@@ -1,9 +1,7 @@
 use crate::debug::error;
 use base16::DecodeError;
-use casper_types::{
-    bytesrepr::{self, FromBytes, ToBytes},
-    Digest as _Digest, DigestError,
-};
+use casper_hashing::{Digest as _Digest, Error as DigestError};
+use casper_types::bytesrepr::{self, FromBytes, ToBytes};
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -54,6 +52,12 @@ impl Digest {
     pub fn from_digest(bytes: Vec<u8>) -> Result<Digest, SdkError> {
         let hex_string = hex::encode(bytes);
         Ok(Digest::from(&hex_string[..]))
+    }
+}
+
+impl AsRef<[u8]> for Digest {
+    fn as_ref(&self) -> &[u8] {
+        self.0.as_ref()
     }
 }
 

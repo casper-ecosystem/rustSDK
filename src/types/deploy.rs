@@ -16,15 +16,11 @@ use crate::{
     },
     make_deploy, make_transfer,
 };
-use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
-use casper_types::{
-    bytesrepr::{self, Bytes as _Bytes},
-    Deploy as _Deploy, DeployApprovalsHash, DeployBuilder, DeployFootprint, ExecutableDeployItem,
-    Phase, RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
-};
-use chrono::{DateTime, Utc};
+use casper_client::types::{TimeDiff, Timestamp, MAX_SERIALIZED_SIZE_OF_DEPLOY};
+use casper_types::{bytesrepr::Bytes as _Bytes, RuntimeArgs, SecretKey, U512};
+
+use casper_client::types::{Deploy as _Deploy, DeployBuilder, ExecutableDeployItem};
 use gloo_utils::format::JsValueSerdeExt;
-use num_traits::cast::FromPrimitive;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -320,44 +316,44 @@ impl Deploy {
         }
     }
 
-    #[wasm_bindgen(js_name = "isValid")]
-    pub fn is_valid(&self) -> bool {
-        let deploy: _Deploy = self.0.clone();
-        match deploy.is_valid() {
-            Ok(()) => true,
-            Err(err) => {
-                error(&format!("Deploy is not valid: {:?}", err));
-                false
-            }
-        }
-    }
+    // #[wasm_bindgen(js_name = "isValid")]
+    // pub fn is_valid(&self) -> bool {
+    //     let deploy: _Deploy = self.0.clone();
+    //     match deploy.is_valid() {
+    //         Ok(()) => true,
+    //         Err(err) => {
+    //             error(&format!("Deploy is not valid: {:?}", err));
+    //             false
+    //         }
+    //     }
+    // }
 
-    #[wasm_bindgen(js_name = "hasValidHash")]
-    pub fn has_valid_hash(&self) -> bool {
-        let deploy: _Deploy = self.0.clone();
-        match deploy.has_valid_hash() {
-            Ok(()) => true,
-            Err(err) => {
-                error(&format!("Deploy has not a valid hash: {:?}", err));
-                false
-            }
-        }
-    }
+    // #[wasm_bindgen(js_name = "hasValidHash")]
+    // pub fn has_valid_hash(&self) -> bool {
+    //     let deploy: _Deploy = self.0.clone();
+    //     match deploy.has_valid_hash() {
+    //         Ok(()) => true,
+    //         Err(err) => {
+    //             error(&format!("Deploy has not a valid hash: {:?}", err));
+    //             false
+    //         }
+    //     }
+    // }
 
-    #[wasm_bindgen(js_name = "isExpired")]
-    pub fn expired(&self) -> bool {
-        let deploy: _Deploy = self.0.clone();
-        let now: DateTime<Utc> = Utc::now();
-        let now_millis = now.timestamp_millis() as u64;
-        let timestamp = Timestamp::from(now_millis);
-        match deploy.expired(timestamp) {
-            false => false,
-            true => {
-                error("Deploy has expired");
-                true
-            }
-        }
-    }
+    // #[wasm_bindgen(js_name = "isExpired")]
+    // pub fn expired(&self) -> bool {
+    //     let deploy: _Deploy = self.0.clone();
+    //     let now: DateTime<Utc> = Utc::now();
+    //     let now_millis = now.timestamp_millis() as u64;
+    //     let timestamp = Timestamp::from(now_millis);
+    //     match deploy.expired(timestamp) {
+    //         false => false,
+    //         true => {
+    //             error("Deploy has expired");
+    //             true
+    //         }
+    //     }
+    // }
 
     #[wasm_bindgen(js_name = "sign")]
     pub fn sign(&mut self, secret_key: &str) -> Deploy {
@@ -374,74 +370,74 @@ impl Deploy {
         deploy.into()
     }
 
-    #[wasm_bindgen(js_name = "footprint")]
-    pub fn footprint_js_alias(&self) -> JsValue {
-        match JsValue::from_serde(&self.footprint()) {
-            Ok(json) => json,
-            Err(err) => {
-                error(&format!("Error serializing footprint to JSON: {:?}", err));
-                JsValue::null()
-            }
-        }
-    }
+    // #[wasm_bindgen(js_name = "footprint")]
+    // pub fn footprint_js_alias(&self) -> JsValue {
+    //     match JsValue::from_serde(&self.footprint()) {
+    //         Ok(json) => json,
+    //         Err(err) => {
+    //             error(&format!("Error serializing footprint to JSON: {:?}", err));
+    //             JsValue::null()
+    //         }
+    //     }
+    // }
 
-    #[wasm_bindgen(js_name = "approvalsHash")]
-    pub fn compute_approvals_hash_js_alias(&self) -> JsValue {
-        match JsValue::from_serde(&self.compute_approvals_hash()) {
-            Ok(json) => json,
-            Err(err) => {
-                error(&format!(
-                    "Error serializing compute_approvals_hash to JSON: {:?}",
-                    err
-                ));
-                JsValue::null()
-            }
-        }
-    }
+    // #[wasm_bindgen(js_name = "approvalsHash")]
+    // pub fn compute_approvals_hash_js_alias(&self) -> JsValue {
+    //     match JsValue::from_serde(&self.compute_approvals_hash()) {
+    //         Ok(json) => json,
+    //         Err(err) => {
+    //             error(&format!(
+    //                 "Error serializing compute_approvals_hash to JSON: {:?}",
+    //                 err
+    //             ));
+    //             JsValue::null()
+    //         }
+    //     }
+    // }
 
-    #[wasm_bindgen(js_name = "isTransfer")]
-    pub fn is_transfer(&self) -> bool {
-        self.0.clone().session().is_transfer()
-    }
+    // #[wasm_bindgen(js_name = "isTransfer")]
+    // pub fn is_transfer(&self) -> bool {
+    //     self.0.clone().session().is_transfer()
+    // }
 
-    #[wasm_bindgen(js_name = "isStandardPayment")]
-    pub fn is_standard_payment(&self, phase: u8) -> bool {
-        if let Some(phase_enum) = Phase::from_u8(phase) {
-            self.0.clone().session().is_standard_payment(phase_enum)
-        } else {
-            false
-        }
-    }
+    // #[wasm_bindgen(js_name = "isStandardPayment")]
+    // pub fn is_standard_payment(&self, phase: u8) -> bool {
+    //     if let Some(phase_enum) = Phase::from_u8(phase) {
+    //         self.0.clone().session().is_standard_payment(phase_enum)
+    //     } else {
+    //         false
+    //     }
+    // }
 
-    #[wasm_bindgen(js_name = "isStoredContract")]
-    pub fn is_stored_contract(&self) -> bool {
-        self.0.clone().session().is_stored_contract()
-    }
+    // #[wasm_bindgen(js_name = "isStoredContract")]
+    // pub fn is_stored_contract(&self) -> bool {
+    //     self.0.clone().session().is_stored_contract()
+    // }
 
-    #[wasm_bindgen(js_name = "isStoredContractPackage")]
-    pub fn is_stored_contract_package(&self) -> bool {
-        self.0.clone().session().is_stored_contract_package()
-    }
+    // #[wasm_bindgen(js_name = "isStoredContractPackage")]
+    // pub fn is_stored_contract_package(&self) -> bool {
+    //     self.0.clone().session().is_stored_contract_package()
+    // }
 
-    #[wasm_bindgen(js_name = "isModuleBytes")]
-    pub fn is_module_bytes(&self) -> bool {
-        self.0.clone().session().is_module_bytes()
-    }
+    // #[wasm_bindgen(js_name = "isModuleBytes")]
+    // pub fn is_module_bytes(&self) -> bool {
+    //     self.0.clone().session().is_module_bytes()
+    // }
 
-    #[wasm_bindgen(js_name = "isByName")]
-    pub fn is_by_name(&self) -> bool {
-        self.0.clone().session().is_by_name()
-    }
+    // #[wasm_bindgen(js_name = "isByName")]
+    // pub fn is_by_name(&self) -> bool {
+    //     self.0.clone().session().is_by_name()
+    // }
 
-    #[wasm_bindgen(js_name = "byName")]
-    pub fn by_name(&self) -> Option<String> {
-        self.0.clone().session().by_name()
-    }
+    // #[wasm_bindgen(js_name = "byName")]
+    // pub fn by_name(&self) -> Option<String> {
+    //     self.0.clone().session().by_name()
+    // }
 
-    #[wasm_bindgen(js_name = "entryPointName")]
-    pub fn entry_point_name(&self) -> String {
-        self.0.clone().session().entry_point_name().to_string()
-    }
+    // #[wasm_bindgen(js_name = "entryPointName")]
+    // pub fn entry_point_name(&self) -> String {
+    //     self.0.clone().session().entry_point_name().to_string()
+    // }
 
     #[wasm_bindgen(js_name = "TTL")]
     pub fn ttl(&self) -> String {
@@ -464,15 +460,15 @@ impl Deploy {
         public_key.to_string()
     }
 
-    #[wasm_bindgen(js_name = "paymentAmount")]
-    pub fn payment_amount(&self, conv_rate: u64) -> String {
-        self.0
-            .clone()
-            .payment()
-            .payment_amount(conv_rate)
-            .unwrap()
-            .to_string()
-    }
+    // #[wasm_bindgen(js_name = "paymentAmount")]
+    // pub fn payment_amount(&self, conv_rate: u64) -> String {
+    //     self.0
+    //         .clone()
+    //         .payment()
+    //         .payment_amount(conv_rate)
+    //         .unwrap()
+    //         .to_string()
+    // }
 
     #[wasm_bindgen(js_name = "args")]
     pub fn args_js_alias(&self) -> JsValue {
@@ -538,21 +534,21 @@ impl Deploy {
         })
     }
 
-    pub fn footprint(&self) -> DeployFootprint {
-        let deploy: _Deploy = self.0.clone();
-        match deploy.footprint() {
-            Ok(footprint) => footprint,
-            Err(err) => {
-                error(&format!("Error getting footprint: {:?}", err));
-                deploy.footprint().unwrap()
-            }
-        }
-    }
+    // pub fn footprint(&self) -> DeployFootprint {
+    //     let deploy: _Deploy = self.0.clone();
+    //     match deploy.footprint() {
+    //         Ok(footprint) => footprint,
+    //         Err(err) => {
+    //             error(&format!("Error getting footprint: {:?}", err));
+    //             deploy.footprint().unwrap()
+    //         }
+    //     }
+    // }
 
-    pub fn compute_approvals_hash(&self) -> Result<DeployApprovalsHash, bytesrepr::Error> {
-        let deploy: _Deploy = self.0.clone();
-        deploy.compute_approvals_hash()
-    }
+    // pub fn compute_approvals_hash(&self) -> Result<DeployApprovalsHash, bytesrepr::Error> {
+    //     let deploy: _Deploy = self.0.clone();
+    //     deploy.compute_approvals_hash()
+    // }
 
     fn build(&self, deploy_params: BuildParams) -> Deploy {
         let BuildParams {
@@ -568,17 +564,17 @@ impl Deploy {
         let chain_name = if let Some(chain_name) = chain_name {
             chain_name
         } else {
-            deploy.chain_name().into()
+            deploy.header().chain_name().into()
         };
         let ttl = if let Some(ttl) = ttl {
             ttl
         } else {
-            deploy.ttl()
+            deploy.header().ttl()
         };
         let timestamp = if let Some(timestamp) = timestamp {
             timestamp
         } else {
-            deploy.timestamp()
+            deploy.header().timestamp()
         };
         let session = if let Some(session) = session {
             session
@@ -593,7 +589,7 @@ impl Deploy {
         let account = if let Some(account) = account {
             account
         } else {
-            deploy.account().clone().into()
+            deploy.header().account().clone().into()
         };
         let mut deploy_builder = DeployBuilder::new(chain_name, session)
             .with_account(account.into())

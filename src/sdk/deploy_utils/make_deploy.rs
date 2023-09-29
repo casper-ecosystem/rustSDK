@@ -14,7 +14,7 @@ use crate::{
     SDK,
 };
 use casper_client::cli::make_deploy as client_make_deploy;
-use casper_types::Deploy as _Deploy;
+use casper_client::types::Deploy as _Deploy;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 

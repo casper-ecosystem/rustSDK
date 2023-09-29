@@ -1,7 +1,7 @@
 use super::digest::Digest;
 use crate::debug::error;
-use casper_types::BlockHash as _BlockHash;
-use casper_types::Digest as _Digest;
+use casper_client::types::BlockHash as _BlockHash;
+use casper_hashing::Digest as _Digest;
 use gloo_utils::format::JsValueSerdeExt;
 use hex::decode;
 use serde::{Deserialize, Serialize};

@@ -1,7 +1,9 @@
 use super::digest::Digest;
 use crate::debug::error;
-use casper_types::DeployHash as _DeployHash;
-use casper_types::Digest as _Digest;
+use casper_hashing::Digest as _Digest;
+use casper_types::{DeployHash as _DeployHash, DEPLOY_HASH_LENGTH};
+// Both Node and client exposes DeployHash
+use casper_client::types::DeployHash as _DeployHashClient;
 use gloo_utils::format::JsValueSerdeExt;
 use hex::decode;
 use serde::{Deserialize, Serialize};
@@ -25,7 +27,10 @@ impl DeployHash {
 
     #[wasm_bindgen(js_name = "fromDigest")]
     pub fn from_digest(digest: Digest) -> Result<DeployHash, JsValue> {
-        Ok(_DeployHash::new(digest.into()).into())
+        let mut hash_bytes = [0u8; DEPLOY_HASH_LENGTH];
+        let digest_bytes: &[u8] = digest.as_ref();
+        hash_bytes.copy_from_slice(&digest_bytes[..DEPLOY_HASH_LENGTH]);
+        Ok(_DeployHash::new(hash_bytes).into())
     }
 
     #[wasm_bindgen(js_name = "toJson")]
@@ -59,6 +64,27 @@ impl From<_DeployHash> for DeployHash {
 
 impl From<Digest> for DeployHash {
     fn from(digest: Digest) -> Self {
-        _DeployHash::new(digest.into()).into()
+        let mut hash_bytes = [0u8; DEPLOY_HASH_LENGTH];
+        let digest_bytes: &[u8] = digest.as_ref();
+        hash_bytes.copy_from_slice(&digest_bytes[..DEPLOY_HASH_LENGTH]);
+        _DeployHash::new(hash_bytes).into()
+    }
+}
+
+// Both Node and Client expose DeployHash but differently
+impl From<DeployHash> for _DeployHashClient {
+    fn from(deploy_hash: DeployHash) -> Self {
+        let mut bytes: [u8; DEPLOY_HASH_LENGTH] = [0; DEPLOY_HASH_LENGTH];
+        bytes.copy_from_slice(deploy_hash.0.as_ref());
+        let digest = Digest::from_digest(bytes.to_vec()).unwrap();
+        _DeployHashClient::new(digest.into())
+    }
+}
+
+impl From<_DeployHashClient> for DeployHash {
+    fn from(deploy_hash: _DeployHashClient) -> Self {
+        let digest = deploy_hash.inner();
+        let deploy_hash = _DeployHash::new(digest.into());
+        DeployHash(deploy_hash)
     }
 }

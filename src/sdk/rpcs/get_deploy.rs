@@ -50,11 +50,11 @@ impl GetDeployResult {
         self.0.deploy.clone().into()
     }
 
-    #[wasm_bindgen(getter)]
-    /// Gets the execution info as a JavaScript value.
-    pub fn execution_info(&self) -> JsValue {
-        JsValue::from_serde(&self.0.execution_info).unwrap()
-    }
+    // #[wasm_bindgen(getter)]
+    // /// Gets the execution info as a JavaScript value.
+    // pub fn execution_info(&self) -> JsValue {
+    //     JsValue::from_serde(&self.0.execution_info).unwrap()
+    // }
 
     #[wasm_bindgen(js_name = "toJson")]
     /// Converts the result to a JSON JavaScript value.

@@ -1,5 +1,7 @@
 use casper_client::{cli::CliError, cli::JsonArgsError, Error};
-use casper_types::{CLValueError, KeyFromStrError, UIntParseError, URefFromStrError};
+use casper_types::{
+    account::FromStrError, CLValueError, KeyFromStrError, UIntParseError, URefFromStrError,
+};
 use humantime::{DurationError, TimestampError};
 use std::num::ParseIntError;
 use thiserror::Error;
@@ -21,7 +23,7 @@ pub enum SdkError {
     #[error("Failed to parse {context} as an account hash: {error}")]
     FailedToParseAccountHash {
         context: &'static str,
-        error: casper_types::addressable_entity::FromStrError,
+        error: FromStrError,
     },
 
     #[error("Failed to parse '{context}' as a uref: {error}")]
@@ -57,7 +59,7 @@ pub enum SdkError {
     #[error("Failed to parse '{context}' as a hash digest: {error:?}")]
     FailedToParseDigest {
         context: String,
-        error: casper_types::DigestError,
+        error: casper_hashing::Error,
     },
 
     #[error("Failed to parse state identifier")]

@@ -1,4 +1,4 @@
-use crate::debug::{error, log};
+use crate::debug::error;
 use crate::types::digest::Digest;
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::{
@@ -339,7 +339,7 @@ impl SDK {
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 &self.get_node_address(node_address),
                 self.get_verbosity(verbosity).into(),
-                maybe_global_state_identifier.into(),
+                Some(maybe_global_state_identifier.into()),
                 key.unwrap().into(),
                 match path {
                     Some(path) if path.is_empty() => Vec::new(),

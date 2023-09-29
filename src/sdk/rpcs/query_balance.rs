@@ -207,6 +207,7 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `SdkError` if there is an error during the retrieval process.
+    #[allow(clippy::too_many_arguments)]
     pub async fn query_balance(
         &self,
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,

@@ -3,11 +3,9 @@ use crate::types::public_key::PublicKey;
 use crate::types::sdk_error::SdkError;
 use crate::types::verbosity::Verbosity;
 use casper_client::cli::JsonArg;
+use casper_client::types::{Deploy, TimeDiff, Timestamp};
 use casper_types::cl_value::cl_value_to_json as cl_value_to_json_from_casper_types;
-use casper_types::{
-    CLValue, DeployBuilder, ErrorExt, PublicKey as CasperTypesPublicKey, SecretKey, TimeDiff,
-    Timestamp,
-};
+use casper_types::{CLValue, ErrorExt, PublicKey as CasperTypesPublicKey, SecretKey};
 use casper_types::{NamedArg, RuntimeArgs};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use gloo_utils::format::JsValueSerdeExt;
@@ -64,7 +62,7 @@ pub fn get_ttl_or_default(ttl: Option<&str>) -> String {
     if let Some(ttl) = ttl {
         ttl.to_string()
     } else {
-        DeployBuilder::DEFAULT_TTL.to_string()
+        Deploy::DEFAULT_TTL.to_string()
     }
 }
 
@@ -110,7 +108,7 @@ pub fn parse_ttl(value: &str) -> Result<TimeDiff, SdkError> {
 ///
 /// The gas price or the default gas price if not provided.
 pub fn get_gas_price_or_default(gas_price: Option<u64>) -> u64 {
-    gas_price.unwrap_or(DeployBuilder::DEFAULT_GAS_PRICE)
+    gas_price.unwrap_or(Deploy::DEFAULT_GAS_PRICE)
 }
 
 /// Gets the value as a string or returns an empty string if not provided.

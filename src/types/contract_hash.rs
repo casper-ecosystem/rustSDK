@@ -1,7 +1,7 @@
 use crate::debug::error;
 use casper_types::{
-    addressable_entity::ContractHash as _ContractHash,
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
+    ContractHash as _ContractHash,
 };
 use wasm_bindgen::prelude::*;
 

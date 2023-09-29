@@ -10,6 +10,7 @@ extern "C" {
 
 /// Logs a message, prefixing it with "log wasm" and sends it to the console in JavaScript when running in a WebAssembly environment.
 /// When running outside WebAssembly, it prints the message to the standard output.
+#[allow(dead_code)]
 pub(crate) fn log(s: &str) {
     let prefixed_s = format!("log wasm {}", s);
     #[cfg(target_arch = "wasm32")]
@@ -28,6 +29,7 @@ extern "C" {
 
 /// Logs an error message, prefixing it with "error wasm" and sends it to the console in JavaScript when running in a WebAssembly environment.
 /// When running outside WebAssembly, it prints the error message to the standard output.
+#[allow(dead_code)]
 pub(crate) fn error(s: &str) {
     let prefixed_s = format!("error wasm {}", s);
     #[cfg(target_arch = "wasm32")]
