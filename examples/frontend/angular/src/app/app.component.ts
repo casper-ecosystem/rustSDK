@@ -638,14 +638,14 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     const signed_deploy = new Deploy(JSON.parse(signed_deploy_as_string));
-    if (!signed_deploy.isValid()) {
-      console.error('Deploy is not valid.');
-      return;
-    }
-    if (signed_deploy.isExpired()) {
-      console.error('Deploy is expired.');
-      return;
-    }
+    // if (!signed_deploy.isValid()) {
+    //   console.error('Deploy is not valid.');
+    //   return;
+    // }
+    // if (signed_deploy.isExpired()) {
+    //   console.error('Deploy is expired.');
+    //   return;
+    // }
     // the deploy hash is correct (should be the hash of the header), and
     // the body hash is correct (should be the hash of the body), and
     // approvals are non empty, and
@@ -664,14 +664,14 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     const signed_deploy = new Deploy(JSON.parse(signed_deploy_as_string));
-    if (!signed_deploy.isValid()) {
-      console.error('Deploy is not valid.');
-      return;
-    }
-    if (signed_deploy.isExpired()) {
-      console.error('Deploy is expired.');
-      return;
-    }
+    // if (!signed_deploy.isValid()) {
+    //   console.error('Deploy is not valid.');
+    //   return;
+    // }
+    // if (signed_deploy.isExpired()) {
+    //   console.error('Deploy is expired.');
+    //   return;
+    // }
     const speculative_exec_options = this.sdk.speculative_exec_options({
       deploy: signed_deploy.toJson()
     });
