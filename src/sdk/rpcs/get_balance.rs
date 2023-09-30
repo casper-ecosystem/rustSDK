@@ -213,13 +213,17 @@ impl SDK {
     ) -> Result<SuccessResponse<_GetBalanceResult>, SdkError> {
         //log("get_balance!");
         let state_root_hash = if state_root_hash.is_empty() {
-            self.get_state_root_hash(None, None, None)
-                .await
-                .unwrap()
-                .result
-                .state_root_hash
-                .unwrap()
-                .into()
+            self.get_state_root_hash(
+                None,
+                None,
+                Some(self.get_node_address(node_address.clone())),
+            )
+            .await
+            .unwrap()
+            .result
+            .state_root_hash
+            .unwrap()
+            .into()
         } else {
             state_root_hash.to_digest()
         };

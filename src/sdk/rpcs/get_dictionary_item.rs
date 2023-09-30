@@ -221,7 +221,11 @@ impl SDK {
                     state_root_hash.to_digest().to_string()
                 } else {
                     let state_root_hash: Digest = self
-                        .get_state_root_hash(None, None, None)
+                        .get_state_root_hash(
+                            None,
+                            None,
+                            Some(self.get_node_address(node_address.clone())),
+                        )
                         .await
                         .unwrap()
                         .result
@@ -242,13 +246,17 @@ impl SDK {
             }
             DictionaryItemInput::Identifier(dictionary_item_identifier) => {
                 let state_root_hash = if state_root_hash.is_empty() {
-                    self.get_state_root_hash(None, None, None)
-                        .await
-                        .unwrap()
-                        .result
-                        .state_root_hash
-                        .unwrap()
-                        .into()
+                    self.get_state_root_hash(
+                        None,
+                        None,
+                        Some(self.get_node_address(node_address.clone())),
+                    )
+                    .await
+                    .unwrap()
+                    .result
+                    .state_root_hash
+                    .unwrap()
+                    .into()
                 } else {
                     state_root_hash.to_digest()
                 };
