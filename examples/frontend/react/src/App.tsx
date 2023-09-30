@@ -2,7 +2,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
 import './App.css';
-
 import init, {
   SDK,
   Verbosity,
@@ -28,14 +27,16 @@ import init, {
   AccountIdentifier
 } from 'casper-sdk';
 
-const host = 'http://localhost:3000';
+const public_key_default = '0171875f35fc884264a08d4b6ac719f3b585bde0c9b085ac1a42130025e5fe9a3d';
+const private_key_default = '-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIO4wiasX4zAGgdlMAMDeSsde6XWlB+FZHDHRhtToJREu\n-----END PRIVATE KEY-----';
+const app_address_default = 'http://localhost:3000';
+const chain_name_default = 'casper-net-1';
 const block_identifier_height_default = BigInt(1);
-const pubKey_default =
-  '0115c9b40c06ff99b0cbadf1140b061b5dbf92103e66a6330fbcc7768f5219c1ce';
-const secret_key = `-----BEGIN PRIVATE KEY-----
-  MC4CAQAwBQYDK2VwBCIEIFQBgrG+PRSS0uehoYE15rjUP1J28UIjGWGvNpcsw+xU
-  -----END PRIVATE KEY-----`;
-const chain_name = 'integration-test';
+
+const public_key = process.env.REACT_APP_PUBLIC_KEY || public_key_default;
+const private_key = process.env.REACT_APP_PRIVATE_KEY?.replace(/\\n/g, '\n') || private_key_default;
+const app_address = process.env.REACT_APP_APP_ADDRESS || app_address_default;
+const chain_name = process.env.REACT_APP_CHAIN_NAME || chain_name_default;
 
 function App() {
   const [wasm, setWasm] = useState(false);
@@ -43,7 +44,8 @@ function App() {
     block_identifier_height_default
   );
   const [hash, setHash] = useState('');
-  const [pubKey] = useState(pubKey_default);
+  const [pubKey, setPubKey] = useState('');
+  const [privateKey, setPrivateKey] = useState('');
   const [block, setBlock] = useState('');
   const [info_get_account_info_hash, setInfo_get_account_info_hash] =
     useState('');
@@ -83,9 +85,14 @@ function App() {
       await fetchWasm();
     };
     // console.log(wasm);
-    const sdk = new SDK(host);
+    const sdk = new SDK(app_address);
     setSdk(sdk);
+
     console.log(sdk);
+    console.log(public_key);
+
+    setPrivateKey(private_key);
+    setPubKey(public_key);
 
     try {
       // get_state_root_hash
@@ -107,7 +114,8 @@ function App() {
       console.log('js chain_get_block', chain_get_block);
 
       // get_account_info
-      const account_identifier = new AccountIdentifier(pubKey);
+      const account_identifier = new AccountIdentifier(public_key);
+      console.log(account_identifier.toJson());
       let state_get_account_info_options = sdk.get_account_options({
         blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height),
         account_identifier: account_identifier.toJson()
@@ -122,81 +130,28 @@ function App() {
         state_get_account_info?.account.main_purse
       );
 
-      // state_get_dictionary_item
-      let stateRootHashDigest = new Digest(chain_get_state_root_hash?.state_root_hash_as_string);
-      console.log(stateRootHashDigest);
-      console.log(stateRootHashDigest.toJson());
-      const dictionary_item_identifier =
-        DictionaryItemIdentifier.newFromSeedUref(
-          'uref-386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530-007', '0'
-        );
-
-      let get_dictionary_item_options = sdk.get_dictionary_item_options({
-        state_root_hash_as_string: chain_get_state_root_hash?.state_root_hash_as_string,
-        //state_root_hash: stateRootHashDigest.toJson(),
-        dictionary_item_identifier: dictionary_item_identifier.toJson(),
-      });
-      console.log(get_dictionary_item_options);
-      const state_get_dictionary_item = (await sdk.state_get_dictionary_item(get_dictionary_item_options)).toJson();
-      setState_get_dictionary_item(
-        state_get_dictionary_item?.stored_value.CLValue.parsed
-      );
-
-
       // get_balance
-      console.log('js state_get_dictionary_item', state_get_dictionary_item);
-      console.log(chain_get_state_root_hash?.state_root_hash);
-      stateRootHashDigest = new Digest(chain_get_state_root_hash?.state_root_hash_as_string);
+      let stateRootHashDigest = new Digest(chain_get_state_root_hash?.state_root_hash_as_string);
       let state_get_balance_options = sdk.get_balance_options({
         state_root_hash: stateRootHashDigest.toJson(),
-        purse_uref: new URef(
-          'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e',
-          AccessRights.READ_ADD_WRITE()
-        ).toJson(),
-        //purse_uref_as_string: 'uref-b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e-007',
+        // purse_uref: new URef(
+        //   'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e',
+        //   AccessRights.READ_ADD_WRITE()
+        // ).toJson(),
+        purse_uref_as_string: state_get_account_info?.account.main_purse,
       });
       const state_get_balance = (await sdk.state_get_balance(state_get_balance_options)).toJson();
       console.log('js state_get_balance', state_get_balance);
       setState_get_balance(state_get_balance?.balance_value);
 
-
-      // query_global_state
-      let path = new Path('');
-      let key = Key.fromURef(
-        new URef(
-          'b57dfc006ca3cff3f3f17852447d3de86ca69c1086405097ceda3b2a492290e8',
-          AccessRights.READ_ADD_WRITE()
-        )
-      );
-      console.log(key);
-      let query_global_state_options = sdk.query_global_state_options({
-        global_state_identifier: GlobalStateIdentifier.fromStateRootHash(
-          new Digest(chain_get_state_root_hash?.state_root_hash_as_string)
-        ).toJson(),
-        key: key.toJson(),
-        //path_as_string: path.toString(),
-        path: path.toJson(),
-      });
-      console.log(query_global_state_options);
-      const query_global_state = (await sdk.query_global_state(query_global_state_options)).toJson();
-      console.log('js query_global_state', query_global_state);
-      setQuery_global_state(
-        query_global_state?.stored_value.CLValue.parsed
-      );
-
-
       // make_transfer
-      let session_account =
-        privateToPublicKey(secret_key);
       const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
       const ttl = '1h';
 
-      console.log("privateToPublicKey result", session_account);
-
       let deploy_params = new DeployStrParams(
         chain_name,
-        session_account,
-        secret_key,
+        public_key,
+        private_key,
         timestamp,
         ttl
       );
@@ -206,7 +161,7 @@ function App() {
       payment_params.payment_amount = '500000000';
       console.log(payment_params);
 
-      // Transfer minimum amount of tokens to recipient
+      // Transfer minimum amount of tokens to recipient;
       const make_transfer = sdk.make_transfer(
         '2500000000',
         '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54',
@@ -217,11 +172,10 @@ function App() {
       setMake_transfer(jsonPrettyPrint(make_transfer));
       console.log(jsonPrettyPrint(make_transfer, Verbosity.Medium));
 
-
       // test deploy type and static builders
       deploy_params = new DeployStrParams(
         chain_name,
-        session_account
+        public_key
       );
       console.log(deploy_params);
 
@@ -246,12 +200,12 @@ function App() {
 
       deploy_params = new DeployStrParams(
         chain_name,
-        session_account
+        public_key
       );
       payment_params = new PaymentStrParams();
       payment_params.payment_amount = '5500000000';
-      test_deploy = test_deploy.sign(secret_key);
-      test_deploy = test_deploy.withTTL('60m', secret_key);
+      test_deploy = test_deploy.sign(private_key);
+      test_deploy = test_deploy.withTTL('60m', private_key);
       test_deploy = test_deploy.withSession(JSON.parse('{ "StoredContractByHash": { "hash": "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477", "entry_point": "decimals", "args": []}}'));
       console.log(test_deploy.toJson());
 
@@ -269,7 +223,7 @@ function App() {
       payment_params.payment_amount = '5500000000';
       deploy_params = new DeployStrParams(
         chain_name,
-        session_account
+        public_key
       );
       session_params = new SessionStrParams();
       session_params.session_hash =
@@ -293,7 +247,7 @@ function App() {
 
       let deploy_signed = (await sdk.sign_deploy(
         deploy_to_sign,
-        secret_key
+        private_key
       )).toJson();
       console.log('js deploy_signed two parties', deploy_signed.approvals);
       console.log(deploy_signed);
@@ -307,20 +261,20 @@ function App() {
       console.assert(deploy_to_sign.toJson().approvals.length === 0);
       deploy_signed = (await sdk.sign_deploy(
         deploy_to_sign,
-        secret_key
+        private_key
       )).toJson();
       console.log('js deploy + addArg > sign_deploy', deploy_signed.approvals);
       console.assert(deploy_signed.approvals.length === 1); // Deploy should have one approval
 
       deploy_to_sign = new Deploy(make_deploy);
-      console.log('make_deploy footprint', deploy_to_sign.footprint());
+      //  console.log('make_deploy footprint', deploy_to_sign.footprint());
       console.assert(deploy_to_sign.toJson().approvals.length === 0); // Deploy has no approval
-      console.log('make_deploy ApprovalsHash before', deploy_to_sign.approvalsHash());
-      deploy_signed = deploy_to_sign.addArg("test:bool='true'", secret_key); // Deploy was modified has one approval
+      // console.log('make_deploy ApprovalsHash before', deploy_to_sign.approvalsHash());
+      deploy_signed = deploy_to_sign.addArg("test:bool='true'", private_key); // Deploy was modified has one approval
       console.log('make_deploy signed', deploy_signed.toJson());
-      console.log('js deploy + addArg + secret_key ', deploy_signed.toJson().approvals);
+      console.log('js deploy + addArg + private_key ', deploy_signed.toJson().approvals);
       console.assert(deploy_signed.toJson().approvals.length === 1); // Deploy should have one approval
-      console.log('make_deploy ApprovalsHash after', deploy_signed.approvalsHash());
+      //  console.log('make_deploy ApprovalsHash after', deploy_signed.approvalsHash());
 
 
       // put_deploy
@@ -351,11 +305,10 @@ function App() {
       setInfo_get_deploy(info_get_deploy?.api_version);
 
       // call entry point
-      session_account = privateToPublicKey(secret_key);
       deploy_params = new DeployStrParams(
         chain_name,
-        session_account,
-        secret_key
+        public_key,
+        private_key
       );
       console.log(deploy_params);
       session_params = new SessionStrParams();
@@ -373,6 +326,51 @@ function App() {
       )).toJson();
       console.log(test_call_entrypoint.deploy_hash);
 
+      // state_get_dictionary_item
+      stateRootHashDigest = new Digest(chain_get_state_root_hash?.state_root_hash_as_string);
+      console.log(stateRootHashDigest);
+      console.log(stateRootHashDigest.toJson());
+      const dictionary_item_identifier =
+        DictionaryItemIdentifier.newFromSeedUref(
+          'uref-386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530-007', '0'
+        );
+
+      let get_dictionary_item_options = sdk.get_dictionary_item_options({
+        state_root_hash_as_string: chain_get_state_root_hash?.state_root_hash_as_string,
+        //state_root_hash: stateRootHashDigest.toJson(),
+        dictionary_item_identifier: dictionary_item_identifier.toJson(),
+      });
+      console.log(get_dictionary_item_options);
+      const state_get_dictionary_item = (await sdk.state_get_dictionary_item(get_dictionary_item_options)).toJson();
+      setState_get_dictionary_item(
+        state_get_dictionary_item?.stored_value.CLValue.parsed
+      );
+      console.log('js state_get_dictionary_item', state_get_dictionary_item);
+
+      // query_global_state
+      let path = new Path('');
+      let key = Key.fromURef(
+        new URef(
+          'b57dfc006ca3cff3f3f17852447d3de86ca69c1086405097ceda3b2a492290e8',
+          AccessRights.READ_ADD_WRITE()
+        )
+      );
+      console.log(key);
+      let query_global_state_options = sdk.query_global_state_options({
+        global_state_identifier: GlobalStateIdentifier.fromStateRootHash(
+          new Digest(chain_get_state_root_hash?.state_root_hash_as_string)
+        ).toJson(),
+        key: key.toJson(),
+        //path_as_string: path.toString(),
+        path: path.toJson(),
+      });
+      console.log(query_global_state_options);
+      const query_global_state = (await sdk.query_global_state(query_global_state_options)).toJson();
+      console.log('js query_global_state', query_global_state);
+      setQuery_global_state(
+        query_global_state?.stored_value.CLValue.parsed
+      );
+
     } catch (error) {
       console.error(error);
     }
@@ -381,16 +379,16 @@ function App() {
   // install
   const onFileSelected = async (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    if (!selectedFile || !(sdk instanceof SDK)) {
+    if (!selectedFile || !(sdk instanceof SDK) || !privateKey) {
       return;
     }
     const sdkInstance = sdk as SDK;
     selectedFile && setSessionPath(selectedFile.name);
-    const session_account = privateToPublicKey(secret_key);
+    const session_account = privateToPublicKey(privateKey);
     let deploy_params = new DeployStrParams(
       chain_name,
       session_account,
-      secret_key
+      privateKey
     );
     console.log(deploy_params);
     let session_params = new SessionStrParams();
@@ -539,4 +537,17 @@ function App() {
   );
 }
 
+// function readPEMFile(key_path?: string): string {
+//   let pemFilePath = key_path ? path.resolve(__dirname, key_path) : null;
+//   if (!pemFilePath || !fs.existsSync(pemFilePath)) {
+//     pemFilePath = path.resolve(__dirname, key_name_default);
+//   }
+//   try {
+//     const data = fs.readFileSync(pemFilePath, 'utf8');
+//     return data;
+//   } catch (error) {
+//     console.error('Error:', error);
+//     return "";
+//   }
+// }
 export default App;
