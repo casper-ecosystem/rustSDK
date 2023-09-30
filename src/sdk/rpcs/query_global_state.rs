@@ -375,7 +375,11 @@ impl SDK {
             .map_err(SdkError::from)
         } else {
             let state_root_hash: Digest = self
-                .get_state_root_hash(None, None, None)
+                .get_state_root_hash(
+                    None,
+                    None,
+                    Some(self.get_node_address(node_address.clone())),
+                )
                 .await
                 .unwrap()
                 .result
