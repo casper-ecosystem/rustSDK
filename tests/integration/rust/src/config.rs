@@ -84,24 +84,32 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
     if *block_hash_initialized_guard {
         return Err("initialize_test_config called after block_hash already initialized".into());
     }
-    let (block_hash, block_height) = get_block().await;
-    *block_hash_initialized_guard = true;
+
     let private_key = read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}"))?;
     let private_key_target_account = read_pem_file(&format!(
         "{}{}",
         PRIVATE_KEY_NCTL_PATH.replace("user-1", "user-2"),
         PRIVATE_KEY_NAME
     ))?;
+
     let account = public_key_from_private_key(&private_key).unwrap();
+
     let target_account = public_key_from_private_key(&private_key_target_account).unwrap();
+
     let public_key = PublicKey::new(&account).unwrap();
+
     let account_hash = public_key.to_account_hash().to_formatted_string();
+
     let purse_uref = get_main_purse(&account).await;
+
     let deploy_hash = install_cep78_if_needed(&account, &private_key)
         .await
         .unwrap();
+
     let (contract_cep78_hash, contract_cep78_package_hash) =
         get_contract_cep78_hash_keys(&account_hash).await;
+
+    // install has been running for over 60 seconds
     mint_nft(&contract_cep78_hash, &account, &account_hash, &private_key).await;
 
     let dictionary_key = get_dictionnary_key(
@@ -111,7 +119,12 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
         None,
     )
     .await;
+
     let dictionary_uref = get_dictionnary_uref(&contract_cep78_hash, DICTIONARY_NAME).await;
+
+    let (block_hash, block_height) = get_block().await;
+    *block_hash_initialized_guard = true;
+
     let config = TestConfig {
         node_address: Some(DEFAULT_NODE_ADDRESS.to_string()),
         verbosity: Some(Verbosity::High),
