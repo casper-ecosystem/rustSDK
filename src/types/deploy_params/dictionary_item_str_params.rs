@@ -143,7 +143,6 @@ impl DictionaryItemStrParams {
             seed_uref: OnceCell::new(),
             dictionary_item_key: OnceCell::new(),
         });
-
         if let Some(uref) = &mut self.uref {
             let seed_uref = URef::from_formatted_str(seed_uref)
                 .map_err(|error| SdkError::FailedToParseURef {
@@ -151,7 +150,7 @@ impl DictionaryItemStrParams {
                     error,
                 })
                 .unwrap();
-            uref.seed_uref.set(seed_uref.to_string()).unwrap();
+            uref.seed_uref.set(seed_uref.to_formatted_string()).unwrap();
             let _ = uref
                 .dictionary_item_key
                 .set(dictionary_item_key.to_string());
