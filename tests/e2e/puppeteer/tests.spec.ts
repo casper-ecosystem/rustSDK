@@ -1,6 +1,6 @@
 import * as config from './config';
 const path = require('path');
-import { setupFixtures, variables as test, deleteFile, getResult, clear, clearInput, setPrivateKey, seletAction, setWasm, submit, get_state_root_hash, sign, screenshot } from './helpers';
+import { setupFixtures, variables as test, deleteFile, getResult, clear, clearInput, setPrivateKey, seletAction, setWasm, submit, get_state_root_hash, sign, screenshot, delay } from './helpers';
 const puppeteer = require('puppeteer');
 
 describe('Angular App Tests', () => {
@@ -60,7 +60,7 @@ describe('Angular App Tests', () => {
     });
 
     it('should clear result', async () => {
-      await test.page.waitForSelector('[e2e-id="clear"]');
+      await test.page.waitForSelector('[e2e-id="clear result"]');
       let result = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
@@ -110,14 +110,12 @@ describe('Angular App Tests', () => {
   describe('Contract install', () => {
     beforeEach(async () => {
       await test.page.reload();
-      await setPrivateKey();
+      await getResult();
       await seletAction('install');
+      await setPrivateKey();
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
       await test.page.waitForSelector('[e2e-id="argsJsonElt"]');
-    });
-    afterEach(async () => {
-      await clear();
     });
 
     it('should install hello contract', async () => {
@@ -168,6 +166,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_account', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await seletAction('get_account');
     });
     afterEach(async () => {
@@ -216,6 +215,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_auction_info', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await seletAction('get_auction_info');
     });
     afterEach(async () => {
@@ -231,6 +231,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_balance', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
@@ -246,6 +247,7 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_balance with state root hash', async () => {
+      await test.page.type('[e2e-id="stateRootHashElt"]', test.state_root_hash_default);
       let main_purse = await test.page.evaluate(() => {
         return (document.querySelector('[e2e-id="purseUrefElt"]') as HTMLInputElement).value;
       });
@@ -255,12 +257,7 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_balance without state root hash', async () => {
-      await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await clearInput('[e2e-id="stateRootHashElt"]');
-      let main_purse = await test.page.evaluate(() => {
-        return (document.querySelector('[e2e-id="purseUrefElt"]') as HTMLInputElement).value;
-      });
-      expect(main_purse).toBeDefined();
       await submit();
       await getResult();
     });
@@ -269,6 +266,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_block', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await seletAction('get_block');
     });
     afterEach(async () => {
@@ -300,6 +298,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_block_transfers', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await seletAction('get_block_transfers');
     });
     afterEach(async () => {
@@ -331,16 +330,13 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_chainspec', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await seletAction('get_chainspec');
     });
     afterEach(async () => {
       await clear();
     });
     it('should get_chainspec', async () => {
-      let result_text = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(result_text).toBeUndefined();
       await submit();
       await getResult();
     });
@@ -349,23 +345,20 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_era_info', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await seletAction('get_era_info');
     });
+
     afterEach(async () => {
       await clear();
     });
 
     it('should get_era_info', async () => {
-      let result_text = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(result_text).toBeUndefined();
       await submit();
       await getResult();
     });
 
     it('should get_era_info with block height', async () => {
-      await seletAction('get_era_info');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
       await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
@@ -374,7 +367,8 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_era_info with block hash', async () => {
-      await seletAction('get_era_info');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
       await clearInput('[e2e-id="blockIdentifierHashElt"]');
       await test.page.type('[e2e-id="blockIdentifierHashElt"]', test.block_hash);
@@ -385,19 +379,21 @@ describe('Angular App Tests', () => {
 
   describe('Rpc call get_era_summary', () => {
     beforeAll(async () => {
+      await test.page.reload();
+      await getResult();
       await seletAction('get_era_summary');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
     });
     afterEach(async () => {
       await clear();
     });
     it('should get_era_summary', async () => {
-      await seletAction('get_era_summary');
       await submit();
       await getResult();
     });
 
     it('should get_era_summary with block height', async () => {
-      await seletAction('get_era_summary');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
       await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
@@ -406,7 +402,8 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_era_summary with block hash', async () => {
-      await seletAction('get_era_summary');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
       await clearInput('[e2e-id="blockIdentifierHashElt"]');
       await test.page.type('[e2e-id="blockIdentifierHashElt"]', test.block_hash);
@@ -418,6 +415,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_node_status', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await seletAction('get_node_status');
     });
     afterEach(async () => {
@@ -432,6 +430,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_peers', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await seletAction('get_peers');
     });
     afterEach(async () => {
@@ -439,22 +438,15 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_peers', async () => {
-      let peers = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="peers"]')?.textContent;
-      });
-      expect(peers).toBeUndefined();
       await submit();
-      await test.page.waitForSelector('[e2e-id="peers"]');
-      peers = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="peers"]')?.textContent;
-      });
-      expect(peers).toBeDefined();
+      await getResult();
     });
   });
 
   describe('Rpc call get_state_root_hash', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await seletAction('get_state_root_hash');
     });
     afterEach(async () => {
@@ -469,6 +461,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_validator_changes', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await seletAction('get_validator_changes');
     });
     afterEach(async () => {
@@ -483,6 +476,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call list_rpcs', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await seletAction('list_rpcs');
     });
     afterEach(async () => {
@@ -497,6 +491,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call query_balance', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
@@ -557,6 +552,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call query_global_state', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
@@ -635,11 +631,9 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       let result_json = JSON.parse(result);
-      expect(result_json?.Account.named_keys).toBeDefined();
-      let named_keys = result_json?.Account.named_keys as Array<{ name: string; key: string; }>;
-
+      expect(result_json?.stored_value.Account.named_keys).toBeDefined();
+      let named_keys = result_json?.stored_value.Account.named_keys as Array<{ name: string; key: string; }>;
       test.contract_cep78_hash = named_keys.find(key => key.name === config.contract_cep78_key)?.key || '';
-
       expect(test.contract_cep78_hash).toBeDefined();
       expect(test.contract_cep78_hash).toBeTruthy();
       await test.page.type('[e2e-id="queryPathElt"]', config.contract_cep78_key + '/collection_name');
@@ -650,12 +644,14 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       result_json = JSON.parse(result);
-      expect(result_json?.CLValue.parsed).toEqual(config.collection_name);
+      expect(result_json?.stored_value.CLValue.parsed).toEqual(config.collection_name);
     });
   });
 
   describe('Rpc call get_deploy', () => {
     beforeAll(async () => {
+      await test.page.reload();
+      await getResult();
       await seletAction('get_deploy');
     });
 
@@ -666,6 +662,7 @@ describe('Angular App Tests', () => {
     it('should get_deploy', async () => {
       await test.page.waitForSelector('[e2e-id="deployHashElt"]');
       await clearInput('[e2e-id="deployHashElt"]');
+      console.log(test.deploy_hash);
       await test.page.type('[e2e-id="deployHashElt"]', test.deploy_hash);
       await submit();
       await getResult();
@@ -676,6 +673,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await get_state_root_hash(); // refresh state root hash before querying contract keys
       await test.page.reload();
+      await getResult();
       await seletAction('query_contract_key');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="queryKeyElt"]');
@@ -705,11 +703,9 @@ describe('Angular App Tests', () => {
   });
 
   describe('Contract call entry point', () => {
-    beforeAll(async () => {
-      await test.page.reload();
-    });
     beforeEach(async () => {
       await test.page.reload();
+      await getResult();
       await setPrivateKey();
       await seletAction('call_entrypoint');
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
@@ -819,6 +815,7 @@ describe('Angular App Tests', () => {
   describe('Deploy util make_deploy', () => {
     beforeEach(async () => {
       await test.page.reload();
+      await getResult();
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
@@ -830,6 +827,7 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
       await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
       await test.page.waitForSelector('[e2e-id="argsJsonElt"]');
+      await test.page.waitForSelector('[e2e-id="TTLElt"]');
     });
     afterEach(async () => {
       await clear();
@@ -838,13 +836,9 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
       await test.page.type('[e2e-id="sessionHashElt"]', test.contract_cep78_hash);
       await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
-      let make_deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_deploy).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      make_deploy = await test.page.evaluate(() => {
+      let make_deploy = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_deploy).toBeDefined();
@@ -855,13 +849,9 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="sessionNameElt"]');
       await test.page.type('[e2e-id="sessionNameElt"]', "enhanced-nft-1");
       await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
-      let make_deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_deploy).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      make_deploy = await test.page.evaluate(() => {
+      let make_deploy = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_deploy).toBeDefined();
@@ -872,13 +862,9 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="sessionHashElt"]', test.contract_cep78_hash);
       await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
       await test.page.type('[e2e-id="argsSimpleElt"]', config.args_simple);
-      let make_deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_deploy).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      make_deploy = await test.page.evaluate(() => {
+      let make_deploy = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_deploy).toBeDefined();
@@ -889,13 +875,9 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="sessionHashElt"]', test.contract_cep78_hash);
       await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
       await test.page.type('[e2e-id="argsJsonElt"]', config.args_json);
-      let make_deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_deploy).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      make_deploy = await test.page.evaluate(() => {
+      let make_deploy = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_deploy).toBeDefined();
@@ -910,13 +892,9 @@ describe('Angular App Tests', () => {
       await test.page.click('[e2e-id="callPackageElt"]');
       await test.page.waitForSelector('[e2e-id="versionElt"]');
       await test.page.type('[e2e-id="versionElt"]', "1");
-      let make_deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_deploy).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      make_deploy = await test.page.evaluate(() => {
+      let make_deploy = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_deploy).toBeDefined();
@@ -927,13 +905,9 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
       await test.page.type('[e2e-id="sessionHashElt"]', test.contract_cep78_hash);
       await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
-      let make_deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_deploy).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      make_deploy = await test.page.evaluate(() => {
+      let make_deploy = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_deploy).toBeDefined();
@@ -943,13 +917,9 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
       await test.page.type('[e2e-id="argsSimpleElt"]', config.args_simple);
       await setWasm(config.contract_hello);
-      let make_deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_deploy).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      make_deploy = await test.page.evaluate(() => {
+      let make_deploy = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_deploy).toBeDefined();
@@ -959,6 +929,7 @@ describe('Angular App Tests', () => {
   describe('Deploy util make_transfer', () => {
     beforeEach(async () => {
       await test.page.reload();
+      await getResult();
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
@@ -975,13 +946,9 @@ describe('Angular App Tests', () => {
     it('should make_transfer', async () => {
       await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
       await test.page.type('[e2e-id="targetAccountElt"]', test.target);
-      let make_transfer = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_transfer).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      make_transfer = await test.page.evaluate(() => {
+      let make_transfer = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_transfer).toBeDefined();
@@ -991,13 +958,9 @@ describe('Angular App Tests', () => {
       await clearInput('[e2e-id="TTLElt"]');
       await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
       await test.page.type('[e2e-id="targetAccountElt"]', test.target);
-      let make_transfer = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_transfer).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      make_transfer = await test.page.evaluate(() => {
+      let make_transfer = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_transfer).toBeDefined();
@@ -1007,7 +970,7 @@ describe('Angular App Tests', () => {
   describe('Deploy util sign_deploy', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await clear();
+      await getResult();
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
@@ -1021,23 +984,20 @@ describe('Angular App Tests', () => {
     it('should sign_deploy', async () => {
       await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
       await test.page.type('[e2e-id="targetAccountElt"]', test.target);
-      let make_transfer = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_transfer).toBeUndefined();
       await submit();
-      await test.page.waitForSelector('[e2e-id="result"]');
-      make_transfer = await test.page.evaluate(() => {
+      await getResult();
+      let make_transfer = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_transfer).toBeDefined();
       await seletAction('sign_deploy');
       const unsigned_deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="deployJsonElt"]')?.textContent;
+        return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(unsigned_deploy).toContain(`"approvals": []`);
       await setPrivateKey();
       await sign();
+      await delay(300);
       const signed_deploy = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="deployJsonElt"]')?.textContent;
       });
@@ -1048,7 +1008,7 @@ describe('Angular App Tests', () => {
   describe('Deploy util put_deploy', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await clear();
+      await getResult();
       await setPrivateKey();
       await seletAction('make_transfer');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
@@ -1058,19 +1018,15 @@ describe('Angular App Tests', () => {
     it('should put_deploy a transfer', async () => {
       await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
       await test.page.type('[e2e-id="targetAccountElt"]', test.target);
-      let make_transfer = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_transfer).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      make_transfer = await test.page.evaluate(() => {
+      let make_transfer = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_transfer).toBeDefined();
       await seletAction('put_deploy');
       const signed_deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="deployJsonElt"]')?.textContent;
+        return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(signed_deploy).not.toContain(`"approvals": []`);
       await submit();
@@ -1081,7 +1037,7 @@ describe('Angular App Tests', () => {
   describe('Deploy deploy', () => {
     beforeEach(async () => {
       await test.page.reload();
-      await clear();
+      await getResult();
       await setPrivateKey();
       await seletAction('deploy');
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
@@ -1219,6 +1175,7 @@ describe('Angular App Tests', () => {
   describe('Deploy transfer', () => {
     beforeEach(async () => {
       await test.page.reload();
+      await getResult();
       await setPrivateKey();
       await seletAction('transfer');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
@@ -1231,13 +1188,9 @@ describe('Angular App Tests', () => {
     it('should transfer', async () => {
       await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
       await test.page.type('[e2e-id="targetAccountElt"]', test.target);
-      let transfer = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(transfer).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      transfer = await test.page.evaluate(() => {
+      let transfer = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(transfer).toBeDefined();
@@ -1247,13 +1200,9 @@ describe('Angular App Tests', () => {
       await clearInput('[e2e-id="TTLElt"]');
       await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
       await test.page.type('[e2e-id="targetAccountElt"]', test.target);
-      let transfer = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(transfer).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      transfer = await test.page.evaluate(() => {
+      let transfer = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(transfer).toBeDefined();
@@ -1263,6 +1212,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_dictionary_item', () => {
     beforeAll(async () => {
       await test.page.reload();
+      await getResult();
       await get_state_root_hash(); // refresh state root hash before querying contract dict
       await seletAction('get_dictionary_item');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
@@ -1298,6 +1248,7 @@ describe('Angular App Tests', () => {
       expect(result).toBeDefined();
       const result_json = JSON.parse(result);
       expect(result_json.dictionary_key).toBeDefined();
+      test.dictionary_key = result_json.dictionary_key;
       test.dictionary_key = result_json.dictionary_key;
     });
 

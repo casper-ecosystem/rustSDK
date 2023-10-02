@@ -27,8 +27,10 @@ export const variables = {
 };
 
 export async function clear() {
-  await variables.page.waitForSelector('[e2e-id="clear"]');
-  await variables.page.click('[e2e-id="clear"]');
+  await variables.page.waitForSelector('[e2e-id="clear result"]');
+  await variables.page.click('[e2e-id="clear result"]');
+  await variables.page.waitForFunction(() => !document.querySelector('[e2e-id="clear result"]'));
+  await delay(100);
   let result = await variables.page.evaluate(() => {
     return document.querySelector('[e2e-id="result"]')?.textContent;
   });
@@ -40,15 +42,7 @@ export async function clearInput(id: string) {
   await variables.page.$eval(id, (input: { value: string; }) => {
     input.value = '';
   });
-}
-
-export async function getResult() {
-  await variables.page.waitForSelector('[e2e-id="result"]');
-  const result = await variables.page.evaluate(() => {
-    return document.querySelector('[e2e-id="result"]')?.textContent;
-  });
-  expect(result).toBeDefined();
-  return result;
+  await variables.page.$eval(id, (e: { blur: () => any; }) => e.blur());
 }
 
 export async function submit() {
@@ -59,6 +53,15 @@ export async function submit() {
 export async function sign() {
   await variables.page.waitForSelector('[e2e-id="sign"]');
   await variables.page.click('[e2e-id="sign"]');
+}
+
+export async function getResult() {
+  await variables.page.waitForSelector('[e2e-id="result"]');
+  const result = await variables.page.evaluate(() => {
+    return document.querySelector('[e2e-id="result"]')?.textContent;
+  });
+  expect(result).toBeDefined();
+  return result;
 }
 
 export async function seletAction(action: string) {
