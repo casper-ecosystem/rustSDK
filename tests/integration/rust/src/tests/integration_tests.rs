@@ -5,7 +5,6 @@ pub mod test_module {
         tests::helpers::create_test_sdk,
     };
     use casper_rust_wasm_sdk::{
-        debug::{error, log},
         helpers::{
             get_current_timestamp, get_gas_price_or_default, get_ttl_or_default, hex_to_string,
             hex_to_uint8_vec, json_pretty_print, motes_to_cspr, parse_timestamp, parse_ttl,
@@ -27,14 +26,6 @@ pub mod test_module {
         assert_eq!(sdk.get_node_address(None), "test".to_string());
         let _ = sdk.set_verbosity(Some(Verbosity::Medium));
         assert_eq!(sdk.get_verbosity(None), Verbosity::Medium);
-    }
-
-    pub fn test_error() {
-        error("bound error to std");
-    }
-
-    pub fn test_log() {
-        log("bound log to std");
     }
 
     pub async fn test_hex_to_uint8_vec() {
@@ -155,14 +146,6 @@ pub mod test_module {
 mod tests {
     use super::test_module::*;
 
-    #[test]
-    pub fn test_log_test() {
-        test_log();
-    }
-    #[test]
-    pub fn test_error_test() {
-        test_error();
-    }
     #[test]
     pub fn test_hex_to_string_test() {
         test_hex_to_string();

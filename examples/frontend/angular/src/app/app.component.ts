@@ -322,6 +322,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async submitAction(action: string) {
+    await this.cleanResult();
     const exec = true;
     await this.handleAction(action, exec);
     this.changeDetectorRef.markForCheck();
@@ -875,13 +876,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.file_name = '';
   }
 
-  cleanResult() {
+  async cleanResult() {
     this.error = '';
-    this.resultService.setResult('');
+    await this.resultService.setResult('');
   }
 
   async selectAction($event: Event) {
-    this.cleanResult();
+    await this.cleanResult();
     const action = ($event.target as HTMLInputElement).value;
     await this.handleAction(action);
     this.changeDetectorRef.detectChanges();

@@ -81,7 +81,7 @@ pub async fn get_block() -> (String, String) {
 }
 
 pub async fn get_main_purse(account_identifier_as_string: &str) -> String {
-    let purse_uref: URef = create_test_sdk(None)
+    let purse_uref = *(create_test_sdk(None)
         .get_account(
             None,
             Some(account_identifier_as_string.to_owned()),
@@ -93,8 +93,8 @@ pub async fn get_main_purse(account_identifier_as_string: &str) -> String {
         .unwrap()
         .result
         .account
-        .main_purse()
-        .into();
+        .main_purse());
+    let purse_uref: URef = purse_uref.into();
     purse_uref.to_formatted_string()
 }
 
@@ -177,7 +177,6 @@ pub async fn mint_nft(
     let deploy_hash = DeployHash::from(test_call_entrypoint.as_ref().unwrap().result.deploy_hash);
     let deploy_hash_as_string = deploy_hash.to_string();
     assert!(!deploy_hash_as_string.is_empty());
-    // dbg!(deploy_hash_as_string);
 
     thread::sleep(DEPLOY_TIME); // Let's wait for deployment on nctl
 }
@@ -219,31 +218,32 @@ pub async fn get_dictionnary_key(
     dictionary_key.to_string()
 }
 
-// TODO Remove hard coded uref
-pub async fn get_dictionnary_uref(_contract_hash: &str, _dictionary_name: &str) -> String {
-    "uref-386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530-007".to_string()
-    // let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-    //     key: KeyIdentifierInput::String(contract_hash.to_string()),
-    //     path: None,
-    //     maybe_global_state_identifier: None,
-    //     state_root_hash: None,
-    //     maybe_block_id: None,
-    //     node_address: None,
-    //     verbosity: None,
-    // };
-    // let query_global_state = create_test_sdk(Some(config)).query_global_state(query_params).await;
-    // let query_global_state_result = query_global_state.unwrap();
-    // let account = query_global_state_result
-    //     .result
-    //     .stored_value
-    //     .as_account()
-    //     .unwrap();
-    // let named_keys = account.named_keys();
-    // let (_, dictionnary_uref) = named_keys
-    //     .iter()
-    //     .find(|(key, _)| key == &dictionary_name)
-    //     .unwrap();
-    // dictionnary_uref.to_string()
+pub async fn get_dictionnary_uref(contract_hash: &str, dictionary_name: &str) -> String {
+    let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
+        key: KeyIdentifierInput::String(contract_hash.to_string()),
+        path: None,
+        maybe_global_state_identifier: None,
+        state_root_hash: None,
+        maybe_block_id: None,
+        node_address: Some(DEFAULT_NODE_ADDRESS.to_string()),
+        verbosity: None,
+    };
+    let query_global_state = create_test_sdk(None).query_global_state(query_params).await;
+    let query_global_state_result = query_global_state.unwrap();
+
+    // Parse the JSON string in 1.6
+    let json_string = to_string(&query_global_state_result.result.stored_value).unwrap();
+    let parsed_json: Value = serde_json::from_str(&json_string).unwrap();
+    let named_keys = &parsed_json["Contract"]["named_keys"];
+    let dictionnary_uref = named_keys
+        .as_array()
+        .unwrap_or_else(|| panic!("named_keys is not an array"))
+        .iter()
+        .find(|obj| obj["name"] == Value::String(dictionary_name.to_string()))
+        .and_then(|obj| obj["key"].as_str())
+        .unwrap_or_else(|| panic!("Dictionary name not found in named_keys"))
+        .to_string();
+    dictionnary_uref.to_string()
 }
 
 lazy_static! {
@@ -301,7 +301,7 @@ pub async fn install_cep78(
     let deploy_hash_as_string = deploy_hash.to_string();
     assert!(!deploy_hash_as_string.is_empty());
 
-    // thread::sleep(DEPLOY_TIME); // Let's wait for deployment on nctl
+    thread::sleep(DEPLOY_TIME); // Let's wait for deployment on nctl
 
     //dbg!(deploy_hash_as_string.clone());
     // let get_deploy = sdk
