@@ -493,8 +493,6 @@ impl Deploy {
         js_value_arg: JsValue,
         secret_key: Option<String>,
     ) -> Deploy {
-        use crate::helpers::insert_js_value_arg;
-
         let deploy = self.0.clone();
         let session = deploy.session();
 
