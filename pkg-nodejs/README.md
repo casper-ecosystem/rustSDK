@@ -503,7 +503,7 @@ You can download an alpha version of the app illustrating the sdk here :
 Tests are run against NCTL by default or the network configured in corresponding configurations. Tests assume a `secret_key.pem` is either at root of tests of in
 `./NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/` from the root (so levels higher than the test). This path can be changed in configuration.
 
-- [Rust Integration tests](tests/integration/rust/) can be run with `cargo test` [configured in config](tests/integration/rust/src/config.rs)
+- [Rust Integration tests](tests/integration/rust/) can be run with `cargo test -- --test-threads=1 --nocapture` [configured in config](tests/integration/rust/src/config.rs)
 
 - [Jest/Puppeteer E2E tests](tests/e2e/) can be run with `npm test` [configured with .env](tests/e2e/.env) or [puppeteer config](tests/e2e/puppeteer/config.ts)
 
