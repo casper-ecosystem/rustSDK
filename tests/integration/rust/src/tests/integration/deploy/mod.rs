@@ -187,16 +187,17 @@ mod tests {
         thread::sleep(WAIT_TIME);
     }
 
-    #[test]
-    pub async fn test_speculative_deploy_test() {
-        thread::sleep(WAIT_TIME);
-        test_speculative_deploy().await;
-        thread::sleep(WAIT_TIME);
-    }
-    #[test]
-    pub async fn test_speculative_transfer_test() {
-        thread::sleep(WAIT_TIME);
-        test_speculative_transfer().await;
-        thread::sleep(WAIT_TIME);
-    }
+    // speculative_exec' is not a supported json-rpc method on 1.6
+    // #[test]
+    // pub async fn test_speculative_deploy_test() {
+    //     thread::sleep(WAIT_TIME);
+    //     test_speculative_deploy().await;
+    //     thread::sleep(WAIT_TIME);
+    // }
+    // #[test]
+    // pub async fn test_speculative_transfer_test() {
+    //     thread::sleep(WAIT_TIME);
+    //     test_speculative_transfer().await;
+    //     thread::sleep(WAIT_TIME);
+    // }
 }

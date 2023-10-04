@@ -3,8 +3,8 @@ pub mod test_module_deploy {
     use crate::{
         config::{
             get_config, TestConfig, ARGS_JSON, CONTRACT_CEP78_KEY, DEFAULT_TTL, ENTRYPOINT_MINT,
-            HELLO_CONTRACT, PAYMENT_AMOUNT, PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT, TTL,
-            WAIT_TIME,
+            HELLO_CONTRACT, PAYMENT_AMOUNT, PAYMENT_TRANSFER_AMOUNT, TIMESTAMP_WAIT_TIME,
+            TRANSFER_AMOUNT, TTL, WAIT_TIME,
         },
         tests::helpers::read_wasm_file,
     };
@@ -120,7 +120,7 @@ pub mod test_module_deploy {
         assert!(!deploy.timestamp().is_empty());
         let deploy_timestamp = &deploy.timestamp()[..19];
         // Do not remove this intentional sleep
-        thread::sleep(WAIT_TIME);
+        thread::sleep(TIMESTAMP_WAIT_TIME);
 
         let current_timestamp = &get_current_timestamp(None)[..19];
         assert_ne!(deploy_timestamp, current_timestamp);

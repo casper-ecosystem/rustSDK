@@ -56,6 +56,7 @@ pub mod test_module {
             .deploy_hash
             .to_string()
             .is_empty());
+        thread::sleep(WAIT_TIME);
     }
 
     pub async fn test_query_contract_dict() {
@@ -138,13 +139,12 @@ pub mod test_module {
         let query_contract_dict = create_test_sdk(Some(config))
             .query_contract_dict(state_root_hash, dictionary_item, None, None)
             .await;
-        thread::sleep(WAIT_TIME);
-        // let query_contract_dict = query_contract_dict.unwrap();
-        // assert!(!query_contract_dict
-        //     .result
-        //     .api_version
-        //     .to_string()
-        //     .is_empty());
+        let query_contract_dict = query_contract_dict.unwrap();
+        assert!(!query_contract_dict
+            .result
+            .api_version
+            .to_string()
+            .is_empty());
         // assert!(!query_contract_dict
         //     .result
         //     .stored_value
@@ -152,7 +152,7 @@ pub mod test_module {
         //     .unwrap()
         //     .inner_bytes()
         //     .is_empty());
-        // thread::sleep(WAIT_TIME);
+        thread::sleep(WAIT_TIME);
     }
 
     pub async fn query_contract_key(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
@@ -169,7 +169,6 @@ pub mod test_module {
         let query_contract_key = create_test_sdk(Some(config))
             .query_contract_key(query_params)
             .await;
-
         let query_contract_key = query_contract_key.unwrap();
         assert!(!query_contract_key.result.api_version.to_string().is_empty());
         // assert!(!query_contract_key
@@ -180,6 +179,7 @@ pub mod test_module {
         //     .account_hash()
         //     .to_string()
         //     .is_empty());
+        thread::sleep(WAIT_TIME);
     }
 
     pub async fn test_install() {
@@ -222,6 +222,7 @@ pub mod test_module {
             .deploy_hash
             .to_string()
             .is_empty());
+        thread::sleep(WAIT_TIME);
     }
 }
 
@@ -240,13 +241,6 @@ mod tests {
     pub async fn test_install_test() {
         thread::sleep(WAIT_TIME);
         test_install().await;
-        thread::sleep(WAIT_TIME);
-    }
-
-    #[test]
-    pub async fn test_call_entrypoint_test() {
-        thread::sleep(WAIT_TIME);
-        test_call_entrypoint().await;
         thread::sleep(WAIT_TIME);
     }
     #[test]
@@ -275,6 +269,13 @@ mod tests {
             BlockHash::new(&config.block_hash).unwrap(),
         ));
         query_contract_key(maybe_global_state_identifier).await;
+        thread::sleep(WAIT_TIME);
+    }
+
+    #[test]
+    pub async fn test_call_entrypoint_test() {
+        thread::sleep(WAIT_TIME);
+        test_call_entrypoint().await;
         thread::sleep(WAIT_TIME);
     }
 }
