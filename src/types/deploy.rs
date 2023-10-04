@@ -58,6 +58,7 @@ impl Deploy {
         deploy.into()
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.0) {
@@ -470,6 +471,7 @@ impl Deploy {
     //         .to_string()
     // }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "args")]
     pub fn args_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.args()) {
@@ -481,6 +483,7 @@ impl Deploy {
         }
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "addArg")]
     pub fn add_arg_js_alias(
         &mut self,

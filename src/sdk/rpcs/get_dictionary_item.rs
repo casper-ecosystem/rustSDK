@@ -210,12 +210,12 @@ impl SDK {
     pub async fn get_dictionary_item(
         &self,
         state_root_hash: impl ToDigest,
-        dictionary_item: DictionaryItemInput,
+        dictionary_item_input: DictionaryItemInput,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
         // log("state_get_dictionary_item!");
-        match dictionary_item {
+        match dictionary_item_input {
             DictionaryItemInput::Params(dictionary_item_params) => {
                 let state_root_hash_as_string: String = if !state_root_hash.is_empty() {
                     state_root_hash.to_digest().to_string()

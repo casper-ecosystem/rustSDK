@@ -316,11 +316,12 @@ pub(crate) fn insert_arg(args: &mut RuntimeArgs, new_arg: String) -> &RuntimeArg
     match serde_json::from_str::<JsonArg>(&new_arg) {
         Ok(json_arg) => {
             if let Ok(named_arg) = NamedArg::try_from(json_arg.clone()) {
+                // JSON args
                 args.insert_cl_value(named_arg.name(), named_arg.cl_value().clone());
             }
         }
-        Err(err) => {
-            error(&format!("Error deserializing JSON argument: {:?}", err));
+        Err(_) => {
+            // Simple args
             let _ = casper_client::cli::insert_arg(&new_arg, args);
         }
     }
