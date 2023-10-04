@@ -270,7 +270,7 @@ where
 /// # Returns
 ///
 /// The modified `RuntimeArgs` map.
-pub(crate) fn insert_js_value_arg(args: &mut RuntimeArgs, js_value_arg: JsValue) -> &RuntimeArgs {
+pub fn insert_js_value_arg(args: &mut RuntimeArgs, js_value_arg: JsValue) -> &RuntimeArgs {
     if js_sys::Object::instanceof(&js_value_arg) {
         let json_arg: Result<JsonArg, serde_json::Error> = js_value_arg.into_serde();
         let json_arg: Option<JsonArg> = match json_arg {

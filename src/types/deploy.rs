@@ -11,15 +11,18 @@ use super::{
 use crate::{
     debug::error,
     helpers::{
-        get_current_timestamp, get_ttl_or_default, insert_arg, insert_js_value_arg,
-        parse_timestamp, parse_ttl, secret_key_from_pem,
+        get_current_timestamp, get_ttl_or_default, insert_arg, parse_timestamp, parse_ttl,
+        secret_key_from_pem,
     },
     make_deploy, make_transfer,
 };
 use casper_client::types::{TimeDiff, Timestamp, MAX_SERIALIZED_SIZE_OF_DEPLOY};
 use casper_types::{bytesrepr::Bytes as _Bytes, RuntimeArgs, SecretKey, U512};
 
+#[cfg(target_arch = "wasm32")]
+use crate::helpers::insert_js_value_arg;
 use casper_client::types::{Deploy as _Deploy, DeployBuilder, ExecutableDeployItem};
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -490,6 +493,8 @@ impl Deploy {
         js_value_arg: JsValue,
         secret_key: Option<String>,
     ) -> Deploy {
+        use crate::helpers::insert_js_value_arg;
+
         let deploy = self.0.clone();
         let session = deploy.session();
 
