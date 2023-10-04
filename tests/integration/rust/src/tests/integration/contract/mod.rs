@@ -56,7 +56,6 @@ pub mod test_module {
             .deploy_hash
             .to_string()
             .is_empty());
-        thread::sleep(WAIT_TIME);
     }
 
     pub async fn test_query_contract_dict() {
@@ -71,7 +70,7 @@ pub mod test_module {
             .unwrap()
             .into();
         let state_root_hash = &state_root_hash_digest.to_string();
-        thread::sleep(WAIT_TIME);
+
         let dictionnary_key = get_dictionnary_key(
             &config.contract_cep78_hash,
             DICTIONARY_NAME,
@@ -80,7 +79,6 @@ pub mod test_module {
         )
         .await;
         assert_eq!(config.dictionary_key, dictionnary_key);
-        thread::sleep(WAIT_TIME);
     }
 
     pub async fn test_query_contract_dict_with_dictionary_key() {
@@ -94,7 +92,6 @@ pub mod test_module {
             .state_root_hash
             .unwrap()
             .into();
-        thread::sleep(WAIT_TIME);
 
         let mut params = DictionaryItemStrParams::new();
         params.set_dictionary(&config.dictionary_key);
@@ -102,7 +99,7 @@ pub mod test_module {
         let query_contract_dict = create_test_sdk(Some(config))
             .query_contract_dict(state_root_hash, dictionary_item, None, None)
             .await;
-        thread::sleep(WAIT_TIME);
+
         let query_contract_dict = query_contract_dict.unwrap();
         assert!(!query_contract_dict
             .result
@@ -116,7 +113,6 @@ pub mod test_module {
         //     .unwrap()
         //     .inner_bytes()
         //     .is_empty());
-        thread::sleep(WAIT_TIME);
     }
 
     pub async fn test_query_contract_dict_with_dictionary_uref() {
@@ -130,7 +126,6 @@ pub mod test_module {
             .state_root_hash
             .unwrap()
             .into();
-        thread::sleep(WAIT_TIME);
 
         let mut params = DictionaryItemStrParams::new();
         params.set_uref(&config.dictionary_uref, DICTIONARY_ITEM_KEY);
@@ -152,7 +147,6 @@ pub mod test_module {
         //     .unwrap()
         //     .inner_bytes()
         //     .is_empty());
-        thread::sleep(WAIT_TIME);
     }
 
     pub async fn query_contract_key(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
@@ -179,7 +173,6 @@ pub mod test_module {
         //     .account_hash()
         //     .to_string()
         //     .is_empty());
-        thread::sleep(WAIT_TIME);
     }
 
     pub async fn test_install() {
@@ -222,7 +215,6 @@ pub mod test_module {
             .deploy_hash
             .to_string()
             .is_empty());
-        thread::sleep(WAIT_TIME);
     }
 }
 
@@ -239,43 +231,32 @@ mod tests {
 
     #[test]
     pub async fn test_install_test() {
-        thread::sleep(WAIT_TIME);
         test_install().await;
-        thread::sleep(WAIT_TIME);
     }
     #[test]
     pub async fn test_query_contract_dict_test() {
-        thread::sleep(WAIT_TIME);
         test_query_contract_dict().await;
-        thread::sleep(WAIT_TIME);
     }
     #[test]
     pub async fn test_query_contract_dict_with_dictionary_key_test() {
-        thread::sleep(WAIT_TIME);
         test_query_contract_dict_with_dictionary_key().await;
-        thread::sleep(WAIT_TIME);
     }
     #[test]
     pub async fn test_query_contract_dict_with_dictionary_uref_test() {
-        thread::sleep(WAIT_TIME);
         test_query_contract_dict_with_dictionary_uref().await;
-        thread::sleep(WAIT_TIME);
     }
     #[test]
     pub async fn test_query_contract_key_test() {
         let config: TestConfig = get_config().await;
-        thread::sleep(WAIT_TIME);
+
         let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
             BlockHash::new(&config.block_hash).unwrap(),
         ));
         query_contract_key(maybe_global_state_identifier).await;
-        thread::sleep(WAIT_TIME);
     }
 
     #[test]
     pub async fn test_call_entrypoint_test() {
-        thread::sleep(WAIT_TIME);
         test_call_entrypoint().await;
-        thread::sleep(WAIT_TIME);
     }
 }
