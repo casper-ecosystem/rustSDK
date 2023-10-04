@@ -13,8 +13,10 @@ use tokio::sync::Mutex;
 pub const DEFAULT_NODE_ADDRESS: &str = "http://localhost:11101";
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PRIVATE_KEY_NAME: &str = "secret_key.pem";
-// TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static not working
-pub const WAIT_TIME: Duration = time::Duration::from_millis(1000);
+// TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static erroring with runtime dropped the dispatch task
+// https://github.com/seanmonstar/reqwest/issues/1148#issuecomment-910868788
+pub const WAIT_TIME: Duration = time::Duration::from_millis(1);
+pub const TIMESTAMP_WAIT_TIME: Duration = time::Duration::from_millis(1000);
 pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 // read_pem_file will look PRIVATE_KEY_NAME to root directory if relative path is not found (relative to root)
 pub const PRIVATE_KEY_NCTL_PATH: &str =
