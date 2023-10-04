@@ -1,12 +1,12 @@
+use super::sdk_error::SdkError;
 use crate::debug::error;
 use base16::DecodeError;
 use casper_hashing::{Digest as _Digest, Error as DigestError};
 use casper_types::bytesrepr::{self, FromBytes, ToBytes};
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
-
-use super::sdk_error::SdkError;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[wasm_bindgen]
@@ -33,6 +33,7 @@ impl Digest {
         })
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())

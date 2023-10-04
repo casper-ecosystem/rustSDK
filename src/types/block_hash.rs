@@ -2,6 +2,7 @@ use super::digest::Digest;
 use crate::debug::error;
 use casper_client::types::BlockHash as _BlockHash;
 use casper_hashing::Digest as _Digest;
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use hex::decode;
 use serde::{Deserialize, Serialize};
@@ -28,6 +29,7 @@ impl BlockHash {
         Ok(_BlockHash::new(digest.into()).into())
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())

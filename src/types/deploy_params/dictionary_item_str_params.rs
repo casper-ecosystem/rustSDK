@@ -1,6 +1,7 @@
 use crate::{debug::error, helpers::get_str_or_default, types::sdk_error::SdkError};
 use casper_client::cli::DictionaryItemStrParams as _DictionaryItemStrParams;
 use casper_types::URef;
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use once_cell::sync::OnceCell;
 use serde::{de::Error as SerdeError, Deserialize, Serialize, Serializer};
@@ -168,6 +169,7 @@ impl DictionaryItemStrParams {
         }
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())

@@ -1,4 +1,6 @@
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
+#[cfg(target_arch = "wasm32")]
 use js_sys::Array;
 use serde::{Deserialize, Deserializer, Serialize};
 use wasm_bindgen::prelude::*;
@@ -21,6 +23,7 @@ impl Path {
         Path::from(path_string)
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromArray")]
     pub fn from_js_array(path: JsValue) -> Self {
         let path: Array = path.into();
@@ -36,11 +39,13 @@ impl Path {
         Path { path }
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.path).unwrap_or(JsValue::null())
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toString")]
     pub fn to_string_js_alias(&self) -> String {
         self.to_string()

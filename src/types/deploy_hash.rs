@@ -4,6 +4,7 @@ use casper_hashing::Digest as _Digest;
 use casper_types::{DeployHash as _DeployHash, DEPLOY_HASH_LENGTH};
 // Both Node and client exposes DeployHash
 use casper_client::types::DeployHash as _DeployHashClient;
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use hex::decode;
 use serde::{Deserialize, Serialize};
@@ -33,6 +34,7 @@ impl DeployHash {
         Ok(_DeployHash::new(hash_bytes).into())
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())

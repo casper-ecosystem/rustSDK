@@ -6,6 +6,7 @@ use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     PublicKey as _PublicKey,
 };
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -46,6 +47,7 @@ impl PublicKey {
         PurseIdentifier::from_main_purse_under_public_key(self.0.clone().into()).into()
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())

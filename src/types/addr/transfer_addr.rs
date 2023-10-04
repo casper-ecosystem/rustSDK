@@ -37,7 +37,7 @@ impl From<Vec<u8>> for TransferAddr {
 //     }
 // }
 
-#[wasm_bindgen(js_name = fromTransfer)]
+#[wasm_bindgen(js_name = "fromTransfer")]
 pub fn from_transfer(key: Vec<u8>) -> TransferAddr {
     TransferAddr::from(key)
 }

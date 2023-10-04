@@ -3,6 +3,7 @@ use crate::debug::error;
 use super::key::Key;
 use casper_client::rpcs::DictionaryItemIdentifier as _DictionaryItemIdentifier;
 use casper_types::Key as _Key;
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -110,6 +111,7 @@ impl DictionaryItemIdentifier {
         ))
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
