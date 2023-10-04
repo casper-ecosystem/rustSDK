@@ -122,13 +122,9 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
       await test.page.type('[e2e-id="argsSimpleElt"]', config.args_simple);
       await setWasm(config.contract_hello);
-      let deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(deploy).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      deploy = await test.page.evaluate(() => {
+      let deploy = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(deploy).toBeDefined();
@@ -144,13 +140,9 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount_contract_cep78);
       await test.page.type('[e2e-id="argsJsonElt"]', config.args_json);
       await setWasm(config.contract_cep78);
-      let deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(deploy).toBeUndefined();
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
-      deploy = await test.page.evaluate(() => {
+      let deploy = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(deploy).toBeDefined();
@@ -662,7 +654,6 @@ describe('Angular App Tests', () => {
     it('should get_deploy', async () => {
       await test.page.waitForSelector('[e2e-id="deployHashElt"]');
       await clearInput('[e2e-id="deployHashElt"]');
-      console.log(test.deploy_hash);
       await test.page.type('[e2e-id="deployHashElt"]', test.deploy_hash);
       await submit();
       await getResult();
@@ -694,11 +685,25 @@ describe('Angular App Tests', () => {
 
     it('should query_contract_key with contract hash without state root hash', async () => {
       await clearInput('[e2e-id="stateRootHashElt"]');
-      await test.page.type('[e2e-id="stateRootHashElt"]', test.state_root_hash_default);
       await test.page.type('[e2e-id="queryKeyElt"]', test.contract_cep78_hash);
       await test.page.type('[e2e-id="queryPathElt"]', 'installer');
       await submit();
       await getResult();
+    });
+
+    it('should query_contract_key to get dictionary uref', async () => {
+      await test.page.waitForSelector('[e2e-id="queryKeyElt"]');
+      await test.page.type('[e2e-id="queryKeyElt"]', test.contract_cep78_hash);
+      await submit();
+      await getResult();
+      const result = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(result).toBeDefined();
+      let result_json = JSON.parse(result);
+      expect(result_json?.stored_value.Contract.named_keys).toBeDefined();
+      let named_keys = result_json?.stored_value.Contract.named_keys as Array<{ name: string; key: string; }>;
+      test.dictionary_uref = named_keys.find(key => key.name === 'events')?.key || '';
     });
   });
 
@@ -1249,7 +1254,6 @@ describe('Angular App Tests', () => {
       const result_json = JSON.parse(result);
       expect(result_json.dictionary_key).toBeDefined();
       test.dictionary_key = result_json.dictionary_key;
-      test.dictionary_key = result_json.dictionary_key;
     });
 
     it('should get_dictionary_item with dictionary key', async () => {
@@ -1261,8 +1265,7 @@ describe('Angular App Tests', () => {
       await getResult();
     });
 
-    // TODO
-    xit('should get_dictionary_item with dictionary uref', async () => {
+    it('should get_dictionary_item with dictionary uref', async () => {
       await test.page.waitForSelector('[e2e-id="selectDictIdentifierElt"]');
       await test.page.select('[e2e-id="selectDictIdentifierElt"]', "newFromSeedUref");
       await test.page.waitForSelector('[e2e-id="seedUrefElt"]');
