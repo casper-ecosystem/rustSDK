@@ -356,7 +356,7 @@ export class Deploy {
 /**
 * @returns {string}
 */
-  to_json(): string;
+  to_json_string(): string;
 /**
 * @param {DeployStrParams} deploy_params
 * @param {SessionStrParams} session_params
@@ -2648,7 +2648,7 @@ export interface InitOutput {
   readonly __wbg_deploy_free: (a: number) => void;
   readonly deploy_new: (a: number) => number;
   readonly deploy_toJson: (a: number) => number;
-  readonly deploy_to_json: (a: number, b: number) => void;
+  readonly deploy_to_json_string: (a: number, b: number) => void;
   readonly deploy_withPaymentAndSession: (a: number, b: number, c: number, d: number) => void;
   readonly deploy_withTransfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
   readonly deploy_withTTL: (a: number, b: number, c: number, d: number, e: number) => number;

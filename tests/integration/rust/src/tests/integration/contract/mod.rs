@@ -113,7 +113,7 @@ pub mod test_module {
         //     .unwrap()
         //     .inner_bytes()
         //     .is_empty());
-
+        // Parse the JSON string in 1.6
         let json_string = to_string(&query_contract_dict.result.stored_value).unwrap();
         let parsed_json: Value = serde_json::from_str(&json_string).unwrap();
         let cl_value_as_value = &parsed_json["CLValue"]["parsed"];
@@ -152,6 +152,7 @@ pub mod test_module {
         //     .unwrap()
         //     .inner_bytes()
         //     .is_empty());
+        // Parse the JSON string in 1.6
         let json_string = to_string(&query_contract_dict.result.stored_value).unwrap();
         let parsed_json: Value = serde_json::from_str(&json_string).unwrap();
         let cl_value_as_value = &parsed_json["CLValue"]["parsed"];
@@ -182,6 +183,7 @@ pub mod test_module {
         //     .account_hash()
         //     .to_string()
         //     .is_empty());
+        // Parse the JSON string in 1.6
         let json_string = to_string(&query_contract_key.result.stored_value).unwrap();
         let parsed_json: Value = serde_json::from_str(&json_string).unwrap();
         let cl_value_as_value = &parsed_json["Account"]["account_hash"];

@@ -4,7 +4,7 @@ export const memory: WebAssembly.Memory;
 export function __wbg_deploy_free(a: number): void;
 export function deploy_new(a: number): number;
 export function deploy_toJson(a: number): number;
-export function deploy_to_json(a: number, b: number): void;
+export function deploy_to_json_string(a: number, b: number): void;
 export function deploy_withPaymentAndSession(a: number, b: number, c: number, d: number): void;
 export function deploy_withTransfer(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number): void;
 export function deploy_withTTL(a: number, b: number, c: number, d: number, e: number): number;

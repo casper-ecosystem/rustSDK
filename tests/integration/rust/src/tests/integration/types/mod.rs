@@ -21,6 +21,7 @@ pub mod test_module_deploy {
         },
         types::{deploy::Deploy, public_key::PublicKey},
     };
+    use serde_json::Value;
 
     use std::thread;
 
@@ -48,6 +49,15 @@ pub mod test_module_deploy {
         //     .unwrap()
         //     .to_string()
         //     .is_empty());
+        // Parse the JSON string in 1.6
+        let parsed_json: Value = serde_json::from_str(&deploy.to_json_string().unwrap()).unwrap();
+        let cl_value_as_value = &parsed_json["approvals"][0]["signer"];
+        assert_eq!(
+            *cl_value_as_value,
+            Value::String(config.account.to_string())
+        );
+        let cl_value_as_value = &parsed_json["approvals"][0]["signature"];
+        assert!(cl_value_as_value.is_string());
     }
 
     pub async fn test_deploy_type_transfer() {
@@ -71,6 +81,13 @@ pub mod test_module_deploy {
         .unwrap();
         // assert!(deploy.is_valid());
         // assert!(deploy.is_transfer());
+        // Parse the JSON string in 1.6
+        let parsed_json: Value = serde_json::from_str(&deploy.to_json_string().unwrap()).unwrap();
+        let cl_value_as_value = &parsed_json["session"]["Transfer"]["args"][0][1]["parsed"];
+        assert_eq!(
+            *cl_value_as_value,
+            Value::String(TRANSFER_AMOUNT.to_string())
+        );
     }
 
     pub async fn test_deploy_type_with_ttl() {
@@ -200,9 +217,23 @@ pub mod test_module_deploy {
                 .unwrap();
         // assert!(deploy.is_valid());
         // assert_eq!(&deploy.entry_point_name(), ENTRYPOINT_MINT);
+
+        // Parse the JSON string in 1.6
+        let parsed_json: Value = serde_json::from_str(&deploy.to_json_string().unwrap()).unwrap();
+        let cl_value_as_value = &parsed_json["session"]["StoredContractByHash"]["entry_point"];
+        assert_eq!(
+            *cl_value_as_value,
+            Value::String(ENTRYPOINT_MINT.to_string())
+        );
+
         deploy = deploy.with_entry_point_name("name", Some(config.private_key.clone()));
         // assert!(deploy.is_valid());
         //assert_eq!(&deploy.entry_point_name(), "name");
+
+        // Parse the JSON string in 1.6
+        let parsed_json: Value = serde_json::from_str(&deploy.to_json_string().unwrap()).unwrap();
+        let cl_value_as_value = &parsed_json["session"]["StoredContractByHash"]["entry_point"];
+        assert_eq!(*cl_value_as_value, Value::String("name".to_string()));
     }
 
     pub async fn test_deploy_type_with_hash() {
@@ -233,10 +264,10 @@ pub mod test_module_deploy {
         // assert!(deploy.is_valid());
         // assert!(deploy.is_stored_contract());
         assert!(!deploy
-            .to_json()
+            .to_json_string()
             .unwrap()
             .contains(&config.contract_cep78_hash));
-        assert!(deploy.to_json().unwrap().contains(new_session_hash));
+        assert!(deploy.to_json_string().unwrap().contains(new_session_hash));
     }
 
     pub async fn test_deploy_type_by_name() {
@@ -259,6 +290,13 @@ pub mod test_module_deploy {
         // assert!(deploy.is_valid());
         // assert!(deploy.is_stored_contract());
         // assert_eq!(deploy.by_name().unwrap().to_string(), CONTRACT_CEP78_KEY);
+        // Parse the JSON string in 1.6
+        let parsed_json: Value = serde_json::from_str(&deploy.to_json_string().unwrap()).unwrap();
+        let cl_value_as_value = &parsed_json["session"]["StoredContractByName"]["name"];
+        assert_eq!(
+            *cl_value_as_value,
+            Value::String(CONTRACT_CEP78_KEY.to_string())
+        );
     }
 
     pub async fn test_deploy_type_with_package_hash() {
@@ -290,10 +328,13 @@ pub mod test_module_deploy {
         // assert!(deploy.is_valid());
         // assert!(deploy.is_stored_contract_package());
         assert!(!deploy
-            .to_json()
+            .to_json_string()
             .unwrap()
             .contains(&config.contract_cep78_package_hash));
-        assert!(deploy.to_json().unwrap().contains(new_session_package_hash));
+        assert!(deploy
+            .to_json_string()
+            .unwrap()
+            .contains(new_session_package_hash));
     }
 
     pub async fn test_deploy_type_with_module_bytes() {
@@ -315,7 +356,7 @@ pub mod test_module_deploy {
         // assert!(deploy.is_valid());
 
         assert!(deploy
-            .to_json()
+            .to_json_string()
             .unwrap()
             .contains("\"module_bytes\":\"00\""));
         let file_path = HELLO_CONTRACT;
@@ -330,7 +371,7 @@ pub mod test_module_deploy {
         // assert!(deploy.is_valid());
         // assert!(deploy.is_module_bytes());
         assert!(!deploy
-            .to_json()
+            .to_json_string()
             .unwrap()
             .contains("\"module_bytes\":\"00\""));
     }
@@ -358,6 +399,15 @@ pub mod test_module_deploy {
         assert_eq!(&deploy.account(), &config.account);
         deploy = deploy.with_secret_key(Some(config.private_key.clone()));
         // assert!(deploy.is_valid());
+        // Parse the JSON string in 1.6
+        let parsed_json: Value = serde_json::from_str(&deploy.to_json_string().unwrap()).unwrap();
+        let cl_value_as_value = &parsed_json["approvals"][0]["signer"];
+        assert_eq!(
+            *cl_value_as_value,
+            Value::String(config.account.to_string())
+        );
+        let cl_value_as_value = &parsed_json["approvals"][0]["signature"];
+        assert!(cl_value_as_value.is_string());
     }
 
     pub async fn test_deploy_type_with_standard_payment() {
@@ -383,6 +433,13 @@ pub mod test_module_deploy {
         deploy = deploy.with_standard_payment(new_payment_amount, None);
         // assert!(!deploy.is_valid());
         // assert_eq!(deploy.payment_amount(1_u64).to_string(), new_payment_amount);
+        // Parse the JSON string in 1.6
+        let parsed_json: Value = serde_json::from_str(&deploy.to_json_string().unwrap()).unwrap();
+        let cl_value_as_value = &parsed_json["payment"]["ModuleBytes"]["args"][0][1]["parsed"];
+        assert_eq!(
+            *cl_value_as_value,
+            Value::String(new_payment_amount.to_string())
+        );
     }
 
     pub async fn test_deploy_type_is_expired() {
@@ -447,6 +504,16 @@ pub mod test_module_deploy {
         // assert!(deploy.is_valid());
         // let new_compute_approvals_hash = deploy.compute_approvals_hash();
         // assert_ne!(compute_approvals_hash, new_compute_approvals_hash);
+
+        // Parse the JSON string in 1.6
+        let parsed_json: Value = serde_json::from_str(&deploy.to_json_string().unwrap()).unwrap();
+        let cl_value_as_value = &parsed_json["approvals"][0]["signer"];
+        assert_eq!(
+            *cl_value_as_value,
+            Value::String(config.account.to_string())
+        );
+        let cl_value_as_value = &parsed_json["approvals"][0]["signature"];
+        assert!(cl_value_as_value.is_string());
     }
 
     pub async fn test_deploy_type_footprint() {
@@ -469,9 +536,11 @@ pub mod test_module_deploy {
         )
         .unwrap();
         // assert!(deploy.is_valid());
-        // let footprint = deploy.footprint();
+        //  let footprint = deploy.footprint();
         // assert!(!footprint.size_estimate.to_string().is_empty());
-        // assert!(footprint.is_transfer);
+        //assert!(footprint.is_transfer);
+        // 1.6 has no method footprint()
+        assert!(deploy.validate_deploy_size());
     }
 
     pub async fn test_deploy_type_empty_args() {

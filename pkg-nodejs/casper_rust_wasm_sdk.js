@@ -1204,12 +1204,12 @@ class Deploy {
     /**
     * @returns {string}
     */
-    to_json() {
+    to_json_string() {
         let deferred2_0;
         let deferred2_1;
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.deploy_to_json(retptr, this.__wbg_ptr);
+            wasm.deploy_to_json_string(retptr, this.__wbg_ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             var r2 = getInt32Memory0()[retptr / 4 + 2];

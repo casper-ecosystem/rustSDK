@@ -356,7 +356,7 @@ export class Deploy {
 /**
 * @returns {string}
 */
-  to_json(): string;
+  to_json_string(): string;
 /**
 * @param {DeployStrParams} deploy_params
 * @param {SessionStrParams} session_params
