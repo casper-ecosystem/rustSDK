@@ -15,7 +15,6 @@ pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PRIVATE_KEY_NAME: &str = "secret_key.pem";
 // TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static erroring with runtime dropped the dispatch task
 // https://github.com/seanmonstar/reqwest/issues/1148#issuecomment-910868788
-pub const WAIT_TIME: Duration = time::Duration::from_millis(1);
 pub const TIMESTAMP_WAIT_TIME: Duration = time::Duration::from_millis(1000);
 pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 // read_pem_file will look PRIVATE_KEY_NAME to root directory if relative path is not found (relative to root)
@@ -86,14 +85,12 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
     if *block_hash_initialized_guard {
         return Err("initialize_test_config called after block_hash already initialized".into());
     }
-
     let private_key = read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}"))?;
     let private_key_target_account = read_pem_file(&format!(
         "{}{}",
         PRIVATE_KEY_NCTL_PATH.replace("user-1", "user-2"),
         PRIVATE_KEY_NAME
     ))?;
-
     let account = public_key_from_private_key(&private_key).unwrap();
 
     let target_account = public_key_from_private_key(&private_key_target_account).unwrap();
@@ -104,6 +101,7 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
 
     let purse_uref = get_main_purse(&account).await;
 
+    println!("install_cep78");
     let deploy_hash = install_cep78_if_needed(&account, &private_key)
         .await
         .unwrap();
@@ -111,6 +109,7 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
     let (contract_cep78_hash, contract_cep78_package_hash) =
         get_contract_cep78_hash_keys(&account_hash).await;
 
+    println!("mint_nft");
     // install has been running for over 60 seconds
     mint_nft(&contract_cep78_hash, &account, &account_hash, &private_key).await;
 

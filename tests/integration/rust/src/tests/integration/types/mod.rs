@@ -4,7 +4,7 @@ pub mod test_module_deploy {
         config::{
             get_config, TestConfig, ARGS_JSON, CONTRACT_CEP78_KEY, DEFAULT_TTL, ENTRYPOINT_MINT,
             HELLO_CONTRACT, PAYMENT_AMOUNT, PAYMENT_TRANSFER_AMOUNT, TIMESTAMP_WAIT_TIME,
-            TRANSFER_AMOUNT, TTL, WAIT_TIME,
+            TRANSFER_AMOUNT, TTL,
         },
         tests::helpers::read_wasm_file,
     };

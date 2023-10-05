@@ -213,11 +213,12 @@ pub async fn get_dictionnary_key(
         .api_version
         .to_string()
         .is_empty());
-    let stored_value = get_dictionary_item.result.stored_value;
 
+    // 1.6 does not have method as_cl_value()
+    // let stored_value = get_dictionary_item.result.stored_value;
     // let cl_value = stored_value.as_cl_value().unwrap();
-
     // assert!(!cl_value.inner_bytes().is_empty());
+
     assert!(!get_dictionary_item
         .result
         .dictionary_key
@@ -312,15 +313,17 @@ pub async fn install_cep78(
 
     thread::sleep(DEPLOY_TIME); // Let's wait for deployment on nctl
 
-    //dbg!(deploy_hash_as_string.clone());
-    // let get_deploy = sdk
-    //     .get_deploy(deploy_hash, Some(true), None, Some(DEFAULT_NODE_ADDRESS.to_string()))
-    //     .await;
-    // let get_deploy = get_deploy.unwrap();
-    // assert!(!get_deploy.result.api_version.to_string().is_empty());
-    // assert!(!get_deploy.result.deploy.to_string().is_empty());
-    //dbg!(get_deploy.result.deploy);
-    //dbg!(deploy_hash_as_string);
+    let get_deploy = sdk
+        .get_deploy(
+            deploy_hash,
+            Some(true),
+            None,
+            Some(DEFAULT_NODE_ADDRESS.to_string()),
+        )
+        .await;
+    let get_deploy = get_deploy.unwrap();
+    assert!(!get_deploy.result.api_version.to_string().is_empty());
+    assert!(!get_deploy.result.deploy.to_string().is_empty());
     Ok(deploy_hash_as_string)
 }
 

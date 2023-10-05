@@ -3,7 +3,7 @@ pub mod test_module {
     use crate::{
         config::{
             get_config, TestConfig, ARGS_JSON, ARGS_SIMPLE, DICTIONARY_ITEM_KEY, DICTIONARY_NAME,
-            ENTRYPOINT_MINT, HELLO_CONTRACT, PAYMENT_AMOUNT, TTL, WAIT_TIME,
+            ENTRYPOINT_MINT, HELLO_CONTRACT, PAYMENT_AMOUNT, TTL,
         },
         tests::helpers::{create_test_sdk, get_dictionnary_key, read_wasm_file},
     };
@@ -22,7 +22,6 @@ pub mod test_module {
             global_state_identifier::GlobalStateIdentifier,
         },
     };
-    use std::thread;
 
     pub async fn test_call_entrypoint() {
         let config: TestConfig = get_config().await;
@@ -220,13 +219,12 @@ pub mod test_module {
 
 #[cfg(test)]
 mod tests {
-    use crate::config::{get_config, TestConfig, WAIT_TIME};
+    use crate::config::{get_config, TestConfig};
 
     use super::test_module::*;
     use casper_rust_wasm_sdk::types::{
         block_hash::BlockHash, global_state_identifier::GlobalStateIdentifier,
     };
-    use std::thread;
     use tokio::test;
 
     #[test]

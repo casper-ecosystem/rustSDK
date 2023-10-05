@@ -2,10 +2,9 @@
 pub mod test_module {
     use crate::config::{
         get_config, TestConfig, COLLECTION_NAME, CONTRACT_CEP78_KEY, DICTIONARY_ITEM_KEY,
-        DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE, WAIT_TIME,
+        DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE,
     };
     use crate::tests::helpers::create_test_sdk;
-    use casper_rust_wasm_sdk::helpers::cl_value_to_json;
     use casper_rust_wasm_sdk::types::account_hash::AccountHash;
     use casper_rust_wasm_sdk::types::account_identifier::AccountIdentifier;
     use casper_rust_wasm_sdk::{
@@ -21,7 +20,6 @@ pub mod test_module {
         },
     };
     use serde_json::{to_string, Value};
-    use std::thread;
 
     pub async fn test_get_peers() {
         let config: TestConfig = get_config().await;
@@ -216,6 +214,11 @@ pub mod test_module {
         //     .unwrap()
         //     .inner_bytes()
         //     .is_empty());
+        // Parse the JSON string in 1.6
+        let json_string = to_string(&get_dictionary_item.result.stored_value).unwrap();
+        let parsed_json: Value = serde_json::from_str(&json_string).unwrap();
+        let cl_value_as_value = &parsed_json["CLValue"]["parsed"];
+        assert!(cl_value_as_value.is_array());
     }
 
     pub async fn test_get_dictionary_item_without_state_root_hash() {
@@ -244,6 +247,11 @@ pub mod test_module {
         //     .unwrap()
         //     .inner_bytes()
         //     .is_empty());
+        // Parse the JSON string in 1.6
+        let json_string = to_string(&get_dictionary_item.result.stored_value).unwrap();
+        let parsed_json: Value = serde_json::from_str(&json_string).unwrap();
+        let cl_value_as_value = &parsed_json["CLValue"]["parsed"];
+        assert!(cl_value_as_value.is_array());
     }
 
     #[allow(deprecated)]
@@ -304,7 +312,7 @@ pub mod test_module {
             .await;
         let validator_changes = validator_changes.unwrap();
         assert!(!validator_changes.result.api_version.to_string().is_empty());
-        // assert!(validator_changes.result.changes.is_empty());
+        assert!(validator_changes.result.changes.is_empty());
     }
 
     pub async fn test_list_rpcs() {
@@ -414,12 +422,11 @@ pub mod test_module {
 #[cfg(test)]
 mod tests {
     use super::test_module::*;
-    use crate::config::{get_config, TestConfig, WAIT_TIME};
+    use crate::config::{get_config, TestConfig};
     use casper_rust_wasm_sdk::types::{
         block_hash::BlockHash, block_identifier::BlockIdentifierInput,
         global_state_identifier::GlobalStateIdentifier,
     };
-    use std::thread;
     use tokio::test;
 
     #[test]

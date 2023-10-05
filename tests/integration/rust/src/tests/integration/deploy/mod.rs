@@ -166,11 +166,7 @@ pub mod test_module {
 
 #[cfg(test)]
 mod tests {
-
-    use crate::config::WAIT_TIME;
-
     use super::test_module::*;
-    use std::thread;
     use tokio::test;
 
     #[test]
