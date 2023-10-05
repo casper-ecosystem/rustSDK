@@ -73,7 +73,7 @@ impl Deploy {
         }
     }
 
-    pub fn to_json(&self) -> Result<String, String> {
+    pub fn to_json_string(&self) -> Result<String, String> {
         let result = serde_json::to_string(&self.0);
         match result {
             Ok(json) => Ok(json),
