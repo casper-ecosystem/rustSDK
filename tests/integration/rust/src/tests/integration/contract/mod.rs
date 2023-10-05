@@ -22,6 +22,7 @@ pub mod test_module {
             global_state_identifier::GlobalStateIdentifier,
         },
     };
+    use serde_json::{to_string, Value};
 
     pub async fn test_call_entrypoint() {
         let config: TestConfig = get_config().await;
@@ -112,6 +113,11 @@ pub mod test_module {
         //     .unwrap()
         //     .inner_bytes()
         //     .is_empty());
+
+        let json_string = to_string(&query_contract_dict.result.stored_value).unwrap();
+        let parsed_json: Value = serde_json::from_str(&json_string).unwrap();
+        let cl_value_as_value = &parsed_json["CLValue"]["parsed"];
+        assert!(cl_value_as_value.is_array());
     }
 
     pub async fn test_query_contract_dict_with_dictionary_uref() {
@@ -146,6 +152,10 @@ pub mod test_module {
         //     .unwrap()
         //     .inner_bytes()
         //     .is_empty());
+        let json_string = to_string(&query_contract_dict.result.stored_value).unwrap();
+        let parsed_json: Value = serde_json::from_str(&json_string).unwrap();
+        let cl_value_as_value = &parsed_json["CLValue"]["parsed"];
+        assert!(cl_value_as_value.is_array());
     }
 
     pub async fn query_contract_key(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
@@ -159,7 +169,7 @@ pub mod test_module {
             node_address: config.to_owned().node_address,
             verbosity: config.to_owned().verbosity,
         };
-        let query_contract_key = create_test_sdk(Some(config))
+        let query_contract_key = create_test_sdk(Some(config.clone()))
             .query_contract_key(query_params)
             .await;
         let query_contract_key = query_contract_key.unwrap();
@@ -172,6 +182,10 @@ pub mod test_module {
         //     .account_hash()
         //     .to_string()
         //     .is_empty());
+        let json_string = to_string(&query_contract_key.result.stored_value).unwrap();
+        let parsed_json: Value = serde_json::from_str(&json_string).unwrap();
+        let cl_value_as_value = &parsed_json["Account"]["account_hash"];
+        assert_eq!(*cl_value_as_value, Value::String(config.account_hash));
     }
 
     pub async fn test_install() {
