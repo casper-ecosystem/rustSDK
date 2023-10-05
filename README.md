@@ -259,7 +259,7 @@ const casper_rust_wasm_sdk = require('casper-sdk');
 const { SDK } = casper_rust_wasm_sdk;
 
 const node_address = 'https://rpc.integration.casperlabs.io';
-let sdk: typeof SDK = new SDK(node_address);
+const sdk: typeof SDK = new SDK(node_address);
 console.log(sdk);
 ```
 
@@ -398,16 +398,686 @@ You can find more examples in the [Angular example app](examples/frontend/angula
 
 </details>
 
-### More examples [TODO]
+### More examples
 
 <details>
   <summary><strong><code>Deploys and Transfers</code></strong></summary>
 
-- [Making a deploy](docs/Example/MakingDeploy.md)
-- [Sending a Transfer](docs/Example/SendingTransfer.md)
-- CEP78
-  - [Install](docs/Example/CEP78/Install.md)
-  - [Mint](docs/Example/CEP78/Mint.md)
+<details>
+    <summary>Making a Transfer</summary>
+
+#### Rust
+
+```rust
+pub const CHAIN_NAME: &str = "casper-net-1";
+pub const PUBLIC_KEY: &str = "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PAYMENT_AMOUNT: &str = "10000";
+pub const TRANSFER_AMOUNT: &str = "2500000000";
+pub const TTL: &str = "1h";
+pub const TARGET_ACCOUNT: &str = "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+
+let deploy_params = DeployStrParams::new(
+    CHAIN_NAME,
+    PUBLIC_KEY, // sender account
+    None, // optional secret key to sign transfer deploy
+    None, // optional timestamp
+    Some(TTL.to_string()), // optional TTL
+);
+
+let payment_params = PaymentStrParams::default();
+payment_params.set_payment_amount(PAYMENT_AMOUNT);
+
+let make_transfer = sdk.make_transfer(
+    TRANSFER_AMOUNT,
+    TARGET_ACCOUNT, // target account
+    None, // optional transfer_id
+    deploy_params,
+    payment_params,
+)
+.unwrap();
+
+```
+
+#### Typescript
+
+```ts
+import { DeployStrParams, PaymentStrParams, getTimestamp } from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const public_key =
+  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+const private_key = undefined;
+const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
+const ttl = '1h'; // or undefined
+const payment_amount = '10000';
+const transfer_amount = '2500000000';
+const target_account =
+  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+
+const deploy_params = new DeployStrParams(
+  chain_name,
+  public_key,
+  private_key,
+  timestamp,
+  ttl
+);
+
+const payment_params = new PaymentStrParams(payment_amount);
+
+const transfer_deploy = sdk.make_transfer(
+  transfer_amount,
+  target_account,
+  undefined, // transfer_id
+  deploy_params,
+  payment_params
+);
+const transfer_deploy_as_json = transfer_deploy.toJson();
+```
+
+</details>
+
+<details>
+    <summary>Transfer</summary>
+
+Sends a [`Transfer Deploy`] to the network for execution. (Alias for make_transfer+ put_deploy)
+
+#### Rust
+
+```rust
+pub const CHAIN_NAME: &str = "casper-net-1";
+pub const PUBLIC_KEY: &str = "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PRIVATE_KEY: &str = "";
+pub const PAYMENT_AMOUNT: &str = "10000";
+pub const TRANSFER_AMOUNT: &str = "2500000000";
+pub const TTL: &str = "1h";
+pub const TARGET_ACCOUNT: &str = "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+
+let deploy_params = DeployStrParams::new(
+    CHAIN_NAME,
+    PUBLIC_KEY, // sender account
+    Some(PRIVATE_KEY.to_string()),
+    None, // optional timestamp
+    Some(TTL.to_string()), // optional TTL
+);
+
+let payment_params = PaymentStrParams::default();
+payment_params.set_payment_amount(PAYMENT_AMOUNT);
+
+let transfer = sdk.transfer(
+    TRANSFER_AMOUNT,
+    TARGET_ACCOUNT,
+    None, // optional transfer_id
+    deploy_params,
+    payment_params,
+)
+.unwrap();
+assert!(!transfer.as_ref().unwrap().result.deploy_hash.to_string().is_empty());
+```
+
+#### Typescript
+
+```ts
+import { DeployStrParams, PaymentStrParams, getTimestamp } from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const public_key =
+  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+const private_key = '';
+const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
+const ttl = '1h'; // or undefined
+const payment_amount = '10000';
+const transfer_amount = '2500000000';
+const target_account =
+  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+
+const deploy_params = new DeployStrParams(
+  chain_name,
+  public_key,
+  private_key,
+  timestamp,
+  ttl
+);
+
+const payment_params = new PaymentStrParams(payment_amount);
+
+const transfer_result = sdk.transfer(
+  transfer_amount,
+  target_account,
+  undefined, // transfer_id
+  deploy_params,
+  payment_params
+);
+const transfer_result_as_json = transfer_result.toJson();
+```
+
+</details>
+
+<details>
+    <summary>Making a Deploy</summary>
+
+#### Rust
+
+```rust
+pub const CHAIN_NAME: &str = "casper-net-1";
+pub const PUBLIC_KEY: &str = "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PAYMENT_AMOUNT: &str = "5000000000";
+pub const CONTRACT_HASH: &str = "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+pub const ENTRY_POINT: &str = "decimals";
+pub const TTL: &str = "1h";
+
+let deploy_params = DeployStrParams::new(
+    CHAIN_NAME,
+    PUBLIC_KEY, // sender account
+    None, // optional secret key to sign deploy
+    None, // optional timestamp
+    Some(TTL.to_string()), // optional TTL
+);
+
+let session_params = SessionStrParams::default();
+session_params.set_session_hash(CONTRACT_HASH);
+session_params.set_session_entry_point(ENTRY_POINT);
+
+let payment_params = PaymentStrParams::default();
+payment_params.set_payment_amount(PAYMENT_AMOUNT);
+
+let deploy = sdk.make_deploy(deploy_params, session_params, payment_params).unwrap();
+```
+
+#### Typescript
+
+```ts
+import {
+  DeployStrParams,
+  PaymentStrParams,
+  SessionStrParams,
+  getTimestamp,
+} from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const public_key =
+  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+const payment_amount = '5000000000';
+const contract_hash =
+  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+
+const deploy_params = new DeployStrParams(chain_name, public_key);
+
+const session_params = new SessionStrParams();
+session_params.session_hash = contract_hash;
+session_params.session_entry_point = 'decimals';
+
+const payment_params = new PaymentStrParams(payment_amount);
+
+const deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
+const deploy_as_json = deploy.toJson();
+```
+
+</details>
+
+<details>
+    <summary>Deploy</summary>
+
+Sends a [`Deploy`] to the network for execution. (Alias for make_deploy + put_deploy)
+
+#### Rust
+
+```rust
+pub const CHAIN_NAME: &str = "casper-net-1";
+pub const PUBLIC_KEY: &str = "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PRIVATE_KEY: &str = "";
+pub const PAYMENT_AMOUNT: &str = "5000000000";
+pub const CONTRACT_HASH: &str = "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+pub const ENTRY_POINT: &str = "decimals";
+pub const TTL: &str = "1h";
+
+let deploy_params = DeployStrParams::new(
+    CHAIN_NAME,
+    PUBLIC_KEY, // sender account
+    Some(PRIVATE_KEY.to_string()),
+    None, // optional timestamp
+    Some(TTL.to_string()), // optional TTL
+);
+
+let session_params = SessionStrParams::default();
+session_params.set_session_hash(CONTRACT_HASH);
+session_params.set_session_entry_point(ENTRY_POINT);
+
+let payment_params = PaymentStrParams::default();
+payment_params.set_payment_amount(PAYMENT_AMOUNT);
+
+let deploy = sdk.deploy(deploy_params, session_params, payment_params).unwrap();
+assert!(!deploy.as_ref().unwrap().result.deploy_hash.to_string().is_empty());
+```
+
+#### Typescript
+
+```ts
+import {
+  DeployStrParams,
+  PaymentStrParams,
+  SessionStrParams,
+  getTimestamp,
+} from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const public_key =
+  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+const private_key = '';
+const payment_amount = '5000000000';
+const contract_hash =
+  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+
+const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
+
+const session_params = new SessionStrParams();
+session_params.session_hash = contract_hash;
+session_params.session_entry_point = 'decimals';
+
+const payment_params = new PaymentStrParams(payment_amount);
+
+const deploy_result = sdk.deploy(deploy_params, payment_params);
+const deploy_result_as_json = deploy_result.toJson();
+```
+
+</details>
+
+<details>
+    <summary>Put Deploy</summary>
+
+#### Rust
+
+Puts a [`Deploy`] to the network for execution.
+
+```rust
+pub const CHAIN_NAME: &str = "casper-net-1";
+pub const PUBLIC_KEY: &str = "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PRIVATE_KEY: &str = "";
+pub const PAYMENT_AMOUNT: &str = "5000000000";
+pub const CONTRACT_HASH: &str = "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+pub const ENTRY_POINT: &str = "decimals";
+pub const TTL: &str = "1h";
+
+let deploy_params = DeployStrParams::new(
+    CHAIN_NAME,
+    PUBLIC_KEY, // sender account
+    Some(PRIVATE_KEY.to_string()),
+    None, // optional timestamp
+    Some(TTL.to_string()), // optional TTL
+);
+
+let session_params = SessionStrParams::default();
+session_params.set_session_hash(CONTRACT_HASH);
+session_params.set_session_entry_point(ENTRY_POINT);
+
+let payment_params = PaymentStrParams::default();
+payment_params.set_payment_amount(PAYMENT_AMOUNT);
+
+let deploy = Deploy::with_payment_and_session(deploy_params, session_params, payment_params).unwrap();
+
+let put_deploy = sdk.put_deploy(deploy, None, None).unwrap();
+assert!(!put_deploy.as_ref().unwrap().result.deploy_hash.to_string().is_empty());
+```
+
+Puts a [`Transfer Deploy`] to the network for execution.
+
+```rust
+pub const CHAIN_NAME: &str = "casper-net-1";
+pub const PUBLIC_KEY: &str = "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PRIVATE_KEY: &str = "";
+pub const TRANSFER_AMOUNT: &str = "2500000000";
+pub const TARGET_ACCOUNT: &str = "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+pub const TTL: &str = "1h";
+
+let deploy_params = DeployStrParams::new(
+    CHAIN_NAME,
+    PUBLIC_KEY, // sender account
+    Some(PRIVATE_KEY.tostring()),
+    None, // optional timestamp
+    Some(TTL.to_string()), // optional TTL
+);
+
+let payment_params = PaymentStrParams::default();
+payment_params.set_payment_amount(PAYMENT_AMOUNT);
+
+let transfer_deploy = Deploy::with_transfer(
+    TRANSFER_AMOUNT,
+    TARGET_ACCOUNT,
+    None,
+    deploy_params,
+    payment_params
+).unwrap();
+
+let put_deploy = sdk.put_deploy(transfer_deploy, None, None).unwrap();
+assert!(!put_deploy.as_ref().unwrap().result.deploy_hash.to_string().is_empty());
+```
+
+#### Typescript
+
+Puts a [`Deploy`] to the network for execution.
+
+```ts
+import {
+  Deploy,
+  DeployStrParams,
+  PaymentStrParams,
+  SessionStrParams,
+  getTimestamp,
+} from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const public_key =
+  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+const private_key = '';
+const payment_amount = '5000000000';
+const contract_hash =
+  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+const entry_point = 'decimals';
+
+const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
+
+const session_params = new SessionStrParams();
+session_params.session_hash = contract_hash;
+session_params.session_entry_point = entry_point;
+
+const payment_params = new PaymentStrParams(payment_amount);
+
+const deploy = Deploy.withPaymentAndSession(
+  deploy_params,
+  session_params,
+  payment_params
+);
+
+const put_deploy_result = sdk.put_deploy(deploy);
+const put_deploy_result_as_json = put_deploy_result.toJson();
+```
+
+Puts a [`Transfer Deploy`] to the network for execution.
+
+```ts
+import {
+  Deploy,
+  DeployStrParams,
+  PaymentStrParams,
+  SessionStrParams,
+  getTimestamp,
+} from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const public_key =
+  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+const private_key = '';
+const payment_amount = '10000';
+const transfer_amount = '2500000000';
+const target_account =
+  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+
+const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
+
+const payment_params = new PaymentStrParams(payment_amount);
+
+const transfer_deploy = Deploy.withTransfer(
+  transfer_amount,
+  target_account,
+  undefined, // transfer_id
+  deploy_params,
+  payment_params
+);
+
+const put_deploy_result = sdk.put_deploy(transfer_deploy);
+const put_deploy_result_as_json = put_deploy_result.toJson();
+```
+
+</details>
+
+<details>
+    <summary>Sign Deploy</summary>
+
+#### Rust
+
+```rust
+pub const PRIVATE_KEY: &str = "";
+... //  same code as 'Making a Deploy' example
+let unsigned_deploy = sdk.make_deploy(deploy_params, session_params, payment_params).unwrap();
+let signed_deploy = sdk.sign_deploy(unsigned_deploy, PRIVATE_KEY);
+```
+
+#### Typescript
+
+```ts
+const private_key = '';
+... //  same code as 'Making a Deploy' example
+const unsigned_deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
+const signed_deploy = unsigned_deploy.sign(private_key);
+```
+
+</details>
+
+</details>
+
+<details>
+    <summary><strong><code>CEP-78</code></strong></summary>
+
+#### Install
+
+- <strong>Rust</strong>
+
+```rust
+pub const CHAIN_NAME: &str = "casper-net-1";
+pub const PUBLIC_KEY: &str = "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PRIVATE_KEY: &str = "";
+pub const ARGS_JSON: &str = r#"[
+{"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
+{"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
+{"name": "total_token_supply", "type": "U64", "value": 10},
+{"name": "ownership_mode", "type": "U8", "value": 0},
+{"name": "nft_kind", "type": "U8", "value": 1},
+{"name": "allow_minting", "type": "Bool", "value": true},
+{"name": "owner_reverse_lookup_mode", "type": "U8", "value": 0},
+{"name": "nft_metadata_kind", "type": "U8", "value": 2},
+{"name": "identifier_mode", "type": "U8", "value": 0},
+{"name": "metadata_mutability", "type": "U8", "value": 0},
+{"name": "events_mode", "type": "U8", "value": 1}
+]"#;
+pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "300000000000";
+pub const CEP78_CONTRACT: &str = "cep78.wasm";
+pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
+
+let deploy_params = DeployStrParams::new(
+    CHAIN_NAME,
+    PUBLIC_KEY,
+    Some(PRIVATE_KEY.to_string()),
+    None,
+    None,
+);
+
+let payment_params = PaymentStrParams::default();
+payment_params.set_payment_amount(PAYMENT_AMOUNT_CONTRACT_CEP78);
+
+let session_params = SessionStrParams::default();
+session_params.set_session_args_json(ARGS_JSON);
+
+let file_path = CEP78_CONTRACT;
+let module_bytes = match read_wasm_file(file_path) {
+    Ok(module_bytes) => module_bytes,
+    Err(err) => {
+        return Err(format!("Error reading file {}: {:?}", file_path, err).into());
+    }
+};
+
+session_params.set_session_bytes(module_bytes.into());
+
+let install = sdk
+    .install(
+        deploy_params,
+        session_params,
+        payment_params,
+        None,
+    )
+    .await;
+
+let deploy_hash = DeployHash::from(install.as_ref().unwrap().result.deploy_hash);
+let deploy_hash_as_string = deploy_hash.to_string();
+assert!(!deploy_hash_as_string.is_empty());
+
+thread::sleep(DEPLOY_TIME); // Let's wait for deployment
+
+let finalized_approvals = true;
+let get_deploy = sdk
+    .get_deploy(
+        deploy_hash,
+        Some(finalized_approvals),
+        None,
+        None,
+    )
+    .await;
+let get_deploy = get_deploy.unwrap();
+assert!(!get_deploy.result.deploy.to_string().is_empty());
+```
+
+with
+
+```rust
+pub fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
+    let root_path = Path::new("./wasm/");
+    let path = root_path.join(file_path);
+    let mut file = File::open(path)?;
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
+    Ok(buffer)
+}
+```
+
+- <strong>Typescript</strong>
+
+```ts
+import {
+  ...
+  DeployStrParams,
+  SessionStrParams,
+  PaymentStrParams,
+  privateToPublicKey,
+  Bytes,
+} from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const private_key = '';
+const public_key = privateToPublicKey(private_key);
+const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
+
+const session_params = new SessionStrParams();
+session_params.session_args_json = JSON.stringify([
+  {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
+  {"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
+  {"name": "total_token_supply", "type": "U64", "value": 10},
+  {"name": "ownership_mode", "type": "U8", "value": 0},
+  {"name": "nft_kind", "type": "U8", "value": 1},
+  {"name": "allow_minting", "type": "Bool", "value": true},
+  {"name": "owner_reverse_lookup_mode", "type": "U8", "value": 0},
+  {"name": "nft_metadata_kind", "type": "U8", "value": 2},
+  {"name": "identifier_mode", "type": "U8", "value": 0},
+  {"name": "metadata_mutability", "type": "U8", "value": 0},
+  {"name": "events_mode", "type": "U8", "value": 1}
+]);
+const payment_amount = '300000000000';
+
+const file = (event.target as HTMLInputElement).files?.item(0);
+const buffer = await file?.arrayBuffer();
+const wasm = buffer && new Uint8Array(buffer);
+const wasmBuffer = wasm?.buffer;
+if (!wasmBuffer) {
+  return;
+}
+if (wasm) {
+
+  session_params.session_bytes = Bytes.fromUint8Array(wasm);
+
+  const install_result = await sdk.install(
+    deploy_params,
+    session_params,
+    payment_amount
+  );
+  const install_result_as_json = install_result.toJson();
+  console.log(install_result_as_json.deploy_hash);
+} else {
+  console.error('Failed to read wasm file.');
+}
+```
+
+#### Mint
+
+- <strong>Rust</strong>
+
+```rust
+pub const CONTRACT_HASH: &str = "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+pub const ENTRYPOINT_MINT: &str = "mint";
+put const TOKEN_OWNER : &str = "account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611";
+
+let deploy_params = DeployStrParams::new(
+    CHAIN_NAME,
+    PUBLIC_KEY,
+    Some(PRIVATE_KEY.to_string()),
+    None,
+    None,
+);
+let mut session_params = SessionStrParams::default();
+session_params.set_session_hash(CONTRACT_HASH);
+session_params.set_session_entry_point(ENTRYPOINT_MINT);
+
+let args = Vec::from([
+    "token_meta_data:String='test_meta_data'".to_string(),
+    format!("token_owner:Key='{TOKEN_OWNER}'").to_string(),
+]);
+session_params.set_session_args(args);
+
+let payment_params = PaymentStrParams::default();
+payment_params.set_payment_amount(PAYMENT_AMOUNT);
+let call_entrypoint = sdk
+    .call_entrypoint(
+        deploy_params,
+        session_params,
+        payment_params,
+        None,
+    )
+    .await;
+let deploy_hash_as_string = call_entrypoint.as_ref().unwrap().result.deploy_hash.to_string();
+assert!(!deploy_hash_as_string.is_empty());
+```
+
+- <strong>Typescript</strong>
+
+```ts
+import {
+  ...
+  DeployStrParams,
+  SessionStrParams,
+  PaymentStrParams,
+  privateToPublicKey,
+  Bytes,
+} from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const private_key = '';
+const public_key = privateToPublicKey(private_key);
+const contract_hash =
+  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+const entry_point = 'mint';
+
+const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
+
+const session_params = new SessionStrParams();
+session_params.session_hash = contract_hash;
+session_params.session_entry_point = entry_point;
+
+const payment_params = new PaymentStrParams(payment_amount);
+
+const call_entrypoint_result = await sdk.call_entrypoint(
+  deploy_params,
+  session_params,
+  payment_amount
+);
+const call_entrypoint_result_as_json = call_entrypoint_result.toJson();
+console.log(call_entrypoint_result_as_json.deploy_hash);
+```
 
 </details>
 

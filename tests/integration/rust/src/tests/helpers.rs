@@ -183,8 +183,12 @@ pub async fn mint_nft(
         .api_version
         .to_string()
         .is_empty());
-    let deploy_hash = DeployHash::from(test_call_entrypoint.as_ref().unwrap().result.deploy_hash);
-    let deploy_hash_as_string = deploy_hash.to_string();
+    let deploy_hash_as_string = test_call_entrypoint
+        .as_ref()
+        .unwrap()
+        .result
+        .deploy_hash
+        .to_string();
     assert!(!deploy_hash_as_string.is_empty());
 
     thread::sleep(DEPLOY_TIME); // Let's wait for deployment on nctl
