@@ -7,9 +7,10 @@ use tokio::sync::Mutex;
 
 #[tokio::main]
 async fn main() {
-    let _ = async_main().await;
+    // Run config initialize for run_tests
+    //  let _ = async_main().await;
     #[cfg(not(test))]
-    crate::tests::run_tests().await;
+    crate::tests::run_tests_or_examples().await;
 }
 
 lazy_static! {

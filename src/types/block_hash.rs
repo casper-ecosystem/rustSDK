@@ -35,8 +35,9 @@ impl BlockHash {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toString")]
-    pub fn to_string_js_name(&self) -> String {
+    pub fn to_string_js_alias(&self) -> String {
         self.to_string()
     }
 }

@@ -1,4 +1,5 @@
 use super::sdk_error::SdkError;
+#[cfg(target_arch = "wasm32")]
 use crate::debug::error;
 use base16::DecodeError;
 use casper_hashing::{Digest as _Digest, Error as DigestError};
@@ -25,6 +26,7 @@ impl Digest {
         Ok(Digest::from(digest_hex_str))
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromDigest")]
     pub fn from_digest_js_alias(bytes: Vec<u8>) -> Result<Digest, JsValue> {
         Self::from_digest(bytes).map_err(|err| {
@@ -39,8 +41,9 @@ impl Digest {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toString")]
-    pub fn to_string_js_name(&self) -> String {
+    pub fn to_string_js_alias(&self) -> String {
         self.to_string()
     }
 }

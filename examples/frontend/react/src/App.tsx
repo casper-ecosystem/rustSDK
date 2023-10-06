@@ -316,9 +316,7 @@ function App() {
       session_params.session_hash =
         '9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477';
       session_params.session_entry_point = 'decimals';
-      // let payment_params = new PaymentStrParams();
-      // payment_params.payment_amount = '5500000000';
-      // console.log(payment_params);
+
       let test_call_entrypoint = (await sdk.call_entrypoint(
         deploy_params,
         session_params,
