@@ -164,25 +164,23 @@ The Angular app needs to load the wasm file through a dedicated `init()` method 
 > wasm.factory.ts
 
 ```js
-import init, { SDK, Verbosity } from "casper-sdk";
+import init, { SDK, Verbosity } from 'casper-sdk';
 
-export const SDK_TOKEN = new InjectionToken<SDK>('SDK');
-export const WASM_ASSET_PATH = new InjectionToken<string>('wasm_asset_path');
-export const NODE_ADDRESS = new InjectionToken<string>('node_address');
-export const VERBOSITY = new InjectionToken<Verbosity>('verbosity');
+export const SDK_TOKEN = new InjectionToken() < SDK > 'SDK';
+export const WASM_ASSET_PATH =
+  new InjectionToken() < string > 'wasm_asset_path';
+export const NODE_ADDRESS = new InjectionToken() < string > 'node_address';
+export const VERBOSITY = new InjectionToken() < Verbosity > 'verbosity';
 
 type Params = {
   wasm_asset_path: string,
-  node_address: string;
-  verbosity: Verbosity;
+  node_address: string,
+  verbosity: Verbosity,
 };
 
-export const fetchWasmFactory = async (
-  params: Params
-): Promise<SDK> => {
-    const wasm = await init(params.wasm_asset_path);
-    return new SDK(params.node_address, params.verbosity);
-  };
+export const fetchWasmFactory = async (params: Params): Promise<SDK> => {
+  const wasm = await init(params.wasm_asset_path);
+  return new SDK(params.node_address, params.verbosity);
 };
 ```
 
@@ -357,6 +355,8 @@ You can find all rpc methods on the [RPC page](docs/API/.md). Here you can see a
 #### Get deploy by deploy hash
 
 ```ts
+import { Deploy } from 'casper-sdk';
+
 const deploy_hash_as_string =
   'a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9';
 const finalized_approvals = true;

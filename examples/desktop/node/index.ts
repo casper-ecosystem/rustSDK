@@ -1,5 +1,4 @@
-import { Deploy } from "casper-sdk";
-import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams, privateToPublicKey, Bytes } from 'casper-sdk';
+import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams, privateToPublicKey, Bytes, Deploy } from 'casper-sdk';
 const fs = require('fs').promises;
 const http = require('http');
 
