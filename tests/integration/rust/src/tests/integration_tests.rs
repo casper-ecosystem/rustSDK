@@ -14,7 +14,7 @@ pub mod test_module {
     };
     use chrono::DateTime;
 
-    pub async fn test_global_node_address_and_verboosity() {
+    pub async fn test_global_node_address_and_verbosity() {
         let sdk = create_test_sdk(None);
         assert_eq!(sdk.get_node_address(None), "".to_string());
         assert_eq!(sdk.get_verbosity(None), Verbosity::Low);
@@ -174,8 +174,8 @@ mod tests_async {
     use tokio::test;
 
     #[test]
-    pub async fn test_global_node_address_and_verboosity_test() {
-        test_global_node_address_and_verboosity().await;
+    pub async fn test_global_node_address_and_verbosity_test() {
+        test_global_node_address_and_verbosity().await;
     }
     #[test]
     pub async fn test_hex_to_uint8_vec_test() {
