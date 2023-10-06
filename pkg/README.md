@@ -164,25 +164,23 @@ The Angular app needs to load the wasm file through a dedicated `init()` method 
 > wasm.factory.ts
 
 ```js
-import init, { SDK, Verbosity } from "casper-sdk";
+import init, { SDK, Verbosity } from 'casper-sdk';
 
-export const SDK_TOKEN = new InjectionToken<SDK>('SDK');
-export const WASM_ASSET_PATH = new InjectionToken<string>('wasm_asset_path');
-export const NODE_ADDRESS = new InjectionToken<string>('node_address');
-export const VERBOSITY = new InjectionToken<Verbosity>('verbosity');
+export const SDK_TOKEN = new InjectionToken() < SDK > 'SDK';
+export const WASM_ASSET_PATH =
+  new InjectionToken() < string > 'wasm_asset_path';
+export const NODE_ADDRESS = new InjectionToken() < string > 'node_address';
+export const VERBOSITY = new InjectionToken() < Verbosity > 'verbosity';
 
 type Params = {
   wasm_asset_path: string,
-  node_address: string;
-  verbosity: Verbosity;
+  node_address: string,
+  verbosity: Verbosity,
 };
 
-export const fetchWasmFactory = async (
-  params: Params
-): Promise<SDK> => {
-    const wasm = await init(params.wasm_asset_path);
-    return new SDK(params.node_address, params.verbosity);
-  };
+export const fetchWasmFactory = async (params: Params): Promise<SDK> => {
+  const wasm = await init(params.wasm_asset_path);
+  return new SDK(params.node_address, params.verbosity);
 };
 ```
 
@@ -255,11 +253,15 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
 > index.ts
 
 ```ts
+// with require
 const casper_sdk = require('casper-sdk');
 const { SDK } = casper_sdk;
 
+// or with import
+import { SDK } from 'casper-sdk';
+
 const node_address = 'https://rpc.integration.casperlabs.io';
-const sdk: typeof SDK = new SDK(node_address);
+const sdk = new SDK(node_address);
 console.log(sdk);
 ```
 
@@ -353,8 +355,7 @@ You can find all rpc methods on the [RPC page](docs/API/.md). Here you can see a
 #### Get deploy by deploy hash
 
 ```ts
-const node_address = 'https://rpc.integration.casperlabs.io';
-let sdk: typeof SDK = new SDK(node_address);
+import { Deploy } from 'casper-sdk';
 
 const deploy_hash_as_string =
   'a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9';
@@ -378,9 +379,10 @@ console.log(timestamp, header);
 ```ts
 const get_auction_info = await sdk.get_auction_info();
 
-const auction_state = = get_auction_info.auction_state;
+const auction_state = get_auction_info.auction_state;
 const state_root_hash = auction_state.state_root_hash.toString();
 const block_height = auction_state.block_height.toString();
+console.log(state_root_hash, block_height);
 ```
 
 #### Get peers from the network
@@ -401,6 +403,7 @@ const get_block = await sdk.get_block();
 
 let block = get_block.block;
 let block_hash = block.hash;
+console.log(block_hash);
 ```
 
 You can find more examples in the [Angular example app](examples/frontend/angular/src/app/app.component.ts) or in the [React example app](examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](./tests/e2e/)
@@ -425,7 +428,7 @@ use casper_rust_wasm_sdk::types::deploy_params::{
 pub const CHAIN_NAME: &str = "integration-test";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-pub const PAYMENT_AMOUNT: &str = "10000";
+pub const PAYMENT_AMOUNT: &str = "100000000";
 pub const TRANSFER_AMOUNT: &str = "2500000000";
 pub const TTL: &str = "1h";
 pub const TARGET_ACCOUNT: &str =
@@ -459,13 +462,13 @@ println!("{:?}", make_transfer.header().timestamp());
 ```ts
 import { DeployStrParams, PaymentStrParams, getTimestamp } from 'casper-sdk';
 
-const chain_name = 'casper-net-1';
+const chain_name = 'integration-test';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
 const private_key = undefined;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
 const ttl = '1h'; // or undefined
-const payment_amount = '10000';
+const payment_amount = '100000000';
 const transfer_amount = '2500000000';
 const target_account =
   '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
@@ -488,6 +491,7 @@ const transfer_deploy = sdk.make_transfer(
   payment_params
 );
 const transfer_deploy_as_json = transfer_deploy.toJson();
+console.log(transfer_deploy_as_json);
 ```
 
 </details>
@@ -504,12 +508,12 @@ use casper_rust_wasm_sdk::types::deploy_params::{
     deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
 };
 
-pub const CHAIN_NAME: &str = "casper-net-1";
+pub const CHAIN_NAME: &str = "integration-test";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
-pub const PAYMENT_AMOUNT: &str = "10000";
+pub const PAYMENT_AMOUNT: &str = "100000000";
 pub const TRANSFER_AMOUNT: &str = "2500000000";
 pub const TTL: &str = "1h";
 pub const TARGET_ACCOUNT: &str =
@@ -548,10 +552,11 @@ import { DeployStrParams, PaymentStrParams, getTimestamp } from 'casper-sdk';
 const chain_name = 'casper-net-1';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = '';
+const private_key = `-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----`;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
 const ttl = '1h'; // or undefined
-const payment_amount = '10000';
+const payment_amount = '100000000';
 const transfer_amount = '2500000000';
 const target_account =
   '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
@@ -566,7 +571,7 @@ const deploy_params = new DeployStrParams(
 
 const payment_params = new PaymentStrParams(payment_amount);
 
-const transfer_result = sdk.transfer(
+const transfer_result = await sdk.transfer(
   transfer_amount,
   target_account,
   undefined, // transfer_id
@@ -574,6 +579,7 @@ const transfer_result = sdk.transfer(
   payment_params
 );
 const transfer_result_as_json = transfer_result.toJson();
+console.log(transfer_result_as_json);
 ```
 
 </details>
@@ -589,13 +595,13 @@ use casper_rust_wasm_sdk::types::deploy_params::{
     session_str_params::SessionStrParams,
 };
 
-pub const CHAIN_NAME: &str = "casper-net-1";
+pub const CHAIN_NAME: &str = "integration-test";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 pub const PAYMENT_AMOUNT: &str = "5000000000";
 pub const CONTRACT_HASH: &str =
     "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
-pub const ENTRY_POINT: &str = "decimals";
+pub const ENTRY_POINT: &str = "set_variables";
 pub const TTL: &str = "1h";
 
 let deploy_params = DeployStrParams::new(
@@ -613,7 +619,7 @@ session_params.set_session_entry_point(ENTRY_POINT);
 let payment_params = PaymentStrParams::default();
 payment_params.set_payment_amount(PAYMENT_AMOUNT);
 
-let deploy = sdk
+let deploy = awaitsdk
     .make_deploy(deploy_params, session_params, payment_params)
     .unwrap();
 println!("{:?}", deploy.header().timestamp());
@@ -629,7 +635,7 @@ import {
   getTimestamp,
 } from 'casper-sdk';
 
-const chain_name = 'casper-net-1';
+const chain_name = 'integration-test';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
 const payment_amount = '5000000000';
@@ -640,12 +646,13 @@ const deploy_params = new DeployStrParams(chain_name, public_key);
 
 const session_params = new SessionStrParams();
 session_params.session_hash = contract_hash;
-session_params.session_entry_point = 'decimals';
+session_params.session_entry_point = 'set_variables';
 
 const payment_params = new PaymentStrParams(payment_amount);
 
 const deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
 const deploy_as_json = deploy.toJson();
+console.log(deploy_as_json);
 ```
 
 </details>
@@ -713,7 +720,8 @@ import {
 const chain_name = 'casper-net-1';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = '';
+const private_key = `-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----`;
 const payment_amount = '5000000000';
 const contract_hash =
   'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
@@ -722,12 +730,17 @@ const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
 
 const session_params = new SessionStrParams();
 session_params.session_hash = contract_hash;
-session_params.session_entry_point = 'decimals';
+session_params.session_entry_point = 'set_variables';
 
 const payment_params = new PaymentStrParams(payment_amount);
 
-const deploy_result = sdk.deploy(deploy_params, payment_params);
+const deploy_result = await sdk.deploy(
+  deploy_params,
+  session_params,
+  payment_params
+);
 const deploy_result_as_json = deploy_result.toJson();
+console.log(deploy_result_as_json);
 ```
 
 </details>
@@ -794,7 +807,7 @@ pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
-pub const PAYMENT_AMOUNT: &str = "10000";
+pub const PAYMENT_AMOUNT: &str = "100000000";
 pub const TRANSFER_AMOUNT: &str = "2500000000";
 pub const TARGET_ACCOUNT: &str =
     "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
@@ -840,11 +853,12 @@ import {
 const chain_name = 'casper-net-1';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = '';
+const private_key = `-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----`;
 const payment_amount = '5000000000';
 const contract_hash =
   'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-const entry_point = 'decimals';
+const entry_point = 'set_variables';
 
 const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
 
@@ -860,8 +874,9 @@ const deploy = Deploy.withPaymentAndSession(
   payment_params
 );
 
-const put_deploy_result = sdk.put_deploy(deploy);
+const put_deploy_result = await sdk.put_deploy(deploy);
 const put_deploy_result_as_json = put_deploy_result.toJson();
+console.log(put_deploy_result_as_json);
 ```
 
 Puts a [`Transfer Deploy`] to the network for execution.
@@ -878,8 +893,9 @@ import {
 const chain_name = 'casper-net-1';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = '';
-const payment_amount = '10000';
+const private_key = `-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----`;
+const payment_amount = '100000000';
 const transfer_amount = '2500000000';
 const target_account =
   '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
@@ -896,8 +912,9 @@ const transfer_deploy = Deploy.withTransfer(
   payment_params
 );
 
-const put_deploy_result = sdk.put_deploy(transfer_deploy);
+const put_deploy_result = await sdk.put_deploy(transfer_deploy);
 const put_deploy_result_as_json = put_deploy_result.toJson();
+console.log(put_deploy_result_as_json);
 ```
 
 </details>
@@ -1038,7 +1055,8 @@ import {
 } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
-const private_key = '';
+  const private_key = `-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----`;
 const public_key = privateToPublicKey(private_key);
 const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
 
@@ -1058,26 +1076,35 @@ session_params.session_args_json = JSON.stringify([
 ]);
 const payment_amount = '300000000000';
 
-const file = (event.target as HTMLInputElement).files?.item(0);
-const buffer = await file?.arrayBuffer();
+const buffer = await loadFile();
 const wasm = buffer && new Uint8Array(buffer);
 const wasmBuffer = wasm?.buffer;
 if (!wasmBuffer) {
+  console.error('Failed to read wasm file.');
   return;
 }
-if (wasm) {
 
-  session_params.session_bytes = Bytes.fromUint8Array(wasm);
+session_params.session_bytes = Bytes.fromUint8Array(wasm);
 
-  const install_result = await sdk.install(
-    deploy_params,
-    session_params,
-    payment_amount
-  );
-  const install_result_as_json = install_result.toJson();
-  console.log(install_result_as_json.deploy_hash);
-} else {
-  console.error('Failed to read wasm file.');
+const install_result = await sdk.install(
+  deploy_params,
+  session_params,
+  payment_amount
+);
+const install_result_as_json = install_result.toJson();
+console.log(install_result_as_json.deploy_hash);
+```
+
+with
+
+```ts
+async function loadFile() {
+  try {
+    const fileBuffer = await fs.readFile('cep78.wasm');
+    return fileBuffer.buffer; // Returns an ArrayBuffer
+  } catch (error) {
+    throw new Error('Error reading file: ' + error.message);
+  }
 }
 ```
 
@@ -1142,14 +1169,14 @@ const public_key = privateToPublicKey(private_key);
 const contract_hash =
   'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 const entry_point = 'mint';
+const token_owner = 'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
 
 const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
 
 const session_params = new SessionStrParams();
 session_params.session_hash = contract_hash;
 session_params.session_entry_point = entry_point;
-
-const payment_params = new PaymentStrParams(payment_amount);
+session_params.session_args_simple = ["token_meta_data:String='test_meta_data'", `token_owner:Key='${token_owner}'`];
 
 const call_entrypoint_result = await sdk.call_entrypoint(
   deploy_params,
