@@ -16,7 +16,7 @@ pub async fn run_tests_or_examples() {
     // Run a specific test ?
     // integration::rpcs::test_module::test_get_peers().await;
     // Run an example ?
-    let _ = _run_example_12().await;
+    let _ = _run_example_1().await;
 }
 
 pub async fn _run_example_1() {
@@ -96,7 +96,7 @@ pub async fn _run_example_5() {
     pub const CHAIN_NAME: &str = "integration-test";
     pub const PUBLIC_KEY: &str =
         "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-    pub const PAYMENT_AMOUNT: &str = "10000";
+    pub const PAYMENT_AMOUNT: &str = "100000000";
     pub const TRANSFER_AMOUNT: &str = "2500000000";
     pub const TTL: &str = "1h";
     pub const TARGET_ACCOUNT: &str =
@@ -139,9 +139,8 @@ pub async fn _run_example_6() {
     pub const PUBLIC_KEY: &str =
         "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
-    MC4CAQAwBQYDK2VwBCIEIB6YXGbx7i/Jg1MCHa10RqzgB4FfeAHpx9govc4RvQEk
     -----END PRIVATE KEY-----"#;
-    pub const PAYMENT_AMOUNT: &str = "10000";
+    pub const PAYMENT_AMOUNT: &str = "100000000";
     pub const TRANSFER_AMOUNT: &str = "2500000000";
     pub const TTL: &str = "1h";
     pub const TARGET_ACCOUNT: &str =
@@ -228,7 +227,6 @@ pub async fn _run_example_8() {
     pub const PUBLIC_KEY: &str =
         "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
-        MC4CAQAwBQYDK2VwBCIEIB6YXGbx7i/Jg1MCHa10RqzgB4FfeAHpx9govc4RvQEk
         -----END PRIVATE KEY-----"#;
     pub const PAYMENT_AMOUNT: &str = "5000000000";
     pub const CONTRACT_HASH: &str =
@@ -275,7 +273,6 @@ pub async fn _run_example_9() {
     pub const PUBLIC_KEY: &str =
         "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
-        MC4CAQAwBQYDK2VwBCIEIB6YXGbx7i/Jg1MCHa10RqzgB4FfeAHpx9govc4RvQEk
         -----END PRIVATE KEY-----"#;
     pub const PAYMENT_AMOUNT: &str = "5000000000";
     pub const CONTRACT_HASH: &str =
@@ -320,9 +317,8 @@ pub async fn _run_example_10() {
     pub const PUBLIC_KEY: &str =
         "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
-        MC4CAQAwBQYDK2VwBCIEIB6YXGbx7i/Jg1MCHa10RqzgB4FfeAHpx9govc4RvQEk
         -----END PRIVATE KEY-----"#;
-    pub const PAYMENT_AMOUNT: &str = "10000";
+    pub const PAYMENT_AMOUNT: &str = "100000000";
     pub const TRANSFER_AMOUNT: &str = "2500000000";
     pub const TARGET_ACCOUNT: &str =
         "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
@@ -382,8 +378,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     pub const PUBLIC_KEY: &str =
         "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
-        MC4CAQAwBQYDK2VwBCIEIB6YXGbx7i/Jg1MCHa10RqzgB4FfeAHpx9govc4RvQEk
------END PRIVATE KEY-----"#;
+    -----END PRIVATE KEY-----"#;
     pub const ARGS_JSON: &str = r#"[
 {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
 {"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
@@ -461,7 +456,6 @@ pub async fn _run_example_12() {
     pub const PUBLIC_KEY: &str =
         "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
-        MC4CAQAwBQYDK2VwBCIEIB6YXGbx7i/Jg1MCHa10RqzgB4FfeAHpx9govc4RvQEk
         -----END PRIVATE KEY-----"#;
     pub const CONTRACT_HASH: &str =
         "hash-c12808431d490e2c463c2f968d0a4eaa0f9d57842508d9041aa42e2bd21eb96c";

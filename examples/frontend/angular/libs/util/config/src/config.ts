@@ -6,7 +6,7 @@ export const config: EnvironmentConfig = {
   verbosity: 'High',
   minimum_transfer: '2500000000',
   TTL: '30m',
-  gas_fee_transfer: '10000',
+  gas_fee_transfer: '100000000',
   block_identifier_height_default: '1958541',
   block_identifier_hash: '372e4c83a6ca19c027d3daf4807ad8fc16b9f01411ef39d5e00888128bf4fd59',
   networks: {

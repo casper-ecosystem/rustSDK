@@ -255,8 +255,8 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
 > index.ts
 
 ```ts
-const casper_rust_wasm_sdk = require('casper-sdk');
-const { SDK } = casper_rust_wasm_sdk;
+const casper_sdk = require('casper-sdk');
+const { SDK } = casper_sdk;
 
 const node_address = 'https://rpc.integration.casperlabs.io';
 const sdk: typeof SDK = new SDK(node_address);
@@ -353,28 +353,30 @@ You can find all rpc methods on the [RPC page](docs/API/.md). Here you can see a
 #### Get deploy by deploy hash
 
 ```ts
-import { DeployHash } from 'casper-sdk';
+const node_address = 'https://rpc.integration.casperlabs.io';
+let sdk: typeof SDK = new SDK(node_address);
 
 const deploy_hash_as_string =
   'a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9';
 const finalized_approvals = true;
 
-const get_deploy_options = this.sdk.get_deploy_options({
+const get_deploy_options = sdk.get_deploy_options({
   deploy_hash_as_string,
   finalized_approvals,
 });
 
-const deploy_result = await this.sdk.get_deploy(get_deploy_options);
+const deploy_result = await sdk.get_deploy(get_deploy_options);
 
-const deploy = deploy_result.deploy.
+const deploy: Deploy = deploy_result.deploy;
 const timestamp = deploy.timestamp();
 const header = deploy.toJson().header; // DeployHeader type not being exposed right now by the SDK you can convert every type to JSON
+console.log(timestamp, header);
 ```
 
 #### Get auction state information
 
 ```ts
-const get_auction_info = await this.sdk.get_auction_info();
+const get_auction_info = await sdk.get_auction_info();
 
 const auction_state = = get_auction_info.auction_state;
 const state_root_hash = auction_state.state_root_hash.toString();
@@ -384,7 +386,7 @@ const block_height = auction_state.block_height.toString();
 #### Get peers from the network
 
 ```ts
-const get_peers = await this.sdk.get_peers();
+const get_peers = await sdk.get_peers();
 
 const peers = get_peers.peers;
 peers.forEach((peer) => {
@@ -395,7 +397,7 @@ peers.forEach((peer) => {
 #### Get the latest block information
 
 ```ts
-const get_block = await this.sdk.get_block();
+const get_block = await sdk.get_block();
 
 let block = get_block.block;
 let block_hash = block.hash;
