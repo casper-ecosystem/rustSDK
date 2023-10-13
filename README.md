@@ -343,7 +343,7 @@ let block_hash = block.hash();
 println!("{:?}", block_hash);
 ```
 
-You can find more examples by reading [Rust integration tests](./tests/integration/rust/)
+You can find more examples by reading [Rust integration tests](./tests/integration/rust/).
 
 </details>
 
