@@ -219,7 +219,7 @@ Add the SDK Wasm file to the assets of your project with the path parameter bein
 
 #### Frontend Angular example
 
-You can look at a more advanced example of usage in the [Angular example app](examples/frontend/angular/src/app/app.component.ts)
+You can look at a more advanced example of usage in the [Angular example app](examples/frontend/angular/src/app/app.component.ts).
 
 ```shell
 $ cd ./examples/frontend/angular
