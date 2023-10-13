@@ -286,7 +286,7 @@ $ npm start
 <details>
   <summary><strong><code>Rust</code></strong></summary>
 <br>
-You can find all rpc methods on the [RPC page](docs/API/.md). Here you can see a several of examples of using the rpc methods. All examples below are supposed to be ran against the Testnet.
+You can find all RPC methods on the [RPC page](docs/API/.md). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get deploy by deploy hash
 
