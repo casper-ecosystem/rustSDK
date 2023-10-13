@@ -2,7 +2,7 @@
 
 The Rust/Wasm SDK allows developers and users to interact with the Casper Blockchain using Rust or TypeScript. It provides a way to embed the [casper-client-rs](https://github.com/casper-ecosystem/casper-client-rs) into another application without the CLI interface. The SDK exposes a list of types and methods from a subset of the Casper client.
 
-You can use the Casper Rust/Wasm SDK in two ways.
+You can use the Casper Rust/Wasm SDK in two ways:
 
 - In a <strong>Rust application</strong> by importing the SDK crate.
 - In a <strong>Typescript application</strong> by importing the SDK Wasm file and the Typescript interfaces.
