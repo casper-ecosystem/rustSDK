@@ -247,7 +247,7 @@ $ npm build
 }
 ```
 
-The Node app loads the SDK with `require()`. You can find more details about building the sdk for [Node with wasm-pack](https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html#nodejs)
+The Node app loads the SDK with `require()`. You can find more details about building the SDK for [Node with wasm-pack](https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html#nodejs).
 Note that this method requires a version of Node.js with WebAssembly support, which is currently Node 8 and above.
 
 > index.ts
