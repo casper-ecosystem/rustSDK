@@ -1207,7 +1207,7 @@ $ npm start
 $ npm build
 ```
 
-You can download an alpha version of the app illustrating the sdk here :
+You can download an alpha version of the app illustrating the SDK here:
 
 - [Microsoft Windows](examples/desktop/electron/release/Casper%20Setup%201.0.0.exe)
 - [GNU/Linux AppImage](examples/desktop/electron/release/Casper-1.0.0.AppImage)
