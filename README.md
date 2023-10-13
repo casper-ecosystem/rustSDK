@@ -16,7 +16,7 @@ This page covers different examples of using the SDK.
 
 ## Rust Project
 
-Add the sdk as dependency of your project
+Add the SDK as a dependency of your project:
 
 > Cargo.toml
 
