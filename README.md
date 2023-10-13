@@ -1278,7 +1278,7 @@ You can download an alpha version of the app illustrating the sdk here :
 
 ## Testing
 
-Tests are run against NCTL by default or the network configured in corresponding configurations. Tests assume a `secret_key.pem` is either at root of tests of in
+Tests are run against NCTL by default or the network configured in corresponding configurations. Tests assume a `secret_key.pem` is either at the root of tests or in `./NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/` from the root (several levels higher than the test). This path can be changed in configuration.
 `./NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/` from the root (so levels higher than the test). This path can be changed in configuration.
 
 - [Rust Integration tests](tests/integration/rust/) can be run with `cargo test -- --test-threads=1 --nocapture` [configured in config](tests/integration/rust/src/config.rs)
