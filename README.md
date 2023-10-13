@@ -267,7 +267,7 @@ console.log(sdk);
 
 #### Desktop Node example
 
-You can look at a very basic example of usage in the [Node example app](examples/desktop/node/index.ts)
+You can look at a very basic example of usage in the [Node example app](examples/desktop/node/index.ts).
 
 ```shell
 $ cd ./examples/desktop/node
