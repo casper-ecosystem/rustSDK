@@ -50,7 +50,7 @@ Or you can use the [TODO][npm package](https://todo)
 
 #### Build package with Wasm pack
 
-If you want to compile the wasm package from Rust you might need to install wasm-pack for ease of use.
+If you want to compile the Wasm package from Rust you may need to install `wasm-pack` for ease of use.
 
 ```shell
 curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
