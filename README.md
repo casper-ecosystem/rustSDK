@@ -133,7 +133,7 @@ function App() {
 
 #### Frontend React example
 
-You can look at a very basic example of usage in the [React example app](examples/frontend/react/src/App.tsx)
+You can look at a very basic example of usage in the [React example app](examples/frontend/react/src/App.tsx).
 
 ```shell
 $ cd ./examples/frontend/react
