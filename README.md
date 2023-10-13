@@ -200,7 +200,7 @@ const providers = provideSafeAsync(SDK_TOKEN, fetchWasmFactory);
 export class WasmModule {}
 ```
 
-You can look at a basic example of factory usage in the [Angular example app](examples/frontend/angular/libs/util/services/wasm/src/lib/wasm.factory.ts)
+You can look at a basic example of factory usage in the [Angular example app](examples/frontend/angular/libs/util/services/wasm/src/lib/wasm.factory.ts).
 
 Add the sdk wasm file to assets of your project with path parameter being ` wasm_asset_path:'assets/casper_rust_wasm_sdk_bg.wasm'`, Angular will then copy the file from `pkg` in `assets` on build making it available for the fetch wasm factory.
 
