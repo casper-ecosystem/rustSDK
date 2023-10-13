@@ -96,7 +96,7 @@ pkg
 }
 ```
 
-The React app needs to load the wasm file through a dedicated `init()` method as per this example
+The React app needs to load the Wasm file through a dedicated `init()` method as per this example:
 
 > App.tsx
 
