@@ -48,7 +48,7 @@ You can directly use the content of the [pkg folder](pkg/) for a browser project
 
 Or you can use the [TODO][npm package](https://todo)
 
-#### Build package with wasm pack
+#### Build package with Wasm pack
 
 If you want to compile the wasm package from Rust you might need to install wasm-pack for ease of use.
 
