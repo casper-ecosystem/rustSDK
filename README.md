@@ -499,7 +499,7 @@ console.log(transfer_deploy_as_json);
 <details>
     <summary>Transfer</summary>
 <br>
-Sends a [`Transfer Deploy`] to the network for execution. (Alias for make_transfer+ put_deploy)
+Sends a [`Transfer Deploy`] to the network for execution. (Alias for make_transfer + put_deploy)
 
 #### Rust
 
