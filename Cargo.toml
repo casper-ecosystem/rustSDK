@@ -7,8 +7,15 @@ repository = "https://github.com/casper-ecosystem/rustSDK"
 license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://casperlabs.io"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+exclude = [
+  ".*",
+  "docs/api-wasm",
+  "docs/images",
+  "examples",
+  "pkg",
+  "pkg-nodejs",
+  "tests/**",
+]
 
 [dependencies]
 casper-hashing = { version = "2.0.0", git = "https://github.com/casper-network/casper-node.git", branch = "rustSDK-1.6", default-features = false }
@@ -46,3 +53,6 @@ doc = false
 
 [profile.release]
 lto = true
+
+[dev-dependencies]
+sdk-tests = { path = "tests/integration/rust" }
