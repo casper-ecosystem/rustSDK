@@ -17,5 +17,11 @@
   "types": "casper_rust_wasm_sdk.d.ts",
   "sideEffects": [
     "./snippets/*"
+  ],
+  "keywords": [
+    "casper",
+    "sdk",
+    "rust",
+    "wasm"
   ]
 }

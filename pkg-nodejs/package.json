@@ -14,5 +14,11 @@
   ],
   "main": "casper_rust_wasm_sdk.js",
   "homepage": "https://casperlabs.io",
-  "types": "casper_rust_wasm_sdk.d.ts"
+  "types": "casper_rust_wasm_sdk.d.ts",
+  "keywords": [
+    "casper",
+    "sdk",
+    "rust",
+    "wasm"
+  ]
 }
