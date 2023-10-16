@@ -22,7 +22,7 @@ clean:
 
 doc:
 	cargo doc --package casper-rust-wasm-sdk
-	cp -r target/doc/static.files/ docs/static.files/
+	cp -r target/doc/static.files/ docs/
 	cp -r target/doc/casper_rust_wasm_sdk/* docs/api-rust/
 	typedoc --out docs/api-wasm pkg/casper_rust_wasm_sdk.d.ts
 
