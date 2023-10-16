@@ -2,7 +2,7 @@
 
 The Rust/Wasm SDK allows developers and users to interact with the Casper Blockchain using Rust or TypeScript. It provides a way to embed the [casper-client-rs](https://github.com/casper-ecosystem/casper-client-rs) into another application without the CLI interface. The SDK exposes a list of types and methods from a subset of the Casper client.
 
-You can use the Casper Rust/Wasm SDK in two ways.
+You can use the Casper Rust/Wasm SDK in two ways:
 
 - In a <strong>Rust application</strong> by importing the SDK crate.
 - In a <strong>Typescript application</strong> by importing the SDK Wasm file and the Typescript interfaces.
@@ -16,7 +16,7 @@ This page covers different examples of using the SDK.
 
 ## Rust Project
 
-Add the sdk as dependency of your project
+Add the SDK as a dependency of your project:
 
 > Cargo.toml
 
@@ -48,9 +48,9 @@ You can directly use the content of the [pkg folder](pkg/) for a browser project
 
 Or you can use the [TODO][npm package](https://todo)
 
-#### Build package with wasm pack
+#### Build package with Wasm pack
 
-If you want to compile the wasm package from Rust you might need to install wasm-pack for ease of use.
+If you want to compile the Wasm package from Rust you may need to install `wasm-pack` for ease of use.
 
 ```shell
 curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
@@ -61,9 +61,9 @@ $ make prepare
 $ make pack
 ```
 
-will create a `pkg` and `pkg-nodejs` cointaining the typescript interfaces. You can find more details about building the sdk for javascript with wasm-pack in the [wasm-pack documention](https://rustwasm.github.io/docs/wasm-pack/commands/build.html).
+This will create a `pkg` and `pkg-nodejs` containing the Typescript interfaces. You can find more details about building the SDK for Javascript with `wasm-pack` in the [wasm-pack documention](https://rustwasm.github.io/docs/wasm-pack/commands/build.html).
 
-This folders will contain a wasm binary, a JS wrapper file, typescript types definitions, and a package.json file that you can load in your proper project.
+This folder contains a Wasm binary, a JS wrapper file, Typescript types definitions, and a package.json file that you can load in your project.
 
 ```shell
 $ tree pkg
@@ -96,7 +96,7 @@ pkg
 }
 ```
 
-The React app needs to load the wasm file through a dedicated `init()` method as per this example
+The React app needs to load the Wasm file through a dedicated `init()` method as per this example:
 
 > App.tsx
 
@@ -133,7 +133,7 @@ function App() {
 
 #### Frontend React example
 
-You can look at a very basic example of usage in the [React example app](examples/frontend/react/src/App.tsx)
+You can look at a very basic example of usage in the [React example app](examples/frontend/react/src/App.tsx).
 
 ```shell
 $ cd ./examples/frontend/react
@@ -159,7 +159,7 @@ $ npm start
 }
 ```
 
-The Angular app needs to load the wasm file through a dedicated `init()` method as per this example. You can import it into a component through a service but it is advised to import it through a factory with the injection token [APP_INITIALIZER](https://angular.io/api/core/APP_INITIALIZER).
+The Angular app needs to load the Wasm file through a dedicated `init()` method as per this example. You can import it into a component through a service but it is advised to import it through a factory with the injection token [APP_INITIALIZER](https://angular.io/api/core/APP_INITIALIZER).
 
 > wasm.factory.ts
 
@@ -200,9 +200,9 @@ const providers = provideSafeAsync(SDK_TOKEN, fetchWasmFactory);
 export class WasmModule {}
 ```
 
-You can look at a basic example of factory usage in the [Angular example app](examples/frontend/angular/libs/util/services/wasm/src/lib/wasm.factory.ts)
+You can look at a basic example of factory usage in the [Angular example app](examples/frontend/angular/libs/util/services/wasm/src/lib/wasm.factory.ts).
 
-Add the sdk wasm file to assets of your project with path parameter being ` wasm_asset_path:'assets/casper_rust_wasm_sdk_bg.wasm'`, Angular will then copy the file from `pkg` in `assets` on build making it available for the fetch wasm factory.
+Add the SDK Wasm file to the assets of your project with the path parameter being ` wasm_asset_path:'assets/casper_rust_wasm_sdk_bg.wasm'`, Angular will then copy the file from `pkg` in `assets` on build making it available for the fetch Wasm factory.
 
 > project.json
 
@@ -219,7 +219,7 @@ Add the sdk wasm file to assets of your project with path parameter being ` wasm
 
 #### Frontend Angular example
 
-You can look at a more advanced example of usage in the [Angular example app](examples/frontend/angular/src/app/app.component.ts)
+You can look at a more advanced example of usage in the [Angular example app](examples/frontend/angular/src/app/app.component.ts).
 
 ```shell
 $ cd ./examples/frontend/angular
@@ -247,7 +247,7 @@ $ npm build
 }
 ```
 
-The Node app loads the SDK with `require()`. You can find more details about building the sdk for [Node with wasm-pack](https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html#nodejs)
+The Node app loads the SDK with `require()`. You can find more details about building the SDK for [Node with wasm-pack](https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html#nodejs).
 Note that this method requires a version of Node.js with WebAssembly support, which is currently Node 8 and above.
 
 > index.ts
@@ -267,7 +267,7 @@ console.log(sdk);
 
 #### Desktop Node example
 
-You can look at a very basic example of usage in the [Node example app](examples/desktop/node/index.ts)
+You can look at a very basic example of usage in the [Node example app](examples/desktop/node/index.ts).
 
 ```shell
 $ cd ./examples/desktop/node
@@ -286,7 +286,7 @@ $ npm start
 <details>
   <summary><strong><code>Rust</code></strong></summary>
 <br>
-You can find all rpc methods on the [RPC page](docs/API/.md). Here you can see a several of examples of using the rpc methods. All examples below are supposed to be ran against the Testnet.
+You can find all RPC methods on the [RPC page](docs/API/.md). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get deploy by deploy hash
 
@@ -343,14 +343,14 @@ let block_hash = block.hash();
 println!("{:?}", block_hash);
 ```
 
-You can find more examples by reading [Rust integration tests](./tests/integration/rust/)
+You can find more examples by reading [Rust integration tests](./tests/integration/rust/).
 
 </details>
 
 <details>
   <summary><strong><code>Typescript</code></strong></summary>
 <br>
-You can find all rpc methods on the [RPC page](docs/API/.md). Here you can see a several of examples of using the rpc methods. All examples below are supposed to be ran against the Testnet.
+You can find all RPC methods on the [RPC page](docs/API/.md). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get deploy by deploy hash
 
@@ -406,7 +406,7 @@ let block_hash = block.hash;
 console.log(block_hash);
 ```
 
-You can find more examples in the [Angular example app](examples/frontend/angular/src/app/app.component.ts) or in the [React example app](examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](./tests/e2e/)
+You can find more examples in the [Angular example app](examples/frontend/angular/src/app/app.component.ts) or in the [React example app](examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](./tests/e2e/).
 
 </details>
 
@@ -499,7 +499,7 @@ console.log(transfer_deploy_as_json);
 <details>
     <summary>Transfer</summary>
 <br>
-Sends a [`Transfer Deploy`] to the network for execution. (Alias for make_transfer+ put_deploy)
+Sends a [`Transfer Deploy`] to the network for execution. (Alias for make_transfer + put_deploy)
 
 #### Rust
 
@@ -1207,7 +1207,7 @@ $ npm start
 $ npm build
 ```
 
-You can download an alpha version of the app illustrating the sdk here :
+You can download an alpha version of the app illustrating the SDK here:
 
 - [Microsoft Windows](examples/desktop/electron/release/Casper%20Setup%201.0.0.exe)
 - [GNU/Linux AppImage](examples/desktop/electron/release/Casper-1.0.0.AppImage)
@@ -1278,7 +1278,7 @@ You can download an alpha version of the app illustrating the sdk here :
 
 ## Testing
 
-Tests are run against NCTL by default or the network configured in corresponding configurations. Tests assume a `secret_key.pem` is either at root of tests of in
+Tests are run against NCTL by default or the network configured in corresponding configurations. Tests assume a `secret_key.pem` is either at the root of tests or in `./NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/` from the root (several levels higher than the test). This path can be changed in configuration.
 `./NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/` from the root (so levels higher than the test). This path can be changed in configuration.
 
 - [Rust Integration tests](tests/integration/rust/) can be run with `cargo test -- --test-threads=1 --nocapture` [configured in config](tests/integration/rust/src/config.rs)
