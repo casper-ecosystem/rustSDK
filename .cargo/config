@@ -1,0 +1,2 @@
+[build]
+exclude = [ "docs/api-wasm", "docs/images", "examples" , "pkg", "pkg-nodejs", "tests/e2e"  ]
