@@ -286,7 +286,7 @@ $ npm start
 <details>
   <summary><strong><code>Rust</code></strong></summary>
 <br>
-You can find all RPC methods on the [RPC page](docs/API/.md). Below are several examples of RPC methods intended for use on Testnet.
+You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/rustSDK/api-rust/rpcs/). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get deploy by deploy hash
 
@@ -350,7 +350,7 @@ You can find more examples by reading [Rust integration tests](./tests/integrati
 <details>
   <summary><strong><code>Typescript</code></strong></summary>
 <br>
-You can find all RPC methods on the [RPC page](docs/API/.md). Below are several examples of RPC methods intended for use on Testnet.
+You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/SDK.html). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get deploy by deploy hash
 
@@ -1222,59 +1222,61 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ## Rust API
 
-- [Full item list](docs/api-rust/all.html)
+- [Modules and Structs](https://casper-ecosystem.github.io/rustSDK/api-rust/)
+
+- [Full item list](https://casper-ecosystem.github.io/rustSDK/api-rust/all.html)
 
 ### SDK
 
-- [SDK Struct and methods](docs/api-rust/struct.SDK.html)
+- [SDK Struct and methods](https://casper-ecosystem.github.io/rustSDK/api-rust/struct.SDK.html)
 
 ### RPC
 
-- [RPC List](docs/api-rust/rpcs/index.html)
+- [RPC List](https://casper-ecosystem.github.io/rustSDK/api-rust/rpcs/index.html)
 
 ### Deploy Params
 
-- [Params and Args simple](docs/api-rust/types/deploy_params/index.html)
+- [Params and Args simple](https://casper-ecosystem.github.io/rustSDK/api-rust/types/deploy_params/index.html)
 
 ### Deploy
 
-- [Deploy Type and static builder](docs/api-rust/types/deploy/struct.Deploy.html)
+- [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/api-rust/types/deploy/struct.Deploy.html)
 
 ### Types
 
-- [Current exposed types](docs/api-rust/types/index.html)
+- [Current exposed types](https://casper-ecosystem.github.io/rustSDK/api-rust/types/index.html)
 
 ### Helpers functions
 
-- [Rust helpers](docs/api-rust/helpers/index.html)
+- [Rust helpers](https://casper-ecosystem.github.io/rustSDK/api-rust/helpers/index.html)
 
 ## Typescript API
 
-- [Full item list](docs/api-wasm/index.html)
+- [Full item list](https://casper-ecosystem.github.io/rustSDK/api-wasm/index.html)
 
 ### SDK
 
-- [SDK Struct and methods](docs/api-wasm/classes/SDK.html)
+- [SDK Struct and methods](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/SDK.html)
 
 ### RPC Methods
 
-- [RPC List](docs/api-rust/rpcs/index.html)
+- [RPC List](https://casper-ecosystem.github.io/rustSDK/api-rust/rpcs/index.html)
 
 ### Deploy Params
 
-- [Params and Args simple](docs/api-rust/types/deploy_params/index.html)
+- [Params and Args simple](https://casper-ecosystem.github.io/rustSDK/api-rust/types/deploy_params/index.html)
 
 ### Deploy
 
-- [Deploy Type and static builder](docs/api-wasm/classes/Deploy.html)
+- [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/Deploy.html)
 
 ### Types
 
-- [Current exposed types](docs/api-wasm/modules.html)
+- [Current exposed types](https://casper-ecosystem.github.io/rustSDK/api-wasm/modules.html)
 
 ### Helpers functions
 
-- [TS helpers](docs/api-wasm/modules.html)
+- [TS helpers](https://casper-ecosystem.github.io/rustSDK/api-wasm/modules.html)
 
 ## Testing
 
