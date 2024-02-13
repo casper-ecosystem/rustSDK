@@ -1,9 +1,9 @@
 use crate::{debug::error, SDK};
-#[cfg(not(target_arch = "wasm32"))]
 use futures_util::StreamExt;
 use gloo_events::EventListener;
-#[cfg(target_arch = "wasm32")]
+
 use gloo_utils::format::JsValueSerdeExt;
+use js_sys::Promise;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use serde_json::Value;
@@ -14,24 +14,51 @@ use std::{
     sync::{Arc, Mutex},
 };
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::future_to_promise;
 #[cfg(target_arch = "wasm32")]
-use wasm_bindgen_futures::{future_to_promise, JsFuture};
+use wasm_bindgen_futures::JsFuture;
 #[cfg(target_arch = "wasm32")]
 use web_sys::{ReadableStream, Request, RequestInit, Response};
 
-#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
     #[wasm_bindgen(js_name = "watchDeploy")]
-    pub fn watch_deploy_js_alias(&self, events_url: String) -> DeployWatcher {
-        self.watch_deploy(events_url)
+    pub fn watch_deploy(&self, events_url: &str) -> DeployWatcher {
+        DeployWatcher::new(events_url.to_string())
     }
-}
 
-#[wasm_bindgen]
-impl SDK {
-    pub fn watch_deploy(&self, events_url: String) -> DeployWatcher {
-        DeployWatcher::new(events_url)
+    #[wasm_bindgen(js_name = "waitDeploy")]
+    pub async fn wait_deploy_js_alias(events_url: &str, deploy_hash: &str) -> Promise {
+        let watcher = DeployWatcher::new(events_url.to_string());
+        let deploy_hash = deploy_hash.to_string();
+        let future = async move {
+            let result = watcher.wait_deploy(&deploy_hash).await;
+            match result {
+                Ok(Some(event_parse_result)) => {
+                    Ok(JsValue::from_serde(&event_parse_result).unwrap())
+                }
+                Ok(None) => Err(JsValue::from_str("Event not found")),
+                Err(err) => Err(JsValue::from_str(&err.to_string())),
+            }
+        };
+
+        future_to_promise(future)
+    }
+
+    pub async fn wait_deploy(
+        &self,
+        events_url: &str,
+        deploy_hash: &str,
+    ) -> Result<EventParseResult, String> {
+        let watcher = DeployWatcher::new(events_url.to_string());
+        let deploy_hash = deploy_hash.to_string();
+
+        let result = watcher.wait_deploy(&deploy_hash).await;
+        match result {
+            Ok(Some(event_parse_result)) => Ok(event_parse_result),
+            Ok(None) => Err("No event parse result found".to_string()),
+            Err(err) => Err(err.to_string()),
+        }
     }
 }
 
@@ -45,6 +72,25 @@ pub struct DeployWatcher {
 }
 
 impl DeployWatcher {
+    pub fn subscribe(
+        &mut self,
+        deploy_subscriptions: Vec<DeploySubscription>,
+    ) -> Result<(), String> {
+        for new_subscription in &deploy_subscriptions {
+            if self
+                .deploy_subscriptions
+                .iter()
+                .any(|s| s.deploy_hash == new_subscription.deploy_hash)
+            {
+                // Check if the deploy hash is already present
+                return Err(String::from("Already subscribed to this event"));
+            }
+        }
+        // If no duplicate deploy hashes found, add the new subscriptions
+        self.deploy_subscriptions.extend(deploy_subscriptions);
+        Ok(())
+    }
+
     #[cfg(target_arch = "wasm32")]
     fn decode_ascii_to_string(data: &serde_json::Value) -> Option<String> {
         if let Some(obj) = data.as_object() {
@@ -76,6 +122,57 @@ impl DeployWatcher {
             .collect();
         data_stream
     }
+
+    fn parse_events(
+        mut self,
+        deploy_hash: &str,
+        decoded_str: &str,
+    ) -> Result<EventParseResult, String> {
+        // log("parse_events");
+
+        let data_stream = Self::extract_data_stream(decoded_str);
+
+        for data_item in data_stream {
+            // log("data item");
+            let trimmed_item = data_item.trim();
+            // Check if trimmed_item contains "DeployProcessed"
+            if !trimmed_item.contains("DeployProcessed") {
+                continue; // Skip to the next iteration if "DeployProcessed" is not found
+            }
+            // log(trimmed_item);
+
+            if let Ok(parsed_json) = serde_json::from_str::<serde_json::Value>(trimmed_item) {
+                // log("Parsed JSON");
+                let deploy = parsed_json.get("DeployProcessed");
+                if let Some(deploy_processed) = deploy.and_then(|d| d.as_object()) {
+                    // log("DeployProcessed");
+                    if let Some(deploy_hash_processed) =
+                        deploy_processed.get("deploy_hash").and_then(|h| h.as_str())
+                    {
+                        // log("deploy_hash");
+                        if deploy_hash_processed == deploy_hash {
+                            // log(deploy_hash);
+
+                            let deploy_processed: Option<DeployProcessed> =
+                                serde_json::from_value(deploy.unwrap().clone()).ok();
+
+                            // Create the Body struct with deploy_processed
+                            let body = Body { deploy_processed };
+
+                            // Create the EventParseResult with body and no error
+                            let event_parse_result = EventParseResult { err: None, body };
+                            self.unsubscribe(deploy_hash.to_string());
+                            self.stop();
+                            return Ok(event_parse_result);
+                        }
+                    }
+                }
+            } else {
+                return Err("Failed to parse JSON data.".to_string());
+            }
+        }
+        Err("No matching event found".to_string())
+    }
 }
 
 #[wasm_bindgen]
@@ -88,6 +185,15 @@ impl DeployWatcher {
             deploy_subscriptions: Vec::new(),
             active: Rc::new(RefCell::new(true)),
         }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "subscribe")]
+    pub fn subscribe_js_alias(
+        &mut self,
+        deploy_subscriptions: Vec<DeploySubscription>,
+    ) -> Result<(), String> {
+        self.subscribe(deploy_subscriptions)
     }
 
     #[wasm_bindgen]
@@ -106,11 +212,77 @@ impl DeployWatcher {
             event_listener.forget();
         }
     }
+
+    #[wasm_bindgen]
+    pub async fn wait_deploy(
+        mut self,
+        deploy_hash: &str,
+    ) -> Result<Option<EventParseResult>, String> {
+        *self.active.borrow_mut() = true;
+        // log("start non wasm32");
+
+        let client = reqwest::Client::new();
+        let url = self.events_url.clone();
+
+        let deploy_watcher = Rc::new(RefCell::new(self.clone()));
+
+        let response = match client.get(&url).send().await {
+            Ok(res) => res,
+            Err(err) => {
+                let err = err.to_string();
+                error(&err);
+                return Err(err);
+            }
+        };
+        // log("after response"); // Use println for logging in the console
+
+        if response.status().is_success() {
+            let mut bytes_stream = response.bytes_stream();
+            while let Some(chunk) = bytes_stream.next().await {
+                match chunk {
+                    Ok(bytes) => {
+                        // Process the chunk of data
+                        // log(&format!("Chunk received: {:?}", bytes));
+                        let this_clone = Rc::clone(&deploy_watcher);
+                        let deploy_watcher_clone = this_clone.borrow_mut().clone();
+                        if !*deploy_watcher_clone.active.borrow() {
+                            // Check if the deploy watcher is no longer active
+                            return Ok(None);
+                        }
+
+                        if let Ok(chunk_str) = std::str::from_utf8(&bytes) {
+                            match deploy_watcher_clone.parse_events(deploy_hash, chunk_str) {
+                                Ok(event_parse_result) => {
+                                    self.unsubscribe(deploy_hash.to_string());
+                                    self.stop();
+                                    return Ok(Some(event_parse_result));
+                                }
+                                Err(_err) => {
+                                    // error(&_err);
+                                    continue;
+                                }
+                            }
+                        } else {
+                            error("Error decoding UTF-8 data");
+                        }
+                    }
+                    Err(err) => {
+                        error(&format!("Error reading chunk: {}", err));
+                        continue;
+                    }
+                }
+            }
+        } else {
+            error("Failed to fetch stream");
+            return Err("Failed to fetch stream".to_string());
+        }
+        Ok(None)
+    }
 }
 
 #[wasm_bindgen]
+#[cfg(target_arch = "wasm32")]
 impl DeployWatcher {
-    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen]
     pub fn start(self) {
         *self.active.borrow_mut() = true;
@@ -162,28 +334,6 @@ impl DeployWatcher {
         let _ = future_to_promise(future);
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen]
-    pub fn subscribe(
-        &mut self,
-        deploy_subscriptions: Vec<DeploySubscription>,
-    ) -> Result<(), String> {
-        for new_subscription in &deploy_subscriptions {
-            if self
-                .deploy_subscriptions
-                .iter()
-                .any(|s| s.deploy_hash == new_subscription.deploy_hash)
-            {
-                // Check if the deploy hash is already present
-                return Err(String::from("Already subscribed to this event"));
-            }
-        }
-        // If no duplicate deploy hashes found, add the new subscriptions
-        self.deploy_subscriptions.extend(deploy_subscriptions);
-        Ok(())
-    }
-
-    #[cfg(target_arch = "wasm32")]
     fn process_events(mut self, subscriptions: Rc<Vec<DeploySubscription>>, json_data: Value) {
         // log("process_events");
         if let Value::Object(ref obj) = json_data {
@@ -218,6 +368,7 @@ impl DeployWatcher {
                             // log("DeployProcessed");
                             if let Some(deploy_hash) = deploy_processed["deploy_hash"].as_str() {
                                 // log("deploy_hash");
+                                let mut deploy_hash_found = false;
                                 for subscription in subscriptions.iter() {
                                     if deploy_hash == subscription.deploy_hash {
                                         // log(&subscription.deploy_hash);
@@ -241,9 +392,13 @@ impl DeployWatcher {
                                         let event_handler = &subscription.event_handler_fn;
                                         event_handler.apply(&this, &args).unwrap();
                                         self.unsubscribe(deploy_hash.to_string());
+                                        deploy_hash_found = true;
                                     }
                                 }
-                                self.stop();
+                                if deploy_hash_found && self.deploy_subscriptions.is_empty() {
+                                    self.stop();
+                                    break;
+                                }
                             }
                         }
                     } else {
@@ -255,8 +410,8 @@ impl DeployWatcher {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 impl DeployWatcher {
-    #[cfg(not(target_arch = "wasm32"))]
     pub async fn start(self) -> Result<(), String> {
         *self.active.borrow_mut() = true;
         // log("start non wasm32");
@@ -310,27 +465,6 @@ impl DeployWatcher {
         Ok(())
     }
 
-    #[cfg(not(target_arch = "wasm32"))]
-    pub fn subscribe(
-        &mut self,
-        deploy_subscriptions: Vec<DeploySubscription>,
-    ) -> Result<(), String> {
-        for new_subscription in &deploy_subscriptions {
-            if self
-                .deploy_subscriptions
-                .iter()
-                .any(|s| s.deploy_hash == new_subscription.deploy_hash)
-            {
-                // Check if the deploy hash is already present
-                return Err(String::from("Already subscribed to this event"));
-            }
-        }
-        // If no duplicate deploy hashes found, add the new subscriptions
-        self.deploy_subscriptions.extend(deploy_subscriptions);
-        Ok(())
-    }
-
-    #[cfg(not(target_arch = "wasm32"))]
     fn process_events(mut self, subscriptions: Rc<Vec<DeploySubscription>>, decoded_str: &str) {
         // log("process_events");
 
@@ -352,6 +486,7 @@ impl DeployWatcher {
                     // log("DeployProcessed");
                     if let Some(deploy_hash) = deploy_processed["deploy_hash"].as_str() {
                         // log("deploy_hash");
+                        let mut deploy_hash_found = false;
                         for subscription in subscriptions.iter() {
                             if deploy_hash == subscription.deploy_hash {
                                 // log(&subscription.deploy_hash);
@@ -367,9 +502,13 @@ impl DeployWatcher {
                                 let event_handler = &subscription.event_handler_fn;
                                 event_handler.call(event_parse_result);
                                 self.unsubscribe(deploy_hash.to_string());
+                                deploy_hash_found = true;
                             }
                         }
-                        self.stop();
+                        if deploy_hash_found && self.deploy_subscriptions.is_empty() {
+                            self.stop();
+                            break;
+                        }
                     }
                 }
             } else {

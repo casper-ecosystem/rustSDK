@@ -42,7 +42,7 @@ pub mod test_module {
 
         assert!(!deploy_hash.is_empty());
 
-        let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS.to_string());
+        let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS);
 
         let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
         let deploy_hash_results = vec![deploy_hash.clone()];
@@ -59,6 +59,22 @@ pub mod test_module {
         let _ = watcher.clone().start().await;
         watcher.clone().stop();
     }
+
+    pub async fn test_wait_deploy() {
+        let config: TestConfig = get_config(true).await;
+        let sdk = create_test_sdk(Some(config.clone()));
+
+        let deploy_hash = test_install().await;
+
+        assert!(!deploy_hash.is_empty());
+
+        let event_parse_result = sdk
+            .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash)
+            .await
+            .unwrap();
+        let deploy_processed = event_parse_result.body.deploy_processed.unwrap();
+        assert_eq!(deploy_processed.deploy_hash, deploy_hash);
+    }
 }
 
 #[cfg(test)]
@@ -69,5 +85,10 @@ mod tests {
     #[test]
     pub async fn test_watch_deploy_test() {
         test_watch_deploy().await;
+    }
+
+    #[test]
+    pub async fn test_wait_deploy_test() {
+        test_wait_deploy().await;
     }
 }
