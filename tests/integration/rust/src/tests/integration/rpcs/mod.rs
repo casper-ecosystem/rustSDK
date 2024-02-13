@@ -34,7 +34,7 @@ pub mod test_module {
     }
 
     pub async fn test_get_account(maybe_block_identifier: Option<BlockIdentifierInput>) {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let public_key = PublicKey::new(&config.account).unwrap();
         let account_identifier =
             AccountIdentifier::from_account_account_under_public_key(public_key);
@@ -60,7 +60,7 @@ pub mod test_module {
     pub async fn test_get_account_with_account_hash(
         maybe_block_identifier: Option<BlockIdentifierInput>,
     ) {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let account_hash = AccountHash::from_formatted_str(&config.account_hash).unwrap();
         let account_identifier = AccountIdentifier::from_account_under_account_hash(account_hash);
         let get_account = create_test_sdk(Some(config))
@@ -83,7 +83,7 @@ pub mod test_module {
     }
 
     pub async fn test_get_auction_info(maybe_block_identifier: Option<BlockIdentifierInput>) {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let get_auction_info = create_test_sdk(Some(config))
             .get_auction_info(maybe_block_identifier, None, None)
             .await;
@@ -98,7 +98,7 @@ pub mod test_module {
     }
 
     pub async fn test_get_balance() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let get_state_root_hash = create_test_sdk(Some(config.clone()))
             .get_state_root_hash(None, None, None)
             .await;
@@ -121,7 +121,7 @@ pub mod test_module {
     }
 
     pub async fn test_get_block_transfers(maybe_block_identifier: Option<BlockIdentifierInput>) {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let get_block_transfers = create_test_sdk(Some(config))
             .get_block_transfers(maybe_block_identifier, None, None)
             .await;
@@ -141,7 +141,7 @@ pub mod test_module {
     }
 
     pub async fn test_get_block(maybe_block_identifier: Option<BlockIdentifierInput>) {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let get_block = create_test_sdk(Some(config))
             .get_block(maybe_block_identifier, None, None)
             .await;
@@ -167,7 +167,7 @@ pub mod test_module {
     }
 
     pub async fn test_get_deploy() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let get_deploy = create_test_sdk(Some(config.clone()))
             .get_deploy(
                 DeployHash::new(&config.deploy_hash).unwrap(),
@@ -182,7 +182,7 @@ pub mod test_module {
     }
 
     pub async fn test_get_dictionary_item() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let get_state_root_hash = create_test_sdk(Some(config.clone()))
             .get_state_root_hash(None, None, None)
             .await;
@@ -225,7 +225,7 @@ pub mod test_module {
     }
 
     pub async fn test_get_dictionary_item_without_state_root_hash() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let mut params = DictionaryItemStrParams::new();
         params.set_contract_named_key(
             &config.contract_cep78_hash,
@@ -331,7 +331,7 @@ pub mod test_module {
     }
 
     pub async fn test_query_balance(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let query_balance = create_test_sdk(Some(config.clone()))
             .query_balance(
                 maybe_global_state_identifier,
@@ -351,7 +351,7 @@ pub mod test_module {
     pub async fn test_query_global_state(
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,
     ) {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let path = format!("{CONTRACT_CEP78_KEY}/collection_name");
 
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
@@ -390,11 +390,11 @@ pub mod test_module {
     pub async fn test_query_global_state_key_from_account_hash(
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,
     ) {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
 
         println!("install_hello_contract");
 
-        test_install().await;
+        let _deploy_hash = test_install().await;
 
         thread::sleep(DEPLOY_TIME); // Let's wait for deployment on nctl
 
@@ -452,7 +452,7 @@ mod tests {
     }
     #[test]
     pub async fn test_get_account_test_with_block_identifier() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_account(maybe_block_identifier).await;
     }
@@ -466,7 +466,7 @@ mod tests {
     }
     #[test]
     pub async fn test_get_auction_info_test_with_block_identifier() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_auction_info(maybe_block_identifier).await;
     }
@@ -480,7 +480,7 @@ mod tests {
     }
     #[test]
     pub async fn test_get_block_transfers_test_with_block_identifier() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_block_transfers(maybe_block_identifier).await;
     }
@@ -506,7 +506,7 @@ mod tests {
     }
     #[test]
     pub async fn test_get_era_info_test_with_block_identifier() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_era_info(maybe_block_identifier).await;
     }
@@ -516,7 +516,7 @@ mod tests {
     }
     #[test]
     pub async fn test_get_era_summary_test_with_block_identifier() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_era_summary(maybe_block_identifier).await;
     }
@@ -538,7 +538,7 @@ mod tests {
     }
     #[test]
     pub async fn test_query_balance_test_with_block_identifier() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
             BlockHash::new(&config.block_hash).unwrap(),
         ));
@@ -554,7 +554,7 @@ mod tests {
     }
     #[test]
     pub async fn test_query_global_state_test_with_block_identifier() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
             BlockHash::new(&config.block_hash).unwrap(),
         ));

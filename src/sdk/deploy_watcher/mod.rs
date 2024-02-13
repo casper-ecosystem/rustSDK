@@ -1,1 +1,1 @@
-pub(crate) mod deploy_watcher;
+pub mod deploy_watcher;

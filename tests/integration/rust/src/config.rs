@@ -10,6 +10,7 @@ use std::time::{self, Duration};
 use tokio::sync::Mutex;
 
 pub const DEFAULT_NODE_ADDRESS: &str = "http://localhost:11101";
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PRIVATE_KEY_NAME: &str = "secret_key.pem";
 // TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static erroring with runtime dropped the dispatch task
@@ -80,7 +81,9 @@ lazy_static! {
     pub static ref BLOCK_HASH_INITIALIZED: Mutex<bool> = Mutex::new(false);
 }
 
-pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::Error>> {
+pub async fn initialize_test_config(
+    skip_install: bool,
+) -> Result<TestConfig, Box<dyn std::error::Error>> {
     use crate::tests::helpers::{get_contract_cep78_hash_keys, install_cep78_if_needed, mint_nft};
 
     let mut block_hash_initialized_guard = BLOCK_HASH_INITIALIZED.lock().await;
@@ -103,27 +106,37 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
 
     let purse_uref = get_main_purse(&account).await;
 
-    println!("install_cep78");
-    let deploy_hash = install_cep78_if_needed(&account, &private_key, None)
-        .await
-        .unwrap();
+    let mut deploy_hash = String::from("");
+    let mut contract_cep78_hash = String::from("");
+    let mut contract_cep78_package_hash = String::from("");
+    let mut dictionary_key = String::from("");
+    let mut dictionary_uref = String::from("");
+    if !skip_install {
+        println!("install_cep78");
+        deploy_hash = install_cep78_if_needed(&account, &private_key, None)
+            .await
+            .unwrap();
 
-    let (contract_cep78_hash, contract_cep78_package_hash) =
-        get_contract_cep78_hash_keys(&account_hash).await;
+        let (_contract_cep78_hash, _contract_cep78_package_hash) =
+            get_contract_cep78_hash_keys(&account_hash).await;
 
-    println!("mint_nft");
-    // install has been running for over 60 seconds
-    mint_nft(&contract_cep78_hash, &account, &account_hash, &private_key).await;
+        contract_cep78_hash = _contract_cep78_hash;
+        contract_cep78_package_hash = _contract_cep78_package_hash;
 
-    let dictionary_key = get_dictionnary_key(
-        &contract_cep78_hash,
-        DICTIONARY_NAME,
-        DICTIONARY_ITEM_KEY,
-        None,
-    )
-    .await;
+        println!("mint_nft");
+        // install has been running for over 60 seconds
+        mint_nft(&contract_cep78_hash, &account, &account_hash, &private_key).await;
 
-    let dictionary_uref = get_dictionnary_uref(&contract_cep78_hash, DICTIONARY_NAME).await;
+        dictionary_key = get_dictionnary_key(
+            &contract_cep78_hash,
+            DICTIONARY_NAME,
+            DICTIONARY_ITEM_KEY,
+            None,
+        )
+        .await;
+
+        dictionary_uref = get_dictionnary_uref(&contract_cep78_hash, DICTIONARY_NAME).await;
+    }
 
     let (block_hash, block_height) = get_block().await;
     *block_hash_initialized_guard = true;
@@ -148,14 +161,14 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
     Ok(config)
 }
 
-pub async fn get_config() -> TestConfig {
-    initialize_test_config_if_needed().await;
+pub async fn get_config(skip_install: bool) -> TestConfig {
+    initialize_test_config_if_needed(skip_install).await;
     CONFIG.lock().await.clone().unwrap()
 }
 
-async fn initialize_test_config_if_needed() {
+async fn initialize_test_config_if_needed(skip_install: bool) {
     let mut config_guard = CONFIG.lock().await;
     if config_guard.is_none() {
-        *config_guard = Some(initialize_test_config().await.unwrap());
+        *config_guard = Some(initialize_test_config(skip_install).await.unwrap());
     }
 }

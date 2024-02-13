@@ -19,7 +19,7 @@ pub mod test_module {
         let sdk = create_test_sdk(None);
         assert_eq!(sdk.get_node_address(None), "".to_string());
         assert_eq!(sdk.get_verbosity(None), Verbosity::Low);
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let mut sdk = create_test_sdk(Some(config.clone()));
         assert_eq!(sdk.get_node_address(None), config.node_address.unwrap());
         assert_eq!(sdk.get_verbosity(None), config.verbosity.unwrap());
@@ -30,7 +30,7 @@ pub mod test_module {
     }
 
     pub async fn test_hex_to_uint8_vec() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let test: Vec<u8> = hex_to_uint8_vec(&config.account);
         assert!(!test.is_empty());
         assert_eq!(test.len(), 33);
@@ -59,13 +59,13 @@ pub mod test_module {
     }
 
     pub async fn test_public_key_from_private_key() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let public_key = public_key_from_private_key(&config.private_key).unwrap();
         assert_eq!(public_key, config.account);
     }
 
     pub async fn test_secret_key_from_pem() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let secret_key = secret_key_from_pem(&config.private_key).unwrap();
         assert_eq!(secret_key.to_string(), "SecretKey::Ed25519");
     }
@@ -118,7 +118,7 @@ pub mod test_module {
     }
 
     pub async fn test_get_json_pretty_print() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let get_node_status = create_test_sdk(Some(config))
             .get_node_status(None, None)
             .await;
