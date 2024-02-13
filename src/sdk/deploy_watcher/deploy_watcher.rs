@@ -1,7 +1,6 @@
 use crate::{debug::error, SDK};
 use futures_util::StreamExt;
 use gloo_events::EventListener;
-
 use gloo_utils::format::JsValueSerdeExt;
 use js_sys::Promise;
 use serde::{Deserialize, Serialize};
@@ -28,7 +27,7 @@ impl SDK {
     }
 
     #[wasm_bindgen(js_name = "waitDeploy")]
-    pub async fn wait_deploy_js_alias(events_url: &str, deploy_hash: &str) -> Promise {
+    pub async fn wait_deploy_js_alias(&self, events_url: &str, deploy_hash: &str) -> Promise {
         let watcher = DeployWatcher::new(events_url.to_string());
         let deploy_hash = deploy_hash.to_string();
         let future = async move {
@@ -69,110 +68,6 @@ pub struct DeployWatcher {
     event_listener: Rc<RefCell<Option<EventListener>>>,
     deploy_subscriptions: Vec<DeploySubscription>,
     active: Rc<RefCell<bool>>,
-}
-
-impl DeployWatcher {
-    pub fn subscribe(
-        &mut self,
-        deploy_subscriptions: Vec<DeploySubscription>,
-    ) -> Result<(), String> {
-        for new_subscription in &deploy_subscriptions {
-            if self
-                .deploy_subscriptions
-                .iter()
-                .any(|s| s.deploy_hash == new_subscription.deploy_hash)
-            {
-                // Check if the deploy hash is already present
-                return Err(String::from("Already subscribed to this event"));
-            }
-        }
-        // If no duplicate deploy hashes found, add the new subscriptions
-        self.deploy_subscriptions.extend(deploy_subscriptions);
-        Ok(())
-    }
-
-    #[cfg(target_arch = "wasm32")]
-    fn decode_ascii_to_string(data: &serde_json::Value) -> Option<String> {
-        if let Some(obj) = data.as_object() {
-            let mut decoded_str = String::new();
-            for i in 0.. {
-                if let Some(code) = obj.get(&i.to_string()) {
-                    if let Some(num) = code.as_u64() {
-                        decoded_str.push(num as u8 as char);
-                    } else {
-                        // Return None if encountered non-numeric value
-                        return None;
-                    }
-                } else {
-                    // Break if key not found
-                    break;
-                }
-            }
-            Some(decoded_str)
-        } else {
-            None
-        }
-    }
-
-    fn extract_data_stream(json_data: &str) -> Vec<&str> {
-        let data_stream: Vec<&str> = json_data
-            .split("data:")
-            .filter(|s| !s.is_empty())
-            .map(|s| s.split("id:").next().unwrap_or(""))
-            .collect();
-        data_stream
-    }
-
-    fn parse_events(
-        mut self,
-        deploy_hash: &str,
-        decoded_str: &str,
-    ) -> Result<EventParseResult, String> {
-        // log("parse_events");
-
-        let data_stream = Self::extract_data_stream(decoded_str);
-
-        for data_item in data_stream {
-            // log("data item");
-            let trimmed_item = data_item.trim();
-            // Check if trimmed_item contains "DeployProcessed"
-            if !trimmed_item.contains("DeployProcessed") {
-                continue; // Skip to the next iteration if "DeployProcessed" is not found
-            }
-            // log(trimmed_item);
-
-            if let Ok(parsed_json) = serde_json::from_str::<serde_json::Value>(trimmed_item) {
-                // log("Parsed JSON");
-                let deploy = parsed_json.get("DeployProcessed");
-                if let Some(deploy_processed) = deploy.and_then(|d| d.as_object()) {
-                    // log("DeployProcessed");
-                    if let Some(deploy_hash_processed) =
-                        deploy_processed.get("deploy_hash").and_then(|h| h.as_str())
-                    {
-                        // log("deploy_hash");
-                        if deploy_hash_processed == deploy_hash {
-                            // log(deploy_hash);
-
-                            let deploy_processed: Option<DeployProcessed> =
-                                serde_json::from_value(deploy.unwrap().clone()).ok();
-
-                            // Create the Body struct with deploy_processed
-                            let body = Body { deploy_processed };
-
-                            // Create the EventParseResult with body and no error
-                            let event_parse_result = EventParseResult { err: None, body };
-                            self.unsubscribe(deploy_hash.to_string());
-                            self.stop();
-                            return Ok(event_parse_result);
-                        }
-                    }
-                }
-            } else {
-                return Err("Failed to parse JSON data.".to_string());
-            }
-        }
-        Err("No matching event found".to_string())
-    }
 }
 
 #[wasm_bindgen]
@@ -280,6 +175,111 @@ impl DeployWatcher {
     }
 }
 
+impl DeployWatcher {
+    pub fn subscribe(
+        &mut self,
+        deploy_subscriptions: Vec<DeploySubscription>,
+    ) -> Result<(), String> {
+        for new_subscription in &deploy_subscriptions {
+            if self
+                .deploy_subscriptions
+                .iter()
+                .any(|s| s.deploy_hash == new_subscription.deploy_hash)
+            {
+                // Check if the deploy hash is already present
+                return Err(String::from("Already subscribed to this event"));
+            }
+        }
+        // If no duplicate deploy hashes found, add the new subscriptions
+        self.deploy_subscriptions.extend(deploy_subscriptions);
+        Ok(())
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    fn decode_ascii_to_string(data: &serde_json::Value) -> Option<String> {
+        if let Some(obj) = data.as_object() {
+            let mut decoded_str = String::new();
+            for i in 0.. {
+                if let Some(code) = obj.get(&i.to_string()) {
+                    if let Some(num) = code.as_u64() {
+                        decoded_str.push(num as u8 as char);
+                    } else {
+                        // Return None if encountered non-numeric value
+                        return None;
+                    }
+                } else {
+                    // Break if key not found
+                    break;
+                }
+            }
+            Some(decoded_str)
+        } else {
+            None
+        }
+    }
+
+    fn extract_data_stream(json_data: &str) -> Vec<&str> {
+        let data_stream: Vec<&str> = json_data
+            .split("data:")
+            .filter(|s| !s.is_empty())
+            .map(|s| s.split("id:").next().unwrap_or(""))
+            .collect();
+        data_stream
+    }
+
+    fn parse_events(
+        mut self,
+        deploy_hash: &str,
+        decoded_str: &str,
+    ) -> Result<EventParseResult, String> {
+        // log("parse_events");
+
+        let data_stream = Self::extract_data_stream(decoded_str);
+
+        for data_item in data_stream {
+            // log("data item");
+            let trimmed_item = data_item.trim();
+            // Check if trimmed_item contains "DeployProcessed"
+            let deploy_processed_str = EventName::DeployProcessed.to_string();
+            if !trimmed_item.contains(&deploy_processed_str) {
+                continue; // Skip to the next iteration if "DeployProcessed" is not found
+            }
+            // log(trimmed_item);
+
+            if let Ok(parsed_json) = serde_json::from_str::<serde_json::Value>(trimmed_item) {
+                // log("Parsed JSON");
+                let deploy = parsed_json.get(deploy_processed_str);
+                if let Some(deploy_processed) = deploy.and_then(|d| d.as_object()) {
+                    // log("DeployProcessed");
+                    if let Some(deploy_hash_processed) =
+                        deploy_processed.get("deploy_hash").and_then(|h| h.as_str())
+                    {
+                        // log("deploy_hash");
+                        if deploy_hash_processed == deploy_hash {
+                            // log(deploy_hash);
+
+                            let deploy_processed: Option<DeployProcessed> =
+                                serde_json::from_value(deploy.unwrap().clone()).ok();
+
+                            // Create the Body struct with deploy_processed
+                            let body = Body { deploy_processed };
+
+                            // Create the EventParseResult with body and no error
+                            let event_parse_result = EventParseResult { err: None, body };
+                            self.unsubscribe(deploy_hash.to_string());
+                            self.stop();
+                            return Ok(event_parse_result);
+                        }
+                    }
+                }
+            } else {
+                return Err("Failed to parse JSON data.".to_string());
+            }
+        }
+        Err("No matching event found".to_string())
+    }
+}
+
 #[wasm_bindgen]
 #[cfg(target_arch = "wasm32")]
 impl DeployWatcher {
@@ -354,8 +354,11 @@ impl DeployWatcher {
                 for data_item in data_stream {
                     // log("data item");
                     let trimmed_item = data_item.trim();
+                    let deploy_processed_str =
+                        serde_json::to_string(&EventName::DeployProcessed).unwrap();
+
                     // Check if trimmed_item contains "DeployProcessed"
-                    if !trimmed_item.contains("DeployProcessed") {
+                    if !trimmed_item.contains(&deploy_processed_str) {
                         continue; // Skip to the next iteration if "DeployProcessed" is not found
                     }
                     //  log(trimmed_item);
@@ -363,7 +366,7 @@ impl DeployWatcher {
                     if let Ok(parsed_json) = serde_json::from_str::<serde_json::Value>(trimmed_item)
                     {
                         // log("Parsed JSON");
-                        let deploy = &parsed_json["DeployProcessed"];
+                        let deploy = &parsed_json[deploy_processed_str];
                         if let Some(deploy_processed) = deploy.as_object() {
                             // log("DeployProcessed");
                             if let Some(deploy_hash) = deploy_processed["deploy_hash"].as_str() {
@@ -473,15 +476,17 @@ impl DeployWatcher {
         for data_item in data_stream {
             // log("data item");
             let trimmed_item = data_item.trim();
+            let deploy_processed_str = EventName::DeployProcessed.to_string();
+
             // Check if trimmed_item contains "DeployProcessed"
-            if !trimmed_item.contains("DeployProcessed") {
+            if !trimmed_item.contains(&deploy_processed_str) {
                 continue; // Skip to the next iteration if "DeployProcessed" is not found
             }
             // log(trimmed_item);
 
             if let Ok(parsed_json) = serde_json::from_str::<serde_json::Value>(trimmed_item) {
                 // log("Parsed JSON");
-                let deploy = &parsed_json["DeployProcessed"];
+                let deploy = &parsed_json[deploy_processed_str];
                 if let Some(deploy_processed) = deploy.as_object() {
                     // log("DeployProcessed");
                     if let Some(deploy_hash) = deploy_processed["deploy_hash"].as_str() {
@@ -639,4 +644,27 @@ pub struct Body {
 pub struct EventParseResult {
     pub err: Option<String>,
     pub body: Body,
+}
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+pub enum EventName {
+    BlockAdded,
+    DeployProcessed,
+    DeployAccepted,
+    BlockFinalized,
+    FinalitySignature,
+    Fault,
+}
+
+impl fmt::Display for EventName {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            EventName::BlockAdded => write!(f, "BlockAdded"),
+            EventName::DeployProcessed => write!(f, "DeployProcessed"),
+            EventName::DeployAccepted => write!(f, "DeployAccepted"),
+            EventName::BlockFinalized => write!(f, "BlockFinalized"),
+            EventName::FinalitySignature => write!(f, "FinalitySignature"),
+            EventName::Fault => write!(f, "Fault"),
+        }
+    }
 }
