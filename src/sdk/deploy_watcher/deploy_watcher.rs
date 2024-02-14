@@ -1,7 +1,7 @@
 use crate::{debug::error, SDK};
 use futures_util::StreamExt;
 use gloo_events::EventListener;
-
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 #[cfg(target_arch = "wasm32")]
 use js_sys::Promise;
@@ -107,6 +107,7 @@ impl DeployWatcher {
             .retain(|s| s.deploy_hash != deploy_hash);
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "start")]
     pub async fn start_js_alias(&self) -> Result<JsValue, JsValue> {
         let result: Result<Option<Vec<EventParseResult>>, String> = self.start_internal(None).await;
