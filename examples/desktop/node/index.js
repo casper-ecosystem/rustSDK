@@ -41,27 +41,18 @@ var fs = require('fs').promises;
 var http = require('http');
 var node_address = 'https://rpc.integration.casperlabs.io';
 var sdk = new casper_sdk_1.SDK(node_address);
-var server = http.createServer(function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var peers_object, peers_as_json;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
-                return [4 /*yield*/, sdk.get_peers()];
-            case 1:
-                peers_object = _a.sent();
-                console.log(peers_object.peers);
-                peers_as_json = peers_object.toJson();
-                console.log(peers_as_json);
-                res.end(JSON.stringify(peers_as_json));
-                return [2 /*return*/];
-        }
-    });
-}); });
-var PORT = process.env.PORT || 3000;
-server.listen(PORT, function () {
-    console.log("Server is running on port ".concat(PORT));
-});
+// const server = http.createServer(async (req, res) => {
+//   res.writeHead(200, { 'Content-Type': 'text/plain' });
+//   let peers_object = await sdk.get_peers();
+//   console.log(peers_object.peers);
+//   const peers_as_json = peers_object.toJson();
+//   console.log(peers_as_json);
+//   res.end(JSON.stringify(peers_as_json));
+// });
+// const PORT = process.env.PORT || 3000;
+// server.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
 // get_deploy
 var example1 = function () { return __awaiter(void 0, void 0, void 0, function () {
     var deploy_hash_as_string, finalized_approvals, get_deploy_options, deploy_result, deploy, timestamp, header;
@@ -312,7 +303,7 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
                 events_address = 'http://127.0.0.1:18101/events/main';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
-                private_key = "-----BEGIN PRIVATE KEY-----\n    -----END PRIVATE KEY-----";
+                private_key = "-----BEGIN PRIVATE KEY-----\n  MC4CAQAwBQYDK2VwBCIEIMSwux1yM00NOvQ+Q6iR6iGbA7rHPqVTx1uE2Si89A3y\n    -----END PRIVATE KEY-----";
                 public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
                 deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, private_key);
                 session_params = new casper_sdk_1.SessionStrParams();
@@ -357,7 +348,7 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
 }); };
 // call_entrypoint
 var example12 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var node_address, events_address, sdk, chain_name, private_key, public_key, contract_hash, entry_point, token_owner, payment_amount, deploy_params, session_params, call_entrypoint_result, call_entrypoint_result_as_json, deploy_hash_results, watcher, deploySubscriptions, getEventHandlerFn;
+    var node_address, events_address, sdk, chain_name, private_key, public_key, contract_hash, entry_point, token_owner, payment_amount, deploy_params, session_params, call_entrypoint_result, call_entrypoint_result_as_json, deploy_hash_results, watcher, deploySubscriptions, getEventHandlerFn, results;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -365,9 +356,9 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                 events_address = 'http://127.0.0.1:18101/events/main';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
-                private_key = "-----BEGIN PRIVATE KEY-----\n    -----END PRIVATE KEY-----";
+                private_key = "-----BEGIN PRIVATE KEY-----\n  MC4CAQAwBQYDK2VwBCIEIMSwux1yM00NOvQ+Q6iR6iGbA7rHPqVTx1uE2Si89A3y\n    -----END PRIVATE KEY-----";
                 public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
-                contract_hash = 'hash-508ec6d085766e8abf5c2ff8a6c60ca9e1712fe6228656d5fae3e281b0218ca0';
+                contract_hash = 'hash-7705c58f20c445c605ba1bf5adab66686a8f891879d6012e07fe24c8bf3af3f2';
                 entry_point = 'mint';
                 token_owner = 'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
                 payment_amount = '5000000000';
@@ -415,9 +406,11 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                 watcher.subscribe(deploySubscriptions);
                 return [4 /*yield*/, watcher.start()];
             case 2:
-                _a.sent();
+                results = _a.sent();
                 watcher.stop();
+                console.log(results);
                 return [2 /*return*/];
         }
     });
 }); };
+example11();

@@ -27,6 +27,19 @@ pub mod test_module {
         assert_eq!(deploy_processed.deploy_hash, deploy_hash);
     }
 
+    pub async fn test_wait_deploy_timeout() {
+        let config: TestConfig = get_config(true).await;
+        let sdk = create_test_sdk(Some(config.clone()));
+
+        let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
+
+        let event_parse_result = sdk
+            .wait_deploy(DEFAULT_EVENT_ADDRESS, deploy_hash)
+            .await
+            .unwrap();
+        dbg!(event_parse_result);
+    }
+
     pub async fn test_watch_deploy() {
         let config: TestConfig = get_config(true).await;
         let sdk = create_test_sdk(Some(config.clone()));
@@ -49,8 +62,9 @@ pub mod test_module {
         }
 
         let _ = watcher.subscribe(deploy_subscriptions);
-        let _ = watcher.clone().start().await;
+        let _results = watcher.clone().start().await;
         watcher.clone().stop();
+        // dbg!(_results);
     }
 }
 
@@ -67,6 +81,14 @@ mod tests {
         let result = timeout(Duration::from_secs(45), test_wait_deploy()).await;
         // Assert whether the test completed within the timeout period
         assert!(result.is_ok(), "Test timed out after 45 seconds");
+    }
+
+    #[test]
+    pub async fn test_wait_deploy_timeout_test() {
+        // Wrap the test function with a timeout of 5 seconds
+        let result = timeout(Duration::from_secs(10), test_wait_deploy_timeout()).await;
+        // Assert whether the test completed within the timeout period
+        assert!(result.is_ok(), "Test timed out after 5 seconds");
     }
 
     #[test]

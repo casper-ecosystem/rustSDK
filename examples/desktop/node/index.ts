@@ -261,6 +261,7 @@ const example11 = async () => {
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
   const private_key = `-----BEGIN PRIVATE KEY-----
+  MC4CAQAwBQYDK2VwBCIEIMSwux1yM00NOvQ+Q6iR6iGbA7rHPqVTx1uE2Si89A3y
     -----END PRIVATE KEY-----`;
   const public_key = privateToPublicKey(private_key);
   const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
@@ -320,10 +321,11 @@ const example12 = async () => {
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
   const private_key = `-----BEGIN PRIVATE KEY-----
+  MC4CAQAwBQYDK2VwBCIEIMSwux1yM00NOvQ+Q6iR6iGbA7rHPqVTx1uE2Si89A3y
     -----END PRIVATE KEY-----`;
   const public_key = privateToPublicKey(private_key);
   const contract_hash =
-    'hash-508ec6d085766e8abf5c2ff8a6c60ca9e1712fe6228656d5fae3e281b0218ca0';
+    'hash-7705c58f20c445c605ba1bf5adab66686a8f891879d6012e07fe24c8bf3af3f2';
   const entry_point = 'mint';
   const token_owner =
     'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
@@ -372,6 +374,7 @@ const example12 = async () => {
     deploySubscriptions.push(deploySubscription);
   });
   watcher.subscribe(deploySubscriptions);
-  await watcher.start();
+  const results = await watcher.start();
   watcher.stop();
+  console.log(results);
 };

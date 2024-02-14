@@ -29,15 +29,6 @@ wasm-bindgen = "*"
 wasm-bindgen-test = "*"
 wasm-bindgen-futures = "*"
 js-sys = "*"
-web-sys = { version = "*", features = [
-  "MessageEvent",
-  "ErrorEvent",
-  "Request",
-  "RequestInit",
-  "Response",
-  "ReadableStream",
-  "ReadableStreamDefaultReader",
-] }
 gloo-utils = { version = "0.2", default-features = false, features = ["serde"] }
 gloo-events = { version = "*", default-features = false }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
