@@ -17,7 +17,6 @@ pub mod test_module {
         let deploy_hash = test_install().await;
 
         assert!(!deploy_hash.is_empty());
-        dbg!(deploy_hash.clone());
 
         let event_parse_result = sdk
             .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash)

@@ -1,7 +1,9 @@
 use crate::{debug::error, SDK};
 use futures_util::StreamExt;
 use gloo_events::EventListener;
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
+#[cfg(target_arch = "wasm32")]
 use js_sys::Promise;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
@@ -13,6 +15,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 use wasm_bindgen::prelude::*;
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen_futures::future_to_promise;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen_futures::JsFuture;
@@ -26,36 +29,41 @@ impl SDK {
         DeployWatcher::new(events_url.to_string())
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn wait_deploy(
+        &self,
+        events_url: &str,
+        deploy_hash: &str,
+    ) -> Result<EventParseResult, String> {
+        Self::wait_deploy_internal(events_url.to_string(), deploy_hash.to_string()).await
+    }
+
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "waitDeploy")]
     pub async fn wait_deploy_js_alias(&self, events_url: &str, deploy_hash: &str) -> Promise {
-        let watcher = DeployWatcher::new(events_url.to_string());
+        let events_url = events_url.to_string();
         let deploy_hash = deploy_hash.to_string();
         let future = async move {
-            let result = watcher.wait_deploy(&deploy_hash).await;
+            let result = Self::wait_deploy_internal(events_url, deploy_hash).await;
             match result {
-                Ok(Some(event_parse_result)) => {
-                    Ok(JsValue::from_serde(&event_parse_result).unwrap())
-                }
-                Ok(None) => Err(JsValue::from_str("Event not found")),
-                Err(err) => Err(JsValue::from_str(&err.to_string())),
+                Ok(event_parse_result) => JsValue::from_serde(&event_parse_result)
+                    .map_err(|err| JsValue::from_str(&format!("{err}"))),
+                Err(err) => Err(JsValue::from_str(&err)),
             }
         };
 
         future_to_promise(future)
     }
 
-    pub async fn wait_deploy(
-        &self,
-        events_url: &str,
-        deploy_hash: &str,
+    async fn wait_deploy_internal(
+        events_url: String,
+        deploy_hash: String,
     ) -> Result<EventParseResult, String> {
-        let watcher = DeployWatcher::new(events_url.to_string());
-        let deploy_hash = deploy_hash.to_string();
-
+        let watcher = DeployWatcher::new(events_url);
         let result = watcher.wait_deploy(&deploy_hash).await;
         match result {
             Ok(Some(event_parse_result)) => Ok(event_parse_result),
-            Ok(None) => Err("No event parse result found".to_string()),
+            Ok(None) => Err("No event result found".to_string()),
             Err(err) => Err(err.to_string()),
         }
     }
@@ -108,11 +116,7 @@ impl DeployWatcher {
         }
     }
 
-    #[wasm_bindgen]
-    pub async fn wait_deploy(
-        mut self,
-        deploy_hash: &str,
-    ) -> Result<Option<EventParseResult>, String> {
+    async fn wait_deploy(mut self, deploy_hash: &str) -> Result<Option<EventParseResult>, String> {
         *self.active.borrow_mut() = true;
         // log("start non wasm32");
 
@@ -133,32 +137,45 @@ impl DeployWatcher {
 
         if response.status().is_success() {
             let mut bytes_stream = response.bytes_stream();
+
+            let buffer_size = 1;
+            let mut buffer = Vec::with_capacity(buffer_size);
+
             while let Some(chunk) = bytes_stream.next().await {
                 match chunk {
                     Ok(bytes) => {
                         // Process the chunk of data
                         // log(&format!("Chunk received: {:?}", bytes));
+
                         let this_clone = Rc::clone(&deploy_watcher);
-                        let deploy_watcher_clone = this_clone.borrow_mut().clone();
-                        if !*deploy_watcher_clone.active.borrow() {
+                        if !*this_clone.borrow_mut().active.borrow() {
                             // Check if the deploy watcher is no longer active
                             return Ok(None);
                         }
 
-                        if let Ok(chunk_str) = std::str::from_utf8(&bytes) {
-                            match deploy_watcher_clone.parse_events(deploy_hash, chunk_str) {
-                                Ok(event_parse_result) => {
-                                    self.unsubscribe(deploy_hash.to_string());
-                                    self.stop();
-                                    return Ok(Some(event_parse_result));
+                        buffer.extend_from_slice(&bytes);
+
+                        // Check if the buffer contains a complete message
+                        while let Some(index) = buffer.iter().position(|&b| b == b'\n') {
+                            let message = buffer.drain(..=index).collect::<Vec<_>>();
+                            // Process the message here
+                            if let Ok(message) = std::str::from_utf8(&message) {
+                                // log(message);
+                                let deploy_watcher_clone = this_clone.borrow_mut().clone();
+                                match deploy_watcher_clone.parse_events(deploy_hash, message) {
+                                    Ok(event_parse_result) => {
+                                        self.unsubscribe(deploy_hash.to_string());
+                                        self.stop();
+                                        return Ok(Some(event_parse_result));
+                                    }
+                                    Err(_err) => {
+                                        // error(&_err);
+                                        continue;
+                                    }
                                 }
-                                Err(_err) => {
-                                    // error(&_err);
-                                    continue;
-                                }
+                            } else {
+                                error("Error decoding UTF-8 data");
                             }
-                        } else {
-                            error("Error decoding UTF-8 data");
                         }
                     }
                     Err(err) => {
@@ -241,9 +258,9 @@ impl DeployWatcher {
             let trimmed_item = data_item.trim();
             // Check if trimmed_item contains "DeployProcessed"
             let deploy_processed_str = EventName::DeployProcessed.to_string();
-            if !trimmed_item.contains(&deploy_processed_str) {
-                continue; // Skip to the next iteration if "DeployProcessed" is not found
-            }
+            // if !trimmed_item.contains(&deploy_processed_str) {
+            //     continue; // Skip to the next iteration if "DeployProcessed" is not found
+            // }
             // log(trimmed_item);
 
             if let Ok(parsed_json) = serde_json::from_str::<serde_json::Value>(trimmed_item) {
@@ -436,23 +453,36 @@ impl DeployWatcher {
         // log("after response"); // Use println for logging in the console
 
         if response.status().is_success() {
+            let buffer_size = 1;
+            let mut buffer = Vec::with_capacity(buffer_size);
+
             let mut bytes_stream = response.bytes_stream();
             while let Some(chunk) = bytes_stream.next().await {
                 match chunk {
                     Ok(bytes) => {
                         // Process the chunk of data
                         // log(&format!("Chunk received: {:?}", bytes));
+
                         let this_clone = Rc::clone(&deploy_watcher);
-                        let deploy_watcher_clone = this_clone.borrow_mut().clone();
-                        if !*deploy_watcher_clone.active.borrow() {
+                        if !*this_clone.borrow_mut().active.borrow() {
                             // Check if the deploy watcher is no longer active
                             return Ok(());
                         }
-                        if let Ok(chunk_str) = std::str::from_utf8(&bytes) {
-                            deploy_watcher_clone
-                                .process_events(Rc::clone(&deploy_subscriptions), chunk_str);
-                        } else {
-                            error("Error decoding UTF-8 data");
+
+                        buffer.extend_from_slice(&bytes);
+
+                        // Check if the buffer contains a complete message
+                        while let Some(index) = buffer.iter().position(|&b| b == b'\n') {
+                            let message = buffer.drain(..=index).collect::<Vec<_>>();
+                            // Process the message here
+                            if let Ok(message) = std::str::from_utf8(&message) {
+                                // log(message);
+                                let deploy_watcher_clone = this_clone.borrow_mut().clone();
+                                deploy_watcher_clone
+                                    .process_events(Rc::clone(&deploy_subscriptions), message);
+                            } else {
+                                error("Error decoding UTF-8 data");
+                            }
                         }
                     }
                     Err(err) => {

@@ -2,20 +2,21 @@ pub mod helpers;
 pub mod integration;
 #[cfg(test)]
 pub mod integration_tests;
-use casper_rust_wasm_sdk::{types::verbosity::Verbosity, SDK};
+use casper_rust_wasm_sdk::{
+    deploy_watcher::deploy_watcher::EventParseResult, helpers::public_key_from_private_key,
+    types::verbosity::Verbosity, SDK,
+};
 use std::{
     fs::File,
     io::{self, Read},
     path::Path,
-    thread,
-    time::{self, Duration},
 };
 
 pub async fn run_tests_or_examples() {
     // Run a specific test ?
-    integration::rpcs::test_module::test_get_peers().await;
+    // integration::rpcs::test_module::test_get_peers().await;
     // Run an example ?
-    let _ = _run_example_3().await;
+    let _ = _run_example_11().await;
 }
 
 // get_deploy
@@ -376,7 +377,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     };
 
     fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
-        let root_path = Path::new("../../wasm/");
+        let root_path = Path::new(".");
         let path = root_path.join(file_path);
         let mut file = File::open(path)?;
         let mut buffer = Vec::new();
@@ -385,10 +386,10 @@ pub async fn _run_example_11() -> Result<(), String> {
     }
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PUBLIC_KEY: &str =
-        "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    MC4CAQAwBQYDK2VwBCIEIMSwux1yM00NOvQ+Q6iR6iGbA7rHPqVTx1uE2Si89A3y
     -----END PRIVATE KEY-----"#;
+    let public_key: &str = &public_key_from_private_key(PRIVATE_KEY).unwrap();
     pub const ARGS_JSON: &str = r#"[
 {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
 {"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
@@ -402,14 +403,14 @@ pub async fn _run_example_11() -> Result<(), String> {
 {"name": "metadata_mutability", "type": "U8", "value": 0},
 {"name": "events_mode", "type": "U8", "value": 1}
 ]"#;
-    pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "400000000000";
+    pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
     pub const WASM_PATH: &str = "../../wasm/";
     pub const CEP78_CONTRACT: &str = "cep78.wasm";
-    pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
+    pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
-        PUBLIC_KEY,
+        public_key,
         Some(PRIVATE_KEY.to_string()),
         None,
         None,
@@ -425,30 +426,40 @@ pub async fn _run_example_11() -> Result<(), String> {
     let module_bytes = match read_wasm_file(file_path) {
         Ok(module_bytes) => module_bytes,
         Err(err) => {
+            dbg!(format!("Error reading file {}: {:?}", file_path, err));
             return Err(format!("Error reading file {}: {:?}", file_path, err));
         }
     };
-
     session_params.set_session_bytes(module_bytes.into());
-
     let install = sdk
         .install(deploy_params, session_params, payment_params, None)
         .await;
 
     let deploy_hash_result = install.as_ref().unwrap().result.deploy_hash;
-    println!("{:?}", deploy_hash_result);
-
-    println!("wait {:?}", DEPLOY_TIME);
-    thread::sleep(DEPLOY_TIME); // Let's wait for deployment
+    // println!("{:?}", deploy_hash_result);
+    let deploy_hash = DeployHash::from(deploy_hash_result);
+    let deploy_hash_as_string = deploy_hash.to_string();
+    println!("watch deploy_hash {}", deploy_hash_as_string);
+    let event_parse_result: EventParseResult = sdk
+        .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_as_string)
+        .await
+        .unwrap();
+    println!("{:?}", event_parse_result);
 
     let finalized_approvals = true;
-    let deploy_hash = DeployHash::from(deploy_hash_result);
     let get_deploy = sdk
         .get_deploy(deploy_hash, Some(finalized_approvals), None, None)
         .await;
     let get_deploy = get_deploy.unwrap();
-    let result = &get_deploy.result.execution_results.first().unwrap().result;
-    println!("{}", json_pretty_print(result, Some(Verbosity::High)));
+    // let result = &get_deploy.result.execution_results.first().unwrap().result;
+    // println!(
+    //     "{}",
+    //     json_pretty_print(result Some(Verbosity::High))
+    // );
+    let result = json_pretty_print(&get_deploy.result.deploy.approvals, Some(Verbosity::Low));
+    println!("approvals {result}");
+    let result = DeployHash::from(get_deploy.result.deploy.hash).to_string();
+    println!("processed deploy hash {result}");
     Ok(())
 }
 

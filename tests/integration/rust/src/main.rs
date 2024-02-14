@@ -20,7 +20,7 @@ lazy_static! {
 pub async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let mut initialized_guard = INITIALIZED.lock().await;
     if !*initialized_guard {
-        let config = initialize_test_config().await?;
+        let config = initialize_test_config(true).await?;
         *CONFIG.lock().await = Some(config);
         *initialized_guard = true;
     }
