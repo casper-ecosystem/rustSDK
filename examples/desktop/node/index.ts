@@ -1,4 +1,4 @@
-import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams, privateToPublicKey, Bytes, Deploy } from 'casper-sdk';
+import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams, privateToPublicKey, Bytes, Deploy, EventParseResult, DeploySubscription } from 'casper-sdk';
 const fs = require('fs').promises;
 const http = require('http');
 
@@ -20,6 +20,7 @@ server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
+// get_deploy
 const example1 = async () => {
   const deploy_hash_as_string =
     'a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9';
@@ -38,6 +39,7 @@ const example1 = async () => {
   console.log(timestamp, header);
 };
 
+// get_auction_info
 const example2 = async () => {
   const get_auction_info = await sdk.get_auction_info();
 
@@ -47,6 +49,7 @@ const example2 = async () => {
   console.log(state_root_hash, block_height);
 };
 
+// get_peers
 const example3 = async () => {
   const get_peers = await sdk.get_peers();
 
@@ -56,6 +59,7 @@ const example3 = async () => {
   });
 };
 
+// get_block
 const example4 = async () => {
   const get_block = await sdk.get_block();
 
@@ -64,6 +68,7 @@ const example4 = async () => {
   console.log(block_hash);
 };
 
+// make_transfer
 const example5 = async () => {
   const chain_name = 'casper-net-1';
   const public_key =
@@ -97,6 +102,7 @@ const example5 = async () => {
   console.log(transfer_deploy_as_json);
 };
 
+// transfer
 const example6 = async () => {
   const node_address = 'http://127.0.0.1:11101';
   const sdk = new SDK(node_address);
@@ -134,6 +140,7 @@ const example6 = async () => {
   console.log(transfer_result_as_json);
 };
 
+// make_deploy
 const example7 = async () => {
   const chain_name = 'integration-test';
   const public_key =
@@ -155,6 +162,7 @@ const example7 = async () => {
   console.log(deploy_as_json);
 };
 
+// deploy
 const example8 = async () => {
   const node_address = 'http://127.0.0.1:11101';
   const sdk = new SDK(node_address);
@@ -181,6 +189,7 @@ const example8 = async () => {
   console.log(deploy_result_as_json);
 };
 
+// put_deploy
 const example9 = async () => {
   const node_address = 'http://127.0.0.1:11101';
   const sdk = new SDK(node_address);
@@ -245,12 +254,13 @@ const example10 = async () => {
   console.log(put_deploy_result_as_json);
 };
 
+// install
 const example11 = async () => {
   const node_address = 'http://127.0.0.1:11101';
+  const events_address = 'http://127.0.0.1:18101/events/main';
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
   const private_key = `-----BEGIN PRIVATE KEY-----
-
     -----END PRIVATE KEY-----`;
   const public_key = privateToPublicKey(private_key);
   const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
@@ -268,7 +278,7 @@ const example11 = async () => {
   session_params.session_args_json = JSON.stringify([
     { "name": "collection_name", "type": "String", "value": "enhanced-nft-1" },
     { "name": "collection_symbol", "type": "String", "value": "ENFT-1" },
-    { "name": "total_token_supply", "type": "U64", "value": 10 },
+    { "name": "total_token_supply", "type": "U64", "value": 100 },
     { "name": "ownership_mode", "type": "U8", "value": 0 },
     { "name": "nft_kind", "type": "U8", "value": 1 },
     { "name": "allow_minting", "type": "Bool", "value": true },
@@ -297,19 +307,23 @@ const example11 = async () => {
   );
   const install_result_as_json = install_result.toJson();
   console.log(install_result_as_json.deploy_hash);
-
+  const eventParseResult: EventParseResult = await sdk.waitDeploy(events_address, install_result_as_json.deploy_hash);
+  const cost = eventParseResult.body.DeployProcessed?.execution_result.Success?.cost;
+  //  console.log(eventParseResult.body.DeployProcessed);
+  console.log(`install cost ${cost}`);
 };
 
+// call_entrypoint
 const example12 = async () => {
   const node_address = 'http://127.0.0.1:11101';
+  const events_address = 'http://127.0.0.1:18101/events/main';
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
   const private_key = `-----BEGIN PRIVATE KEY-----
-
     -----END PRIVATE KEY-----`;
   const public_key = privateToPublicKey(private_key);
   const contract_hash =
-    'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+    'hash-508ec6d085766e8abf5c2ff8a6c60ca9e1712fe6228656d5fae3e281b0218ca0';
   const entry_point = 'mint';
   const token_owner =
     'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
@@ -328,5 +342,36 @@ const example12 = async () => {
     payment_amount
   );
   const call_entrypoint_result_as_json = call_entrypoint_result.toJson();
-  console.log(call_entrypoint_result_as_json.deploy_hash);
+
+  // watch deploy_hash to trigger callback
+  const deploy_hash_results = [call_entrypoint_result_as_json.deploy_hash];
+  const watcher = sdk.watchDeploy(events_address);
+  const deploySubscriptions: DeploySubscription[] = [];
+  const getEventHandlerFn = (deployHash: string) => {
+    const eventHandlerFn = (eventParseResult: EventParseResult) => {
+      console.log(`callback for ${deployHash}`);
+      if (eventParseResult.err) {
+        return false;
+      }
+      else if (eventParseResult.body?.DeployProcessed?.execution_result.Success) {
+        console.error(eventParseResult.body?.DeployProcessed?.execution_result.Success);
+        return true;
+      }
+      else {
+        console.error(eventParseResult.body?.DeployProcessed?.execution_result.Failure);
+        return false;
+      };
+    };
+    return eventHandlerFn;
+  };
+
+  deploy_hash_results.map(async (deploy_hash) => {
+    const eventHandlerFn = getEventHandlerFn(deploy_hash);
+    console.log(deploy_hash);
+    const deploySubscription: DeploySubscription = new DeploySubscription(deploy_hash, eventHandlerFn);
+    deploySubscriptions.push(deploySubscription);
+  });
+  watcher.subscribe(deploySubscriptions);
+  await watcher.start();
+  watcher.stop();
 };

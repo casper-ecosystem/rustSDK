@@ -4,6 +4,7 @@ use crate::config::{
     CHAIN_NAME, DEFAULT_NODE_ADDRESS, DEPLOY_TIME, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
 use crate::config::{CONTRACT_CEP78_KEY, PACKAGE_CEP78_KEY};
+use casper_rust_wasm_sdk::deploy_watcher::deploy_watcher::EventParseResult;
 use casper_rust_wasm_sdk::rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams};
 use casper_rust_wasm_sdk::types::block_hash::BlockHash;
 use casper_rust_wasm_sdk::types::deploy_params::{
@@ -366,5 +367,29 @@ pub async fn get_block() -> (String, u64) {
             let block_height = block.header().height();
             (block_hash.to_string(), block_height)
         }
+    }
+}
+
+pub fn get_event_handler_fn(deploy_hash: String) -> impl Fn(EventParseResult) {
+    move |event_parse_result: EventParseResult| {
+        println!("get_event_handler_fn {}", deploy_hash);
+        if let Some(err) = &event_parse_result.err {
+            println!("{} {}", deploy_hash, err);
+        } else if let Some(deploy_processed) = &event_parse_result.body.deploy_processed {
+            if let Some(success) = &deploy_processed.execution_result.success {
+                println!(
+                    "Hash: {}\nBlock: {:?}\nCost: {} motes",
+                    deploy_hash, deploy_processed.block_hash, success.cost
+                );
+                return;
+            } else if let Some(failure) = &deploy_processed.execution_result.failure {
+                println!(
+                    "Hash: {}\nBlock: {:?}\nError: \"{}\"",
+                    deploy_hash, deploy_processed.block_hash, failure.error_message
+                );
+                return;
+            }
+        }
+        println!("No information available for {}", deploy_hash);
     }
 }

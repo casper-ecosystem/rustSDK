@@ -3,8 +3,10 @@ pub mod integration;
 #[cfg(test)]
 pub mod integration_tests;
 use casper_rust_wasm_sdk::{
-    deploy_watcher::deploy_watcher::EventParseResult, helpers::public_key_from_private_key,
-    types::verbosity::Verbosity, SDK,
+    deploy_watcher::deploy_watcher::{DeploySubscription, EventHandlerFn, EventParseResult},
+    helpers::public_key_from_private_key,
+    types::verbosity::Verbosity,
+    SDK,
 };
 use std::{
     fs::File,
@@ -12,11 +14,13 @@ use std::{
     path::Path,
 };
 
+use crate::{config::DEFAULT_EVENT_ADDRESS, tests::helpers::get_event_handler_fn};
+
 pub async fn run_tests_or_examples() {
     // Run a specific test ?
     // integration::rpcs::test_module::test_get_peers().await;
     // Run an example ?
-    let _ = _run_example_11().await;
+    let _ = _run_example_3().await;
 }
 
 // get_deploy
@@ -387,7 +391,6 @@ pub async fn _run_example_11() -> Result<(), String> {
 
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
-    MC4CAQAwBQYDK2VwBCIEIMSwux1yM00NOvQ+Q6iR6iGbA7rHPqVTx1uE2Si89A3y
     -----END PRIVATE KEY-----"#;
     let public_key: &str = &public_key_from_private_key(PRIVATE_KEY).unwrap();
     pub const ARGS_JSON: &str = r#"[
@@ -439,7 +442,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     // println!("{:?}", deploy_hash_result);
     let deploy_hash = DeployHash::from(deploy_hash_result);
     let deploy_hash_as_string = deploy_hash.to_string();
-    println!("watch deploy_hash {}", deploy_hash_as_string);
+    println!("wait deploy_hash {}", deploy_hash_as_string);
     let event_parse_result: EventParseResult = sdk
         .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_as_string)
         .await
@@ -470,18 +473,20 @@ pub async fn _run_example_12() {
         Some(Verbosity::High),
     );
 
-    use casper_rust_wasm_sdk::types::deploy_params::{
-        deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-        session_str_params::SessionStrParams,
+    use casper_rust_wasm_sdk::types::{
+        deploy_hash::DeployHash,
+        deploy_params::{
+            deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+            session_str_params::SessionStrParams,
+        },
     };
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PUBLIC_KEY: &str =
-        "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
         -----END PRIVATE KEY-----"#;
+    let public_key: &str = &public_key_from_private_key(PRIVATE_KEY).unwrap();
     pub const CONTRACT_HASH: &str =
-        "hash-c12808431d490e2c463c2f968d0a4eaa0f9d57842508d9041aa42e2bd21eb96c";
+        "hash-508ec6d085766e8abf5c2ff8a6c60ca9e1712fe6228656d5fae3e281b0218ca0";
     pub const ENTRYPOINT_MINT: &str = "mint";
     pub const TOKEN_OWNER: &str =
         "account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611";
@@ -489,7 +494,7 @@ pub async fn _run_example_12() {
 
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
-        PUBLIC_KEY,
+        public_key,
         Some(PRIVATE_KEY.to_string()),
         None,
         None,
@@ -510,5 +515,22 @@ pub async fn _run_example_12() {
         .call_entrypoint(deploy_params, session_params, payment_params, None)
         .await;
     let deploy_hash_result = call_entrypoint.as_ref().unwrap().result.deploy_hash;
-    println!("{:?}", deploy_hash_result);
+    let deploy_hash_string = DeployHash::from(deploy_hash_result).to_string();
+    println!("watch deploy_hash {deploy_hash_string}");
+    let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS);
+
+    let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
+    let deploy_hash_results = vec![deploy_hash_string.to_string().clone()];
+
+    for deploy_hash in deploy_hash_results {
+        let event_handler_fn = get_event_handler_fn(deploy_hash.clone());
+        deploy_subscriptions.push(DeploySubscription::new(
+            deploy_hash.clone(),
+            EventHandlerFn::new(event_handler_fn),
+        ));
+    }
+
+    let _ = watcher.subscribe(deploy_subscriptions);
+    let _ = watcher.clone().start().await;
+    watcher.clone().stop()
 }

@@ -3,11 +3,12 @@ pub mod test_module {
     use crate::{
         config::{get_config, TestConfig, DEFAULT_EVENT_ADDRESS},
         tests::{
-            helpers::intern::create_test_sdk, integration::contract::test_module::test_install,
+            helpers::{get_event_handler_fn, intern::create_test_sdk},
+            integration::contract::test_module::test_install,
         },
     };
     use casper_rust_wasm_sdk::deploy_watcher::deploy_watcher::{
-        DeploySubscription, EventHandlerFn, EventParseResult,
+        DeploySubscription, EventHandlerFn,
     };
 
     pub async fn test_wait_deploy() {
@@ -50,30 +51,6 @@ pub mod test_module {
         let _ = watcher.subscribe(deploy_subscriptions);
         let _ = watcher.clone().start().await;
         watcher.clone().stop();
-    }
-
-    fn get_event_handler_fn(deploy_hash: String) -> impl Fn(EventParseResult) {
-        move |event_parse_result: EventParseResult| {
-            println!("get_event_handler_fn {}", deploy_hash);
-            if let Some(err) = &event_parse_result.err {
-                println!("{} {}", deploy_hash, err);
-            } else if let Some(deploy_processed) = &event_parse_result.body.deploy_processed {
-                if let Some(success) = &deploy_processed.execution_result.success {
-                    println!(
-                        "Hash: {}\nBlock: {:?}\nCost: {} motes",
-                        deploy_hash, deploy_processed.block_hash, success.cost
-                    );
-                    return;
-                } else if let Some(failure) = &deploy_processed.execution_result.failure {
-                    println!(
-                        "Hash: {}\nBlock: {:?}\nError: \"{}\"",
-                        deploy_hash, deploy_processed.block_hash, failure.error_message
-                    );
-                    return;
-                }
-            }
-            println!("No information available for {}", deploy_hash);
-        }
     }
 }
 
