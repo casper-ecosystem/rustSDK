@@ -460,7 +460,7 @@ pub struct Body {
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[wasm_bindgen(getter_with_clone)]
 pub struct EventParseResult {
-    pub err: Option<String>, // Deprecated, do not use
+    pub err: Option<String>,
     pub body: Option<Body>,
 }
 
