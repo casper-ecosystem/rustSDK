@@ -261,7 +261,6 @@ const example11 = async () => {
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
   const private_key = `-----BEGIN PRIVATE KEY-----
-  MC4CAQAwBQYDK2VwBCIEIMSwux1yM00NOvQ+Q6iR6iGbA7rHPqVTx1uE2Si89A3y
     -----END PRIVATE KEY-----`;
   const public_key = privateToPublicKey(private_key);
   const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
