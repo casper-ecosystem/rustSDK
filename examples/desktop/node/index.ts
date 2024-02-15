@@ -355,7 +355,7 @@ const example12 = async () => {
         return false;
       }
       else if (eventParseResult.body?.DeployProcessed?.execution_result.Success) {
-        console.error(eventParseResult.body?.DeployProcessed?.execution_result.Success);
+        console.log(eventParseResult.body?.DeployProcessed?.execution_result.Success);
         return true;
       }
       else {

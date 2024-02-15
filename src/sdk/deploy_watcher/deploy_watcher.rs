@@ -1,4 +1,4 @@
-use crate::{debug::error, SDK};
+use crate::SDK;
 use chrono::{Duration, Utc};
 use futures_util::StreamExt;
 #[cfg(target_arch = "wasm32")]
@@ -240,10 +240,8 @@ impl DeployWatcher {
         let result: Option<Vec<EventParseResult>> = self.start_internal(None).await;
 
         match result {
-            Some(vec) => JsValue::from_serde(&vec).map_err(|err| {
-                error(&err.to_string());
-                JsValue::from_str(&format!("{:?}", err)).clone()
-            }),
+            Some(vec) => JsValue::from_serde(&vec)
+                .map_err(|err| JsValue::from_str(&format!("{:?}", err)).clone()),
             None => Ok(JsValue::NULL),
         }
     }
@@ -291,7 +289,6 @@ impl DeployWatcher {
             Ok(res) => res,
             Err(err) => {
                 let err = err.to_string();
-                error(&err);
                 let event_parse_result = EventParseResult {
                     err: Some(err.to_string()),
                     body: None,
@@ -456,6 +453,7 @@ impl DeployWatcher {
                                     );
                                     event_handler.apply(&this, &args).unwrap();
                                 }
+
                                 self.unsubscribe(deploy_hash_processed.to_string());
                                 deploy_hash_found = true;
                                 results.push(event_parse_result.clone())

@@ -38,7 +38,7 @@ pub mod test_module {
             .wait_deploy(DEFAULT_EVENT_ADDRESS, deploy_hash, timeout_duration)
             .await
             .unwrap();
-        dbg!(event_parse_result);
+        assert_eq!(event_parse_result.err.unwrap(), "Timeout expired");
     }
 
     pub async fn test_watch_deploy() {
@@ -63,8 +63,8 @@ pub mod test_module {
         }
 
         let _ = watcher.subscribe(deploy_subscriptions);
-        let _results = watcher.clone().start().await;
-        watcher.clone().stop();
+        let _results = watcher.start().await;
+        watcher.stop();
         // dbg!(_results);
     }
 
@@ -78,8 +78,9 @@ pub mod test_module {
 
         // random non existing deploy_hash
         let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
+        let deploy_hash_2 = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
-        let deploy_hash_results = vec![deploy_hash, deploy_hash];
+        let deploy_hash_results = vec![deploy_hash, deploy_hash_2];
 
         for deploy_hash in deploy_hash_results {
             let event_handler_fn = get_event_handler_fn(deploy_hash.to_string());
@@ -90,9 +91,11 @@ pub mod test_module {
         }
 
         let _ = watcher.subscribe(deploy_subscriptions);
-        let _results = watcher.clone().start().await;
+        let event_parse_results = watcher.clone().start().await;
         watcher.clone().stop();
-        // dbg!(_results);
+        let event_parse_results = event_parse_results.unwrap();
+        let err = event_parse_results.first().unwrap().err.as_ref().unwrap();
+        assert_eq!(err, "Timeout expired");
     }
 }
 
@@ -121,7 +124,19 @@ mod tests {
     // }
 
     #[test]
-    pub async fn test_wait_deploy_defined_timeout_test() {
+    pub async fn test_wait_deploy_test_defined_timeout_test() {
+        // Wrap the test function with a timeout of 10 seconds
+        let result = timeout(
+            Duration::from_secs(10),
+            test_wait_deploy_timeout(Some(3000)),
+        )
+        .await;
+        // Assert whether the test completed within the timeout period
+        assert!(result.is_ok(), "Test timed out after 10 seconds");
+    }
+
+    #[test]
+    pub async fn test_watch_deploy_defined_timeout_test() {
         // Wrap the test function with a timeout of 10 seconds
         let result = timeout(
             Duration::from_secs(10),
