@@ -59,9 +59,9 @@ var server = http.createServer(function (req, res) { return __awaiter(void 0, vo
     });
 }); });
 var PORT = process.env.PORT || 3000;
-// server.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
+server.listen(PORT, function () {
+    console.log("Server is running on port ".concat(PORT));
+});
 // get_deploy
 var example1 = function () { return __awaiter(void 0, void 0, void 0, function () {
     var deploy_hash_as_string, finalized_approvals, get_deploy_options, deploy_result, deploy, timestamp, header;
@@ -303,7 +303,7 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
             });
         });
     }
-    var node_address, events_address, sdk, chain_name, private_key, public_key, deploy_params, session_params, payment_amount, buffer, wasm, wasmBuffer, install_result, install_result_as_json, eventParseResult, cost, eventParseResult2;
+    var node_address, events_address, sdk, chain_name, private_key, public_key, deploy_params, session_params, payment_amount, buffer, wasm, wasmBuffer, install_result, install_result_as_json, eventParseResult, cost;
     var _a, _b, _c;
     return __generator(this, function (_d) {
         switch (_d.label) {
@@ -351,10 +351,6 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
                 cost = (_c = (_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.DeployProcessed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) === null || _c === void 0 ? void 0 : _c.cost;
                 //  console.log(eventParseResult.body.DeployProcessed);
                 console.log("install cost ".concat(cost));
-                return [4 /*yield*/, sdk.waitDeploy(events_address, "032123", BigInt(3000))];
-            case 4:
-                eventParseResult2 = _d.sent();
-                console.log(eventParseResult2);
                 return [2 /*return*/];
         }
     });
@@ -369,7 +365,7 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                 events_address = 'http://127.0.0.1:18101/events/main';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
-                private_key = "-----BEGIN PRIVATE KEY-----\n  MC4CAQAwBQYDK2VwBCIEIMSwux1yM00NOvQ+Q6iR6iGbA7rHPqVTx1uE2Si89A3y\n    -----END PRIVATE KEY-----";
+                private_key = "-----BEGIN PRIVATE KEY-----\n    -----END PRIVATE KEY-----";
                 public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
                 contract_hash = 'hash-7705c58f20c445c605ba1bf5adab66686a8f891879d6012e07fe24c8bf3af3f2';
                 entry_point = 'mint';
@@ -395,7 +391,7 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                             return false;
                         }
                         else if ((_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.DeployProcessed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) {
-                            console.error((_d = (_c = eventParseResult.body) === null || _c === void 0 ? void 0 : _c.DeployProcessed) === null || _d === void 0 ? void 0 : _d.execution_result.Success);
+                            console.log((_d = (_c = eventParseResult.body) === null || _c === void 0 ? void 0 : _c.DeployProcessed) === null || _d === void 0 ? void 0 : _d.execution_result.Success);
                             return true;
                         }
                         else {
@@ -426,4 +422,3 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
         }
     });
 }); };
-example11();
