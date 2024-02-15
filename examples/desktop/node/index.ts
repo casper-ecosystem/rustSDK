@@ -16,9 +16,9 @@ const server = http.createServer(async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// server.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
 
 // get_deploy
 const example1 = async () => {
@@ -261,6 +261,7 @@ const example11 = async () => {
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
   const private_key = `-----BEGIN PRIVATE KEY-----
+  MC4CAQAwBQYDK2VwBCIEIMSwux1yM00NOvQ+Q6iR6iGbA7rHPqVTx1uE2Si89A3y
     -----END PRIVATE KEY-----`;
   const public_key = privateToPublicKey(private_key);
   const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
@@ -308,9 +309,11 @@ const example11 = async () => {
   const install_result_as_json = install_result.toJson();
   console.log(install_result_as_json.deploy_hash);
   const eventParseResult: EventParseResult = await sdk.waitDeploy(events_address, install_result_as_json.deploy_hash);
-  const cost = eventParseResult.body.DeployProcessed?.execution_result.Success?.cost;
+  const cost = eventParseResult.body?.DeployProcessed?.execution_result.Success?.cost;
   //  console.log(eventParseResult.body.DeployProcessed);
   console.log(`install cost ${cost}`);
+  const eventParseResult2: EventParseResult = await sdk.waitDeploy(events_address, "032123", BigInt(3000));
+  console.log(eventParseResult2);
 };
 
 // call_entrypoint
@@ -320,6 +323,7 @@ const example12 = async () => {
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
   const private_key = `-----BEGIN PRIVATE KEY-----
+  MC4CAQAwBQYDK2VwBCIEIMSwux1yM00NOvQ+Q6iR6iGbA7rHPqVTx1uE2Si89A3y
     -----END PRIVATE KEY-----`;
   const public_key = privateToPublicKey(private_key);
   const contract_hash =
@@ -376,3 +380,5 @@ const example12 = async () => {
   watcher.stop();
   console.log(results);
 };
+
+example11();

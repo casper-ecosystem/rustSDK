@@ -59,9 +59,9 @@ var server = http.createServer(function (req, res) { return __awaiter(void 0, vo
     });
 }); });
 var PORT = process.env.PORT || 3000;
-server.listen(PORT, function () {
-    console.log("Server is running on port ".concat(PORT));
-});
+// server.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
 // get_deploy
 var example1 = function () { return __awaiter(void 0, void 0, void 0, function () {
     var deploy_hash_as_string, finalized_approvals, get_deploy_options, deploy_result, deploy, timestamp, header;
@@ -303,16 +303,16 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
             });
         });
     }
-    var node_address, events_address, sdk, chain_name, private_key, public_key, deploy_params, session_params, payment_amount, buffer, wasm, wasmBuffer, install_result, install_result_as_json, eventParseResult, cost;
-    var _a, _b;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
+    var node_address, events_address, sdk, chain_name, private_key, public_key, deploy_params, session_params, payment_amount, buffer, wasm, wasmBuffer, install_result, install_result_as_json, eventParseResult, cost, eventParseResult2;
+    var _a, _b, _c;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
             case 0:
                 node_address = 'http://127.0.0.1:11101';
                 events_address = 'http://127.0.0.1:18101/events/main';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
-                private_key = "-----BEGIN PRIVATE KEY-----\n    -----END PRIVATE KEY-----";
+                private_key = "-----BEGIN PRIVATE KEY-----\n  MC4CAQAwBQYDK2VwBCIEIMSwux1yM00NOvQ+Q6iR6iGbA7rHPqVTx1uE2Si89A3y\n    -----END PRIVATE KEY-----";
                 public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
                 deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, private_key);
                 session_params = new casper_sdk_1.SessionStrParams();
@@ -332,7 +332,7 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
                 payment_amount = '500000000000';
                 return [4 /*yield*/, loadFile()];
             case 1:
-                buffer = _c.sent();
+                buffer = _d.sent();
                 wasm = buffer && new Uint8Array(buffer);
                 wasmBuffer = wasm === null || wasm === void 0 ? void 0 : wasm.buffer;
                 if (!wasmBuffer) {
@@ -342,15 +342,19 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
                 session_params.session_bytes = casper_sdk_1.Bytes.fromUint8Array(wasm);
                 return [4 /*yield*/, sdk.install(deploy_params, session_params, payment_amount)];
             case 2:
-                install_result = _c.sent();
+                install_result = _d.sent();
                 install_result_as_json = install_result.toJson();
                 console.log(install_result_as_json.deploy_hash);
                 return [4 /*yield*/, sdk.waitDeploy(events_address, install_result_as_json.deploy_hash)];
             case 3:
-                eventParseResult = _c.sent();
-                cost = (_b = (_a = eventParseResult.body.DeployProcessed) === null || _a === void 0 ? void 0 : _a.execution_result.Success) === null || _b === void 0 ? void 0 : _b.cost;
+                eventParseResult = _d.sent();
+                cost = (_c = (_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.DeployProcessed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) === null || _c === void 0 ? void 0 : _c.cost;
                 //  console.log(eventParseResult.body.DeployProcessed);
                 console.log("install cost ".concat(cost));
+                return [4 /*yield*/, sdk.waitDeploy(events_address, "032123", BigInt(3000))];
+            case 4:
+                eventParseResult2 = _d.sent();
+                console.log(eventParseResult2);
                 return [2 /*return*/];
         }
     });
@@ -365,7 +369,7 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                 events_address = 'http://127.0.0.1:18101/events/main';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
-                private_key = "-----BEGIN PRIVATE KEY-----\n    -----END PRIVATE KEY-----";
+                private_key = "-----BEGIN PRIVATE KEY-----\n  MC4CAQAwBQYDK2VwBCIEIMSwux1yM00NOvQ+Q6iR6iGbA7rHPqVTx1uE2Si89A3y\n    -----END PRIVATE KEY-----";
                 public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
                 contract_hash = 'hash-7705c58f20c445c605ba1bf5adab66686a8f891879d6012e07fe24c8bf3af3f2';
                 entry_point = 'mint';
@@ -422,3 +426,4 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
         }
     });
 }); };
+example11();

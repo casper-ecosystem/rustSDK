@@ -1,4 +1,5 @@
 use crate::{debug::error, SDK};
+use chrono::{Duration, Utc};
 use futures_util::StreamExt;
 use gloo_events::EventListener;
 #[cfg(target_arch = "wasm32")]
@@ -17,11 +18,13 @@ use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen_futures::future_to_promise;
 
+const DEFAULT_TIMEOUT_MS: u64 = 60000;
+
 #[wasm_bindgen]
 impl SDK {
     #[wasm_bindgen(js_name = "watchDeploy")]
-    pub fn watch_deploy(&self, events_url: &str) -> DeployWatcher {
-        DeployWatcher::new(events_url.to_string())
+    pub fn watch_deploy(&self, events_url: &str, timeout_duration: Option<u32>) -> DeployWatcher {
+        DeployWatcher::new(events_url.to_string(), timeout_duration.map(Into::into))
     }
 
     #[cfg(not(target_arch = "wasm32"))]
@@ -29,17 +32,33 @@ impl SDK {
         &self,
         events_url: &str,
         deploy_hash: &str,
+        timeout_duration: Option<u64>,
     ) -> Result<EventParseResult, String> {
-        Self::wait_deploy_internal(events_url.to_string(), deploy_hash.to_string()).await
+        Self::wait_deploy_internal(
+            events_url.to_string(),
+            deploy_hash.to_string(),
+            timeout_duration,
+        )
+        .await
     }
 
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "waitDeploy")]
-    pub async fn wait_deploy_js_alias(&self, events_url: &str, deploy_hash: &str) -> Promise {
+    pub async fn wait_deploy_js_alias(
+        &self,
+        events_url: &str,
+        deploy_hash: &str,
+        timeout_duration: Option<u32>,
+    ) -> Promise {
         let events_url = events_url.to_string();
         let deploy_hash = deploy_hash.to_string();
         let future = async move {
-            let result = Self::wait_deploy_internal(events_url, deploy_hash).await;
+            let result = Self::wait_deploy_internal(
+                events_url,
+                deploy_hash,
+                timeout_duration.map(Into::into),
+            )
+            .await;
             match result {
                 Ok(event_parse_result) => JsValue::from_serde(&event_parse_result)
                     .map_err(|err| JsValue::from_str(&format!("{err}"))),
@@ -53,8 +72,9 @@ impl SDK {
     async fn wait_deploy_internal(
         events_url: String,
         deploy_hash: String,
+        timeout_duration: Option<u64>,
     ) -> Result<EventParseResult, String> {
-        let watcher = DeployWatcher::new(events_url);
+        let watcher = DeployWatcher::new(events_url, timeout_duration);
         let result = watcher.start_internal(Some(deploy_hash)).await;
         match result {
             Some(event_parse_results) => {
@@ -75,17 +95,26 @@ pub struct DeployWatcher {
     event_listener: Rc<RefCell<Option<EventListener>>>,
     deploy_subscriptions: Vec<DeploySubscription>,
     active: Rc<RefCell<bool>>,
+    timeout_duration: Duration,
 }
 
 #[wasm_bindgen]
 impl DeployWatcher {
     #[wasm_bindgen(constructor)]
-    pub fn new(events_url: String) -> Self {
+    pub fn new(events_url: String, timeout_duration_ms: Option<u64>) -> Self {
+        let timeout_duration = Duration::milliseconds(
+            timeout_duration_ms
+                .unwrap_or(DEFAULT_TIMEOUT_MS)
+                .try_into()
+                .unwrap(),
+        );
+
         DeployWatcher {
             events_url,
             event_listener: Rc::new(RefCell::new(None)),
             deploy_subscriptions: Vec::new(),
             active: Rc::new(RefCell::new(true)),
+            timeout_duration,
         }
     }
 
@@ -144,6 +173,9 @@ impl DeployWatcher {
 
         let deploy_watcher = Rc::new(RefCell::new(self.clone()));
 
+        let start_time = Utc::now();
+        let timeout_duration = self.timeout_duration;
+
         let response = match client.get(&url).send().await {
             Ok(res) => res,
             Err(err) => {
@@ -173,6 +205,14 @@ impl DeployWatcher {
                         if !*this_clone.borrow_mut().active.borrow() {
                             // Check if the deploy watcher is no longer active
                             return None;
+                        }
+
+                        if Utc::now() - start_time >= timeout_duration {
+                            let event_parse_result = EventParseResult {
+                                err: Some("Timeout expired".to_string()),
+                                body: None,
+                            };
+                            return Some([event_parse_result].to_vec());
                         }
 
                         buffer.extend_from_slice(&bytes);

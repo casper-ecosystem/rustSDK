@@ -444,7 +444,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     let deploy_hash_as_string = deploy_hash.to_string();
     println!("wait deploy_hash {}", deploy_hash_as_string);
     let event_parse_result: EventParseResult = sdk
-        .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_as_string)
+        .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_as_string, None)
         .await
         .unwrap();
     println!("{:?}", event_parse_result);
@@ -517,7 +517,7 @@ pub async fn _run_example_12() {
     let deploy_hash_result = call_entrypoint.as_ref().unwrap().result.deploy_hash;
     let deploy_hash_string = DeployHash::from(deploy_hash_result).to_string();
     println!("watch deploy_hash {deploy_hash_string}");
-    let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS);
+    let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, None);
 
     let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
     let deploy_hash_results = vec![deploy_hash_string.to_string().clone()];
@@ -525,7 +525,7 @@ pub async fn _run_example_12() {
     for deploy_hash in deploy_hash_results {
         let event_handler_fn = get_event_handler_fn(deploy_hash.clone());
         deploy_subscriptions.push(DeploySubscription::new(
-            deploy_hash.clone(),
+            deploy_hash,
             EventHandlerFn::new(event_handler_fn),
         ));
     }
