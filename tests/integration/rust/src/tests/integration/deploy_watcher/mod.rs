@@ -23,7 +23,7 @@ pub mod test_module {
             .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash)
             .await
             .unwrap();
-        let deploy_processed = event_parse_result.body.deploy_processed.unwrap();
+        let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
         assert_eq!(deploy_processed.deploy_hash, deploy_hash);
     }
 

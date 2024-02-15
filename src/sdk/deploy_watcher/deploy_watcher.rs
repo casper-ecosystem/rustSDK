@@ -57,15 +57,13 @@ impl SDK {
         let watcher = DeployWatcher::new(events_url);
         let result = watcher.start_internal(Some(deploy_hash)).await;
         match result {
-            Ok(Some(event_parse_results)) => {
+            Some(event_parse_results) => {
                 if let Some(event_parse_result) = event_parse_results.first() {
-                    Ok(event_parse_result.clone())
-                } else {
-                    Err("No event result found".to_string())
+                    return Ok(event_parse_result.clone());
                 }
+                Err("No first event result".to_string())
             }
-            Ok(None) => Err("No event result found".to_string()),
-            Err(err) => Err(err.to_string()),
+            None => Err("No event result found".to_string()),
         }
     }
 }
@@ -110,14 +108,15 @@ impl DeployWatcher {
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "start")]
     pub async fn start_js_alias(&self) -> Result<JsValue, JsValue> {
-        let result: Result<Option<Vec<EventParseResult>>, String> = self.start_internal(None).await;
-        result
-            .map(|inner| inner.unwrap_or_default())
-            .map(|vec| JsValue::from_serde(&vec).unwrap_or(JsValue::NULL))
-            .map_err(|err| {
+        let result: Option<Vec<EventParseResult>> = self.start_internal(None).await;
+
+        match result {
+            Some(vec) => JsValue::from_serde(&vec).map_err(|err| {
                 error(&err.to_string());
                 JsValue::from_str(&format!("{:?}", err)).clone()
-            })
+            }),
+            None => Ok(JsValue::NULL),
+        }
     }
 
     #[wasm_bindgen]
@@ -132,14 +131,11 @@ impl DeployWatcher {
 }
 
 impl DeployWatcher {
-    pub async fn start(&self) -> Result<Option<Vec<EventParseResult>>, String> {
+    pub async fn start(&self) -> Option<Vec<EventParseResult>> {
         self.start_internal(None).await
     }
 
-    async fn start_internal(
-        &self,
-        deploy_hash: Option<String>,
-    ) -> Result<Option<Vec<EventParseResult>>, String> {
+    async fn start_internal(&self, deploy_hash: Option<String>) -> Option<Vec<EventParseResult>> {
         // log("start");
         *self.active.borrow_mut() = true;
 
@@ -153,7 +149,11 @@ impl DeployWatcher {
             Err(err) => {
                 let err = err.to_string();
                 error(&err);
-                return Err(err);
+                let event_parse_result = EventParseResult {
+                    err: Some(err.to_string()),
+                    body: None,
+                };
+                return Some([event_parse_result].to_vec());
             }
         };
         // log("after response"); // Use println for logging in the console
@@ -172,7 +172,7 @@ impl DeployWatcher {
                         let this_clone = Rc::clone(&deploy_watcher);
                         if !*this_clone.borrow_mut().active.borrow() {
                             // Check if the deploy watcher is no longer active
-                            return Ok(None);
+                            return None;
                         }
 
                         buffer.extend_from_slice(&bytes);
@@ -187,28 +187,38 @@ impl DeployWatcher {
 
                                 let result = deploy_watcher_clone
                                     .process_events(message, deploy_hash.as_deref());
-
                                 match result {
-                                    Ok(event_parse_result) => return Ok(event_parse_result),
-                                    Err(_err) => {
-                                        // Handle of error not needed here
+                                    Some(event_parse_result) => return Some(event_parse_result),
+                                    None => {
+                                        continue; // Handle of error not needed here, None case is not bubbled
                                     }
-                                }
+                                };
                             } else {
-                                error("Error decoding UTF-8 data");
+                                let event_parse_result = EventParseResult {
+                                    err: Some("Error decoding UTF-8 data".to_string()),
+                                    body: None,
+                                };
+                                return Some([event_parse_result].to_vec());
                             }
                         }
                     }
                     Err(err) => {
-                        error(&format!("Error reading chunk: {}", err));
+                        let event_parse_result = EventParseResult {
+                            err: Some(format!("Error reading chunk: {}", err)),
+                            body: None,
+                        };
+                        return Some([event_parse_result].to_vec());
                     }
                 }
             }
         } else {
-            error("Failed to fetch stream");
-            return Err("Failed to fetch stream".to_string());
+            let event_parse_result = EventParseResult {
+                err: Some("Failed to fetch stream".to_string()),
+                body: None,
+            };
+            return Some([event_parse_result].to_vec());
         }
-        Ok(None)
+        None
     }
 
     pub fn subscribe(
@@ -234,7 +244,7 @@ impl DeployWatcher {
         mut self,
         message: &str,
         target_deploy_hash: Option<&str>,
-    ) -> Result<Option<Vec<EventParseResult>>, String> {
+    ) -> Option<Vec<EventParseResult>> {
         // log("process_events");
 
         let data_stream = Self::extract_data_stream(message);
@@ -267,7 +277,7 @@ impl DeployWatcher {
                             serde_json::from_value(deploy.unwrap().clone()).ok();
 
                         // Create the Body struct with deploy_processed
-                        let body = Body { deploy_processed };
+                        let body = Some(Body { deploy_processed });
 
                         // Create the EventParseResult with body and no error
                         let event_parse_result = EventParseResult { err: None, body };
@@ -276,7 +286,7 @@ impl DeployWatcher {
                             // If target_deploy_hash is found, unsubscribe and stop processing
                             self.unsubscribe(target_deploy_hash.unwrap().to_string());
                             self.stop();
-                            return Ok(Some([event_parse_result].to_vec()));
+                            return Some([event_parse_result].to_vec());
                         }
 
                         let mut results: Vec<EventParseResult> = [].to_vec();
@@ -307,15 +317,19 @@ impl DeployWatcher {
 
                         if deploy_hash_found && self.deploy_subscriptions.is_empty() {
                             self.stop();
-                            return Ok(Some(results));
+                            return Some(results);
                         }
                     }
                 }
             } else {
-                return Err("Failed to parse JSON data.".to_string());
+                let event_parse_result = EventParseResult {
+                    err: Some("Failed to parse JSON data.".to_string()),
+                    body: None,
+                };
+                return Some([event_parse_result].to_vec());
             }
         }
-        Err("No matching event found".to_string())
+        None
     }
 
     fn extract_data_stream(json_data: &str) -> Vec<&str> {
@@ -446,8 +460,8 @@ pub struct Body {
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[wasm_bindgen(getter_with_clone)]
 pub struct EventParseResult {
-    pub err: Option<String>,
-    pub body: Body,
+    pub err: Option<String>, // Deprecated, do not use
+    pub body: Option<Body>,
 }
 
 #[derive(Debug, Deserialize, Clone, Serialize)]

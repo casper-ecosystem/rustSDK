@@ -375,7 +375,7 @@ pub fn get_event_handler_fn(deploy_hash: String) -> impl Fn(EventParseResult) {
         println!("get_event_handler_fn {}", deploy_hash);
         if let Some(err) = &event_parse_result.err {
             println!("{} {}", deploy_hash, err);
-        } else if let Some(deploy_processed) = &event_parse_result.body.deploy_processed {
+        } else if let Some(deploy_processed) = &event_parse_result.body.unwrap().deploy_processed {
             if let Some(success) = &deploy_processed.execution_result.success {
                 println!(
                     "Hash: {}\nBlock: {:?}\nCost: {} motes",
