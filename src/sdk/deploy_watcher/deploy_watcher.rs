@@ -499,6 +499,7 @@ impl DeployWatcher {
 /// A wrapper for an event handler function, providing synchronization and cloning capabilities.
 pub struct EventHandlerFn(Arc<Mutex<dyn Fn(EventParseResult) + Send + Sync>>);
 
+#[allow(dead_code)]
 impl EventHandlerFn {
     /// Creates a new `EventHandlerFn` with the specified event handling function.
     ///

@@ -1,4 +1,3 @@
-#[allow(dead_code)]
 pub mod test_module {
     use crate::{
         config::{get_config, TestConfig, DEFAULT_EVENT_ADDRESS},

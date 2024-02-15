@@ -942,6 +942,139 @@ const signed_deploy = unsigned_deploy.sign(private_key);
 
 </details>
 
+<details>
+    <summary>Wait Deploy</summary>
+
+#### Rust
+
+```rust
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+
+let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
+
+let timeout_duration = None; // Some(30000) for 30s instead of default timeout duration of 60s
+
+// Wait for deploy
+let event_parse_result = sdk
+    .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash, timeout_duration)
+    .await
+    .unwrap();
+let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
+println!("{:?}", deploy_processed);
+```
+
+#### Typescript
+
+```ts
+const events_address = 'http://127.0.0.1:18101/events/main';
+
+const deploy_hash =
+  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+
+const timeout_duration = undefined; // 30000 for 30s instead of default timeout duration of 60s
+
+// Wait for deploy
+const eventParseResult: EventParseResult = await sdk.waitDeploy(
+  events_address,
+  install_result_as_json.deploy_hash,
+  timeout_duration
+);
+console.log(eventParseResult.body.DeployProcessed);
+const cost =
+  eventParseResult.body?.DeployProcessed?.execution_result.Success?.cost;
+console.log(`deploy cost ${cost}`);
+```
+
+</details>
+
+<details>
+    <summary>Watch Deploy</summary>
+
+#### Rust
+
+```rust
+use casper_rust_wasm_sdk::deploy_watcher::deploy_watcher::{
+    DeploySubscription, EventHandlerFn,
+};
+
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+
+let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
+
+let timeout_duration = None; // Some(30000) for 30s instead of default timeout duration of 60s
+
+// Creates a watcher instance
+let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, timeout_duration);
+
+// Create a callback function handler of your design
+let event_handler_fn = get_event_handler_fn(deploy_hash.to_string());
+
+let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
+deploy_subscriptions.push(DeploySubscription::new(
+    deploy_hash.to_string(),
+    EventHandlerFn::new(event_handler_fn),
+));
+
+// Subscribe and start watching
+let _ = watcher.subscribe(deploy_subscriptions);
+let results = watcher.start().await;
+watcher.stop();
+println!("{:?}", results);
+```
+
+#### Typescript
+
+```ts
+import { EventParseResult, DeploySubscription } from 'casper-sdk';
+
+const events_address = 'http://127.0.0.1:18101/events/main';
+
+const deploy_hash =
+  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+
+// Creates a watcher instance
+const watcher = sdk.watchDeploy(events_address);
+
+// Create a callback function handler of your design
+const getEventHandlerFn = (deployHash: string) => {
+  const eventHandlerFn = (eventParseResult: EventParseResult) => {
+    console.log(`callback for ${deployHash}`);
+    if (eventParseResult.err) {
+      return false;
+    } else if (
+      eventParseResult.body?.DeployProcessed?.execution_result.Success
+    ) {
+      console.log(
+        eventParseResult.body?.DeployProcessed?.execution_result.Success
+      );
+      return true;
+    } else {
+      console.error(
+        eventParseResult.body?.DeployProcessed?.execution_result.Failure
+      );
+      return false;
+    }
+  };
+  return eventHandlerFn;
+};
+
+const eventHandlerFn = getEventHandlerFn(deploy_hash);
+
+const deploySubscription: DeploySubscription = new DeploySubscription(
+  deploy_hash,
+  eventHandlerFn
+);
+const deploySubscriptions: DeploySubscription[] = [deploySubscription];
+
+// Subscribe and start watching
+watcher.subscribe(deploySubscriptions);
+const results = await watcher.start();
+watcher.stop();
+console.log(results);
+```
+
+</details>
+
 </details>
 
 <details>
@@ -1242,6 +1375,10 @@ You can download an alpha version of the app illustrating the SDK here:
 
 - [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
 
+### Deploy Watcher
+
+- [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/)
+
 ### Types
 
 - [Current exposed types](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/types/index.html)
@@ -1268,6 +1405,10 @@ You can download an alpha version of the app illustrating the SDK here:
 ### Deploy
 
 - [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/Deploy.html)
+
+### Deploy Watcher
+
+- [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/DeployWatcher.html)
 
 ### Types
 
