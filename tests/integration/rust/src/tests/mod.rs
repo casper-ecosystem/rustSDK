@@ -18,9 +18,9 @@ use crate::{config::DEFAULT_EVENT_ADDRESS, tests::helpers::get_event_handler_fn}
 
 pub async fn run_tests_or_examples() {
     // Run a specific test ?
-    // integration::rpcs::test_module::test_get_peers().await;
+    integration::rpcs::test_module::test_get_peers().await;
     // Run an example ?
-    let _ = _run_example_12().await;
+    let _ = _run_example_3().await;
 }
 
 // get_deploy
