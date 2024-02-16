@@ -51,7 +51,7 @@ pub mod test_module {
         let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, None);
 
         let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
-        let deploy_hash_results = vec![deploy_hash];
+        let deploy_hash_results = vec![deploy_hash.clone()];
 
         for deploy_hash in deploy_hash_results {
             let event_handler_fn = get_event_handler_fn(deploy_hash.clone());
@@ -62,9 +62,19 @@ pub mod test_module {
         }
 
         let _ = watcher.subscribe(deploy_subscriptions);
-        let _results = watcher.start().await;
+        let event_parse_results = watcher.start().await;
         watcher.stop();
-        // dbg!(_results);
+        let event_parse_results = event_parse_results.as_ref().unwrap();
+
+        let actual_deploy_hash = event_parse_results
+            .first()
+            .as_ref()
+            .and_then(|result| result.body.as_ref())
+            .and_then(|body| body.deploy_processed.as_ref())
+            .map(|deploy_processed| deploy_processed.deploy_hash.clone())
+            .expect("Expected deploy hash in the result");
+
+        assert_eq!(actual_deploy_hash, deploy_hash);
     }
 
     pub async fn test_watch_deploy_timeout(timeout_duration: Option<u64>) {
