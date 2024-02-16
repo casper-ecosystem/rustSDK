@@ -2625,19 +2625,19 @@ class DeployWatcher {
     * # Arguments
     *
     * * `events_url` - The URL for deploy events.
-    * * `timeout_duration_ms` - Optional duration in milliseconds for watching events. If not provided,
+    * * `timeout_duration` - Optional duration in milliseconds for watching events. If not provided,
     *   a default timeout of 60,000 milliseconds (1 minute) is used.
     *
     * # Returns
     *
     * A new `DeployWatcher` instance.
     * @param {string} events_url
-    * @param {bigint | undefined} [timeout_duration_ms]
+    * @param {bigint | undefined} [timeout_duration]
     */
-    constructor(events_url, timeout_duration_ms) {
+    constructor(events_url, timeout_duration) {
         const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.deploywatcher_new(ptr0, len0, !isLikeNone(timeout_duration_ms), isLikeNone(timeout_duration_ms) ? BigInt(0) : timeout_duration_ms);
+        const ret = wasm.deploywatcher_new(ptr0, len0, !isLikeNone(timeout_duration), isLikeNone(timeout_duration) ? BigInt(0) : timeout_duration);
         this.__wbg_ptr = ret >>> 0;
         return this;
     }

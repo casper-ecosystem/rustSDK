@@ -796,16 +796,16 @@ export class DeployWatcher {
 * # Arguments
 *
 * * `events_url` - The URL for deploy events.
-* * `timeout_duration_ms` - Optional duration in milliseconds for watching events. If not provided,
+* * `timeout_duration` - Optional duration in milliseconds for watching events. If not provided,
 *   a default timeout of 60,000 milliseconds (1 minute) is used.
 *
 * # Returns
 *
 * A new `DeployWatcher` instance.
 * @param {string} events_url
-* @param {bigint | undefined} [timeout_duration_ms]
+* @param {bigint | undefined} [timeout_duration]
 */
-  constructor(events_url: string, timeout_duration_ms?: bigint);
+  constructor(events_url: string, timeout_duration?: bigint);
 /**
 * Subscribes to deploy events.
 *

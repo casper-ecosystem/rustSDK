@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["call_entrypoint","debug","deploy","helpers","install","query_contract_dict","query_contract_key","rpcs","speculative_deploy","speculative_transfer","transfer","types"],"struct":["SDK"]};
+window.SIDEBAR_ITEMS = {"mod":["call_entrypoint","debug","deploy","deploy_watcher","helpers","install","query_contract_dict","query_contract_key","rpcs","speculative_deploy","speculative_transfer","transfer","types"],"struct":["SDK"]};

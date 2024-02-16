@@ -947,6 +947,8 @@ const signed_deploy = unsigned_deploy.sign(private_key);
 
 #### Rust
 
+Developers using Rust can utilize the wait_deploy function to wait for a specific deploy event. This is achieved by providing the desired event URL, deploy hash, and an optional timeout duration. The asynchronous nature of the operation in Rust allows for efficient handling of deploy events. Once the deploy is processed, the resulting data, such as the deploy's cost, can be easily accessed and utilized in subsequent logic.
+
 ```rust
 pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 
@@ -964,6 +966,8 @@ println!("{:?}", deploy_processed);
 ```
 
 #### Typescript
+
+In TypeScript, the waitDeploy function provides a similar capability to wait for a specific deploy event. Developers can leverage this function by specifying the event address, deploy hash, and an optional timeout duration. The received EventParseResult object can then be processed to extract valuable information, such as the cost of the deploy.
 
 ```ts
 const events_address = 'http://127.0.0.1:18101/events/main';
@@ -991,6 +995,8 @@ console.log(`deploy cost ${cost}`);
     <summary>Watch Deploy</summary>
 
 #### Rust
+
+The watch_deploy functionality facilitates actively monitoring deploy events. By creating a deploy watcher, developers can subscribe to specific deploy hashes and define custom callback functions to handle these events. The watcher is then started, and as deploy events occur, the specified callback functions are executed. This mechanism enables real-time responsiveness to deploy events within Rust applications.
 
 ```rust
 use casper_rust_wasm_sdk::deploy_watcher::deploy_watcher::{
@@ -1023,6 +1029,8 @@ println!("{:?}", results);
 ```
 
 #### Typescript
+
+Similarly, TypeScript developers can utilize the watchDeploy function to actively watch for deploy events on the Casper blockchain. By creating a deploy watcher and defining callback functions, developers can subscribe to specific deploy hashes and respond dynamically as events unfold.
 
 ```ts
 import { EventParseResult, DeploySubscription } from 'casper-sdk';
