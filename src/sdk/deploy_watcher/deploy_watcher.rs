@@ -175,16 +175,16 @@ impl DeployWatcher {
     /// # Arguments
     ///
     /// * `events_url` - The URL for deploy events.
-    /// * `timeout_duration_ms` - Optional duration in milliseconds for watching events. If not provided,
+    /// * `timeout_duration` - Optional duration in milliseconds for watching events. If not provided,
     ///   a default timeout of 60,000 milliseconds (1 minute) is used.
     ///
     /// # Returns
     ///
     /// A new `DeployWatcher` instance.
     #[wasm_bindgen(constructor)]
-    pub fn new(events_url: String, timeout_duration_ms: Option<u64>) -> Self {
+    pub fn new(events_url: String, timeout_duration: Option<u64>) -> Self {
         let timeout_duration = Duration::milliseconds(
-            timeout_duration_ms
+            timeout_duration
                 .unwrap_or(DEFAULT_TIMEOUT_MS)
                 .try_into()
                 .unwrap(),
@@ -688,5 +688,214 @@ impl fmt::Display for EventName {
             EventName::FinalitySignature => write!(f, "FinalitySignature"),
             EventName::Fault => write!(f, "Fault"),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sdk_tests::config::DEFAULT_EVENT_ADDRESS;
+
+    #[test]
+    fn test_new() {
+        // Arrange
+        let events_url = DEFAULT_EVENT_ADDRESS.to_string();
+        let timeout_duration = 5000;
+
+        // Act
+        let deploy_watcher = DeployWatcher::new(events_url.clone(), Some(timeout_duration));
+
+        // Assert
+        assert_eq!(deploy_watcher.events_url, events_url);
+        assert_eq!(deploy_watcher.deploy_subscriptions.len(), 0);
+        assert!(*deploy_watcher.active.borrow());
+        assert_eq!(
+            deploy_watcher.timeout_duration,
+            Duration::milliseconds(timeout_duration.try_into().unwrap())
+        );
+    }
+
+    #[test]
+    fn test_new_default_timeout() {
+        // Arrange
+        let events_url = DEFAULT_EVENT_ADDRESS.to_string();
+
+        // Act
+        let deploy_watcher = DeployWatcher::new(events_url.clone(), None);
+
+        // Assert
+        assert_eq!(deploy_watcher.events_url, events_url);
+        assert_eq!(deploy_watcher.deploy_subscriptions.len(), 0);
+        assert!(*deploy_watcher.active.borrow());
+        assert_eq!(
+            deploy_watcher.timeout_duration,
+            Duration::milliseconds(DEFAULT_TIMEOUT_MS.try_into().unwrap())
+        );
+    }
+
+    #[tokio::test]
+    async fn test_extract_data_stream() {
+        // Arrange
+        let json_data = r#"data:segment1id:data:segment2id:data:segment3id:"#;
+
+        // Act
+        let result = DeployWatcher::extract_data_stream(json_data);
+
+        // Assert
+        assert_eq!(result, vec!["segment1", "segment2", "segment3"]);
+    }
+
+    #[tokio::test]
+    async fn test_process_events() {
+        // Arrange
+        let deploy_watcher = DeployWatcher::new(DEFAULT_EVENT_ADDRESS.to_string(), None);
+        let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
+
+        let message = r#"
+data:{"DeployProcessed":{"deploy_hash":"19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2","account":"0109016beb0dbac17f21f339375da8f0b0a5e29feb93562f9fd269cef97c0467e0","timestamp":"2024-02-16T00:51:04.000Z","ttl":"30m","dependencies":[],"block_hash":"4452fa7c019a19cb246d629330fa109f467dae5c39ca867cafb3f68b9e0177d4","execution_result":{"Success":{"effect":{"operations":[],"transforms":[{"key":"account-hash-6174cf2e6f8fed1715c9a3bace9c50bfe572eecb763b0ed3f644532616452008","transform":"Identity"},{"key":"hash-adc9ed25a5a0afcb2b3d229b2d226dc3a5ff5d29e9dbd2acccf728c835152225","transform":"Identity"},{"key":"hash-adc9ed25a5a0afcb2b3d229b2d226dc3a5ff5d29e9dbd2acccf728c835152225","transform":"Identity"},{"key":"hash-5d0e804990367d4561fb770c045a0148af2bc52f3643e695bf78559910d4c77e","transform":"Identity"},{"key":"hash-adc9ed25a5a0afcb2b3d229b2d226dc3a5ff5d29e9dbd2acccf728c835152225","transform":"Identity"},{"key":"hash-15020e0558e72304ddf7f3e2f57ac909fe11f871d5354ffb4c7050ecbbb5e9a0","transform":"Identity"},{"key":"hash-1a6ac00b5ff7022b43b7bae35847f83a2a674318b01cbd34e17b003dd2b5552e","transform":"Identity"},{"key":"hash-15020e0558e72304ddf7f3e2f57ac909fe11f871d5354ffb4c7050ecbbb5e9a0","transform":"Identity"},{"key":"balance-c378999daa8de52f9c7a7f856d2fdbe962f754376cfbe923e61ff787307a507e","transform":"Identity"},{"key":"balance-8d23f7abd1cf4305ee60ef0ad383c2aa0ac7956ca7e55c59e87a7010b0699ee3","transform":"Identity"},{"key":"balance-c378999daa8de52f9c7a7f856d2fdbe962f754376cfbe923e61ff787307a507e","transform":{"WriteCLValue":{"cl_type":"U512","bytes":"0eed4705e8b536c138938d44c64d31","parsed":"999999999999999999960056401840109"}}},{"key":"balance-8d23f7abd1cf4305ee60ef0ad383c2aa0ac7956ca7e55c59e87a7010b0699ee3","transform":{"AddUInt512":"240000000000"}},{"key":"uref-9f720aabff7fbf1f6773d784d9a34c445124c2cfbde3a353320a5fe58df2ffdd-000","transform":{"WriteCLValue":{"cl_type":"String","bytes":"09000000746573747474747474","parsed":"testttttt"}}},{"key":"uref-15131ff4703037858947e88c6f25200cb63c2ee5f9efcf810680295397d46349-000","transform":{"WriteCLValue":{"cl_type":"String","bytes":"030000004f4f4f","parsed":"OOO"}}},{"key":"uref-cfac103ab95b563355a61bdee8ea97d8dcdf8d52fb14b0fdbc435b0ff929a824-000","transform":{"WriteCLValue":{"cl_type":"U8","bytes":"0a","parsed":10}}},{"key":"uref-f33efca0755b3cc1c6a87165bcd0a85b4cf1ee42b3cfd7acb55da4f71a00b61a-000","transform":{"WriteCLValue":{"cl_type":"U256","bytes":"02e803","parsed":"1000"}}},{"key":"uref-961e8aaa8303b061e55bc0e605935b2e8c438223b981feb0e546fef53b194838-000","transform":{"WriteCLValue":{"cl_type":"U8","bytes":"00","parsed":0}}},{"key":"uref-2a46ede77da07d2362dc9bd479bb9de8e5662c819ca3bb8116b021a979acc3ca-000","transform":{"WriteCLValue":{"cl_type":"U8","bytes":"00","parsed":0}}},{"key":"uref-ce33a5c81e6123cf6c199df2c824d174bc3dc498fea31a19548d71a32da030fa-000","transform":{"WriteCLValue":{"cl_type":"Unit","bytes":"","parsed":null}}},{"key":"hash-58c08d0f854383f761e92f873d75117b4c2f932c75da074c897c4b078f8c6438","transform":"WriteContractPackage"},{"key":"account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f","transform":{"AddKeys":[{"name":"cep18_contract_package_testttttt","key":"hash-58c08d0f854383f761e92f873d75117b4c2f932c75da074c897c4b078f8c6438"}]}},{"key":"account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f","transform":{"AddKeys":[{"name":"cep18_contract_package_access_testttttt","key":"uref-ce33a5c81e6123cf6c199df2c824d174bc3dc498fea31a19548d71a32da030fa-007"}]}},{"key":"hash-58c08d0f854383f761e92f873d75117b4c2f932c75da074c897c4b078f8c6438","transform":"Identity"},{"key":"hash-f069d36f7c7d32427fe9ecf3a81a26aa357addba2180bc054d52077ea90ee8b8","transform":"WriteContractWasm"},{"key":"hash-66afcb5db2152f5d34ab3bef78d22f6bbcec49edd724cd568eb5a75909d0d088","transform":"WriteContract"},{"key":"hash-58c08d0f854383f761e92f873d75117b4c2f932c75da074c897c4b078f8c6438","transform":"WriteContractPackage"},{"key":"account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f","transform":{"AddKeys":[{"name":"cep18_contract_hash_testttttt","key":"hash-66afcb5db2152f5d34ab3bef78d22f6bbcec49edd724cd568eb5a75909d0d088"}]}},{"key":"uref-dee665d61176329b217a81b2f80790811e2c53e6a22482cfcce2e2afd8b783ea-000","transform":{"WriteCLValue":{"cl_type":"U32","bytes":"01000000","parsed":1}}},{"key":"account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f","transform":{"AddKeys":[{"name":"cep18_contract_version_testttttt","key":"uref-dee665d61176329b217a81b2f80790811e2c53e6a22482cfcce2e2afd8b783ea-007"}]}},{"key":"hash-66afcb5db2152f5d34ab3bef78d22f6bbcec49edd724cd568eb5a75909d0d088","transform":"Identity"},{"key":"hash-58c08d0f854383f761e92f873d75117b4c2f932c75da074c897c4b078f8c6438","transform":"Identity"},{"key":"hash-f069d36f7c7d32427fe9ecf3a81a26aa357addba2180bc054d52077ea90ee8b8","transform":"Identity"},{"key":"hash-66afcb5db2152f5d34ab3bef78d22f6bbcec49edd724cd568eb5a75909d0d088","transform":{"AddKeys":[{"name":"package_hash","key":"hash-58c08d0f854383f761e92f873d75117b4c2f932c75da074c897c4b078f8c6438"}]}},{"key":"uref-29d772d4046a290ede279a28da43019a798b20d56028c37f858986590049fcf1-000","transform":{"WriteCLValue":{"cl_type":"Unit","bytes":"","parsed":null}}},{"key":"hash-66afcb5db2152f5d34ab3bef78d22f6bbcec49edd724cd568eb5a75909d0d088","transform":{"AddKeys":[{"name":"allowances","key":"uref-29d772d4046a290ede279a28da43019a798b20d56028c37f858986590049fcf1-007"}]}},{"key":"uref-0925c002732af4e4bff8adb01aea1aba9bfecef734856a861efbbf26a167b624-000","transform":{"WriteCLValue":{"cl_type":"Unit","bytes":"","parsed":null}}},{"key":"hash-66afcb5db2152f5d34ab3bef78d22f6bbcec49edd724cd568eb5a75909d0d088","transform":{"AddKeys":[{"name":"balances","key":"uref-0925c002732af4e4bff8adb01aea1aba9bfecef734856a861efbbf26a167b624-007"}]}},{"key":"dictionary-70c1aa192db636ed2952984cd8a5491549139f4dfe70703846323ae757e4ff86","transform":{"WriteCLValue":{"cl_type":"Any","bytes":"0300000002e80307200000000925c002732af4e4bff8adb01aea1aba9bfecef734856a861efbbf26a167b6242c000000414c53467748544f393879737a514d436c4a3067513674784d367662464d2b6f666f4f536c46774c32417066","parsed":null}}},{"key":"uref-40f02b835921a9e09cc262d5e74ef3fe9b4b4c725fe825447295837dcb9ed7d2-000","transform":{"WriteCLValue":{"cl_type":"Unit","bytes":"","parsed":null}}},{"key":"hash-66afcb5db2152f5d34ab3bef78d22f6bbcec49edd724cd568eb5a75909d0d088","transform":{"AddKeys":[{"name":"security_badges","key":"uref-40f02b835921a9e09cc262d5e74ef3fe9b4b4c725fe825447295837dcb9ed7d2-007"}]}},{"key":"dictionary-bf7a642a4f48d4f7c4b4b0185c06d7bd519d70bf0bee3e9b3ce1e0f934dd1e14","transform":{"WriteCLValue":{"cl_type":"Any","bytes":"0100000000032000000040f02b835921a9e09cc262d5e74ef3fe9b4b4c725fe825447295837dcb9ed7d22c000000414c53467748544f393879737a514d436c4a3067513674784d367662464d2b6f666f4f536c46774c32417066","parsed":null}}},{"key":"uref-961e8aaa8303b061e55bc0e605935b2e8c438223b981feb0e546fef53b194838-000","transform":"Identity"},{"key":"deploy-19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2","transform":{"WriteDeployInfo":{"deploy_hash":"19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2","transfers":[],"from":"account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f","source":"uref-c378999daa8de52f9c7a7f856d2fdbe962f754376cfbe923e61ff787307a507e-007","gas":"238706167853"}}},{"key":"hash-adc9ed25a5a0afcb2b3d229b2d226dc3a5ff5d29e9dbd2acccf728c835152225","transform":"Identity"},{"key":"hash-adc9ed25a5a0afcb2b3d229b2d226dc3a5ff5d29e9dbd2acccf728c835152225","transform":"Identity"},{"key":"hash-adc9ed25a5a0afcb2b3d229b2d226dc3a5ff5d29e9dbd2acccf728c835152225","transform":"Identity"},{"key":"hash-5d0e804990367d4561fb770c045a0148af2bc52f3643e695bf78559910d4c77e","transform":"Identity"},{"key":"hash-adc9ed25a5a0afcb2b3d229b2d226dc3a5ff5d29e9dbd2acccf728c835152225","transform":"Identity"},{"key":"balance-8d23f7abd1cf4305ee60ef0ad383c2aa0ac7956ca7e55c59e87a7010b0699ee3","transform":"Identity"},{"key":"hash-adc9ed25a5a0afcb2b3d229b2d226dc3a5ff5d29e9dbd2acccf728c835152225","transform":"Identity"},{"key":"account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f","transform":"Identity"},{"key":"hash-15020e0558e72304ddf7f3e2f57ac909fe11f871d5354ffb4c7050ecbbb5e9a0","transform":"Identity"},{"key":"hash-1a6ac00b5ff7022b43b7bae35847f83a2a674318b01cbd34e17b003dd2b5552e","transform":"Identity"},{"key":"hash-15020e0558e72304ddf7f3e2f57ac909fe11f871d5354ffb4c7050ecbbb5e9a0","transform":"Identity"},{"key":"balance-8d23f7abd1cf4305ee60ef0ad383c2aa0ac7956ca7e55c59e87a7010b0699ee3","transform":"Identity"},{"key":"balance-c378999daa8de52f9c7a7f856d2fdbe962f754376cfbe923e61ff787307a507e","transform":"Identity"},{"key":"balance-8d23f7abd1cf4305ee60ef0ad383c2aa0ac7956ca7e55c59e87a7010b0699ee3","transform":{"WriteCLValue":{"cl_type":"U512","bytes":"057f7cc49437","parsed":"238719106175"}}},{"key":"balance-c378999daa8de52f9c7a7f856d2fdbe962f754376cfbe923e61ff787307a507e","transform":{"AddUInt512":"1280893825"}},{"key":"hash-15020e0558e72304ddf7f3e2f57ac909fe11f871d5354ffb4c7050ecbbb5e9a0","transform":"Identity"},{"key":"hash-1a6ac00b5ff7022b43b7bae35847f83a2a674318b01cbd34e17b003dd2b5552e","transform":"Identity"},{"key":"hash-15020e0558e72304ddf7f3e2f57ac909fe11f871d5354ffb4c7050ecbbb5e9a0","transform":"Identity"},{"key":"balance-8d23f7abd1cf4305ee60ef0ad383c2aa0ac7956ca7e55c59e87a7010b0699ee3","transform":"Identity"},{"key":"balance-f6b1f72830701f3f8d5138532cd050e6a2aeeec0f0a4ba4ef0a1f083fc9b0ec6","transform":"Identity"},{"key":"balance-8d23f7abd1cf4305ee60ef0ad383c2aa0ac7956ca7e55c59e87a7010b0699ee3","transform":{"WriteCLValue":{"cl_type":"U512","bytes":"00","parsed":"0"}}},{"key":"balance-f6b1f72830701f3f8d5138532cd050e6a2aeeec0f0a4ba4ef0a1f083fc9b0ec6","transform":{"AddUInt512":"238719106175"}}]},"transfers":[],"cost":"238706167853"}}}}
+id:272545"#;
+
+        let target_deploy_hash = Some(deploy_hash);
+
+        // Act
+        let result = deploy_watcher.process_events(message, target_deploy_hash);
+
+        // Assert
+        assert!(result.is_some());
+        let results = result.unwrap();
+        assert_eq!(results.len(), 1);
+
+        let event_parse_result = &results[0];
+        assert!(event_parse_result.err.is_none());
+
+        let body = event_parse_result.body.as_ref().unwrap();
+        let deploy_processed = body.deploy_processed.as_ref().unwrap();
+        assert_eq!(deploy_processed.deploy_hash, deploy_hash);
+    }
+
+    #[tokio::test]
+    async fn test_start_timeout() {
+        // Arrange
+        let deploy_watcher = DeployWatcher::new(DEFAULT_EVENT_ADDRESS.to_string(), Some(1));
+
+        // Act
+        let result = deploy_watcher.start().await;
+
+        // Assert
+        assert!(result.is_some());
+        let results = result.unwrap();
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].err, Some("Timeout expired".to_string()));
+        assert!(results[0].body.is_none());
+    }
+
+    #[test]
+    fn test_stop() {
+        // Arrange
+        let deploy_watcher = DeployWatcher::new(DEFAULT_EVENT_ADDRESS.to_string(), None);
+        assert!(*deploy_watcher.active.borrow());
+
+        // Act
+        deploy_watcher.stop();
+
+        // Assert
+        assert!(!(*deploy_watcher.active.borrow()));
+    }
+
+    #[test]
+    fn test_subscribe() {
+        // Arrange
+        let mut deploy_watcher = DeployWatcher::new(DEFAULT_EVENT_ADDRESS.to_string(), None);
+        let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
+
+        // Create a subscription
+        let subscription =
+            DeploySubscription::new(deploy_hash.to_string(), EventHandlerFn::default());
+
+        // Act
+        let result = deploy_watcher.subscribe(vec![subscription]);
+
+        // Assert
+        assert!(result.is_ok());
+
+        // Try subscribing to the same deploy hash again
+        let duplicate_subscription =
+            DeploySubscription::new(deploy_hash.to_string(), EventHandlerFn::default());
+        let result_duplicate = deploy_watcher.subscribe(vec![duplicate_subscription]);
+
+        // Assert
+        assert!(result_duplicate.is_err());
+        assert_eq!(
+            result_duplicate.err().unwrap(),
+            "Already subscribed to this event"
+        );
+    }
+
+    #[test]
+    fn test_unsubscribe() {
+        // Arrange
+        let mut deploy_watcher = DeployWatcher::new(DEFAULT_EVENT_ADDRESS.to_string(), None);
+        let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
+
+        // Subscribe to a deploy hash
+        let deploy_hash_to_subscribe = deploy_hash.to_string();
+        let subscription =
+            DeploySubscription::new(deploy_hash_to_subscribe.clone(), EventHandlerFn::default());
+        let _ = deploy_watcher.subscribe(vec![subscription]);
+
+        // Assert that the deploy hash is initially subscribed
+        assert!(deploy_watcher
+            .deploy_subscriptions
+            .iter()
+            .any(|s| s.deploy_hash == deploy_hash_to_subscribe));
+
+        // Act
+        deploy_watcher.unsubscribe(deploy_hash_to_subscribe.clone());
+
+        // Assert that the deploy hash is unsubscribed after calling unsubscribe
+        assert!(!deploy_watcher
+            .deploy_subscriptions
+            .iter()
+            .any(|s| s.deploy_hash == deploy_hash_to_subscribe));
+    }
+
+    #[test]
+    fn test_sdk_watch_deploy_retunrs_instance() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let events_url = DEFAULT_EVENT_ADDRESS;
+        let timeout_duration = 5000;
+
+        // Act
+        let deploy_watcher = sdk.watch_deploy(events_url, Some(timeout_duration));
+
+        // Assert
+        assert_eq!(deploy_watcher.events_url, events_url);
+        assert_eq!(deploy_watcher.deploy_subscriptions.len(), 0);
+        assert!(*deploy_watcher.active.borrow());
+        assert_eq!(
+            deploy_watcher.timeout_duration,
+            Duration::milliseconds(timeout_duration.try_into().unwrap())
+        );
+    }
+
+    #[tokio::test]
+    async fn test_wait_deploy_timeout() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let events_url = DEFAULT_EVENT_ADDRESS;
+        let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
+        let timeout_duration = Some(5000);
+
+        // Act
+        let result = sdk
+            .wait_deploy(events_url, deploy_hash, timeout_duration)
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+        let event_parse_result = result.unwrap();
+        assert!(event_parse_result.err.is_some());
+        assert_eq!(event_parse_result.err, Some("Timeout expired".to_string()));
     }
 }
