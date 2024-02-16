@@ -429,7 +429,6 @@ pub async fn _run_example_11() -> Result<(), String> {
     let module_bytes = match read_wasm_file(file_path) {
         Ok(module_bytes) => module_bytes,
         Err(err) => {
-            dbg!(format!("Error reading file {}: {:?}", file_path, err));
             return Err(format!("Error reading file {}: {:?}", file_path, err));
         }
     };
