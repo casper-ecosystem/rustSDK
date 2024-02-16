@@ -133,13 +133,6 @@ export function makeDictionaryItemKey(key: Key, value: string): string;
 export function fromTransfer(key: Uint8Array): TransferAddr;
 /**
 */
-export enum Verbosity {
-  Low = 0,
-  Medium = 1,
-  High = 2,
-}
-/**
-*/
 export enum CLTypeEnum {
   Bool = 0,
   I32 = 1,
@@ -164,6 +157,13 @@ export enum CLTypeEnum {
   Tuple2 = 20,
   Tuple3 = 21,
   Any = 22,
+}
+/**
+*/
+export enum Verbosity {
+  Low = 0,
+  Medium = 1,
+  High = 2,
 }
 /**
 */
@@ -835,7 +835,7 @@ export class DeployWatcher {
 *
 * # Returns
 *
-* Result containing the serialized deploy event data or an error message.
+* Result containing the serialized deploy events data or an error message.
 * @returns {Promise<any>}
 */
   start(): Promise<any>;

@@ -233,7 +233,7 @@ impl DeployWatcher {
     ///
     /// # Returns
     ///
-    /// Result containing the serialized deploy event data or an error message.
+    /// Result containing the serialized deploy events data or an error message.
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "start")]
     pub async fn start_js_alias(&self) -> Result<JsValue, JsValue> {
@@ -668,7 +668,7 @@ pub struct EventParseResult {
 
 /// Enum representing different event names.
 #[derive(Debug, Deserialize, Clone, Serialize)]
-pub enum EventName {
+enum EventName {
     BlockAdded,
     DeployProcessed,
     DeployAccepted,

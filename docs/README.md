@@ -1385,7 +1385,9 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ### Deploy Watcher
 
-- [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/)
+- [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/deploy_watcher/index.html)
+- [DeploySubscription](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/deploy_watcher/struct.DeploySubscription.html)
+- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/deploy_watcher/struct.EventParseResult.html)
 
 ### Types
 
@@ -1417,6 +1419,8 @@ You can download an alpha version of the app illustrating the SDK here:
 ### Deploy Watcher
 
 - [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/DeployWatcher.html)
+- [DeploySubscription](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/DeploySubscription.html)
+- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/EventParseResult.html)
 
 ### Types
 

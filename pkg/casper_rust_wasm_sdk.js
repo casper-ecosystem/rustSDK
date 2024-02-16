@@ -2669,7 +2669,7 @@ export class DeployWatcher {
     *
     * # Returns
     *
-    * Result containing the serialized deploy event data or an error message.
+    * Result containing the serialized deploy events data or an error message.
     * @returns {Promise<any>}
     */
     start() {

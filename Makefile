@@ -33,7 +33,7 @@ e2e-test:
 doc:
 	cargo doc --package casper-rust-wasm-sdk --no-deps
 	cp -r target/doc/* docs/api-rust/
-	cd examples/frontend/angular npm typedoc --out docs/api-wasm pkg/casper_rust_wasm_sdk.d.ts
+	npx typedoc --name api-wasm --out docs/api-wasm pkg/casper_rust_wasm_sdk.d.ts
 
 build: pack doc
 	cd examples/frontend/angular/ && npm run build && cd .

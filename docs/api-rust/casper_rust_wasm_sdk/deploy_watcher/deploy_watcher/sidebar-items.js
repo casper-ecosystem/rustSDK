@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["EventName"],"struct":["Body","DeployProcessed","DeploySubscription","DeployWatcher","EventHandlerFn","EventParseResult","ExecutionResult","Failure","Success"]};
+window.SIDEBAR_ITEMS = {"struct":["Body","DeployProcessed","DeploySubscription","DeployWatcher","EventHandlerFn","EventParseResult","ExecutionResult","Failure","Success"]};

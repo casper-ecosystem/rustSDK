@@ -1136,7 +1136,7 @@
     ///
     /// # Returns
     ///
-    /// Result containing the serialized deploy event data or an error message.
+    /// Result containing the serialized deploy events data or an error message.
     </span><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
     #[wasm_bindgen(js_name = <span class="string">"start"</span>)]
     </span><span class="kw">pub async fn </span>start_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;JsValue, JsValue&gt; {
@@ -1571,7 +1571,7 @@
 
 <span class="doccomment">/// Enum representing different event names.
 </span><span class="attr">#[derive(Debug, Deserialize, Clone, Serialize)]
-</span><span class="kw">pub enum </span>EventName {
+</span><span class="kw">enum </span>EventName {
     BlockAdded,
     DeployProcessed,
     DeployAccepted,
