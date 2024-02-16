@@ -20,7 +20,7 @@ pub async fn run_tests_or_examples() {
     // Run a specific test ?
     // integration::rpcs::test_module::test_get_peers().await;
     // Run an example ?
-    let _ = _run_example_3().await;
+    let _ = _run_example_12().await;
 }
 
 // get_deploy
@@ -526,6 +526,6 @@ pub async fn _run_example_12() {
     }
 
     let _ = watcher.subscribe(deploy_subscriptions);
-    let _ = watcher.clone().start().await;
-    watcher.clone().stop()
+    let _ = watcher.start().await;
+    watcher.stop()
 }
