@@ -77,7 +77,7 @@ pub mod test_module {
 
         // random non existing deploy_hash
         let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
-        let deploy_hash_2 = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
+        let deploy_hash_2 = "720a2fb78a0621562072d9786b2d540a15a4b1bf83bdcbb1ff3680a8e1e3a522";
 
         let deploy_hash_results = vec![deploy_hash, deploy_hash_2];
 
