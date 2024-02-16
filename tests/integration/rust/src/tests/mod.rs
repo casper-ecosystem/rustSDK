@@ -4,7 +4,7 @@ pub mod integration;
 pub mod integration_tests;
 use casper_rust_wasm_sdk::{
     deploy_watcher::deploy_watcher::{DeploySubscription, EventHandlerFn, EventParseResult},
-    helpers::public_key_from_private_key,
+    helpers::public_key_from_secret_key,
     types::verbosity::Verbosity,
     SDK,
 };
@@ -392,7 +392,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
     -----END PRIVATE KEY-----"#;
-    let public_key: &str = &public_key_from_private_key(PRIVATE_KEY).unwrap();
+    let public_key: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
     pub const ARGS_JSON: &str = r#"[
 {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
 {"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
@@ -478,7 +478,7 @@ pub async fn _run_example_12() {
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
         -----END PRIVATE KEY-----"#;
-    let public_key: &str = &public_key_from_private_key(PRIVATE_KEY).unwrap();
+    let public_key: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
     pub const CONTRACT_HASH: &str =
         "hash-508ec6d085766e8abf5c2ff8a6c60ca9e1712fe6228656d5fae3e281b0218ca0";
     pub const ENTRYPOINT_MINT: &str = "mint";

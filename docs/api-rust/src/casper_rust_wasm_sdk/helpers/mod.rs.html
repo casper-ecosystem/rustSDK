@@ -632,6 +632,54 @@
 <a href="#630" id="630">630</a>
 <a href="#631" id="631">631</a>
 <a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="kw">use </span><span class="kw">crate</span>::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
 <span class="kw">use </span>blake2::{
@@ -838,6 +886,32 @@
     opt_str.map(String::as_str).unwrap_or_default()
 }
 
+<span class="doccomment">/// Generates a secret key using the Ed25519 algorithm.
+///
+/// # Returns
+///
+/// A `Result` containing the generated secret key or an error if the generation fails.
+///
+/// # Errors
+///
+/// Returns an `ErrorExt` if the secret key generation fails.
+</span><span class="kw">pub fn </span>secret_key_generate() -&gt; <span class="prelude-ty">Result</span>&lt;SecretKey, ErrorExt&gt; {
+    SecretKey::generate_ed25519()
+}
+
+<span class="doccomment">/// Generates a secret key using the secp256k1 algorithm.
+///
+/// # Returns
+///
+/// A `Result` containing the generated secret key or an error if the generation fails.
+///
+/// # Errors
+///
+/// Returns an `ErrorExt` if the secret key generation fails.
+</span><span class="kw">pub fn </span>secret_key_secp256k1_generate() -&gt; <span class="prelude-ty">Result</span>&lt;SecretKey, ErrorExt&gt; {
+    SecretKey::generate_secp256k1()
+}
+
 <span class="doccomment">/// Parses a secret key in PEM format into a `SecretKey` object.
 ///
 /// # Arguments
@@ -860,12 +934,12 @@
 /// # Returns
 ///
 /// A `Result` containing the public key as a string or an error if the conversion fails.
-</span><span class="kw">pub fn </span>public_key_from_private_key(secret_key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, ErrorExt&gt; {
+</span><span class="kw">pub fn </span>public_key_from_secret_key(secret_key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, ErrorExt&gt; {
     <span class="kw">let </span>secret_key_from_pem = secret_key_from_pem(secret_key);
     <span class="kw">let </span>public_key = <span class="kw">match </span>secret_key_from_pem {
         <span class="prelude-val">Ok</span>(secret_key) =&gt; CasperTypesPublicKey::from(<span class="kw-2">&amp;</span>secret_key),
         <span class="prelude-val">Err</span>(err) =&gt; {
-            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error in public_key_from_private_key: {:?}"</span>, err));
+            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error in public_key_from_secret_key: {:?}"</span>, err));
             <span class="kw">return </span><span class="prelude-val">Err</span>(err);
         }
     };
@@ -1134,6 +1208,28 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_secret_key_generate() {
+        <span class="comment">// Act
+        </span><span class="kw">let </span>result = secret_key_generate();
+
+        <span class="comment">// Assert
+        </span><span class="macro">assert!</span>(result.is_ok());
+        <span class="kw">let </span>secret_key = result.unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>secret_key.to_string(), <span class="string">"SecretKey::Ed25519"</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_secret_key_secp256k1_generate() {
+        <span class="comment">// Act
+        </span><span class="kw">let </span>result = secret_key_secp256k1_generate();
+
+        <span class="comment">// Assert
+        </span><span class="macro">assert!</span>(result.is_ok());
+        <span class="kw">let </span>secret_key = result.unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>secret_key.to_string(), <span class="string">"SecretKey::Secp256k1"</span>);
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_secret_key_from_pem() {
         <span class="kw">let </span>pem_key = <span class="string">"-----BEGIN PRIVATE KEY-----\nTEST\n-----END PRIVATE KEY-----"</span>;
         <span class="kw">let </span>result = secret_key_from_pem(pem_key);
@@ -1146,13 +1242,13 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_public_key_from_private_key() {
+    </span><span class="kw">fn </span>test_public_key_from_secret_key() {
         <span class="kw">let </span>pem_key = <span class="string">"-----BEGIN PRIVATE KEY-----\nTEST\n-----END PRIVATE KEY-----"</span>;
-        <span class="kw">let </span>result = public_key_from_private_key(pem_key);
+        <span class="kw">let </span>result = public_key_from_secret_key(pem_key);
         <span class="macro">assert!</span>(result.is_err());
         <span class="kw">let </span>pem_key =
         <span class="string">"-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIKR3ayaSpNtpZmu9Tv3kUXi+Xq+V7bQHn+9tT0ZjH5id\n-----END PRIVATE KEY-----"</span>;
-        <span class="kw">let </span>result = public_key_from_private_key(pem_key);
+        <span class="kw">let </span>result = public_key_from_secret_key(pem_key);
         <span class="macro">assert!</span>(result.is_ok());
         <span class="macro">assert_eq!</span>(
             result.unwrap(),

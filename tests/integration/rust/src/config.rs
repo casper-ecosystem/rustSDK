@@ -4,7 +4,7 @@ use crate::tests::helpers::{
     read_pem_file,
 };
 use casper_rust_wasm_sdk::types::verbosity::Verbosity;
-use casper_rust_wasm_sdk::{helpers::public_key_from_private_key, types::public_key::PublicKey};
+use casper_rust_wasm_sdk::{helpers::public_key_from_secret_key, types::public_key::PublicKey};
 use lazy_static::lazy_static;
 use std::time::{self, Duration};
 use tokio::sync::Mutex;
@@ -96,9 +96,9 @@ pub async fn initialize_test_config(
         PRIVATE_KEY_NCTL_PATH.replace("user-1", "user-2"),
         PRIVATE_KEY_NAME
     ))?;
-    let account = public_key_from_private_key(&private_key).unwrap();
+    let account = public_key_from_secret_key(&private_key).unwrap();
 
-    let target_account = public_key_from_private_key(&private_key_target_account).unwrap();
+    let target_account = public_key_from_secret_key(&private_key_target_account).unwrap();
 
     let public_key = PublicKey::new(&account).unwrap();
 

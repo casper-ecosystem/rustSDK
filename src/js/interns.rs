@@ -1,14 +1,15 @@
 use crate::helpers::{
     get_blake2b_hash, get_current_timestamp, hex_to_uint8_vec,
-    make_dictionary_item_key as make_dictionary_item_key_helper,
+    make_dictionary_item_key as make_dictionary_item_key_helper, public_key_from_secret_key,
+    secret_key_generate, secret_key_secp256k1_generate,
 };
 use crate::types::{cl::bytes::Bytes, key::Key};
 use crate::{
     debug::error,
-    helpers::{hex_to_string, motes_to_cspr, secret_key_from_pem},
+    helpers::{hex_to_string, motes_to_cspr},
     types::verbosity::Verbosity,
 };
-use casper_types::{PublicKey, U256};
+use casper_types::U256;
 use gloo_utils::format::JsValueSerdeExt;
 use wasm_bindgen::prelude::*;
 
@@ -107,14 +108,70 @@ pub fn json_pretty_print_js_alias(value: JsValue, verbosity: Option<Verbosity>) 
 /// If an error occurs during the conversion, JsValue::null() is returned.
 #[wasm_bindgen(js_name = "privateToPublicKey")]
 pub fn secret_to_public_key(secret_key: &str) -> JsValue {
-    let secret_key_from_pem = secret_key_from_pem(secret_key);
-    if let Err(err) = secret_key_from_pem {
+    let public_key = public_key_from_secret_key(secret_key);
+    if let Err(err) = public_key {
         error(&format!("Error loading secret key: {:?}", err));
         return JsValue::null();
     }
-    let public_key = PublicKey::from(&secret_key_from_pem.unwrap());
-    JsValue::from_serde(&public_key).unwrap_or_else(|err| {
+    JsValue::from_serde(&public_key.unwrap()).unwrap_or_else(|err| {
         error(&format!("Error serializing public key: {:?}", err));
+        JsValue::null()
+    })
+}
+
+/// Generates a secret key using the Ed25519 algorithm and returns it as a PEM-encoded string.
+///
+/// # Returns
+///
+/// A `JsValue` containing the PEM-encoded secret key or `JsValue::null()` if an error occurs.
+///
+/// # Errors
+///
+/// Returns an error if the secret key generation or serialization fails.
+#[wasm_bindgen(js_name = "generatePrivateKey")]
+pub fn generate_ed25519_js_alias() -> JsValue {
+    let secret_key = secret_key_generate()
+        .map_err(|err| {
+            error(&format!("Error in secret_key_generate: {:?}", err));
+            err
+        })
+        .and_then(|secret_key| secret_key.to_pem());
+    if let Err(err) = secret_key {
+        error(&format!("Error creating secret key: {:?}", err));
+        return JsValue::null();
+    }
+    JsValue::from_serde(&secret_key.unwrap()).unwrap_or_else(|err| {
+        error(&format!("Error serializing secret key: {:?}", err));
+        JsValue::null()
+    })
+}
+
+/// Generates a secret key using the secp256k1 algorithm and returns it as a PEM-encoded string.
+///
+/// # Returns
+///
+/// A `JsValue` containing the PEM-encoded secret key or `JsValue::null()` if an error occurs.
+///
+/// # Errors
+///
+/// Returns an error if the secret key generation or serialization fails.
+#[wasm_bindgen(js_name = "generatePrivateKey_secp256k1")]
+pub fn generate_secp256k1_js_alias() -> JsValue {
+    let secret_key = secret_key_secp256k1_generate()
+        .map_err(|err| {
+            error(&format!(
+                "Error in secret_key_secp256k1_generate: {:?}",
+                err
+            ));
+            err
+        })
+        .and_then(|secret_key| secret_key.to_pem());
+    if let Err(err) = secret_key {
+        error(&format!("Error creating secret key: {:?}", err));
+        return JsValue::null();
+    }
+    JsValue::from_serde(&secret_key.unwrap()).unwrap_or_else(|err| {
+        error(&format!("Error serializing secret key: {:?}", err));
         JsValue::null()
     })
 }

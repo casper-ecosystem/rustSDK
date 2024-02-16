@@ -947,7 +947,7 @@ const signed_deploy = unsigned_deploy.sign(private_key);
 
 #### Rust
 
-Developers using Rust can utilize the wait_deploy function to wait for a specific deploy event. This is achieved by providing the desired event URL, deploy hash, and an optional timeout duration. The asynchronous nature of the operation in Rust allows for efficient handling of deploy events. Once the deploy is processed, the resulting data, such as the deploy's cost, can be easily accessed and utilized in subsequent logic.
+Developers using Rust can utilize the wait_deploy function to wait for a specific deploy event. This is achieved by providing the desired event URL, deploy hash, and an optional timeout duration. Once the deploy is processed, the resulting data, such as the deploy's cost, can be easily accessed and utilized in subsequent logic.
 
 ```rust
 pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";

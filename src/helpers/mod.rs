@@ -204,6 +204,32 @@ pub(crate) fn get_str_or_default(opt_str: Option<&String>) -> &str {
     opt_str.map(String::as_str).unwrap_or_default()
 }
 
+/// Generates a secret key using the Ed25519 algorithm.
+///
+/// # Returns
+///
+/// A `Result` containing the generated secret key or an error if the generation fails.
+///
+/// # Errors
+///
+/// Returns an `ErrorExt` if the secret key generation fails.
+pub fn secret_key_generate() -> Result<SecretKey, ErrorExt> {
+    SecretKey::generate_ed25519()
+}
+
+/// Generates a secret key using the secp256k1 algorithm.
+///
+/// # Returns
+///
+/// A `Result` containing the generated secret key or an error if the generation fails.
+///
+/// # Errors
+///
+/// Returns an `ErrorExt` if the secret key generation fails.
+pub fn secret_key_secp256k1_generate() -> Result<SecretKey, ErrorExt> {
+    SecretKey::generate_secp256k1()
+}
+
 /// Parses a secret key in PEM format into a `SecretKey` object.
 ///
 /// # Arguments
@@ -226,12 +252,12 @@ pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, ErrorExt> {
 /// # Returns
 ///
 /// A `Result` containing the public key as a string or an error if the conversion fails.
-pub fn public_key_from_private_key(secret_key: &str) -> Result<String, ErrorExt> {
+pub fn public_key_from_secret_key(secret_key: &str) -> Result<String, ErrorExt> {
     let secret_key_from_pem = secret_key_from_pem(secret_key);
     let public_key = match secret_key_from_pem {
         Ok(secret_key) => CasperTypesPublicKey::from(&secret_key),
         Err(err) => {
-            error(&format!("Error in public_key_from_private_key: {:?}", err));
+            error(&format!("Error in public_key_from_secret_key: {:?}", err));
             return Err(err);
         }
     };
@@ -500,6 +526,28 @@ mod tests {
     }
 
     #[test]
+    fn test_secret_key_generate() {
+        // Act
+        let result = secret_key_generate();
+
+        // Assert
+        assert!(result.is_ok());
+        let secret_key = result.unwrap();
+        assert_eq!(&secret_key.to_string(), "SecretKey::Ed25519");
+    }
+
+    #[test]
+    fn test_secret_key_secp256k1_generate() {
+        // Act
+        let result = secret_key_secp256k1_generate();
+
+        // Assert
+        assert!(result.is_ok());
+        let secret_key = result.unwrap();
+        assert_eq!(&secret_key.to_string(), "SecretKey::Secp256k1");
+    }
+
+    #[test]
     fn test_secret_key_from_pem() {
         let pem_key = "-----BEGIN PRIVATE KEY-----\nTEST\n-----END PRIVATE KEY-----";
         let result = secret_key_from_pem(pem_key);
@@ -512,13 +560,13 @@ mod tests {
     }
 
     #[test]
-    fn test_public_key_from_private_key() {
+    fn test_public_key_from_secret_key() {
         let pem_key = "-----BEGIN PRIVATE KEY-----\nTEST\n-----END PRIVATE KEY-----";
-        let result = public_key_from_private_key(pem_key);
+        let result = public_key_from_secret_key(pem_key);
         assert!(result.is_err());
         let pem_key =
         "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIKR3ayaSpNtpZmu9Tv3kUXi+Xq+V7bQHn+9tT0ZjH5id\n-----END PRIVATE KEY-----";
-        let result = public_key_from_private_key(pem_key);
+        let result = public_key_from_secret_key(pem_key);
         assert!(result.is_ok());
         assert_eq!(
             result.unwrap(),
