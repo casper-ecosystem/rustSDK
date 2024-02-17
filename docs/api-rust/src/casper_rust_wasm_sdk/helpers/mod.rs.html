@@ -680,19 +680,66 @@
 <a href="#678" id="678">678</a>
 <a href="#679" id="679">679</a>
 <a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="kw">use </span><span class="kw">crate</span>::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
+<span class="kw">use </span>base64::engine::general_purpose;
+<span class="kw">use </span>base64::Engine;
 <span class="kw">use </span>blake2::{
     digest::{Update, VariableOutput},
     VarBlake2b,
 };
-<span class="kw">use </span>casper_client::cli::JsonArg;
-<span class="kw">use </span>casper_client::types::{Deploy, TimeDiff, Timestamp};
-<span class="kw">use </span>casper_types::{
-    bytesrepr::ToBytes, cl_value_to_json <span class="kw">as </span>cl_value_to_json_from_casper_types, Key <span class="kw">as </span>_Key,
+<span class="kw">use </span>casper_client::{
+    cli::JsonArg,
+    types::{Deploy, TimeDiff, Timestamp},
 };
-<span class="kw">use </span>casper_types::{CLValue, ErrorExt, PublicKey <span class="kw">as </span>CasperTypesPublicKey, SecretKey};
-<span class="kw">use </span>casper_types::{NamedArg, RuntimeArgs};
+<span class="kw">use </span>casper_types::{
+    account::{AccountHash <span class="kw">as </span>_AccountHash, FromStrError},
+    bytesrepr::ToBytes,
+    cl_value_to_json <span class="kw">as </span>cl_value_to_json_from_casper_types, CLValue, ErrorExt, Key <span class="kw">as </span>_Key,
+    NamedArg, PublicKey <span class="kw">as </span>CasperTypesPublicKey, RuntimeArgs, SecretKey,
+};
 <span class="kw">use </span>chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
@@ -757,7 +804,7 @@
     hasher.finalize_variable(|slice| {
         result.copy_from_slice(slice);
     });
-    base16::encode_lower(<span class="kw-2">&amp;</span>result)
+    hex::encode(<span class="kw-2">&amp;</span>result).to_lowercase()
 }
 
 <span class="doccomment">/// Creates a dictionary item key by concatenating the serialized bytes of the key and value.
@@ -810,6 +857,29 @@
     });
     hex::encode(result)
 }
+
+<span class="doccomment">/// Convert a formatted account hash to a base64-encoded string (cep-18 key encoding).
+///
+/// # Arguments
+///
+/// * `formatted_account_hash` - A hex-formatted string representing the account hash.
+/// Example: "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+///
+/// # Returns
+///
+/// Returns a `Result` with the base64-encoded string on success, or a `FromStrError` on failure.
+/// Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+</span><span class="kw">pub fn </span>get_base64_from_account_hash(account_hash: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, FromStrError&gt; {
+    <span class="kw">let </span>account_hash = _AccountHash::from_formatted_str(account_hash);
+    <span class="kw">let </span>key = <span class="kw">match </span>account_hash {
+        <span class="prelude-val">Ok</span>(account_hash) =&gt; _Key::from(account_hash).to_bytes().unwrap(),
+        <span class="prelude-val">Err</span>(err) =&gt; {
+            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error in account_hash deser: {:?}"</span>, err));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(err);
+        }
+    };
+    <span class="prelude-val">Ok</span>(general_purpose::STANDARD.encode(key)) <span class="comment">// base64.encode
+</span>}
 
 <span class="doccomment">/// Gets the time to live (TTL) value or returns the default value if not provided.
 ///
@@ -1358,6 +1428,20 @@
             dictionary_item_key,
             <span class="string">"1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca"</span>.to_string()
         );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_get_base64_from_account_hash() {
+        <span class="comment">// Test with a known input and expected output
+        </span><span class="kw">let </span>input_hash =
+            <span class="string">"account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"</span>;
+        <span class="kw">let </span>expected_output = <span class="string">"ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"</span>;
+
+        <span class="comment">// Call the function under test
+        </span><span class="kw">let </span>result = get_base64_from_account_hash(input_hash).unwrap();
+
+        <span class="comment">// Check the result against the expected output
+        </span><span class="macro">assert_eq!</span>(result, expected_output.to_string());
     }
 }
 </code></pre></div></section></main></body></html>

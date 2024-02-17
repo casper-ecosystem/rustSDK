@@ -1,16 +1,21 @@
 use crate::debug::error;
 use crate::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
+use base64::engine::general_purpose;
+use base64::Engine;
 use blake2::{
     digest::{Update, VariableOutput},
     VarBlake2b,
 };
-use casper_client::cli::JsonArg;
-use casper_client::types::{Deploy, TimeDiff, Timestamp};
-use casper_types::{
-    bytesrepr::ToBytes, cl_value_to_json as cl_value_to_json_from_casper_types, Key as _Key,
+use casper_client::{
+    cli::JsonArg,
+    types::{Deploy, TimeDiff, Timestamp},
 };
-use casper_types::{CLValue, ErrorExt, PublicKey as CasperTypesPublicKey, SecretKey};
-use casper_types::{NamedArg, RuntimeArgs};
+use casper_types::{
+    account::{AccountHash as _AccountHash, FromStrError},
+    bytesrepr::ToBytes,
+    cl_value_to_json as cl_value_to_json_from_casper_types, CLValue, ErrorExt, Key as _Key,
+    NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs, SecretKey,
+};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -75,7 +80,7 @@ pub fn get_blake2b_hash(meta_data: &str) -> String {
     hasher.finalize_variable(|slice| {
         result.copy_from_slice(slice);
     });
-    base16::encode_lower(&result)
+    hex::encode(&result).to_lowercase()
 }
 
 /// Creates a dictionary item key by concatenating the serialized bytes of the key and value.
@@ -127,6 +132,29 @@ pub fn make_dictionary_item_key<V: ToBytes>(key: Key, value: &V) -> String {
         result.copy_from_slice(slice);
     });
     hex::encode(result)
+}
+
+/// Convert a formatted account hash to a base64-encoded string (cep-18 key encoding).
+///
+/// # Arguments
+///
+/// * `formatted_account_hash` - A hex-formatted string representing the account hash.
+/// Example: "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+///
+/// # Returns
+///
+/// Returns a `Result` with the base64-encoded string on success, or a `FromStrError` on failure.
+/// Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+pub fn get_base64_from_account_hash(account_hash: &str) -> Result<String, FromStrError> {
+    let account_hash = _AccountHash::from_formatted_str(account_hash);
+    let key = match account_hash {
+        Ok(account_hash) => _Key::from(account_hash).to_bytes().unwrap(),
+        Err(err) => {
+            error(&format!("Error in account_hash deser: {:?}", err));
+            return Err(err);
+        }
+    };
+    Ok(general_purpose::STANDARD.encode(key)) // base64.encode
 }
 
 /// Gets the time to live (TTL) value or returns the default value if not provided.
@@ -676,5 +704,19 @@ mod tests {
             dictionary_item_key,
             "1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca".to_string()
         );
+    }
+
+    #[test]
+    fn test_get_base64_from_account_hash() {
+        // Test with a known input and expected output
+        let input_hash =
+            "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f";
+        let expected_output = "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf";
+
+        // Call the function under test
+        let result = get_base64_from_account_hash(input_hash).unwrap();
+
+        // Check the result against the expected output
+        assert_eq!(result, expected_output.to_string());
     }
 }

@@ -1,5 +1,5 @@
 use crate::helpers::{
-    get_blake2b_hash, get_current_timestamp, hex_to_uint8_vec,
+    get_base64_from_account_hash, get_blake2b_hash, get_current_timestamp, hex_to_uint8_vec,
     make_dictionary_item_key as make_dictionary_item_key_helper, public_key_from_secret_key,
     secret_key_generate, secret_key_secp256k1_generate,
 };
@@ -174,6 +174,29 @@ pub fn generate_secp256k1_js_alias() -> JsValue {
         error(&format!("Error serializing secret key: {:?}", err));
         JsValue::null()
     })
+}
+
+/// Converts a formatted account hash to a base64-encoded string (cep-18 key encoding).
+///
+///
+/// # Arguments
+///
+/// * `formatted_account_hash` - A hex-formatted string representing the account hash.
+/// Example: "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+///
+/// # Returns
+///
+/// Returns the base64-encoded string.
+/// Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+#[wasm_bindgen(js_name = "accountHashToBase64")]
+pub fn get_base64_from_account_hash_js_alias(formatted_account_hash: &str) -> String {
+    match get_base64_from_account_hash(formatted_account_hash) {
+        Ok(hash) => hash,
+        Err(err) => {
+            error(&format!("Error serializing account hash: {:?}", err));
+            String::from("")
+        }
+    }
 }
 
 /// Gets the current timestamp.

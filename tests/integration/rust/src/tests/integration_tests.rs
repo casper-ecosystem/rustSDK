@@ -6,10 +6,11 @@ pub mod test_module {
     };
     use casper_rust_wasm_sdk::{
         helpers::{
-            get_blake2b_hash, get_current_timestamp, get_gas_price_or_default, get_ttl_or_default,
-            hex_to_string, hex_to_uint8_vec, json_pretty_print, make_dictionary_item_key,
-            motes_to_cspr, parse_timestamp, parse_ttl, public_key_from_secret_key,
-            secret_key_from_pem, secret_key_generate, secret_key_secp256k1_generate,
+            get_base64_from_account_hash, get_blake2b_hash, get_current_timestamp,
+            get_gas_price_or_default, get_ttl_or_default, hex_to_string, hex_to_uint8_vec,
+            json_pretty_print, make_dictionary_item_key, motes_to_cspr, parse_timestamp, parse_ttl,
+            public_key_from_secret_key, secret_key_from_pem, secret_key_generate,
+            secret_key_secp256k1_generate,
         },
         types::{key::Key, verbosity::Verbosity},
     };
@@ -112,6 +113,14 @@ pub mod test_module {
         );
     }
 
+    pub fn test_get_base64_from_account_hash() {
+        let hash = get_base64_from_account_hash(
+            "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f",
+        )
+        .unwrap();
+        assert_eq!(hash, "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf");
+    }
+
     pub fn test_get_ttl_or_default() {
         let ttl = get_ttl_or_default(None);
         assert_eq!(ttl, DEFAULT_TTL);
@@ -202,6 +211,10 @@ mod tests {
     #[test]
     pub fn test_get_blake2b_hash_test() {
         test_get_blake2b_hash();
+    }
+    #[test]
+    pub fn test_get_base64_from_account_hash_test() {
+        test_get_base64_from_account_hash();
     }
     #[test]
     pub fn test_get_ttl_or_default_test() {
