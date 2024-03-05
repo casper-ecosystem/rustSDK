@@ -112,7 +112,7 @@ mod tests {
     };
 
     use crate::{
-        helpers::public_key_from_private_key,
+        helpers::public_key_from_secret_key,
         rpcs::{PRIVATE_KEY_NCTL_PATH, WASM_PATH},
     };
 
@@ -148,7 +148,7 @@ mod tests {
         let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
             DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
@@ -185,7 +185,7 @@ mod tests {
         let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let error_message =
             "Missing a required arg - exactly one of the following must be provided";
@@ -229,7 +229,7 @@ mod tests {
         let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let error_message = "account authorization invalid at state root hash";
 
@@ -267,7 +267,7 @@ mod tests {
 
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
             DeployStrParams::new(CHAIN_NAME, &account, Some(private_key.clone()), None, None);

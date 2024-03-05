@@ -289,7 +289,7 @@ impl SDK {
 mod tests {
 
     use crate::{
-        helpers::public_key_from_private_key,
+        helpers::public_key_from_secret_key,
         rpcs::PRIVATE_KEY_NCTL_PATH,
         types::{digest::Digest, public_key::PublicKey},
     };
@@ -303,7 +303,7 @@ mod tests {
     fn get_purse_identifier() -> PurseIdentifier {
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
 
         PurseIdentifier::from_main_purse_under_public_key(public_key)

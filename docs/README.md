@@ -1470,5 +1470,4 @@ make test
 
 - Expose more CL Types and Casper Client result Types
 - EventStream
-- Keygen
 - Wallet connect

@@ -802,7 +802,7 @@
 </span><span class="kw">mod </span>tests {
 
     <span class="kw">use crate</span>::{
-        helpers::public_key_from_private_key,
+        helpers::public_key_from_secret_key,
         rpcs::PRIVATE_KEY_NCTL_PATH,
         types::{
             digest::Digest, global_state_identifier::GlobalStateIdentifier, public_key::PublicKey,
@@ -819,7 +819,7 @@
     <span class="kw">fn </span>get_purse_identifier() -&gt; PurseIdentifier {
         <span class="kw">let </span>private_key =
             read_pem_file(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}"</span>)).unwrap();
-        <span class="kw">let </span>account = public_key_from_private_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
         <span class="kw">let </span>public_key = PublicKey::new(<span class="kw-2">&amp;</span>account).unwrap();
 
         PurseIdentifier::from_main_purse_under_public_key(public_key)
