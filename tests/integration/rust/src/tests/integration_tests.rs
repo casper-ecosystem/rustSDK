@@ -6,10 +6,11 @@ pub mod test_module {
     };
     use casper_rust_wasm_sdk::{
         helpers::{
-            get_blake2b_hash, get_current_timestamp, get_gas_price_or_default, get_ttl_or_default,
-            hex_to_string, hex_to_uint8_vec, json_pretty_print, make_dictionary_item_key,
-            motes_to_cspr, parse_timestamp, parse_ttl, public_key_from_private_key,
-            secret_key_from_pem,
+            get_base64_from_account_hash, get_blake2b_hash, get_current_timestamp,
+            get_gas_price_or_default, get_ttl_or_default, hex_to_string, hex_to_uint8_vec,
+            json_pretty_print, make_dictionary_item_key, motes_to_cspr, parse_timestamp, parse_ttl,
+            public_key_from_secret_key, secret_key_from_pem, secret_key_generate,
+            secret_key_secp256k1_generate,
         },
         types::{key::Key, verbosity::Verbosity},
     };
@@ -58,9 +59,9 @@ pub mod test_module {
         assert_eq!(cspr, "1000000000000250000");
     }
 
-    pub async fn test_public_key_from_private_key() {
+    pub async fn test_public_key_from_secret_key() {
         let config: TestConfig = get_config(true).await;
-        let public_key = public_key_from_private_key(&config.private_key).unwrap();
+        let public_key = public_key_from_secret_key(&config.private_key).unwrap();
         assert_eq!(public_key, config.account);
     }
 
@@ -68,6 +69,22 @@ pub mod test_module {
         let config: TestConfig = get_config(true).await;
         let secret_key = secret_key_from_pem(&config.private_key).unwrap();
         assert_eq!(secret_key.to_string(), "SecretKey::Ed25519");
+    }
+
+    #[test]
+    pub fn test_secret_key_generate() {
+        let result = secret_key_generate();
+        assert!(result.is_ok());
+        let secret_key = result.unwrap();
+        assert_eq!(secret_key.to_string(), "SecretKey::Ed25519");
+    }
+
+    #[test]
+    pub fn test_secret_key_secp256k1_generate() {
+        let result = secret_key_secp256k1_generate();
+        assert!(result.is_ok());
+        let secret_key = result.unwrap();
+        assert_eq!(secret_key.to_string(), "SecretKey::Secp256k1");
     }
 
     pub fn test_get_current_timestamp() {
@@ -94,6 +111,14 @@ pub mod test_module {
             hash,
             "21ba862c03d43fedded8c1c5a30397f567c1adab5b2a75debc58966c021e3b64"
         );
+    }
+
+    pub fn test_get_base64_from_account_hash() {
+        let hash = get_base64_from_account_hash(
+            "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f",
+        )
+        .unwrap();
+        assert_eq!(hash, "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf");
     }
 
     pub fn test_get_ttl_or_default() {
@@ -188,12 +213,24 @@ mod tests {
         test_get_blake2b_hash();
     }
     #[test]
+    pub fn test_get_base64_from_account_hash_test() {
+        test_get_base64_from_account_hash();
+    }
+    #[test]
     pub fn test_get_ttl_or_default_test() {
         test_get_ttl_or_default();
     }
     #[test]
     pub fn test_get_gas_price_or_default_test() {
         test_get_gas_price_or_default();
+    }
+    #[test]
+    pub fn test_secret_key_generate_test() {
+        test_secret_key_generate();
+    }
+    #[test]
+    pub fn test_secret_key_secp256k1_generate_test() {
+        test_secret_key_secp256k1_generate();
     }
 }
 
@@ -211,8 +248,8 @@ mod tests_async {
         test_hex_to_uint8_vec().await;
     }
     #[test]
-    pub async fn test_public_key_from_private_key_test() {
-        test_public_key_from_private_key().await;
+    pub async fn test_public_key_from_secret_key_test() {
+        test_public_key_from_secret_key().await;
     }
     #[test]
     pub async fn test_secret_key_from_pem_test() {

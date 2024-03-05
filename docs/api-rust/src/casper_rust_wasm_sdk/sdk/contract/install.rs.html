@@ -415,7 +415,7 @@
     };
 
     <span class="kw">use crate</span>::{
-        helpers::public_key_from_private_key,
+        helpers::public_key_from_secret_key,
         rpcs::{PRIVATE_KEY_NCTL_PATH, WASM_PATH},
     };
 
@@ -451,7 +451,7 @@
         <span class="kw">let </span>node_address = <span class="prelude-val">Some</span>(DEFAULT_NODE_ADDRESS.to_string());
         <span class="kw">let </span>private_key =
             read_pem_file(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}"</span>)).unwrap();
-        <span class="kw">let </span>account = public_key_from_private_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
             DeployStrParams::new(CHAIN_NAME, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
@@ -488,7 +488,7 @@
         <span class="kw">let </span>node_address = <span class="prelude-val">Some</span>(DEFAULT_NODE_ADDRESS.to_string());
         <span class="kw">let </span>private_key =
             read_pem_file(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}"</span>)).unwrap();
-        <span class="kw">let </span>account = public_key_from_private_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
 
         <span class="kw">let </span>error_message =
             <span class="string">"Missing a required arg - exactly one of the following must be provided"</span>;
@@ -532,7 +532,7 @@
         <span class="kw">let </span>node_address = <span class="prelude-val">Some</span>(DEFAULT_NODE_ADDRESS.to_string());
         <span class="kw">let </span>private_key =
             read_pem_file(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}"</span>)).unwrap();
-        <span class="kw">let </span>account = public_key_from_private_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
 
         <span class="kw">let </span>error_message = <span class="string">"account authorization invalid at state root hash"</span>;
 
@@ -570,7 +570,7 @@
 
         <span class="kw">let </span>private_key =
             read_pem_file(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}"</span>)).unwrap();
-        <span class="kw">let </span>account = public_key_from_private_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
             DeployStrParams::new(CHAIN_NAME, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key.clone()), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);

@@ -7,7 +7,7 @@ pub mod query_contract_key;
 use crate::rpcs::get_dictionary_item::DictionaryItemInput;
 #[cfg(test)]
 use crate::{
-    helpers::public_key_from_private_key, rpcs::PRIVATE_KEY_NCTL_PATH, types::public_key::PublicKey,
+    helpers::public_key_from_secret_key, rpcs::PRIVATE_KEY_NCTL_PATH, types::public_key::PublicKey,
 };
 #[cfg(test)]
 use sdk_tests::config::{DICTIONARY_ITEM_KEY, DICTIONARY_NAME};
@@ -23,7 +23,7 @@ pub async fn install_cep78() -> String {
     use sdk_tests::tests::helpers::{get_contract_cep78_hash_keys, install_cep78_if_needed};
 
     let private_key = read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-    let account = public_key_from_private_key(&private_key).unwrap();
+    let account = public_key_from_secret_key(&private_key).unwrap();
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
     install_cep78_if_needed(&account, &private_key, Some(WASM_PATH)).await;
@@ -40,7 +40,7 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
             let contract_cep78_hash = install_cep78().await;
             let private_key =
                 read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-            let account = public_key_from_private_key(&private_key).unwrap();
+            let account = public_key_from_secret_key(&private_key).unwrap();
             let public_key = PublicKey::new(&account).unwrap();
             let account_hash = public_key.to_account_hash().to_formatted_string();
             mint_nft(&contract_cep78_hash, &account, &account_hash, &private_key).await;

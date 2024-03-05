@@ -87,7 +87,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::rpcs::get_dictionary_item::DictionaryItemInput;
 <span class="attr">#[cfg(test)]
 </span><span class="kw">use crate</span>::{
-    helpers::public_key_from_private_key, rpcs::PRIVATE_KEY_NCTL_PATH, types::public_key::PublicKey,
+    helpers::public_key_from_secret_key, rpcs::PRIVATE_KEY_NCTL_PATH, types::public_key::PublicKey,
 };
 <span class="attr">#[cfg(test)]
 </span><span class="kw">use </span>sdk_tests::config::{DICTIONARY_ITEM_KEY, DICTIONARY_NAME};
@@ -103,7 +103,7 @@
     <span class="kw">use </span>sdk_tests::tests::helpers::{get_contract_cep78_hash_keys, install_cep78_if_needed};
 
     <span class="kw">let </span>private_key = read_pem_file(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}"</span>)).unwrap();
-    <span class="kw">let </span>account = public_key_from_private_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+    <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
     <span class="kw">let </span>public_key = PublicKey::new(<span class="kw-2">&amp;</span>account).unwrap();
     <span class="kw">let </span>account_hash = public_key.to_account_hash().to_formatted_string();
     install_cep78_if_needed(<span class="kw-2">&amp;</span>account, <span class="kw-2">&amp;</span>private_key, <span class="prelude-val">Some</span>(WASM_PATH)).<span class="kw">await</span>;
@@ -120,7 +120,7 @@
             <span class="kw">let </span>contract_cep78_hash = install_cep78().<span class="kw">await</span>;
             <span class="kw">let </span>private_key =
                 read_pem_file(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}"</span>)).unwrap();
-            <span class="kw">let </span>account = public_key_from_private_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+            <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
             <span class="kw">let </span>public_key = PublicKey::new(<span class="kw-2">&amp;</span>account).unwrap();
             <span class="kw">let </span>account_hash = public_key.to_account_hash().to_formatted_string();
             mint_nft(<span class="kw-2">&amp;</span>contract_cep78_hash, <span class="kw-2">&amp;</span>account, <span class="kw-2">&amp;</span>account_hash, <span class="kw-2">&amp;</span>private_key).<span class="kw">await</span>;
