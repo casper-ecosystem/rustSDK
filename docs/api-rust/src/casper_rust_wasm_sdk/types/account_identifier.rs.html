@@ -96,11 +96,13 @@
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{account_hash::AccountHash, public_key::PublicKey};
 <span class="kw">use </span>casper_client::rpcs::AccountIdentifier <span class="kw">as </span>_AccountIdentifier;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::fmt;
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug, Deserialize, Clone, Serialize)]
@@ -142,11 +144,11 @@
     }
 }
 
-<span class="kw">impl </span>ToString <span class="kw">for </span>AccountIdentifier {
-    <span class="kw">fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>AccountIdentifier {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
-            _AccountIdentifier::PublicKey(key) =&gt; PublicKey::from(key.clone()).to_string(),
-            _AccountIdentifier::AccountHash(hash) =&gt; hash.to_formatted_string(),
+            _AccountIdentifier::PublicKey(key) =&gt; <span class="macro">write!</span>(f, <span class="string">"{}"</span>, PublicKey::from(key.clone())),
+            _AccountIdentifier::AccountHash(hash) =&gt; <span class="macro">write!</span>(f, <span class="string">"{}"</span>, hash.to_formatted_string()),
         }
     }
 }

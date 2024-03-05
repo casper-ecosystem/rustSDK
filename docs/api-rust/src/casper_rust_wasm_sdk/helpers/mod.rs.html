@@ -802,7 +802,7 @@
     hasher.finalize_variable(|slice| {
         result.copy_from_slice(slice);
     });
-    hex::encode(<span class="kw-2">&amp;</span>result).to_lowercase()
+    hex::encode(result).to_lowercase()
 }
 
 <span class="doccomment">/// Creates a dictionary item key by concatenating the serialized bytes of the key and value.

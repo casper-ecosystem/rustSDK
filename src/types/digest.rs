@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter};
+
 use super::sdk_error::SdkError;
 use crate::debug::error;
 use base16::DecodeError;
@@ -64,9 +66,9 @@ impl AsRef<[u8]> for Digest {
     }
 }
 
-impl ToString for Digest {
-    fn to_string(&self) -> String {
-        hex::encode(self.0)
+impl Display for Digest {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", hex::encode(self.0))
     }
 }
 

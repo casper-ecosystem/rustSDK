@@ -79,7 +79,7 @@ pub fn get_blake2b_hash(meta_data: &str) -> String {
     hasher.finalize_variable(|slice| {
         result.copy_from_slice(slice);
     });
-    hex::encode(&result).to_lowercase()
+    hex::encode(result).to_lowercase()
 }
 
 /// Creates a dictionary item key by concatenating the serialized bytes of the key and value.

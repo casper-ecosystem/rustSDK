@@ -313,6 +313,7 @@
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
 <a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -383,8 +384,9 @@
 
     <span class="doccomment">/// Alias for state_root_hash_as_string
     </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"toString"</span>)]
-    </span><span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="self">self</span>.state_root_hash_as_string()
+    </span><span class="kw">pub fn </span>to_string_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="comment">// You can still use to_string method for compatibility
+        </span><span class="self">self</span>.state_root_hash_as_string()
     }
 
     <span class="doccomment">/// Converts the GetStateRootHashResult to a JsValue.

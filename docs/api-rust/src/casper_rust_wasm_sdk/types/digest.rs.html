@@ -169,7 +169,11 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::sdk_error::SdkError;
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::{Display, Formatter};
+
+<span class="kw">use </span><span class="kw">super</span>::sdk_error::SdkError;
 <span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="kw">use </span>base16::DecodeError;
 <span class="kw">use </span>casper_hashing::{Digest <span class="kw">as </span>_Digest, Error <span class="kw">as </span>DigestError};
@@ -235,9 +239,9 @@
     }
 }
 
-<span class="kw">impl </span>ToString <span class="kw">for </span>Digest {
-    <span class="kw">fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        hex::encode(<span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl </span>Display <span class="kw">for </span>Digest {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), std::fmt::Error&gt; {
+        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, hex::encode(<span class="self">self</span>.<span class="number">0</span>))
     }
 }
 

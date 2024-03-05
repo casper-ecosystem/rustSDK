@@ -3,6 +3,7 @@ use casper_client::rpcs::PurseIdentifier as _PurseIdentifier;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
@@ -36,14 +37,14 @@ impl PurseIdentifier {
     }
 }
 
-impl ToString for PurseIdentifier {
-    fn to_string(&self) -> String {
+impl fmt::Display for PurseIdentifier {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match &self.0 {
             _PurseIdentifier::MainPurseUnderPublicKey(key) => {
-                PublicKey::from(key.clone()).to_string()
+                write!(f, "{}", PublicKey::from(key.clone()))
             }
-            _PurseIdentifier::MainPurseUnderAccountHash(hash) => hash.to_formatted_string(),
-            _PurseIdentifier::PurseUref(uref) => uref.to_formatted_string(),
+            _PurseIdentifier::MainPurseUnderAccountHash(hash) => write!(f, "{}", hash),
+            _PurseIdentifier::PurseUref(uref) => write!(f, "{}", uref),
         }
     }
 }

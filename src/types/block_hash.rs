@@ -6,6 +6,7 @@ use casper_hashing::Digest as _Digest;
 use gloo_utils::format::JsValueSerdeExt;
 use hex::decode;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -42,9 +43,9 @@ impl BlockHash {
     }
 }
 
-impl ToString for BlockHash {
-    fn to_string(&self) -> String {
-        hex::encode(self.0)
+impl fmt::Display for BlockHash {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", hex::encode(self.0))
     }
 }
 

@@ -93,6 +93,7 @@
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::digest::Digest;
 <span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="kw">use </span>casper_hashing::Digest <span class="kw">as </span>_Digest;
@@ -103,6 +104,7 @@
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
 <span class="kw">use </span>hex::decode;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::fmt;
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug, Deserialize, Clone, Serialize)]
@@ -142,9 +144,9 @@
     }
 }
 
-<span class="kw">impl </span>ToString <span class="kw">for </span>DeployHash {
-    <span class="kw">fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        hex::encode(<span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>DeployHash {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, hex::encode(<span class="self">self</span>.<span class="number">0</span>))
     }
 }
 
