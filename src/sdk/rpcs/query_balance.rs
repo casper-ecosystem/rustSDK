@@ -135,7 +135,7 @@ impl SDK {
             self.query_balance(
                 global_state_identifier,
                 purse_identifier_as_string,
-                purse_identifier.into(),
+                purse_identifier,
                 Some(hash.to_string()),
                 None,
                 verbosity,
@@ -146,7 +146,7 @@ impl SDK {
             self.query_balance(
                 global_state_identifier,
                 purse_identifier_as_string,
-                purse_identifier.into(),
+                purse_identifier,
                 Some(hash.to_string()),
                 None,
                 verbosity,
@@ -157,7 +157,7 @@ impl SDK {
             self.query_balance(
                 global_state_identifier,
                 purse_identifier_as_string,
-                purse_identifier.into(),
+                purse_identifier,
                 None,
                 Some(maybe_block_id_as_string),
                 verbosity,
@@ -168,7 +168,7 @@ impl SDK {
             self.query_balance(
                 global_state_identifier,
                 purse_identifier_as_string,
-                purse_identifier.into(),
+                purse_identifier,
                 None,
                 None,
                 verbosity,
@@ -291,10 +291,7 @@ mod tests {
     use crate::{
         helpers::public_key_from_private_key,
         rpcs::PRIVATE_KEY_NCTL_PATH,
-        types::{
-            digest::Digest, global_state_identifier::GlobalStateIdentifier, public_key::PublicKey,
-            purse_identifier::PurseIdentifier,
-        },
+        types::{digest::Digest, public_key::PublicKey},
     };
     use sdk_tests::{
         config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},

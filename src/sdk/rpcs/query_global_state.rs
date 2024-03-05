@@ -408,9 +408,8 @@ impl SDK {
 mod tests {
 
     use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
-        types::{global_state_identifier::GlobalStateIdentifier, public_key::PublicKey},
+        helpers::public_key_from_private_key, rpcs::PRIVATE_KEY_NCTL_PATH,
+        types::public_key::PublicKey,
     };
     use sdk_tests::{
         config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},

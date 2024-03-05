@@ -17,7 +17,6 @@ use gloo_utils::format::JsValueSerdeExt;
 use rust_decimal::prelude::*;
 use serde::Serialize;
 use serde_json::Value;
-use std::str::FromStr;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::{JsCast, JsValue};
 

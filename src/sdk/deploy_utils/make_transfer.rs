@@ -51,7 +51,7 @@ impl SDK {
             payment_params,
         );
         match result {
-            Ok(data) => Ok(data.into()),
+            Ok(data) => Ok(data),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
                 error(err);
@@ -125,13 +125,7 @@ pub(crate) fn make_transfer(
 mod tests {
 
     use super::*;
-    use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
-        types::deploy_params::{
-            deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-        },
-    };
+    use crate::{helpers::public_key_from_private_key, rpcs::PRIVATE_KEY_NCTL_PATH};
     use sdk_tests::{
         config::{CHAIN_NAME, PAYMENT_TRANSFER_AMOUNT, PRIVATE_KEY_NAME, TRANSFER_AMOUNT},
         tests::helpers::read_pem_file,

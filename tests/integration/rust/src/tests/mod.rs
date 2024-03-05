@@ -3,7 +3,7 @@ pub mod integration;
 #[cfg(test)]
 pub mod integration_tests;
 use casper_rust_wasm_sdk::{
-    deploy_watcher::deploy_watcher::{DeploySubscription, EventHandlerFn, EventParseResult},
+    deploy_watcher::watcher::{DeploySubscription, EventHandlerFn, EventParseResult},
     helpers::public_key_from_private_key,
     types::verbosity::Verbosity,
     SDK,

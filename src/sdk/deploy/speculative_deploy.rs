@@ -42,6 +42,7 @@ impl SDK {
     ///
     /// A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
     #[wasm_bindgen(js_name = "speculative_deploy")]
+    #[allow(clippy::too_many_arguments)]
     pub async fn speculative_deploy_js_alias(
         &self,
         deploy_params: DeployStrParams,
@@ -137,13 +138,7 @@ mod tests {
     use crate::{
         helpers::public_key_from_private_key,
         rpcs::{PRIVATE_KEY_NCTL_PATH, WASM_PATH},
-        types::{
-            block_identifier::BlockIdentifier,
-            deploy_params::{
-                deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-                session_str_params::SessionStrParams,
-            },
-        },
+        types::block_identifier::BlockIdentifier,
     };
     use sdk_tests::{
         config::{

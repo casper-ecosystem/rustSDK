@@ -162,9 +162,6 @@ mod tests {
     use crate::{
         helpers::public_key_from_private_key,
         rpcs::{PRIVATE_KEY_NCTL_PATH, WASM_PATH},
-        types::deploy_params::{
-            deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-        },
     };
     use sdk_tests::{
         config::{

@@ -40,3 +40,18 @@ build: pack doc
 	cd examples/frontend/react/ && npm run build && cd .
 	cd examples/desktop/node/ && npx tsc index.ts && cd .
 	cd examples/desktop/electron && npm run build && cd .
+
+format:
+	cargo fmt
+
+lint: format clippy
+
+clippy:
+	cargo clippy --target wasm32-unknown-unknown --bins -- -D warnings
+	cargo clippy --lib -- -D warnings
+	cargo clippy --no-default-features --lib -- -D warnings
+
+check-lint: clippy
+	cargo fmt -- --check
+
+.PHONY: format lint check clippy

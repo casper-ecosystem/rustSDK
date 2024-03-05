@@ -263,10 +263,7 @@ impl SDK {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        get_dictionary_item,
-        types::deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
-    };
+    use crate::get_dictionary_item;
     use sdk_tests::config::DEFAULT_NODE_ADDRESS;
 
     #[tokio::test]

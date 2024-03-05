@@ -130,13 +130,7 @@ impl SDK {
 mod tests {
 
     use super::*;
-    use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
-        types::deploy_params::{
-            deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-        },
-    };
+    use crate::{helpers::public_key_from_private_key, rpcs::PRIVATE_KEY_NCTL_PATH};
     use sdk_tests::{
         config::{
             CHAIN_NAME, DEFAULT_NODE_ADDRESS, PAYMENT_TRANSFER_AMOUNT, PRIVATE_KEY_NAME,

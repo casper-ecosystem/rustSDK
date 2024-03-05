@@ -137,9 +137,9 @@ impl SDK {
         } else if let Some(deploy) = deploy {
             deploy
         } else {
-            let err = &format!("Error: Missing deploy as json or deploy");
-            error(err);
-            return Err(JsError::new(err));
+            let err = "Error: Missing deploy as json or deploy".to_string();
+            error(&err);
+            return Err(JsError::new(&err));
         };
 
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {

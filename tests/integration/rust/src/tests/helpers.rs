@@ -4,7 +4,7 @@ use crate::config::{
     CHAIN_NAME, DEFAULT_NODE_ADDRESS, DEPLOY_TIME, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
 use crate::config::{CONTRACT_CEP78_KEY, PACKAGE_CEP78_KEY};
-use casper_rust_wasm_sdk::deploy_watcher::deploy_watcher::EventParseResult;
+use casper_rust_wasm_sdk::deploy_watcher::watcher::EventParseResult;
 use casper_rust_wasm_sdk::rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams};
 use casper_rust_wasm_sdk::types::block_hash::BlockHash;
 use casper_rust_wasm_sdk::types::deploy_params::{

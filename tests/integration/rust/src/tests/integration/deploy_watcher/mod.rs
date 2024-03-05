@@ -6,9 +6,7 @@ pub mod test_module {
             integration::contract::test_module::test_install,
         },
     };
-    use casper_rust_wasm_sdk::deploy_watcher::deploy_watcher::{
-        DeploySubscription, EventHandlerFn,
-    };
+    use casper_rust_wasm_sdk::deploy_watcher::watcher::{DeploySubscription, EventHandlerFn};
 
     pub async fn test_wait_deploy() {
         let config: TestConfig = get_config(true).await;

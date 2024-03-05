@@ -154,14 +154,8 @@ mod tests {
 
     use super::*;
     use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
-        types::{
-            block_identifier::BlockIdentifier,
-            deploy_params::{
-                deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-            },
-        },
+        helpers::public_key_from_private_key, rpcs::PRIVATE_KEY_NCTL_PATH,
+        types::block_identifier::BlockIdentifier,
     };
     use sdk_tests::{
         config::{
