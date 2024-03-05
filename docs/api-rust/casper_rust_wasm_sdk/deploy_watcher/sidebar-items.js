@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["deploy_watcher"]};
+window.SIDEBAR_ITEMS = {"mod":["watcher"]};

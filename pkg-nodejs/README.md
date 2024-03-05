@@ -999,7 +999,7 @@ console.log(`deploy cost ${cost}`);
 The watch_deploy functionality facilitates actively monitoring deploy events. By creating a deploy watcher, developers can subscribe to specific deploy hashes and define custom callback functions to handle these events. The watcher is then started, and as deploy events occur, the specified callback functions are executed. This mechanism enables real-time responsiveness to deploy events within Rust applications.
 
 ```rust
-use casper_rust_wasm_sdk::deploy_watcher::deploy_watcher::{
+use casper_rust_wasm_sdk::deploy_watcher::watcher::{
     DeploySubscription, EventHandlerFn,
 };
 
