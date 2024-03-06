@@ -119,18 +119,31 @@ export function delay(time: number | undefined) {
 
 export async function setupFixtures() {
   variables.sdk = new SDK();
+  let copy_key_to_root_folder = true;
 
   // User 1 as target for default account
-  let copy_key_to_root_folder = true;
-  variables.private_key = readPEMFile(`${config.key_path}${config.key_name}`, copy_key_to_root_folder);
-  variables.account = privateToPublicKey(variables.private_key);
+  if (config.private_key_user_1) {
+    variables.private_key = `-----BEGIN PRIVATE KEY----- ${config.private_key_user_1} -----END PRIVATE KEY-----`;
+    variables.account = privateToPublicKey(variables.private_key);
+    const copyFilePath = path.resolve(__dirname, '../', config.key_name);
+    writeFile(variables.private_key, copyFilePath);
+    variables.delete_key_at_root_after_test = copy_key_to_root_folder;
+  } else {
+    variables.private_key = readPEMFile(`${config.key_path}${config.key_name}`, copy_key_to_root_folder);
+    variables.account = privateToPublicKey(variables.private_key);
+  }
 
   // User 2 as target for transfers etc
-  const key_path_target = config.key_path.replace('user-1', 'user-2');
-  const private_key_target = readPEMFile(`${key_path_target}${config.key_name}`);
-  variables.target = privateToPublicKey(private_key_target);
+  if (config.private_key_user_2) {
+    const private_key_target = `-----BEGIN PRIVATE KEY----- ${config.private_key_user_2} -----END PRIVATE KEY-----`;
+    variables.target = privateToPublicKey(private_key_target);
+  } else {
+    const key_path_target = config.key_path.replace('user-1', 'user-2');
+    const private_key_target = readPEMFile(`${key_path_target}${config.key_name}`);
+    variables.target = privateToPublicKey(private_key_target);
+  }
 
-  if (!variables.account) {
+  if (!variables.account || !variables.target) {
     console.error('Missing account');
   }
   let public_key = new PublicKey(variables.account);
@@ -192,6 +205,15 @@ function copyFile(src: string, dest: string) {
     console.info(`Copied ${src} to ${dest}`);
   } catch (error) {
     console.error(`Error copying ${src} to ${dest}:`, error);
+  }
+}
+
+function writeFile(content: string, dest: string) {
+  try {
+    fs.writeFileSync(dest, content);
+    console.info(`Written content to ${dest}`);
+  } catch (error) {
+    console.error(`Error writing content to ${dest}:`, error);
   }
 }
 
