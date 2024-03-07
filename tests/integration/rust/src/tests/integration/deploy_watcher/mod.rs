@@ -1,6 +1,6 @@
 pub mod test_module {
     use crate::{
-        config::{get_config, TestConfig, DEFAULT_EVENT_ADDRESS},
+        config::{get_config, TestConfig},
         tests::{
             helpers::{get_event_handler_fn, intern::create_test_sdk},
             integration::contract::test_module::test_install,
@@ -17,7 +17,7 @@ pub mod test_module {
         assert!(!deploy_hash.is_empty());
 
         let event_parse_result = sdk
-            .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash, None)
+            .wait_deploy(&config.event_address, &deploy_hash, None)
             .await
             .unwrap();
         let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
@@ -32,7 +32,7 @@ pub mod test_module {
         let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
         let event_parse_result = sdk
-            .wait_deploy(DEFAULT_EVENT_ADDRESS, deploy_hash, timeout_duration)
+            .wait_deploy(&config.event_address, deploy_hash, timeout_duration)
             .await
             .unwrap();
         assert_eq!(event_parse_result.err.unwrap(), "Timeout expired");
@@ -46,7 +46,7 @@ pub mod test_module {
 
         assert!(!deploy_hash.is_empty());
 
-        let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, None);
+        let mut watcher = sdk.watch_deploy(&config.event_address, None);
 
         let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
         let deploy_hash_results = vec![deploy_hash.clone()];
@@ -79,7 +79,7 @@ pub mod test_module {
         let config: TestConfig = get_config(true).await;
         let sdk = create_test_sdk(Some(config.clone()));
 
-        let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, timeout_duration);
+        let mut watcher = sdk.watch_deploy(&config.event_address, timeout_duration);
 
         let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
 
@@ -132,26 +132,22 @@ mod tests {
 
     #[test]
     pub async fn test_wait_deploy_test_defined_timeout_test() {
-        // Wrap the test function with a timeout of 10 seconds
-        let result = timeout(
-            Duration::from_secs(10),
-            test_wait_deploy_timeout(Some(3000)),
-        )
-        .await;
+        // Wrap the test function with a timeout of 5 seconds
+        let result = timeout(Duration::from_secs(5), test_wait_deploy_timeout(Some(3000))).await;
         // Assert whether the test completed within the timeout period
-        assert!(result.is_ok(), "Test timed out after 10 seconds");
+        assert!(result.is_ok(), "Test timed out after 5 seconds");
     }
 
     #[test]
     pub async fn test_watch_deploy_defined_timeout_test() {
-        // Wrap the test function with a timeout of 10 seconds
+        // Wrap the test function with a timeout of 5 seconds
         let result = timeout(
-            Duration::from_secs(10),
-            test_watch_deploy_timeout(Some(3000)), // should time out on 3s on the 10s available for the test
+            Duration::from_secs(5),
+            test_watch_deploy_timeout(Some(3000)), // should time out on 3s on the 5s available for the test
         )
         .await;
         // Assert whether the test completed within the timeout period
-        assert!(result.is_ok(), "Test timed out after 10 seconds");
+        assert!(result.is_ok(), "Test timed out after 5 seconds");
     }
 
     #[test]

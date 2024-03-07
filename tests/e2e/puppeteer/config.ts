@@ -11,8 +11,8 @@ export const chain_name_default = 'casper-net-1';
 export const private_key_user_1 = process.env.PRIVATE_KEY_USER_1;
 export const private_key_user_2 = process.env.PRIVATE_KEY_USER_2;
 
-export const key_name = process.env.KEY_NAME || key_name_default;
-export const key_path = process.env.KEY_PATH || key_path_default;
+export const key_name = process.env.PRIVATE_KEY_NAME || key_name_default;
+export const key_path = process.env.PRIVATE_KEY_NCTL_PATH || key_path_default;
 
 export const node_address = process.env.NODE_ADDRESS || node_address_default;
 export const app_address = process.env.APP_ADDRESS || app_address_default;

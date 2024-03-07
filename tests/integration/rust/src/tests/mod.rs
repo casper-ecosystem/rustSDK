@@ -2,6 +2,7 @@ pub mod helpers;
 pub mod integration;
 #[cfg(test)]
 pub mod integration_tests;
+use crate::{config::DEFAULT_EVENT_ADDRESS, tests::helpers::get_event_handler_fn};
 use casper_rust_wasm_sdk::{
     deploy_watcher::watcher::{DeploySubscription, EventHandlerFn, EventParseResult},
     helpers::public_key_from_secret_key,
@@ -13,8 +14,6 @@ use std::{
     io::{self, Read},
     path::Path,
 };
-
-use crate::{config::DEFAULT_EVENT_ADDRESS, tests::helpers::get_event_handler_fn};
 
 pub async fn run_tests_or_examples() {
     // Run a specific test ?
