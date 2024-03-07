@@ -104,17 +104,11 @@ impl SDK {
 #[cfg(test)]
 mod tests {
     use sdk_tests::{
-        config::{
-            ARGS_SIMPLE, CHAIN_NAME, DEFAULT_NODE_ADDRESS, HELLO_CONTRACT, PAYMENT_AMOUNT,
-            PRIVATE_KEY_NAME, TTL,
-        },
-        tests::helpers::{read_pem_file, read_wasm_file},
+        config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, TTL, WASM_PATH},
+        tests::helpers::{get_network_constants, get_user_private_key, read_wasm_file},
     };
 
-    use crate::{
-        helpers::public_key_from_secret_key,
-        rpcs::{PRIVATE_KEY_NCTL_PATH, WASM_PATH},
-    };
+    use crate::helpers::public_key_from_secret_key;
 
     use super::*;
 
@@ -145,13 +139,12 @@ mod tests {
     async fn test_install_with_valid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let (node_address, _, chain_name) = get_network_constants();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
         let mut session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -168,7 +161,12 @@ mod tests {
 
         // Act
         let result = sdk
-            .install(deploy_params, session_params, payment_params, node_address)
+            .install(
+                deploy_params,
+                session_params,
+                payment_params,
+                Some(node_address),
+            )
             .await;
 
         // Assert
@@ -182,16 +180,15 @@ mod tests {
     async fn test_install_with_invalid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let (node_address, _, chain_name) = get_network_constants();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let error_message =
             "Missing a required arg - exactly one of the following must be provided";
 
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
+            &chain_name,
             &account,
             Some(private_key.clone()),
             None,
@@ -213,7 +210,12 @@ mod tests {
 
         // Act
         let result = sdk
-            .install(deploy_params, session_params, payment_params, node_address)
+            .install(
+                deploy_params,
+                session_params,
+                payment_params,
+                Some(node_address),
+            )
             .await;
 
         // Assert
@@ -226,15 +228,14 @@ mod tests {
     async fn test_install_without_private_key() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let (node_address, _, chain_name) = get_network_constants();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let error_message = "account authorization invalid at state root hash";
 
         let deploy_params =
-            DeployStrParams::new(CHAIN_NAME, &account, None, None, Some(TTL.to_string()));
+            DeployStrParams::new(&chain_name, &account, None, None, Some(TTL.to_string()));
         let mut session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -251,7 +252,12 @@ mod tests {
 
         // Act
         let result = sdk
-            .install(deploy_params, session_params, payment_params, node_address)
+            .install(
+                deploy_params,
+                session_params,
+                payment_params,
+                Some(node_address),
+            )
             .await;
 
         // Assert
@@ -264,13 +270,12 @@ mod tests {
     async fn test_install_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
-
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let (_, _, chain_name) = get_network_constants();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key.clone()), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key.clone()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
 

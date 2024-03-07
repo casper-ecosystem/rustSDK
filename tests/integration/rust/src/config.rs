@@ -18,8 +18,8 @@ pub const TIMESTAMP_WAIT_TIME: Duration = time::Duration::from_millis(1000);
 pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 // read_pem_file will look PRIVATE_KEY_NAME to root directory if relative path is not found (relative to root)
 pub const DEFAULT_PRIVATE_KEY_NCTL_PATH: &str =
-    "./../../../../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/";
-pub const WASM_PATH: &str = "../../wasm/";
+    "../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/";
+pub const WASM_PATH: &str = "./tests/wasm/";
 pub const DEFAULT_TTL: &str = "30m";
 pub const TTL: &str = "1h";
 pub const HELLO_CONTRACT: &str = "hello.wasm";
@@ -95,7 +95,7 @@ pub async fn initialize_test_config(
     if *block_hash_initialized_guard {
         return Err("initialize_test_config called after block_hash already initialized".into());
     }
-    let private_key = get_user_private_key(None)?;
+    let private_key = get_user_private_key(None).unwrap();
     let private_key_target_account = get_user_private_key(Some("user-2"))?;
     let account = public_key_from_secret_key(&private_key).unwrap();
     let target_account = public_key_from_secret_key(&private_key_target_account).unwrap();

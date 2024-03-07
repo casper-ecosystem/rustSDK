@@ -15,3 +15,5 @@ Cargo.lock
 
 ## any pem Key
 *.pem
+
+.env

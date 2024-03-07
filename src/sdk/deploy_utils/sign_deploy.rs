@@ -50,15 +50,14 @@ mod tests {
     use super::*;
     use crate::{
         helpers::public_key_from_secret_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
         types::deploy_params::{
             deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
             session_str_params::SessionStrParams,
         },
     };
     use sdk_tests::{
-        config::{CHAIN_NAME, PAYMENT_AMOUNT, PRIVATE_KEY_NAME},
-        tests::helpers::read_pem_file,
+        config::PAYMENT_AMOUNT,
+        tests::helpers::{get_network_constants, get_user_private_key},
     };
     use serde_json::Value;
 
@@ -66,12 +65,12 @@ mod tests {
     async fn test_sign_deploy_with_valid_params() {
         // Arrange
         let sdk = SDK::new(None, None);
+        let (_, _, chain_name) = get_network_constants();
 
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
-        let deploy_params = DeployStrParams::new(CHAIN_NAME, &account, None, None, None);
+        let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None);
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(
             "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
@@ -102,12 +101,12 @@ mod tests {
     async fn test_sign_deploy_with_invalid_signature() {
         // Arrange
         let sdk = SDK::new(None, None);
+        let (_, _, chain_name) = get_network_constants();
 
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
-        let deploy_params = DeployStrParams::new(CHAIN_NAME, &account, None, None, None);
+        let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None);
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(
             "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",

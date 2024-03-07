@@ -6,44 +6,60 @@ pub mod query_contract_key;
 #[cfg(test)]
 use crate::rpcs::get_dictionary_item::DictionaryItemInput;
 #[cfg(test)]
-use crate::{
-    helpers::public_key_from_secret_key, rpcs::PRIVATE_KEY_NCTL_PATH, types::public_key::PublicKey,
-};
+use crate::{helpers::public_key_from_secret_key, types::public_key::PublicKey};
 #[cfg(test)]
 use sdk_tests::config::{DICTIONARY_ITEM_KEY, DICTIONARY_NAME};
 #[cfg(test)]
-use sdk_tests::{
-    config::PRIVATE_KEY_NAME,
-    tests::helpers::{mint_nft, read_pem_file},
-};
+use sdk_tests::tests::helpers::mint_nft;
 
 #[cfg(test)]
 pub async fn install_cep78() -> String {
-    use crate::rpcs::WASM_PATH;
-    use sdk_tests::tests::helpers::{get_contract_cep78_hash_keys, install_cep78_if_needed};
+    use sdk_tests::{
+        config::WASM_PATH,
+        tests::helpers::{
+            get_contract_cep78_hash_keys, get_network_constants, get_user_private_key,
+            install_cep78_if_needed,
+        },
+    };
 
-    let private_key = read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+    let private_key = get_user_private_key(None).unwrap();
     let account = public_key_from_secret_key(&private_key).unwrap();
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
-    install_cep78_if_needed(&account, &private_key, Some(WASM_PATH)).await;
-    let (contract_cep78_hash, _) = get_contract_cep78_hash_keys(&account_hash).await;
+    let (node_address, event_address, chain_name) = get_network_constants();
+    install_cep78_if_needed(
+        &account,
+        &private_key,
+        Some(WASM_PATH),
+        (&node_address, &event_address, &chain_name),
+    )
+    .await;
+    let (contract_cep78_hash, _) = get_contract_cep78_hash_keys(&account_hash, &node_address).await;
     contract_cep78_hash
 }
 
 #[cfg(test)]
 pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
+
     static mut CONTRACT_CEP78_HASH: Option<String> = None;
+    let (node_address, event_address, chain_name) = get_network_constants();
 
     unsafe {
         if CONTRACT_CEP78_HASH.is_none() {
             let contract_cep78_hash = install_cep78().await;
-            let private_key =
-                read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+            let private_key = get_user_private_key(None).unwrap();
             let account = public_key_from_secret_key(&private_key).unwrap();
             let public_key = PublicKey::new(&account).unwrap();
             let account_hash = public_key.to_account_hash().to_formatted_string();
-            mint_nft(&contract_cep78_hash, &account, &account_hash, &private_key).await;
+            mint_nft(
+                &contract_cep78_hash,
+                &account,
+                &account_hash,
+                &private_key,
+                (&node_address, &event_address, &chain_name),
+            )
+            .await;
             CONTRACT_CEP78_HASH = Some(contract_cep78_hash);
         }
         if as_params {

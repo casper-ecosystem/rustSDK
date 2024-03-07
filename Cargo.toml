@@ -44,6 +44,7 @@ rust_decimal = "1.10"
 blake2 = { version = "0.9.0", default-features = false }
 reqwest = { version = "0.11", default-features = false, features = ["stream"] }
 futures-util = "*"
+dotenv = "0.15.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -66,3 +67,4 @@ lto = true
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 sdk_tests = { path = "tests/integration/rust" }
+ctor = "*"

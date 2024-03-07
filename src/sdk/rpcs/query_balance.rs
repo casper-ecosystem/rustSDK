@@ -290,19 +290,14 @@ mod tests {
 
     use crate::{
         helpers::public_key_from_secret_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
         types::{digest::Digest, public_key::PublicKey},
     };
-    use sdk_tests::{
-        config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},
-        tests::helpers::read_pem_file,
-    };
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
 
     use super::*;
 
     fn get_purse_identifier() -> PurseIdentifier {
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
 
@@ -358,7 +353,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let global_state_identifier = GlobalStateIdentifier::from_block_height(1);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         // Act
         let result = sdk
             .query_balance(
@@ -368,7 +363,7 @@ mod tests {
                 None,
                 None,
                 verbosity,
-                node_address.clone(),
+                Some(node_address),
             )
             .await;
 
@@ -381,9 +376,9 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         let state_root_hash: Digest = sdk
-            .get_state_root_hash(None, verbosity, node_address.clone())
+            .get_state_root_hash(None, verbosity, Some(node_address.clone()))
             .await
             .unwrap()
             .result
@@ -400,7 +395,7 @@ mod tests {
                 Some(state_root_hash.to_string()),
                 None,
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -413,7 +408,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -424,7 +419,7 @@ mod tests {
                 None,
                 Some("1".to_string()),
                 verbosity,
-                node_address.clone(),
+                Some(node_address.clone()),
             )
             .await;
 
@@ -437,7 +432,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -448,7 +443,7 @@ mod tests {
                 None,
                 None,
                 verbosity,
-                node_address.clone(),
+                Some(node_address.clone()),
             )
             .await;
 
@@ -461,7 +456,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -472,7 +467,7 @@ mod tests {
                 None,
                 None,
                 verbosity,
-                node_address.clone(),
+                Some(node_address),
             )
             .await;
 

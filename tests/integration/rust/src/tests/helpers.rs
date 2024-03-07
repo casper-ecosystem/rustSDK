@@ -238,33 +238,29 @@ pub fn get_network_constants() -> (String, String, String) {
     (default_node_address, default_event_address, chain_name)
 }
 
-pub fn get_private_key_constants() -> (String, String) {
-    let private_key_name =
-        env::var("PRIVATE_KEY_NAME").unwrap_or_else(|_| DEFAULT_PRIVATE_KEY_NAME.to_string());
-    let private_key_nctl_path = env::var("PRIVATE_KEY_NCTL_PATH")
-        .unwrap_or_else(|_| DEFAULT_PRIVATE_KEY_NCTL_PATH.to_string());
-
-    (private_key_name, private_key_nctl_path)
-}
-
 pub fn get_user_private_key(user: Option<&str>) -> Result<String, std::io::Error> {
     let user = user.unwrap_or("user-1");
     let env_key = get_env_key(user);
     if !env_key.is_empty() {
         return Ok(env_key);
     }
-    let (private_key_name, private_key_nctl_path) = get_private_key_constants();
+    let (private_key_nctl_path, private_key_name) = get_private_key_constants();
     let user_key_path = match user {
         user if user.starts_with("user-") => {
-            format!(
-                "{}{}",
-                private_key_nctl_path.replace("user-1", user),
-                private_key_name
-            )
+            format!("{}", private_key_nctl_path.replace("user-1", user))
         }
         _ => format!("{private_key_nctl_path}{private_key_name}"),
     };
     read_pem_file(&user_key_path, &private_key_name)
+}
+
+fn get_private_key_constants() -> (String, String) {
+    let private_key_name =
+        env::var("PRIVATE_KEY_NAME").unwrap_or_else(|_| DEFAULT_PRIVATE_KEY_NAME.to_string());
+    let private_key_nctl_path = env::var("PRIVATE_KEY_NCTL_PATH")
+        .unwrap_or_else(|_| DEFAULT_PRIVATE_KEY_NCTL_PATH.to_string());
+
+    (private_key_nctl_path, private_key_name)
 }
 
 fn get_env_key(user: &str) -> String {
@@ -280,13 +276,16 @@ fn get_env_key(user: &str) -> String {
 }
 
 fn read_pem_file(file_path: &str, private_key_name: &str) -> Result<String, io::Error> {
-    let mut path_buf = PathBuf::new();
-    path_buf.push(file_path);
-    if file_path.is_empty() || !path_buf.exists() {
-        path_buf.clear();
-        path_buf.push(private_key_name);
-    }
-    let mut file = match File::open(&path_buf) {
+    let path_buf = PathBuf::from(env::current_dir()?);
+
+    let relative_path = path_buf
+        .to_string_lossy()
+        .replace("tests/integration/rust", "");
+    let mut relative_path_buf = PathBuf::from(relative_path.clone());
+    relative_path_buf.push(file_path);
+    relative_path_buf.push(private_key_name);
+
+    let mut file = match File::open(&relative_path_buf) {
         Ok(file) => file,
         Err(err) => {
             eprintln!("{err} {file_path}");
@@ -299,9 +298,13 @@ fn read_pem_file(file_path: &str, private_key_name: &str) -> Result<String, io::
 }
 
 pub fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
-    let mut path_buf = PathBuf::new();
-    path_buf.push(file_path);
-    let mut file = File::open(path_buf.as_path())?;
+    let path_buf = PathBuf::from(env::current_dir()?);
+    let relative_path = path_buf
+        .to_string_lossy()
+        .replace("tests/integration/rust", "");
+    let mut relative_path_buf = PathBuf::from(relative_path.clone());
+    relative_path_buf.push(file_path);
+    let mut file = File::open(relative_path_buf)?;
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer)?;
     Ok(buffer)

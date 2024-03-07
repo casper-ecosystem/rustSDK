@@ -153,16 +153,10 @@ impl SDK {
 mod tests {
 
     use super::*;
-    use crate::{
-        helpers::public_key_from_secret_key, rpcs::PRIVATE_KEY_NCTL_PATH,
-        types::block_identifier::BlockIdentifier,
-    };
+    use crate::{helpers::public_key_from_secret_key, types::block_identifier::BlockIdentifier};
     use sdk_tests::{
-        config::{
-            CHAIN_NAME, DEFAULT_NODE_ADDRESS, PAYMENT_TRANSFER_AMOUNT, PRIVATE_KEY_NAME,
-            TRANSFER_AMOUNT,
-        },
-        tests::helpers::read_pem_file,
+        config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
+        tests::helpers::{get_network_constants, get_user_private_key},
     };
 
     // TODO speculative_exec not available in 1.6
@@ -171,14 +165,13 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, chain_name) = get_network_constants();
 
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -192,7 +185,7 @@ mod tests {
                 payment_params,
                 None,
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -206,16 +199,15 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, chain_name) = get_network_constants();
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
 
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -229,7 +221,7 @@ mod tests {
                 payment_params,
                 Some(block_identifier),
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -242,13 +234,12 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, chain_name) = get_network_constants();
 
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
-        let deploy_params = DeployStrParams::new(CHAIN_NAME, &account, None, None, None);
+        let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -262,7 +253,7 @@ mod tests {
                 payment_params,
                 None,
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -275,15 +266,14 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, chain_name) = get_network_constants();
 
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]".to_string();
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(""); // This is not valid payment amount
 
@@ -297,7 +287,7 @@ mod tests {
                 payment_params,
                 None,
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 

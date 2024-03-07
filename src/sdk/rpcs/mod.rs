@@ -19,7 +19,13 @@ pub mod query_global_state;
 pub mod speculative_exec;
 
 #[cfg(test)]
-pub const PRIVATE_KEY_NCTL_PATH: &str =
-    "./../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/";
+use dotenv::dotenv;
+
 #[cfg(test)]
-pub const WASM_PATH: &str = "./tests/wasm/";
+mod setup {
+    use super::*;
+    #[ctor::ctor]
+    fn setup() {
+        dotenv().ok();
+    }
+}
