@@ -1,5 +1,5 @@
 const dotenv = require('dotenv');
-dotenv.config();
+dotenv.config({ path: '../../.env' });
 
 export const key_name_default = 'secret_key.pem';
 export const key_path_default = '../../../../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/';
@@ -13,7 +13,6 @@ export const private_key_user_2 = process.env.PRIVATE_KEY_USER_2;
 
 export const key_name = process.env.PRIVATE_KEY_NAME || key_name_default;
 export const key_path = process.env.PRIVATE_KEY_NCTL_PATH || key_path_default;
-
 export const node_address = process.env.NODE_ADDRESS || node_address_default;
 export const app_address = process.env.APP_ADDRESS || app_address_default;
 export const chain_name = process.env.CHAIN_NAME || chain_name_default;

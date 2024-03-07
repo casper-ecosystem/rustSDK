@@ -1,0 +1,7 @@
+{
+  "/rpc": {
+    "target": "${NODE_ADDRESS}",
+    "secure": false,
+    "changeOrigin": false
+  }
+}
