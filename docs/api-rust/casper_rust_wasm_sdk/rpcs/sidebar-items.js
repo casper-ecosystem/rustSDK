@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["get_account","get_auction_info","get_balance","get_block","get_block_transfers","get_chainspec","get_deploy","get_dictionary_item","get_era_info","get_era_summary","get_node_status","get_peers","get_state_root_hash","get_validator_changes","list_rpcs","put_deploy","query_balance","query_global_state","speculative_exec"]};

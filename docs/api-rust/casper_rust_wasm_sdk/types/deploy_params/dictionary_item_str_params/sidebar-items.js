@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["dictionary_item_str_params_to_casper_client"],"struct":["AccountNamedKey","ContractNamedKey","DictionaryItemStrParams","DictionaryVariant","URefVariant"]};
