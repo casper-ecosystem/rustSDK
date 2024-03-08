@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
@@ -17,11 +15,11 @@ import init, {
   Path,
   Deploy,
   AccessRights,
-  PublicKey,
+  // PublicKey,
   DeployStrParams,
   SessionStrParams,
   PaymentStrParams,
-  hexToUint8Array,
+  // hexToUint8Array,
   jsonPrettyPrint,
   privateToPublicKey,
   getTimestamp,
@@ -42,7 +40,7 @@ const chain_name = process.env.REACT_APP_CHAIN_NAME || chain_name_default;
 
 function App() {
   const [wasm, setWasm] = useState(false);
-  const [block_identifier_height, setBlock_identifier_height] = useState(
+  const [block_identifier_height, _setBlock_identifier_height] = useState(
     block_identifier_height_default
   );
   const [hash, setHash] = useState('');
@@ -54,7 +52,7 @@ function App() {
   const [info_get_account_info_purse, setInfo_get_account_info_purse] =
     useState('');
   const [info_get_deploy, setInfo_get_deploy] = useState('');
-  const [sessionPath, setSessionPath] = useState('');
+  const [_sessionPath, setSessionPath] = useState('');
   const [state_get_balance, setState_get_balance] = useState('');
   const [state_get_dictionary_item, setState_get_dictionary_item] = useState(
     []
@@ -85,7 +83,7 @@ function App() {
   const initApp = async () => {
     if (!wasm) {
       await fetchWasm();
-    };
+    }
     // console.log(wasm);
     const sdk = new SDK(app_address);
     setSdk(sdk);
@@ -108,7 +106,7 @@ function App() {
       console.log(chain_get_state_root_hash);
 
       // get_block
-      let chain_get_block_options = sdk.get_block_options({
+      const chain_get_block_options = sdk.get_block_options({
         blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height)
       });
       const chain_get_block = await sdk.chain_get_block(chain_get_block_options);
@@ -118,7 +116,7 @@ function App() {
       // get_account_info
       const account_identifier = new AccountIdentifier(public_key);
       console.log(account_identifier.toJson());
-      let state_get_account_info_options = sdk.get_account_options({
+      const state_get_account_info_options = sdk.get_account_options({
         blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height),
         account_identifier: account_identifier.toJson()
       });
@@ -134,7 +132,7 @@ function App() {
 
       // get_balance
       let stateRootHashDigest = new Digest(chain_get_state_root_hash?.toString());
-      let state_get_balance_options = sdk.get_balance_options({
+      const state_get_balance_options = sdk.get_balance_options({
         state_root_hash: stateRootHashDigest.toJson(),
         // purse_uref: new URef(
         //   'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e',
@@ -211,7 +209,7 @@ function App() {
       test_deploy = test_deploy.withSession(JSON.parse('{ "StoredContractByHash": { "hash": "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477", "entry_point": "decimals", "args": []}}'));
       console.log(test_deploy.toJson());
 
-      let test_transfer = Deploy.withTransfer(
+      const test_transfer = Deploy.withTransfer(
         '2500000000',
         '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54',
         undefined,
@@ -280,7 +278,7 @@ function App() {
 
 
       // put_deploy
-      let signed_deploy = new Deploy(make_transfer); // or make_deploy
+      const signed_deploy = new Deploy(make_transfer); // or make_deploy
       console.log(signed_deploy);
       const account_put_deploy = (await sdk.account_put_deploy(
         signed_deploy,
@@ -294,8 +292,8 @@ function App() {
       }
 
       // get_deploy
-      let finalized_approvals = true;
-      let get_deploy_options = sdk.get_deploy_options({
+      const finalized_approvals = true;
+      const get_deploy_options = sdk.get_deploy_options({
         deploy_hash: new DeployHash(
           //'397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445' // random deploy
           account_put_deploy?.deploy_hash
@@ -319,7 +317,7 @@ function App() {
         '9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477';
       session_params.session_entry_point = 'decimals';
 
-      let test_call_entrypoint = (await sdk.call_entrypoint(
+      const test_call_entrypoint = (await sdk.call_entrypoint(
         deploy_params,
         session_params,
         '5500000000'
@@ -335,7 +333,7 @@ function App() {
           'uref-386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530-007', '0'
         );
 
-      let get_dictionary_item_options = sdk.get_dictionary_item_options({
+      const get_dictionary_item_options = sdk.get_dictionary_item_options({
         state_root_hash_as_string: chain_get_state_root_hash?.toString(),
         //state_root_hash: stateRootHashDigest.toJson(),
         dictionary_item_identifier: dictionary_item_identifier.toJson(),
@@ -348,15 +346,15 @@ function App() {
       console.log('js state_get_dictionary_item', state_get_dictionary_item);
 
       // query_global_state
-      let path = new Path('');
-      let key = Key.fromURef(
+      const path = new Path('');
+      const key = Key.fromURef(
         new URef(
           'b57dfc006ca3cff3f3f17852447d3de86ca69c1086405097ceda3b2a492290e8',
           AccessRights.READ_ADD_WRITE()
         )
       );
       console.log(key);
-      let query_global_state_options = sdk.query_global_state_options({
+      const query_global_state_options = sdk.query_global_state_options({
         global_state_identifier: GlobalStateIdentifier.fromStateRootHash(
           new Digest(chain_get_state_root_hash?.toString())
         ).toJson(),
@@ -385,13 +383,13 @@ function App() {
     const sdkInstance = sdk as SDK;
     selectedFile && setSessionPath(selectedFile.name);
     const session_account = privateToPublicKey(privateKey);
-    let deploy_params = new DeployStrParams(
+    const deploy_params = new DeployStrParams(
       chain_name,
       session_account,
       privateKey
     );
     console.log(deploy_params);
-    let session_params = new SessionStrParams();
+    const session_params = new SessionStrParams();
     session_params.session_args_simple = ["message:string='hello casper"];
     console.log(session_params);
     const file = event.target.files?.[0];
@@ -403,7 +401,7 @@ function App() {
     }
     if (wasm) {
       session_params.session_bytes = Bytes.fromUint8Array(wasm);
-      let test_install = await sdkInstance.install(
+      const test_install = await sdkInstance.install(
         deploy_params,
         session_params,
         '500000000'

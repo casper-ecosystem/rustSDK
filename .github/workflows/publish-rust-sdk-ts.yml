@@ -1,0 +1,32 @@
+name: publish-rust-sdk-ts
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+      - run: wasm-pack build --target web
+      - run: cp -r pkg/* pkg-dist/
+      - run: cp -r pkg-nodejs/* pkg-nodejs-dist/
+      - name: Publish pkg to NPM
+        run: npm publish pkg-dist/ --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish pkg-nodejs to NPM
+        run: npm publish pkg-nodejs-dist/ --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
