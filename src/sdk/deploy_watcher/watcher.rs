@@ -183,12 +183,13 @@ impl DeployWatcher {
     /// A new `DeployWatcher` instance.
     #[wasm_bindgen(constructor)]
     pub fn new(events_url: String, timeout_duration: Option<u64>) -> Self {
-        let timeout_duration = Duration::milliseconds(
+        let timeout_duration = Duration::try_milliseconds(
             timeout_duration
                 .unwrap_or(DEFAULT_TIMEOUT_MS)
                 .try_into()
                 .unwrap(),
-        );
+        )
+        .unwrap_or_default();
 
         DeployWatcher {
             events_url,
@@ -714,7 +715,7 @@ mod tests {
         assert!(*deploy_watcher.active.borrow());
         assert_eq!(
             deploy_watcher.timeout_duration,
-            Duration::milliseconds(timeout_duration.try_into().unwrap())
+            Duration::try_milliseconds(timeout_duration.try_into().unwrap()).unwrap()
         );
     }
 
@@ -732,7 +733,7 @@ mod tests {
         assert!(*deploy_watcher.active.borrow());
         assert_eq!(
             deploy_watcher.timeout_duration,
-            Duration::milliseconds(DEFAULT_TIMEOUT_MS.try_into().unwrap())
+            Duration::try_milliseconds(DEFAULT_TIMEOUT_MS.try_into().unwrap()).unwrap()
         );
     }
 
@@ -879,7 +880,7 @@ mod tests {
         assert!(*deploy_watcher.active.borrow());
         assert_eq!(
             deploy_watcher.timeout_duration,
-            Duration::milliseconds(timeout_duration.try_into().unwrap())
+            Duration::try_milliseconds(timeout_duration.try_into().unwrap()).unwrap()
         );
     }
 

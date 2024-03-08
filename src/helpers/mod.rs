@@ -16,7 +16,7 @@ use casper_types::{
     cl_value_to_json as cl_value_to_json_from_casper_types, CLValue, ErrorExt, Key as _Key,
     NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs, SecretKey,
 };
-use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
+use chrono::{DateTime, SecondsFormat, Utc};
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rust_decimal::prelude::*;
@@ -52,11 +52,7 @@ pub fn cl_value_to_json(cl_value: &CLValue) -> Option<Value> {
 pub fn get_current_timestamp(timestamp: Option<String>) -> String {
     let parsed_timestamp = timestamp.as_ref().and_then(|ts| ts.parse::<i64>().ok());
     let current_timestamp = parsed_timestamp
-        .map(|parsed_time| {
-            NaiveDateTime::from_timestamp_opt(parsed_time / 1000, 0)
-                .map(|naive_time| DateTime::<Utc>::from_naive_utc_and_offset(naive_time, Utc))
-                .unwrap_or_else(Utc::now)
-        })
+        .map(|parsed_time| DateTime::from_timestamp(parsed_time / 1000, 0).unwrap_or_else(Utc::now))
         .unwrap_or_else(Utc::now);
     current_timestamp.to_rfc3339_opts(SecondsFormat::Secs, true)
 }

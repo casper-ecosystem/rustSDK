@@ -36,8 +36,8 @@ pub enum CLTypeEnum {
 pub struct CLType(CLTypeEnum);
 
 #[wasm_bindgen]
+#[allow(non_snake_case)]
 impl CLType {
-    #![allow(non_snake_case)]
     #[wasm_bindgen(js_name = "Bool")]
     pub fn Bool() -> Self {
         CLType(CLTypeEnum::Bool)
