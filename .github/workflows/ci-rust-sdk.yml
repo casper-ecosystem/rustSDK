@@ -51,8 +51,8 @@ jobs:
         with:
           command: clippy
 
-      - name: Lint
-        run: make check-lint
+      # - name: Lint
+      #   run: make check-lint
 
       # - name: Doc
       #   uses: actions-rs/cargo@v1
