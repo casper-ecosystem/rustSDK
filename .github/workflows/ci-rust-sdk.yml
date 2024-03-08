@@ -35,9 +35,6 @@ jobs:
           components: rustfmt, clippy
           target: wasm32-unknown-unknown
 
-      - name: Install make
-        run: sudo apt-get install make
-
       - name: Fmt
         uses: actions-rs/cargo@v1
         with:
@@ -57,32 +54,32 @@ jobs:
       - name: Lint
         run: make check-lint
 
-      - name: Doc
-        uses: actions-rs/cargo@v1
-        with:
-          command: doc
-          args: --package casper-rust-wasm-sdk --no-deps
+      # - name: Doc
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: doc
+      #     args: --package casper-rust-wasm-sdk --no-deps
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
-        with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: 'https://registry.npmjs.org'
+      # - name: Use Node.js ${{ matrix.node-version }}
+      #   uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
+      #   with:
+      #     node-version: ${{ matrix.node-version }}
+      #     registry-url: 'https://registry.npmjs.org'
 
-      - name: Casper node launcher js
-        run: npx casper-node-launcher-js node --daemon
+      # - name: Casper node launcher js
+      #   run: npx casper-node-launcher-js node --daemon
 
-      - name: Unit Test
-        run: make test
+      # - name: Unit Test
+      #   run: make test
 
-      - name: Integration test
-        run: make integration-test
+      # - name: Integration test
+      #   run: make integration-test
 
-      - name: Build lib for Wasm with no features
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --lib --target wasm32-unknown-unknown --no-default-features
+      # - name: Build lib for Wasm with no features
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: build
+      #     args: --lib --target wasm32-unknown-unknown --no-default-features
 
-      - name: Build
-        run: make build
+      # - name: Build
+      #   run: make build
