@@ -58,10 +58,12 @@ jobs:
         run: make check-lint
 
       - name: Doc
-        uses: actions-rs/cargo@v1
+v        run: make doc
+
+      - name: Github pages 🚀
+        uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6 #v4.4.1
         with:
-          command: doc
-          args: --package casper-rust-wasm-sdk --no-deps
+          folder: docs # The folder the action should deploy.
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
