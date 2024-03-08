@@ -55,8 +55,7 @@ jobs:
           command: clippy
 
       - name: Lint
-        with:
-          command: make check-lint
+        run: make check-lint
 
       - name: Doc
         uses: actions-rs/cargo@v1
@@ -74,12 +73,10 @@ jobs:
         run: npx casper-node-launcher-js node --daemon
 
       - name: Unit Test
-        with:
-          command: make test
+        run: make test
 
       - name: Integration test
-        with:
-          command: make integration-test
+        run: make integration-test
 
       - name: Build lib for Wasm with no features
         uses: actions-rs/cargo@v1
@@ -88,5 +85,4 @@ jobs:
           args: --lib --target wasm32-unknown-unknown --no-default-features
 
       - name: Build
-        with:
-          command: make build
+        run: make build
