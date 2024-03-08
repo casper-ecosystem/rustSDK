@@ -40,6 +40,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: audit
+          args: --deny warnings
 
       - name: Clippy
         uses: actions-rs/cargo@v1
