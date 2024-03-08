@@ -23,6 +23,8 @@ jobs:
     env:
       NODE_ADDRESS: http://127.0.0.1:7777/rpc
       EVENT_ADDRESS: http://127.0.0.1:9999/events/main
+      # WARNING: These accounts, and their private keys, are publicly known.
+      # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
       PRIVATE_KEY_USER_1: MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
       PRIVATE_KEY_USER_2: MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
 
@@ -82,5 +84,8 @@ jobs:
           command: build
           args: --lib --target wasm32-unknown-unknown --no-default-features
 
-      - name: Build
-        run: make build
+      - name: Install Wasm Pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Pack
+        run: make pack
