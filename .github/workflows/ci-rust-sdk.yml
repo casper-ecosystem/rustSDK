@@ -58,7 +58,7 @@ jobs:
         run: make check-lint
 
       - name: Doc
-        run:|
+        run: |
           mkdir docs
           make doc
 
