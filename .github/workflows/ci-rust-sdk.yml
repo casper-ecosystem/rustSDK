@@ -72,8 +72,8 @@ jobs:
       - name: Casper node launcher js
         run: npx casper-node-launcher-js node --daemon
 
-      # - name: Unit Tests
-      #   run: make test
+      - name: Unit Tests
+        run: make test
 
       - name: Integration Tests
         run: make integration-test

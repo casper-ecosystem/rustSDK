@@ -10,16 +10,16 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
-    "@types/jest": "^29.5.11",
+    "@types/jest": "^29.5.12",
     "@types/puppeteer": "^7.0.4",
     "jest": "^29.7.0",
-    "jest-puppeteer": "^9.0.2",
-    "ts-jest": "^29.1.1",
+    "jest-puppeteer": "^10.0.1",
+    "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2"
   },
   "dependencies": {
-    "puppeteer": "^21.6.1",
+    "puppeteer": "^22.4.1",
     "casper-rust-wasm-sdk": "file:../../pkg-nodejs",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.4.5"
   }
 }
