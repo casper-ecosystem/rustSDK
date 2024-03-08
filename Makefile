@@ -43,7 +43,7 @@ doc:
 	cp -r target/doc/* docs/api-rust/
 	npx typedoc --name api-wasm --out docs/api-wasm pkg/casper_rust_wasm_sdk.d.ts
 
-build: pack doc
+build: pack
 	cd examples/frontend/angular/ && npm ci && npm run build && cd .
 	cd examples/frontend/react/ && npm ci && npm run build && cd .
 	cd examples/desktop/node/ && npm ci && npx tsc index.ts && cd .
