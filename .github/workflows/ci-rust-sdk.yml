@@ -20,6 +20,11 @@ jobs:
         os: [ubuntu-20.04]
         node-version: [20.x]
     runs-on: ${{ matrix.os }}
+    env:
+      NODE_ADDRESS: http://127.0.0.1:7777/rpc
+      EVENT_ADDRESS: http://127.0.0.1:9999/events/main
+      PRIVATE_KEY_USER_1: MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
+      PRIVATE_KEY_USER_2: MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
 
     steps:
       - uses: actions/checkout@v2
@@ -48,11 +53,11 @@ jobs:
           command: clippy
           args: --all-targets
 
-      # - name: Clippy with no features
-      #   uses: actions-rs/cargo@v1
-      #   with:
-      #     command: clippy
-      #     args: --all-targets --no-default-features
+      - name: Lint
+        uses: actions-rs/cargo@v1
+        with:
+          command: make check-lint
+          args: --all-targets
 
       - name: Doc
         uses: actions-rs/cargo@v1
@@ -69,24 +74,23 @@ jobs:
       - name: Casper node launcher js
         run: npx casper-node-launcher-js node --daemon
 
-      - name: Test
+      - name: Unit Test
         uses: actions-rs/cargo@v1
         with:
-          command: test
-        env:
-          NODE_ADDRESS: http://127.0.0.1:7777/rpc
-          EVENT_ADDRESS: http://127.0.0.1:9999/events/main
-          PRIVATE_KEY_USER_1: MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
-          PRIVATE_KEY_USER_2: MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
+          command: make test
 
-      - name: Test with no features
+      - name: Integration test
         uses: actions-rs/cargo@v1
         with:
-          command: test
-          args: --no-default-features
+          command: make integration-test
 
       - name: Build lib for Wasm with no features
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --lib --target wasm32-unknown-unknown --no-default-features
+
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          command: make build
