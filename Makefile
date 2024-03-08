@@ -28,7 +28,7 @@ integration-test:
 	cd tests/integration/rust && cargo test -- --test-threads=1 --nocapture
 
 e2e-test:
-	cd examples/frontend/angular/ && npm install && build-proxy-conf && npm start && cd .
+	cd examples/frontend/angular/ && npm install && npm run build-proxy-conf && npm start && cd .
 	cd tests/e2e && npm install && npm test
 
 doc:
