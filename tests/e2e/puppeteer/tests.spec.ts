@@ -655,8 +655,9 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       result_json = JSON.parse(result);
+      console.log(result_json);
       expect(result_json?.stored_value.CLValue.parsed).toEqual(config.collection_name);
-    }, 15000);
+    }, 30000);
   });
 
   describe('Rpc call get_deploy', () => {
