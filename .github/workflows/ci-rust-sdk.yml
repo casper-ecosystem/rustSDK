@@ -1,0 +1,91 @@
+---
+name: ci-rust-sdk
+
+on:
+  push:
+    branches: [dev-1.6, cid_cd_tests]
+    paths-ignore:
+      - '**.md'
+
+  pull_request:
+    branches: [dev-1.6, cid_cd_tests]
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build_and_test:
+    strategy:
+      matrix:
+        #https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
+        os: [ubuntu-20.04]
+        node-version: [20.x]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          components: rustfmt, clippy
+          target: wasm32-unknown-unknown
+
+      - name: Fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check
+
+      - name: Audit
+        uses: actions-rs/cargo@v1
+        with:
+          command: audit
+
+      - name: Clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --all-targets
+
+      - name: Clippy with no features
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --all-targets --no-default-features
+
+      - name: Doc
+        uses: actions-rs/cargo@v1
+        with:
+          command: doc
+          args: --package casper-rust-wasm-sdk --no-deps
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Casper node launcher js
+        run: npx casper-node-launcher-js node --daemon
+        env:
+          NODE_ADDRESS: http://127.0.0.1:7777/rpc
+          EVENT_ADDRESS: http://127.0.0.1:9999/events/main
+          PRIVATE_KEY_USER_1: MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
+          PRIVATE_KEY_USER_2: MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
+
+      - name: Test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+      - name: Test with no features
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --no-default-features
+
+      - name: Build lib for Wasm with no features
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --lib --target wasm32-unknown-unknown --no-default-features
