@@ -75,8 +75,8 @@ jobs:
       # - name: Unit Tests
       #   run: make test
 
-      # - name: Integration Tests
-      #   run: make integration-test
+      - name: Integration Tests
+        run: make integration-test
 
       - name: E2E Tests
         run: make e2e-test
