@@ -58,7 +58,9 @@ jobs:
         run: make check-lint
 
       - name: Doc
-        run: make doc
+        run:|
+          mkdir docs
+          make doc
 
       - name: Github pages 🚀
         uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6 #v4.4.1
