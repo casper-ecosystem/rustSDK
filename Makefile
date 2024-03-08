@@ -34,10 +34,7 @@ start-app:
 run-e2e-tests:
 	cd tests/e2e && npm install && npm test
 
-stop-app:
-	pkill -f "nx serve"
-
-e2e-test: start-app run-e2e-tests stop-app
+e2e-test: start-app run-e2e-tests
 
 .PHONY: start-app run-tests stop-app e2e-test
 
