@@ -27,9 +27,19 @@ test:
 integration-test:
 	cd tests/integration/rust && cargo test -- --test-threads=1 --nocapture
 
-e2e-test:
-	cd examples/frontend/angular/ && npm install && npm run build-proxy-conf && npm start && cd .
+start-app:
+	cd examples/frontend/angular/ && npm install && npm run build-proxy-conf && npm start & \
+	until [ $$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4200) -eq 200 ]; do sleep 1; done
+
+run-e2e-tests:
 	cd tests/e2e && npm install && npm test
+
+stop-app:
+	pkill -f "nx serve"
+
+e2e-test: start-app run-e2e-tests stop-app
+
+.PHONY: start-app run-tests stop-app e2e-test
 
 doc:
 	cargo doc --package casper-rust-wasm-sdk --no-deps
