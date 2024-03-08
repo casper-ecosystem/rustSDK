@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
