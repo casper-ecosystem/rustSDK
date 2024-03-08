@@ -51,16 +51,12 @@ jobs:
       #     args: --deny warnings || true
 
       - name: Clippy
-        uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --all-targets
 
       - name: Lint
-        uses: actions-rs/cargo@v1
         with:
           command: make check-lint
-          args: --all-targets
 
       - name: Doc
         uses: actions-rs/cargo@v1
@@ -78,12 +74,10 @@ jobs:
         run: npx casper-node-launcher-js node --daemon
 
       - name: Unit Test
-        uses: actions-rs/cargo@v1
         with:
           command: make test
 
       - name: Integration test
-        uses: actions-rs/cargo@v1
         with:
           command: make integration-test
 
@@ -94,6 +88,5 @@ jobs:
           args: --lib --target wasm32-unknown-unknown --no-default-features
 
       - name: Build
-        uses: actions-rs/cargo@v1
         with:
           command: make build
