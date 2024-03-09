@@ -269,12 +269,15 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_block', async () => {
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHashElt"]');
       await submit();
       await getResult();
     });
 
     it('should get_block with block height', async () => {
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHashElt"]');
       await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
       await submit();
       await getResult();
