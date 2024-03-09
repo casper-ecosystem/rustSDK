@@ -40,6 +40,7 @@ const chain_name = process.env.REACT_APP_CHAIN_NAME || chain_name_default;
 
 function App() {
   const [wasm, setWasm] = useState(false);
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const [block_identifier_height, _setBlock_identifier_height] = useState(
     block_identifier_height_default
   );
@@ -52,6 +53,7 @@ function App() {
   const [info_get_account_info_purse, setInfo_get_account_info_purse] =
     useState('');
   const [info_get_deploy, setInfo_get_deploy] = useState('');
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const [_sessionPath, setSessionPath] = useState('');
   const [state_get_balance, setState_get_balance] = useState('');
   const [state_get_dictionary_item, setState_get_dictionary_item] = useState(
@@ -64,10 +66,14 @@ function App() {
   const [make_transfer, setMake_transfer] = useState('');
   const [sdk, setSdk] = useState({});
 
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   let test = false;
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     if (!test) {
       // FIX ME please
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       test = true;
       initApp();
     }
