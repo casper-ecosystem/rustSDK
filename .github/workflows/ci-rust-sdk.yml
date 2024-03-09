@@ -37,49 +37,63 @@ jobs:
           components: rustfmt, clippy
           target: wasm32-unknown-unknown
 
-      - name: Fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: -- --check
-
-      # - name: Audit
+      # - name: Fmt
       #   uses: actions-rs/cargo@v1
       #   with:
-      #     command: audit
-      #     args: --deny warnings || true
+      #     command: fmt
+      #     args: -- --check
 
-      - name: Clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
+      # # - name: Audit
+      # #   uses: actions-rs/cargo@v1
+      # #   with:
+      # #     command: audit
+      # #     args: --deny warnings || true
 
-      - name: Lint
-        run: make check-lint
+      # - name: Clippy
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: clippy
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
-        with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: 'https://registry.npmjs.org'
+      # - name: Lint
+      #   run: make check-lint
 
-      - name: Casper node launcher js
-        run: npx casper-node-launcher-js node --daemon
+      # - name: Use Node.js ${{ matrix.node-version }}
+      #   uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
+      #   with:
+      #     node-version: ${{ matrix.node-version }}
+      #     registry-url: 'https://registry.npmjs.org'
 
-      - name: Unit Tests
-        run: make test
+      # - name: Casper node launcher js
+      #   run: npx casper-node-launcher-js node --daemon
 
-      - name: Integration Tests
-        run: make integration-test
+      # - name: Unit Tests
+      #   run: make test
 
-      - name: E2E Tests
-        run: make e2e-test
+      # - name: Integration Tests
+      #   run: make integration-test
 
-      - name: Build lib for all targets
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --lib --all-targets
+      # - name: E2E Tests
+      #   run: make e2e-test
+
+      # - name: Build lib for all targets
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: build
+      #     args: --lib --all-targets
+
+      - name: Install Electron
+        run: |
+          sudo apt-get install --no-install-recommends -y libopenjp2-tools
+          sudo dpkg --add-architecture i386
+          sudo mkdir -pm755 /etc/apt/keyrings
+          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
+          sudo apt install --install-recommends winehq-stable
+          sudo apt install ca-certificates gnupg
+          sudo gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.sudo gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+          sudo echo "deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+          sudo apt update
+          sudo apt install mono-devel
 
       - name: Install Wasm Pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh

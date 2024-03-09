@@ -19,14 +19,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: 'https://registry.npmjs.org'
-      - run: wasm-pack build --target web
-      - run: cp -r pkg/* pkg-dist/
-      - run: cp -r pkg-nodejs/* pkg-nodejs-dist/
+      - run: make build
+
       - name: Publish pkg to NPM
-        run: npm publish pkg-dist/ --access public
+        run: npm publish pkg/ --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish pkg-nodejs to NPM
-        run: npm publish pkg-nodejs-dist/ --access public
+        run: npm publish pkg-nodejs/ --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
