@@ -29,7 +29,7 @@ pub mod test_module {
             .await;
         let peers = peers.unwrap();
         assert!(!peers.result.api_version.to_string().is_empty());
-        assert!(peers.result.peers.is_empty() || peers.result.peers.iter().next().is_some());
+        assert!(peers.result.peers.is_empty() || peers.result.peers.first().is_some());
     }
 
     pub async fn test_get_account(maybe_block_identifier: Option<BlockIdentifierInput>) {
