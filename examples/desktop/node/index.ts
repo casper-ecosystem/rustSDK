@@ -72,14 +72,14 @@ const example4 = async () => {
 const example5 = async () => {
   const chain_name = 'casper-net-1';
   const public_key =
-    '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+    '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
   const private_key = undefined;
   const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
   const ttl = '1h'; // or undefined
   const payment_amount = '100000000';
   const transfer_amount = '2500000000';
   const target_account =
-    '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+    '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
 
   const deploy_params = new DeployStrParams(
     chain_name,
@@ -107,17 +107,16 @@ const example6 = async () => {
   const node_address = 'http://127.0.0.1:11101';
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
-  const public_key =
-    '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
   const private_key = `-----BEGIN PRIVATE KEY-----
-
+MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 -----END PRIVATE KEY-----`;
+  const public_key = privateToPublicKey(private_key);
   const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
   const ttl = '1h'; // or undefined
   const payment_amount = '100000000';
   const transfer_amount = '2500000000';
   const target_account =
-    '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+    '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
 
   const deploy_params = new DeployStrParams(
     chain_name,
@@ -144,7 +143,7 @@ const example6 = async () => {
 const example7 = async () => {
   const chain_name = 'integration-test';
   const public_key =
-    '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+    '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
   const payment_amount = '5000000000';
   const contract_hash =
     'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
@@ -167,11 +166,10 @@ const example8 = async () => {
   const node_address = 'http://127.0.0.1:11101';
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
-  const public_key =
-    '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
   const private_key = `-----BEGIN PRIVATE KEY-----
-
-    -----END PRIVATE KEY-----`;
+MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
+-----END PRIVATE KEY-----`;
+  const public_key = privateToPublicKey(private_key);
   const payment_amount = '5000000000';
   const contract_hash =
     'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
@@ -194,11 +192,10 @@ const example9 = async () => {
   const node_address = 'http://127.0.0.1:11101';
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
-  const public_key =
-    '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
   const private_key = `-----BEGIN PRIVATE KEY-----
-
-    -----END PRIVATE KEY-----`;
+MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
+-----END PRIVATE KEY-----`;
+  const public_key = privateToPublicKey(private_key);
   const payment_amount = '5000000000';
   const contract_hash =
     'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
@@ -227,15 +224,14 @@ const example10 = async () => {
   const node_address = 'http://127.0.0.1:11101';
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
-  const public_key =
-    '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
   const private_key = `-----BEGIN PRIVATE KEY-----
-
-    -----END PRIVATE KEY-----`;
+MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
+-----END PRIVATE KEY-----`;
+  const public_key = privateToPublicKey(private_key);
   const payment_amount = '100000000';
   const transfer_amount = '2500000000';
   const target_account =
-    '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+    '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
 
   const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
 
@@ -261,7 +257,8 @@ const example11 = async () => {
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
   const private_key = `-----BEGIN PRIVATE KEY-----
-    -----END PRIVATE KEY-----`;
+MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
+-----END PRIVATE KEY-----`;
   const public_key = privateToPublicKey(private_key);
   const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
 
@@ -320,7 +317,8 @@ const example12 = async () => {
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
   const private_key = `-----BEGIN PRIVATE KEY-----
-    -----END PRIVATE KEY-----`;
+MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
+-----END PRIVATE KEY-----`;
   const public_key = privateToPublicKey(private_key);
   const contract_hash =
     'hash-7705c58f20c445c605ba1bf5adab66686a8f891879d6012e07fe24c8bf3af3f2';
@@ -377,3 +375,51 @@ const example12 = async () => {
   console.log(results);
 };
 
+// sign deploy
+const example13 = async () => {
+  const chain_name = 'integration-test';
+  const payment_amount = '5000000000';
+  const contract_hash =
+    'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+  const private_key = `-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
+-----END PRIVATE KEY-----`;
+  const public_key = privateToPublicKey(private_key);
+  const deploy_params = new DeployStrParams(chain_name, public_key);
+
+  const session_params = new SessionStrParams();
+  session_params.session_hash = contract_hash;
+  session_params.session_entry_point = 'set_variables';
+
+  const payment_params = new PaymentStrParams(payment_amount);
+
+  const deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
+  const deploy_signed = deploy.sign(private_key);
+  console.log(deploy_signed.toJson());
+};
+
+// add signature to deploy
+const example14 = async () => {
+  const chain_name = 'integration-test';
+  const payment_amount = '5000000000';
+  const contract_hash =
+    'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+  let public_key_kms = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
+  const deploy_params = new DeployStrParams(chain_name, public_key_kms);
+
+  const session_params = new SessionStrParams();
+  session_params.session_hash = contract_hash;
+  session_params.session_entry_point = 'set_variables';
+
+  const payment_params = new PaymentStrParams(payment_amount);
+
+  const deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
+
+  const signature_kms = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980b';
+  let deploy_signed = deploy.addSignature(public_key_kms, signature_kms);
+
+  const public_key_kms_2 = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
+  const signature_kms_2 = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980c';
+  deploy_signed = deploy_signed.addSignature(public_key_kms_2, signature_kms_2);
+  console.log(deploy_signed.toJson());
+};

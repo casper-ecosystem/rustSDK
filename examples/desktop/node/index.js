@@ -137,13 +137,13 @@ var example5 = function () { return __awaiter(void 0, void 0, void 0, function (
     var chain_name, public_key, private_key, timestamp, ttl, payment_amount, transfer_amount, target_account, deploy_params, payment_params, transfer_deploy, transfer_deploy_as_json;
     return __generator(this, function (_a) {
         chain_name = 'casper-net-1';
-        public_key = '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+        public_key = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
         private_key = undefined;
         timestamp = (0, casper_sdk_1.getTimestamp)();
         ttl = '1h';
         payment_amount = '100000000';
         transfer_amount = '2500000000';
-        target_account = '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+        target_account = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
         deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, private_key, timestamp, ttl);
         payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
         transfer_deploy = sdk.make_transfer(transfer_amount, target_account, undefined, // transfer_id
@@ -155,20 +155,20 @@ var example5 = function () { return __awaiter(void 0, void 0, void 0, function (
 }); };
 // transfer
 var example6 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var node_address, sdk, chain_name, public_key, private_key, timestamp, ttl, payment_amount, transfer_amount, target_account, deploy_params, payment_params, transfer_result, transfer_result_as_json;
+    var node_address, sdk, chain_name, private_key, public_key, timestamp, ttl, payment_amount, transfer_amount, target_account, deploy_params, payment_params, transfer_result, transfer_result_as_json;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 node_address = 'http://127.0.0.1:11101';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
-                public_key = '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-                private_key = "-----BEGIN PRIVATE KEY-----\n\n-----END PRIVATE KEY-----";
+                private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
+                public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
                 timestamp = (0, casper_sdk_1.getTimestamp)();
                 ttl = '1h';
                 payment_amount = '100000000';
                 transfer_amount = '2500000000';
-                target_account = '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+                target_account = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
                 deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, private_key, timestamp, ttl);
                 payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
                 return [4 /*yield*/, sdk.transfer(transfer_amount, target_account, undefined, // transfer_id
@@ -186,7 +186,7 @@ var example7 = function () { return __awaiter(void 0, void 0, void 0, function (
     var chain_name, public_key, payment_amount, contract_hash, deploy_params, session_params, payment_params, deploy, deploy_as_json;
     return __generator(this, function (_a) {
         chain_name = 'integration-test';
-        public_key = '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+        public_key = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
         payment_amount = '5000000000';
         contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
         deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key);
@@ -202,15 +202,15 @@ var example7 = function () { return __awaiter(void 0, void 0, void 0, function (
 }); };
 // deploy
 var example8 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var node_address, sdk, chain_name, public_key, private_key, payment_amount, contract_hash, deploy_params, session_params, payment_params, deploy_result, deploy_result_as_json;
+    var node_address, sdk, chain_name, private_key, public_key, payment_amount, contract_hash, deploy_params, session_params, payment_params, deploy_result, deploy_result_as_json;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 node_address = 'http://127.0.0.1:11101';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
-                public_key = '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-                private_key = "-----BEGIN PRIVATE KEY-----\n\n    -----END PRIVATE KEY-----";
+                private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
+                public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
                 payment_amount = '5000000000';
                 contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
                 deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, private_key);
@@ -229,15 +229,15 @@ var example8 = function () { return __awaiter(void 0, void 0, void 0, function (
 }); };
 // put_deploy
 var example9 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var node_address, sdk, chain_name, public_key, private_key, payment_amount, contract_hash, entry_point, deploy_params, session_params, payment_params, deploy, put_deploy_result, put_deploy_result_as_json;
+    var node_address, sdk, chain_name, private_key, public_key, payment_amount, contract_hash, entry_point, deploy_params, session_params, payment_params, deploy, put_deploy_result, put_deploy_result_as_json;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 node_address = 'http://127.0.0.1:11101';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
-                public_key = '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-                private_key = "-----BEGIN PRIVATE KEY-----\n\n    -----END PRIVATE KEY-----";
+                private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
+                public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
                 payment_amount = '5000000000';
                 contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
                 entry_point = 'set_variables';
@@ -257,18 +257,18 @@ var example9 = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 var example10 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var node_address, sdk, chain_name, public_key, private_key, payment_amount, transfer_amount, target_account, deploy_params, payment_params, transfer_deploy, put_deploy_result, put_deploy_result_as_json;
+    var node_address, sdk, chain_name, private_key, public_key, payment_amount, transfer_amount, target_account, deploy_params, payment_params, transfer_deploy, put_deploy_result, put_deploy_result_as_json;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 node_address = 'http://127.0.0.1:11101';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
-                public_key = '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-                private_key = "-----BEGIN PRIVATE KEY-----\n\n    -----END PRIVATE KEY-----";
+                private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
+                public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
                 payment_amount = '100000000';
                 transfer_amount = '2500000000';
-                target_account = '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+                target_account = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
                 deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, private_key);
                 payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
                 transfer_deploy = casper_sdk_1.Deploy.withTransfer(transfer_amount, target_account, undefined, // transfer_id
@@ -312,7 +312,7 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
                 events_address = 'http://127.0.0.1:18101/events/main';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
-                private_key = "-----BEGIN PRIVATE KEY-----\n    -----END PRIVATE KEY-----";
+                private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
                 public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
                 deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, private_key);
                 session_params = new casper_sdk_1.SessionStrParams();
@@ -365,7 +365,7 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                 events_address = 'http://127.0.0.1:18101/events/main';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
-                private_key = "-----BEGIN PRIVATE KEY-----\n    -----END PRIVATE KEY-----";
+                private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
                 public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
                 contract_hash = 'hash-7705c58f20c445c605ba1bf5adab66686a8f891879d6012e07fe24c8bf3af3f2';
                 entry_point = 'mint';
@@ -420,5 +420,48 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                 console.log(results);
                 return [2 /*return*/];
         }
+    });
+}); };
+// sign deploy
+var example13 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var chain_name, payment_amount, contract_hash, private_key, public_key, deploy_params, session_params, payment_params, deploy, deploy_signed;
+    return __generator(this, function (_a) {
+        chain_name = 'integration-test';
+        payment_amount = '5000000000';
+        contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+        private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
+        public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
+        deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key);
+        session_params = new casper_sdk_1.SessionStrParams();
+        session_params.session_hash = contract_hash;
+        session_params.session_entry_point = 'set_variables';
+        payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
+        deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
+        deploy_signed = deploy.sign(private_key);
+        console.log(deploy_signed.toJson());
+        return [2 /*return*/];
+    });
+}); };
+// add signature to deploy
+var example14 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var chain_name, payment_amount, contract_hash, public_key_kms, deploy_params, session_params, payment_params, deploy, signature_kms, deploy_signed, public_key_kms_2, signature_kms_2;
+    return __generator(this, function (_a) {
+        chain_name = 'integration-test';
+        payment_amount = '5000000000';
+        contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+        public_key_kms = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
+        deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key_kms);
+        session_params = new casper_sdk_1.SessionStrParams();
+        session_params.session_hash = contract_hash;
+        session_params.session_entry_point = 'set_variables';
+        payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
+        deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
+        signature_kms = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980b';
+        deploy_signed = deploy.addSignature(public_key_kms, signature_kms);
+        public_key_kms_2 = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
+        signature_kms_2 = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980c';
+        deploy_signed = deploy_signed.addSignature(public_key_kms_2, signature_kms_2);
+        console.log(deploy_signed.toJson());
+        return [2 /*return*/];
     });
 }); };

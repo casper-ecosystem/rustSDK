@@ -18,7 +18,7 @@ use crate::{
     make_deploy, make_transfer,
 };
 use casper_client::types::{TimeDiff, Timestamp, MAX_SERIALIZED_SIZE_OF_DEPLOY};
-use casper_types::{bytesrepr::Bytes as _Bytes, RuntimeArgs, SecretKey, U512};
+use casper_types::{bytesrepr::Bytes as _Bytes, AsymmetricType, RuntimeArgs, SecretKey, U512};
 use serde_json::{json, Value};
 
 #[cfg(target_arch = "wasm32")]
@@ -448,8 +448,8 @@ impl Deploy {
             .iter()
             .map(|approval| {
                 json!({
-                    "signer": approval.signer().to_string(),
-                    "signature": approval.signature().to_string(),
+                    "signer": approval.signer().to_hex(),
+                    "signature": approval.signature().to_hex(),
                 })
             })
             .collect::<Vec<_>>();
