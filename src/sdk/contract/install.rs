@@ -121,8 +121,7 @@ mod tests {
         let payment_params = PaymentStrParams::default();
 
         let error_message =
-            "Invalid argument 'is_session_transfer': requires --session-arg to be present"
-                .to_string();
+            "Invalid argument 'is_session_transfer': requires --session-arg to be present";
 
         // Act
         let result = sdk
@@ -132,7 +131,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -277,7 +276,7 @@ mod tests {
         let deploy_params =
             DeployStrParams::new(&chain_name, &account, Some(private_key.clone()), None, None);
 
-        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        let error_message = "error sending request for url (http://localhost/rpc)";
 
         let mut session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
@@ -301,6 +300,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }

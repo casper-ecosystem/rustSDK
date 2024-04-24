@@ -225,7 +225,7 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (node_address, _, chain_name) = get_network_constants();
 
-        let error_message = "Invalid Deploy".to_string();
+        let error_message = "Invalid Deploy";
 
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
@@ -248,7 +248,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -258,7 +258,7 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (node_address, _, chain_name) = get_network_constants();
 
-        let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]".to_string();
+        let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
@@ -281,6 +281,6 @@ mod tests {
         assert!(result.is_err());
 
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }

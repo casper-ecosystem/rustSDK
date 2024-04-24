@@ -261,7 +261,7 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (node_address, _, _) = get_network_constants();
 
-        let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]".to_string();
+        let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
 
         let deploy_params = DeployStrParams::default();
         let payment_params = PaymentStrParams::default();
@@ -283,6 +283,6 @@ mod tests {
         assert!(result.is_err());
 
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }
