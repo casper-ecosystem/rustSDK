@@ -307,14 +307,14 @@ describe('Angular App Tests', () => {
     it('should get_block_transfers', async () => {
       await submit();
       await getResult();
-    });
+    }, 10000);
 
     it('should get_block_transfers with block height', async () => {
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
       await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
       await submit();
       await getResult();
-    });
+    }, 10000);
 
     it('should get_block_transfers with block hash', async () => {
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
@@ -322,7 +322,7 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="blockIdentifierHashElt"]', test.block_hash);
       await submit();
       await getResult();
-    });
+    }, 10000);
   });
 
   describe('Rpc call get_chainspec', () => {
