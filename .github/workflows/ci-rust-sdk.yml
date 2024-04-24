@@ -37,63 +37,72 @@ jobs:
           components: rustfmt, clippy
           target: wasm32-unknown-unknown
 
-      # - name: Fmt
+      - name: Fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check
+
+      # - name: Audit
       #   uses: actions-rs/cargo@v1
       #   with:
-      #     command: fmt
-      #     args: -- --check
+      #     command: audit
+      #     args: --deny warnings || true
 
-      # # - name: Audit
-      # #   uses: actions-rs/cargo@v1
-      # #   with:
-      # #     command: audit
-      # #     args: --deny warnings || true
+      - name: Clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
 
-      # - name: Clippy
-      #   uses: actions-rs/cargo@v1
-      #   with:
-      #     command: clippy
+      - name: Lint
+        run: make check-lint
 
-      # - name: Lint
-      #   run: make check-lint
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
 
-      # - name: Use Node.js ${{ matrix.node-version }}
-      #   uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
-      #   with:
-      #     node-version: ${{ matrix.node-version }}
-      #     registry-url: 'https://registry.npmjs.org'
+      - name: Casper node launcher js
+        run: npx casper-node-launcher-js node --daemon
 
-      # - name: Casper node launcher js
-      #   run: npx casper-node-launcher-js node --daemon
+      - name: Unit Tests
+        run: make test
 
-      # - name: Unit Tests
-      #   run: make test
+      - name: Integration Tests
+        run: make integration-test
 
-      # - name: Integration Tests
-      #   run: make integration-test
+      - name: E2E Tests
+        run: make e2e-test
 
-      # - name: E2E Tests
-      #   run: make e2e-test
+      - name: Build lib for all targets
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --lib --all-targets
 
-      # - name: Build lib for all targets
-      #   uses: actions-rs/cargo@v1
-      #   with:
-      #     command: build
-      #     args: --lib --all-targets
+      - name: Doc
+        run: make doc
 
-      - name: Install Electron
-        run: |
-          sudo apt-get install --no-install-recommends -y libopenjp2-tools
-          sudo dpkg --add-architecture i386
-          sudo mkdir -pm755 /etc/apt/keyrings
-          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
+      - name: Github pages 🚀
+        uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6 #v4.4.1
+        with:
+          folder: docs # The folder the action should deploy.
 
-          sudo apt update
-          sudo apt install --install-recommends winehq-stable
 
-      - name: Install Wasm Pack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      # - name: Install Electron
+      #   run: |
+      #     sudo apt-get install --no-install-recommends -y libopenjp2-tools
+      #     sudo dpkg --add-architecture i386
+      #     sudo mkdir -pm755 /etc/apt/keyrings
+      #     sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+      #     sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
 
-      - name: Build packages and apps
-        run: make build
+      #     sudo apt update
+      #     sudo apt install --install-recommends winehq-stable
+
+      # - name: Install Wasm Pack
+      #   run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      # - name: Build packages and apps
+      #   run: make build
