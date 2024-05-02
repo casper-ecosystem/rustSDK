@@ -113,7 +113,7 @@ impl SDK {
 #[cfg(test)]
 mod tests {
 
-    use sdk_tests::config::DEFAULT_NODE_ADDRESS;
+    use sdk_tests::tests::helpers::get_network_constants;
 
     use super::*;
 
@@ -137,10 +137,10 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
-        let result = sdk.get_peers(verbosity, node_address.clone()).await;
+        let result = sdk.get_peers(verbosity, Some(node_address)).await;
 
         // Assert
         assert!(result.is_ok());

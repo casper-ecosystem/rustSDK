@@ -240,7 +240,7 @@ impl SDK {
 #[cfg(test)]
 mod tests {
 
-    use sdk_tests::config::DEFAULT_NODE_ADDRESS;
+    use sdk_tests::tests::helpers::get_network_constants;
 
     use crate::types::{block_hash::BlockHash, block_identifier::BlockIdentifier};
 
@@ -266,23 +266,16 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
-        let result = sdk.get_block(None, verbosity, node_address.clone()).await;
-        let block_hash = BlockHash::from(
-            *result
-                .unwrap()
-                .result
-                .block_with_signatures
-                .unwrap()
-                .block
-                .hash(),
-        )
-        .to_string();
+        let (node_address, _, _) = get_network_constants();
+        let result = sdk
+            .get_block(None, verbosity, Some(node_address.clone()))
+            .await;
+        let block_hash = BlockHash::from(*result.unwrap().result.block.unwrap().hash()).to_string();
         let block_identifier = BlockIdentifierInput::String(block_hash.to_string());
 
         // Act
         let result = sdk
-            .get_state_root_hash(Some(block_identifier), verbosity, node_address.clone())
+            .get_state_root_hash(Some(block_identifier), verbosity, Some(node_address))
             .await;
         // Assert
         assert!(result.is_ok());
@@ -295,11 +288,15 @@ mod tests {
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
-            .get_state_root_hash(Some(block_identifier), verbosity, node_address.clone())
+            .get_state_root_hash(
+                Some(block_identifier),
+                verbosity,
+                Some(node_address.clone()),
+            )
             .await;
 
         // Assert

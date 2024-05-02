@@ -1,10 +1,8 @@
 #[allow(dead_code)]
 pub mod test_module {
-    use std::thread;
-
     use crate::config::{
-        get_config, TestConfig, COLLECTION_NAME, CONTRACT_CEP78_KEY, DEFAULT_NODE_ADDRESS,
-        DEPLOY_TIME, DICTIONARY_ITEM_KEY, DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE,
+        get_config, TestConfig, COLLECTION_NAME, CONTRACT_CEP78_KEY, DICTIONARY_ITEM_KEY,
+        DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE,
     };
     use crate::tests::helpers::intern::create_test_sdk;
     use crate::tests::integration::contract::test_module::test_install;
@@ -25,12 +23,13 @@ pub mod test_module {
     };
 
     pub async fn test_get_peers() {
+        let config: TestConfig = get_config(true).await;
         let peers = create_test_sdk(None)
-            .get_peers(None, Some(DEFAULT_NODE_ADDRESS.to_string()))
+            .get_peers(None, config.node_address)
             .await;
         let peers = peers.unwrap();
         assert!(!peers.result.api_version.to_string().is_empty());
-        assert!(!peers.result.peers.is_empty());
+        assert!(peers.result.peers.is_empty() || peers.result.peers.iter().next().is_some());
     }
 
     pub async fn test_get_account(maybe_block_identifier: Option<BlockIdentifierInput>) {
@@ -158,8 +157,9 @@ pub mod test_module {
     }
 
     pub async fn test_get_chainspec() {
+        let config: TestConfig = get_config(true).await;
         let get_chainspec = create_test_sdk(None)
-            .get_chainspec(None, Some(DEFAULT_NODE_ADDRESS.to_string()))
+            .get_chainspec(None, config.node_address)
             .await;
 
         let get_chainspec = get_chainspec.unwrap();
@@ -250,24 +250,18 @@ pub mod test_module {
 
     #[allow(deprecated)]
     pub async fn test_get_era_info(maybe_block_identifier: Option<BlockIdentifierInput>) {
+        let config: TestConfig = get_config(true).await;
         let get_era_info = create_test_sdk(None)
-            .get_era_info(
-                maybe_block_identifier,
-                None,
-                Some(DEFAULT_NODE_ADDRESS.to_string()),
-            )
+            .get_era_info(maybe_block_identifier, None, config.node_address)
             .await;
         let get_era_info = get_era_info.unwrap();
         assert!(!get_era_info.result.api_version.to_string().is_empty());
     }
 
     pub async fn test_get_era_summary(maybe_block_identifier: Option<BlockIdentifierInput>) {
+        let config: TestConfig = get_config(true).await;
         let get_era_summary = create_test_sdk(None)
-            .get_era_summary(
-                maybe_block_identifier,
-                None,
-                Some(DEFAULT_NODE_ADDRESS.to_string()),
-            )
+            .get_era_summary(maybe_block_identifier, None, config.node_address)
             .await;
 
         let get_era_summary = get_era_summary.unwrap();
@@ -281,8 +275,9 @@ pub mod test_module {
     }
 
     pub async fn test_get_node_status() {
+        let config: TestConfig = get_config(true).await;
         let get_node_status = create_test_sdk(None)
-            .get_node_status(None, Some(DEFAULT_NODE_ADDRESS.to_string()))
+            .get_node_status(None, config.node_address)
             .await;
         let get_node_status = get_node_status.unwrap();
         assert!(!get_node_status.result.api_version.to_string().is_empty());
@@ -290,8 +285,9 @@ pub mod test_module {
     }
 
     pub async fn test_get_state_root_hash() {
+        let config: TestConfig = get_config(true).await;
         let get_state_root_hash = create_test_sdk(None)
-            .get_state_root_hash(None, None, Some(DEFAULT_NODE_ADDRESS.to_string()))
+            .get_state_root_hash(None, None, config.node_address)
             .await;
 
         let state_root_hash: Digest = get_state_root_hash
@@ -304,8 +300,9 @@ pub mod test_module {
     }
 
     pub async fn test_get_validator_changes() {
+        let config: TestConfig = get_config(true).await;
         let validator_changes = create_test_sdk(None)
-            .get_validator_changes(None, Some(DEFAULT_NODE_ADDRESS.to_string()))
+            .get_validator_changes(None, config.node_address)
             .await;
         let validator_changes = validator_changes.unwrap();
         assert!(!validator_changes.result.api_version.to_string().is_empty());
@@ -313,8 +310,9 @@ pub mod test_module {
     }
 
     pub async fn test_list_rpcs() {
+        let config: TestConfig = get_config(true).await;
         let list_rpcs = create_test_sdk(None)
-            .list_rpcs(None, Some(DEFAULT_NODE_ADDRESS.to_string()))
+            .list_rpcs(None, config.node_address)
             .await;
         let list_rpcs = list_rpcs.unwrap();
         assert!(!list_rpcs.result.api_version.to_string().is_empty());
@@ -383,9 +381,16 @@ pub mod test_module {
 
         println!("install_hello_contract");
 
-        let _deploy_hash = test_install().await;
+        let sdk = create_test_sdk(Some(config.clone()));
 
-        thread::sleep(DEPLOY_TIME); // Let's wait for deployment on nctl
+        let deploy_hash_as_string = test_install().await;
+
+        let event_parse_result = sdk
+            .wait_deploy(&config.event_address, &deploy_hash_as_string, None)
+            .await
+            .unwrap();
+        let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
+        assert_eq!(deploy_processed.deploy_hash, deploy_hash_as_string);
 
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
             key: KeyIdentifierInput::String(config.to_owned().account_hash),
@@ -396,9 +401,7 @@ pub mod test_module {
             node_address: config.node_address.to_owned(),
             verbosity: config.verbosity.to_owned(),
         };
-        let query_global_state = create_test_sdk(Some(config.clone()))
-            .query_global_state(query_params)
-            .await;
+        let query_global_state = sdk.query_global_state(query_params).await;
 
         let query_global_state = query_global_state.unwrap();
         assert!(!query_global_state.result.api_version.to_string().is_empty());

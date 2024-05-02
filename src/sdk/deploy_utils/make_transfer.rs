@@ -125,23 +125,22 @@ pub(crate) fn make_transfer(
 mod tests {
 
     use super::*;
-    use crate::{helpers::public_key_from_secret_key, rpcs::PRIVATE_KEY_NCTL_PATH};
+    use crate::helpers::public_key_from_secret_key;
     use sdk_tests::{
-        config::{CHAIN_NAME, PAYMENT_TRANSFER_AMOUNT, PRIVATE_KEY_NAME, TRANSFER_AMOUNT},
-        tests::helpers::read_pem_file,
+        config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
+        tests::helpers::{get_network_constants, get_user_private_key},
     };
 
     #[tokio::test]
     async fn test_make_transfer_with_valid_transfer_params() {
         // Arrange
         let sdk = SDK::new(None, None);
-
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let (_, _, chain_name) = get_network_constants();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -162,12 +161,11 @@ mod tests {
     async fn test_make_transfer_with_valid_transfer_params_without_private_key() {
         // Arrange
         let sdk = SDK::new(None, None);
-
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let (_, _, chain_name) = get_network_constants();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
-        let deploy_params = DeployStrParams::new(CHAIN_NAME, &account, None, None, None);
+        let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -188,13 +186,13 @@ mod tests {
     async fn test_make_transfer_with_invalid_transfer_params() {
         // Arrange
         let sdk = SDK::new(None, None);
+        let (_, _, chain_name) = get_network_constants();
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]".to_string();
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(""); // This is not valid payment amount
 

@@ -110,7 +110,7 @@ mod tests {
             deploy_params::dictionary_item_str_params::DictionaryItemStrParams, digest::Digest,
         },
     };
-    use sdk_tests::config::DEFAULT_NODE_ADDRESS;
+    use sdk_tests::tests::helpers::get_network_constants;
 
     #[tokio::test]
     async fn test_query_contract_dict_with_none_values() {
@@ -139,12 +139,12 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         let dictionary_item = get_dictionary_item(false).await;
 
         let state_root_hash: Digest = sdk
-            .get_state_root_hash(None, verbosity, node_address.clone())
+            .get_state_root_hash(None, verbosity, Some(node_address.clone()))
             .await
             .unwrap()
             .result
@@ -154,7 +154,12 @@ mod tests {
 
         // Act
         let result = sdk
-            .query_contract_dict(state_root_hash, dictionary_item, verbosity, node_address)
+            .query_contract_dict(
+                state_root_hash,
+                dictionary_item,
+                verbosity,
+                Some(node_address),
+            )
             .await;
 
         // Assert
@@ -166,7 +171,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         let state_root_hash = "";
 
         // Act
@@ -175,7 +180,7 @@ mod tests {
                 state_root_hash,
                 get_dictionary_item(false).await,
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -188,7 +193,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         let state_root_hash = "";
 
         // Act
@@ -197,7 +202,7 @@ mod tests {
                 state_root_hash,
                 get_dictionary_item(false).await,
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -210,7 +215,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         let state_root_hash = "";
 
         // Act
@@ -219,7 +224,7 @@ mod tests {
                 state_root_hash,
                 get_dictionary_item(true).await,
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -232,7 +237,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         let error_message =
             "Failed to parse dictionary item address as a key: unknown prefix for key".to_string();
@@ -246,7 +251,7 @@ mod tests {
                 state_root_hash,
                 DictionaryItemInput::Params(params),
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 

@@ -1,0 +1,99 @@
+---
+name: ci-rust-sdk
+
+on:
+  push:
+    branches: [dev, dev-1.6, cid_cd_tests, 'feat*', 'release-*']
+    paths-ignore:
+      - '**.md'
+
+  pull_request:
+    branches: [dev, dev-1.6, cid_cd_tests, 'feat*', 'release-*']
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build_and_test:
+    strategy:
+      matrix:
+        #https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
+        os: [ubuntu-22.04]
+        node-version: [20.x]
+    runs-on: ${{ matrix.os }}
+    env:
+      NODE_ADDRESS: http://127.0.0.1:7777/rpc
+      EVENT_ADDRESS: http://127.0.0.1:9999/events/main
+      # WARNING: These accounts, and their private keys, are publicly known.
+      # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
+      PRIVATE_KEY_USER_1: MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
+      PRIVATE_KEY_USER_2: MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          components: rustfmt, clippy
+          target: wasm32-unknown-unknown
+
+      # - name: Fmt
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: fmt
+      #     args: -- --check
+
+      # # - name: Audit
+      # #   uses: actions-rs/cargo@v1
+      # #   with:
+      # #     command: audit
+      # #     args: --deny warnings || true
+
+      # - name: Clippy
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: clippy
+
+      # - name: Lint
+      #   run: make check-lint
+
+      # - name: Use Node.js ${{ matrix.node-version }}
+      #   uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
+      #   with:
+      #     node-version: ${{ matrix.node-version }}
+      #     registry-url: 'https://registry.npmjs.org'
+
+      # - name: Casper node launcher js
+      #   run: npx casper-node-launcher-js node --daemon
+
+      # - name: Unit Tests
+      #   run: make test
+
+      # - name: Integration Tests
+      #   run: make integration-test
+
+      # - name: E2E Tests
+      #   run: make e2e-test
+
+      # - name: Build lib for all targets
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: build
+      #     args: --lib --all-targets
+
+      - name: Install Electron
+        run: |
+          sudo apt-get install --no-install-recommends -y libopenjp2-tools
+          sudo dpkg --add-architecture i386
+          sudo mkdir -pm755 /etc/apt/keyrings
+          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
+
+          sudo apt update
+          sudo apt install --install-recommends winehq-stable
+
+      - name: Install Wasm Pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build packages and apps
+        run: make build

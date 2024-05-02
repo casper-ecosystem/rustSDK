@@ -19,4 +19,8 @@ files:
 extraFiles:
   - from: ./../../frontend/angular/dist/casper
     to: frontend/angular/dist/casper
+<<<<<<< HEAD
 electronVersion: 26.1.0
+=======
+electronVersion: 29.1.1
+>>>>>>> e374407 (CI CD + tests + remove docs (#37))

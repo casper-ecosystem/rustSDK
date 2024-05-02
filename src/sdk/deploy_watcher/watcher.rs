@@ -183,12 +183,13 @@ impl DeployWatcher {
     /// A new `DeployWatcher` instance.
     #[wasm_bindgen(constructor)]
     pub fn new(events_url: String, timeout_duration: Option<u64>) -> Self {
-        let timeout_duration = Duration::milliseconds(
+        let timeout_duration = Duration::try_milliseconds(
             timeout_duration
                 .unwrap_or(DEFAULT_TIMEOUT_MS)
                 .try_into()
                 .unwrap(),
-        );
+        )
+        .unwrap_or_default();
 
         DeployWatcher {
             events_url,
@@ -693,15 +694,16 @@ impl fmt::Display for EventName {
 
 #[cfg(test)]
 mod tests {
+    use sdk_tests::tests::helpers::get_network_constants;
+
     use crate::deploy_watcher::deploy_mock::DEPLOY_MOCK;
 
     use super::*;
-    use sdk_tests::config::DEFAULT_EVENT_ADDRESS;
 
     #[test]
     fn test_new() {
         // Arrange
-        let events_url = DEFAULT_EVENT_ADDRESS.to_string();
+        let (_, events_url, _) = get_network_constants();
         let timeout_duration = 5000;
 
         // Act
@@ -713,14 +715,14 @@ mod tests {
         assert!(*deploy_watcher.active.borrow());
         assert_eq!(
             deploy_watcher.timeout_duration,
-            Duration::milliseconds(timeout_duration.try_into().unwrap())
+            Duration::try_milliseconds(timeout_duration.try_into().unwrap()).unwrap()
         );
     }
 
     #[test]
     fn test_new_default_timeout() {
         // Arrange
-        let events_url = DEFAULT_EVENT_ADDRESS.to_string();
+        let (_, events_url, _) = get_network_constants();
 
         // Act
         let deploy_watcher = DeployWatcher::new(events_url.clone(), None);
@@ -731,7 +733,7 @@ mod tests {
         assert!(*deploy_watcher.active.borrow());
         assert_eq!(
             deploy_watcher.timeout_duration,
-            Duration::milliseconds(DEFAULT_TIMEOUT_MS.try_into().unwrap())
+            Duration::try_milliseconds(DEFAULT_TIMEOUT_MS.try_into().unwrap()).unwrap()
         );
     }
 
@@ -750,7 +752,8 @@ mod tests {
     #[tokio::test]
     async fn test_process_events() {
         // Arrange
-        let deploy_watcher = DeployWatcher::new(DEFAULT_EVENT_ADDRESS.to_string(), None);
+        let (_, events_url, _) = get_network_constants();
+        let deploy_watcher = DeployWatcher::new(events_url, None);
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
 
         let target_deploy_hash = Some(deploy_hash);
@@ -774,7 +777,8 @@ mod tests {
     #[tokio::test]
     async fn test_start_timeout() {
         // Arrange
-        let deploy_watcher = DeployWatcher::new(DEFAULT_EVENT_ADDRESS.to_string(), Some(1));
+        let (_, events_url, _) = get_network_constants();
+        let deploy_watcher = DeployWatcher::new(events_url, Some(1));
 
         // Act
         let result = deploy_watcher.start().await;
@@ -790,7 +794,8 @@ mod tests {
     #[test]
     fn test_stop() {
         // Arrange
-        let deploy_watcher = DeployWatcher::new(DEFAULT_EVENT_ADDRESS.to_string(), None);
+        let (_, events_url, _) = get_network_constants();
+        let deploy_watcher = DeployWatcher::new(events_url, None);
         assert!(*deploy_watcher.active.borrow());
 
         // Act
@@ -803,7 +808,8 @@ mod tests {
     #[test]
     fn test_subscribe() {
         // Arrange
-        let mut deploy_watcher = DeployWatcher::new(DEFAULT_EVENT_ADDRESS.to_string(), None);
+        let (_, events_url, _) = get_network_constants();
+        let mut deploy_watcher = DeployWatcher::new(events_url, None);
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
 
         // Create a subscription
@@ -832,7 +838,8 @@ mod tests {
     #[test]
     fn test_unsubscribe() {
         // Arrange
-        let mut deploy_watcher = DeployWatcher::new(DEFAULT_EVENT_ADDRESS.to_string(), None);
+        let (_, events_url, _) = get_network_constants();
+        let mut deploy_watcher = DeployWatcher::new(events_url, None);
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
 
         // Subscribe to a deploy hash
@@ -861,11 +868,11 @@ mod tests {
     fn test_sdk_watch_deploy_retunrs_instance() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let events_url = DEFAULT_EVENT_ADDRESS;
+        let (_, events_url, _) = get_network_constants();
         let timeout_duration = 5000;
 
         // Act
-        let deploy_watcher = sdk.watch_deploy(events_url, Some(timeout_duration));
+        let deploy_watcher = sdk.watch_deploy(&events_url, Some(timeout_duration));
 
         // Assert
         assert_eq!(deploy_watcher.events_url, events_url);
@@ -873,7 +880,7 @@ mod tests {
         assert!(*deploy_watcher.active.borrow());
         assert_eq!(
             deploy_watcher.timeout_duration,
-            Duration::milliseconds(timeout_duration.try_into().unwrap())
+            Duration::try_milliseconds(timeout_duration.try_into().unwrap()).unwrap()
         );
     }
 
@@ -881,13 +888,13 @@ mod tests {
     async fn test_wait_deploy_timeout() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let events_url = DEFAULT_EVENT_ADDRESS;
+        let (_, events_url, _) = get_network_constants();
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
         let timeout_duration = Some(5000);
 
         // Act
         let result = sdk
-            .wait_deploy(events_url, deploy_hash, timeout_duration)
+            .wait_deploy(&events_url, deploy_hash, timeout_duration)
             .await;
 
         // Assert

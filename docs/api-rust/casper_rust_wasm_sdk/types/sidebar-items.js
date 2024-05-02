@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["access_rights","account_hash","account_identifier","addr","block_hash","block_identifier","cl","contract_hash","contract_package_hash","deploy","deploy_hash","deploy_params","dictionary_item_identifier","digest","era_id","global_state_identifier","key","path","peer_entry","public_key","purse_identifier","sdk_error","uref","verbosity"]};

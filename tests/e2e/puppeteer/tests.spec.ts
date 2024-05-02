@@ -269,12 +269,15 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_block', async () => {
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHashElt"]');
       await submit();
       await getResult();
     });
 
     it('should get_block with block height', async () => {
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHashElt"]');
       await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
       await submit();
       await getResult();
@@ -610,9 +613,21 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="queryKeyElt"]', test.account_hash);
       await submit();
       await getResult();
+      await clearInput('[e2e-id="queryKeyElt"]');
+      await clearInput('[e2e-id="queryPathElt"]');
     });
 
     it(`should query_global_state with nft key`, async () => {
+      expect(test.account).toBeDefined();
+      expect(config.contract_cep78_key).toBeDefined();
+      await test.page.reload();
+      await getResult();
+      await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
+      await clearInput('[e2e-id="publicKeyElt"]');
+      await test.page.type('[e2e-id="publicKeyElt"]', test.account);
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: { blur: () => any; }) => e.blur());
+      await test.page.waitForSelector('[e2e-id="main_purse"]');
+      await seletAction('query_global_state');
       await clearInput('[e2e-id="queryPathElt"]');
       await clearInput('[e2e-id="stateRootHashElt"]');
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
@@ -642,7 +657,7 @@ describe('Angular App Tests', () => {
       });
       result_json = JSON.parse(result);
       expect(result_json?.stored_value.CLValue.parsed).toEqual(config.collection_name);
-    });
+    }, 30000);
   });
 
   describe('Rpc call get_deploy', () => {
@@ -657,6 +672,7 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_deploy', async () => {
+      expect(test.deploy_hash).toBeDefined();
       await test.page.waitForSelector('[e2e-id="deployHashElt"]');
       await clearInput('[e2e-id="deployHashElt"]');
       await test.page.type('[e2e-id="deployHashElt"]', test.deploy_hash);

@@ -27,19 +27,27 @@ test:
 integration-test:
 	cd tests/integration/rust && cargo test -- --test-threads=1 --nocapture
 
-e2e-test:
-	cd tests/e2e && npm test
+start-app:
+	(cd examples/frontend/angular/ && npm ci && npm run build-proxy-conf && npm start &) && \
+	until curl -s -o /dev/null http://localhost:4200; do sleep 5; done
+
+run-e2e-tests:
+	cd tests/e2e && npm ci && npm test
+
+e2e-test: start-app run-e2e-tests
+
+.PHONY: start-app run-tests stop-app e2e-test
 
 doc:
 	cargo doc --package casper-rust-wasm-sdk --no-deps
 	cp -r target/doc/* docs/api-rust/
 	npx typedoc --name api-wasm --out docs/api-wasm pkg/casper_rust_wasm_sdk.d.ts
 
-build: pack doc
-	cd examples/frontend/angular/ && npm run build && cd .
-	cd examples/frontend/react/ && npm run build && cd .
-	cd examples/desktop/node/ && npx tsc index.ts && cd .
-	cd examples/desktop/electron && npm run build && cd .
+build: pack
+	cd examples/frontend/angular/ && npm ci && npm run build && cd .
+	cd examples/frontend/react/ && npm ci && npm run build && cd .
+	cd examples/desktop/node/ && npm ci && npx tsc index.ts && cd .
+	cd examples/desktop/electron && npm ci && npm run build && cd .
 
 format:
 	cargo fmt

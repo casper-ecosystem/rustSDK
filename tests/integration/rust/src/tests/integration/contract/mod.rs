@@ -42,6 +42,7 @@ pub mod test_module {
         session_params.set_session_args_json(ARGS_JSON);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
+
         let test_call_entrypoint = create_test_sdk(Some(config))
             .call_entrypoint(deploy_params, session_params, payment_params, None)
             .await;
@@ -79,6 +80,7 @@ pub mod test_module {
             DICTIONARY_NAME,
             DICTIONARY_ITEM_KEY,
             Some(state_root_hash),
+            config.node_address,
         )
         .await;
         assert_eq!(config.dictionary_key, dictionnary_key);
