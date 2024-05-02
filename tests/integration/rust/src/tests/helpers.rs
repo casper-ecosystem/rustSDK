@@ -204,7 +204,7 @@ pub(crate) mod intern {
         assert!(!deploy_hash_as_string.is_empty());
 
         let event_parse_result = sdk
-            .wait_deploy(&event_address, &deploy_hash_as_string, None)
+            .wait_deploy(event_address, &deploy_hash_as_string, None)
             .await
             .unwrap();
         let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
@@ -244,7 +244,7 @@ pub fn get_user_private_key(user: Option<&str>) -> Result<String, std::io::Error
     let (private_key_nctl_path, private_key_name) = get_private_key_constants();
     let user_key_path = match user {
         user if user.starts_with("user-") => {
-            format!("{}", private_key_nctl_path.replace("user-1", user))
+            private_key_nctl_path.replace("user-1", user).to_string()
         }
         _ => format!("{private_key_nctl_path}{private_key_name}"),
     };
@@ -261,9 +261,9 @@ fn get_private_key_constants() -> (String, String) {
 }
 
 fn get_env_key(user: &str) -> String {
-    let private_key = match env::var(&format!(
+    let private_key = match env::var(format!(
         "PRIVATE_KEY_{}",
-        user.replace("-", "_").to_uppercase()
+        user.replace('-', "_").to_uppercase()
     )) {
         Ok(key) => key,
         Err(_) => return "".to_string(),
@@ -273,7 +273,7 @@ fn get_env_key(user: &str) -> String {
 }
 
 fn read_pem_file(file_path: &str, private_key_name: &str) -> Result<String, io::Error> {
-    let path_buf = PathBuf::from(env::current_dir()?);
+    let path_buf = env::current_dir()?;
 
     let relative_path = path_buf
         .to_string_lossy()
@@ -295,7 +295,7 @@ fn read_pem_file(file_path: &str, private_key_name: &str) -> Result<String, io::
 }
 
 pub fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
-    let path_buf = PathBuf::from(env::current_dir()?);
+    let path_buf = env::current_dir()?;
     let relative_path = path_buf
         .to_string_lossy()
         .replace("tests/integration/rust", "");
@@ -407,7 +407,7 @@ pub async fn mint_nft(
     assert!(!deploy_hash_as_string.is_empty());
 
     let event_parse_result = sdk
-        .wait_deploy(&event_address, &deploy_hash_as_string, None)
+        .wait_deploy(event_address, &deploy_hash_as_string, None)
         .await
         .unwrap();
     let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
