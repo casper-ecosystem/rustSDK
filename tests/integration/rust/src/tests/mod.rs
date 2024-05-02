@@ -2,14 +2,19 @@ pub mod helpers;
 pub mod integration;
 #[cfg(test)]
 pub mod integration_tests;
-use casper_rust_wasm_sdk::{types::verbosity::Verbosity, SDK};
+use casper_rust_wasm_sdk::{
+    deploy_watcher::watcher::{DeploySubscription, EventHandlerFn, EventParseResult},
+    helpers::public_key_from_secret_key,
+    types::verbosity::Verbosity,
+    SDK,
+};
 use std::{
     fs::File,
     io::{self, Read},
     path::Path,
-    thread,
-    time::{self, Duration},
 };
+
+use crate::{config::DEFAULT_EVENT_ADDRESS, tests::helpers::get_event_handler_fn};
 
 pub async fn run_tests_or_examples() {
     // Run a specific test ?
@@ -381,7 +386,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     };
 
     fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
-        let root_path = Path::new("../../wasm/");
+        let root_path = Path::new(".");
         let path = root_path.join(file_path);
         let mut file = File::open(path)?;
         let mut buffer = Vec::new();
@@ -390,10 +395,9 @@ pub async fn _run_example_11() -> Result<(), String> {
     }
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PUBLIC_KEY: &str =
-        "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
     -----END PRIVATE KEY-----"#;
+    let public_key: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
     pub const ARGS_JSON: &str = r#"[
 {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
 {"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
@@ -407,14 +411,14 @@ pub async fn _run_example_11() -> Result<(), String> {
 {"name": "metadata_mutability", "type": "U8", "value": 0},
 {"name": "events_mode", "type": "U8", "value": 1}
 ]"#;
-    pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "400000000000";
+    pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
     pub const WASM_PATH: &str = "../../wasm/";
     pub const CEP78_CONTRACT: &str = "cep78.wasm";
-    pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
+    pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
-        PUBLIC_KEY,
+        public_key,
         Some(PRIVATE_KEY.to_string()),
         None,
         None,
@@ -433,27 +437,31 @@ pub async fn _run_example_11() -> Result<(), String> {
             return Err(format!("Error reading file {}: {:?}", file_path, err));
         }
     };
-
     session_params.set_session_bytes(module_bytes.into());
-
     let install = sdk
         .install(deploy_params, session_params, payment_params, None)
         .await;
 
     let deploy_hash_result = install.as_ref().unwrap().result.deploy_hash;
-    println!("{:?}", deploy_hash_result);
-
-    println!("wait {:?}", DEPLOY_TIME);
-    thread::sleep(DEPLOY_TIME); // Let's wait for deployment
+    // println!("{:?}", deploy_hash_result);
+    let deploy_hash = DeployHash::from(deploy_hash_result);
+    let deploy_hash_as_string = deploy_hash.to_string();
+    println!("wait deploy_hash {}", deploy_hash_as_string);
+    let event_parse_result: EventParseResult = sdk
+        .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_as_string, None)
+        .await
+        .unwrap();
+    println!("{:?}", event_parse_result);
 
     let finalized_approvals = true;
-    let deploy_hash = DeployHash::from(deploy_hash_result);
     let get_deploy = sdk
         .get_deploy(deploy_hash, Some(finalized_approvals), None, None)
         .await;
     let get_deploy = get_deploy.unwrap();
-    let result = &get_deploy.result.execution_results.first().unwrap().result;
-    println!("{}", json_pretty_print(result, Some(Verbosity::High)));
+    let result = json_pretty_print(&get_deploy.result.deploy.approvals, Some(Verbosity::Low));
+    println!("approvals {result}");
+    let result = DeployHash::from(get_deploy.result.deploy.hash).to_string();
+    println!("processed deploy hash {result}");
     Ok(())
 }
 
@@ -464,18 +472,20 @@ pub async fn _run_example_12() {
         Some(Verbosity::High),
     );
 
-    use casper_rust_wasm_sdk::types::deploy_params::{
-        deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-        session_str_params::SessionStrParams,
+    use casper_rust_wasm_sdk::types::{
+        deploy_hash::DeployHash,
+        deploy_params::{
+            deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+            session_str_params::SessionStrParams,
+        },
     };
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PUBLIC_KEY: &str =
-        "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
     pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
         -----END PRIVATE KEY-----"#;
+    let public_key: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
     pub const CONTRACT_HASH: &str =
-        "hash-c12808431d490e2c463c2f968d0a4eaa0f9d57842508d9041aa42e2bd21eb96c";
+        "hash-508ec6d085766e8abf5c2ff8a6c60ca9e1712fe6228656d5fae3e281b0218ca0";
     pub const ENTRYPOINT_MINT: &str = "mint";
     pub const TOKEN_OWNER: &str =
         "account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611";
@@ -483,7 +493,7 @@ pub async fn _run_example_12() {
 
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
-        PUBLIC_KEY,
+        public_key,
         Some(PRIVATE_KEY.to_string()),
         None,
         None,
@@ -504,5 +514,22 @@ pub async fn _run_example_12() {
         .call_entrypoint(deploy_params, session_params, payment_params, None)
         .await;
     let deploy_hash_result = call_entrypoint.as_ref().unwrap().result.deploy_hash;
-    println!("{:?}", deploy_hash_result);
+    let deploy_hash_string = DeployHash::from(deploy_hash_result).to_string();
+    println!("watch deploy_hash {deploy_hash_string}");
+    let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, None);
+
+    let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
+    let deploy_hash_results = vec![deploy_hash_string.to_string().clone()];
+
+    for deploy_hash in deploy_hash_results {
+        let event_handler_fn = get_event_handler_fn(deploy_hash.clone());
+        deploy_subscriptions.push(DeploySubscription::new(
+            deploy_hash,
+            EventHandlerFn::new(event_handler_fn),
+        ));
+    }
+
+    let _ = watcher.subscribe(deploy_subscriptions);
+    let _ = watcher.start().await;
+    watcher.stop()
 }

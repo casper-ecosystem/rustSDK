@@ -68,7 +68,8 @@ impl GetStateRootHashResult {
 
     /// Alias for state_root_hash_as_string
     #[wasm_bindgen(js_name = "toString")]
-    pub fn to_string(&self) -> String {
+    pub fn to_string_js_alias(&self) -> String {
+        // You can still use to_string method for compatibility
         self.state_root_hash_as_string()
     }
 

@@ -6,6 +6,8 @@ pub use deploy::*;
 pub(crate) mod deploy_utils;
 pub(crate) use deploy_utils::*;
 
+pub mod deploy_watcher;
+
 pub(crate) mod contract;
 pub use contract::*;
 

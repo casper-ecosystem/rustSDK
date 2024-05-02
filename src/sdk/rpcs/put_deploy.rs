@@ -99,7 +99,7 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::{
-        helpers::public_key_from_private_key,
+        helpers::public_key_from_secret_key,
         rpcs::PRIVATE_KEY_NCTL_PATH,
         types::deploy_params::{
             deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
@@ -116,7 +116,7 @@ mod tests {
     fn get_deploy() -> Deploy {
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
             DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);

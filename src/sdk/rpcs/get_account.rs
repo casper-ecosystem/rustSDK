@@ -228,7 +228,7 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::{
-        helpers::public_key_from_private_key,
+        helpers::public_key_from_secret_key,
         rpcs::PRIVATE_KEY_NCTL_PATH,
         types::{block_identifier::BlockIdentifier, public_key::PublicKey},
     };
@@ -240,7 +240,7 @@ mod tests {
     fn get_account_identifier() -> AccountIdentifier {
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
 
         AccountIdentifier::from_account_account_under_public_key(public_key)

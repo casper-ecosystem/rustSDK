@@ -16,6 +16,7 @@ pub mod test_module {
             query_global_state::{KeyIdentifierInput, PathIdentifierInput, QueryGlobalStateParams},
         },
         types::{
+            deploy_hash::DeployHash,
             deploy_params::{
                 deploy_str_params::DeployStrParams,
                 dictionary_item_str_params::DictionaryItemStrParams,
@@ -27,7 +28,7 @@ pub mod test_module {
     };
 
     pub async fn test_call_entrypoint() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -61,7 +62,7 @@ pub mod test_module {
     }
 
     pub async fn test_query_contract_dict() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let get_state_root_hash = create_test_sdk(Some(config.clone()))
             .get_state_root_hash(None, None, None)
             .await;
@@ -84,7 +85,7 @@ pub mod test_module {
     }
 
     pub async fn test_query_contract_dict_with_dictionary_key() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let get_state_root_hash = create_test_sdk(Some(config.clone()))
             .get_state_root_hash(None, None, None)
             .await;
@@ -118,7 +119,7 @@ pub mod test_module {
     }
 
     pub async fn test_query_contract_dict_with_dictionary_uref() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let get_state_root_hash = create_test_sdk(Some(config.clone()))
             .get_state_root_hash(None, None, None)
             .await;
@@ -152,7 +153,7 @@ pub mod test_module {
     }
 
     pub async fn query_contract_key(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
             key: KeyIdentifierInput::String(config.to_owned().contract_cep78_hash),
             path: Some(PathIdentifierInput::String("installer".to_string())),
@@ -178,8 +179,8 @@ pub mod test_module {
             .is_empty());
     }
 
-    pub async fn test_install() {
-        let config: TestConfig = get_config().await;
+    pub async fn test_install() -> String {
+        let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -193,7 +194,7 @@ pub mod test_module {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
                 eprintln!("Error reading file: {:?}", err);
-                return;
+                return String::from("");
             }
         };
         session_params.set_session_bytes(module_bytes.into());
@@ -210,13 +211,11 @@ pub mod test_module {
             .api_version
             .to_string()
             .is_empty());
-        assert!(!install
-            .as_ref()
-            .unwrap()
-            .result
-            .deploy_hash
-            .to_string()
-            .is_empty());
+
+        let deploy_hash = DeployHash::from(install.as_ref().unwrap().result.deploy_hash);
+        let deploy_hash_as_string = deploy_hash.to_string();
+        assert!(!deploy_hash_as_string.is_empty());
+        deploy_hash_as_string
     }
 }
 
@@ -255,7 +254,7 @@ mod tests {
     }
     #[test]
     pub async fn test_query_contract_key_test() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
 
         let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
             BlockHash::new(&config.block_hash).unwrap(),

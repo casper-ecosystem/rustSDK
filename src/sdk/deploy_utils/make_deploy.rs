@@ -40,7 +40,7 @@ impl SDK {
     ) -> Result<Deploy, JsError> {
         let result = make_deploy(deploy_params, session_params, payment_params);
         match result {
-            Ok(data) => Ok(data.into()),
+            Ok(data) => Ok(data),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
                 error(err);
@@ -94,14 +94,7 @@ pub(crate) fn make_deploy(
 mod tests {
 
     use super::*;
-    use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
-        types::deploy_params::{
-            deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-            session_str_params::SessionStrParams,
-        },
-    };
+    use crate::{helpers::public_key_from_secret_key, rpcs::PRIVATE_KEY_NCTL_PATH};
     use sdk_tests::{
         config::{CHAIN_NAME, PAYMENT_AMOUNT, PRIVATE_KEY_NAME},
         tests::helpers::read_pem_file,
@@ -114,7 +107,7 @@ mod tests {
 
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
             DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
@@ -140,7 +133,7 @@ mod tests {
 
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params = DeployStrParams::new(CHAIN_NAME, &account, None, None, None);
         let session_params = SessionStrParams::default();
@@ -165,7 +158,7 @@ mod tests {
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]".to_string();
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
             DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);

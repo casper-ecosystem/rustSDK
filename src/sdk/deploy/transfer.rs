@@ -130,13 +130,7 @@ impl SDK {
 mod tests {
 
     use super::*;
-    use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
-        types::deploy_params::{
-            deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-        },
-    };
+    use crate::{helpers::public_key_from_secret_key, rpcs::PRIVATE_KEY_NCTL_PATH};
     use sdk_tests::{
         config::{
             CHAIN_NAME, DEFAULT_NODE_ADDRESS, PAYMENT_TRANSFER_AMOUNT, PRIVATE_KEY_NAME,
@@ -154,7 +148,7 @@ mod tests {
 
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
             DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
@@ -189,7 +183,7 @@ mod tests {
 
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params = DeployStrParams::new(CHAIN_NAME, &account, None, None, None);
         let payment_params = PaymentStrParams::default();
@@ -224,7 +218,7 @@ mod tests {
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]".to_string();
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
             DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);

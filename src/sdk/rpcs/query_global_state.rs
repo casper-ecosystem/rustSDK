@@ -408,9 +408,8 @@ impl SDK {
 mod tests {
 
     use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
-        types::{global_state_identifier::GlobalStateIdentifier, public_key::PublicKey},
+        helpers::public_key_from_secret_key, rpcs::PRIVATE_KEY_NCTL_PATH,
+        types::public_key::PublicKey,
     };
     use sdk_tests::{
         config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},
@@ -422,7 +421,7 @@ mod tests {
     fn get_key_input() -> KeyIdentifierInput {
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
         KeyIdentifierInput::String(public_key.to_account_hash().to_formatted_string())
     }

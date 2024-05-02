@@ -42,6 +42,7 @@ impl SDK {
     ///
     /// A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
     #[wasm_bindgen(js_name = "speculative_deploy")]
+    #[allow(clippy::too_many_arguments)]
     pub async fn speculative_deploy_js_alias(
         &self,
         deploy_params: DeployStrParams,
@@ -135,15 +136,9 @@ mod tests {
 
     use super::*;
     use crate::{
-        helpers::public_key_from_private_key,
+        helpers::public_key_from_secret_key,
         rpcs::{PRIVATE_KEY_NCTL_PATH, WASM_PATH},
-        types::{
-            block_identifier::BlockIdentifier,
-            deploy_params::{
-                deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-                session_str_params::SessionStrParams,
-            },
-        },
+        types::block_identifier::BlockIdentifier,
     };
     use sdk_tests::{
         config::{
@@ -185,7 +180,7 @@ mod tests {
 
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
             DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
@@ -219,7 +214,7 @@ mod tests {
 
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
             DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);

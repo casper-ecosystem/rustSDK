@@ -137,9 +137,9 @@ impl SDK {
         } else if let Some(deploy) = deploy {
             deploy
         } else {
-            let err = &format!("Error: Missing deploy as json or deploy");
-            error(err);
-            return Err(JsError::new(err));
+            let err = "Error: Missing deploy as json or deploy".to_string();
+            error(&err);
+            return Err(JsError::new(&err));
         };
 
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
@@ -211,7 +211,7 @@ mod tests {
 
     use super::*;
     use crate::{
-        helpers::public_key_from_private_key,
+        helpers::public_key_from_secret_key,
         rpcs::PRIVATE_KEY_NCTL_PATH,
         types::{
             block_identifier::BlockIdentifier,
@@ -231,7 +231,7 @@ mod tests {
     fn get_deploy() -> Deploy {
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
             DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);

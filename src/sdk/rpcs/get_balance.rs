@@ -269,7 +269,7 @@ impl SDK {
 mod tests {
 
     use super::*;
-    use crate::{helpers::public_key_from_private_key, rpcs::PRIVATE_KEY_NCTL_PATH};
+    use crate::{helpers::public_key_from_secret_key, rpcs::PRIVATE_KEY_NCTL_PATH};
     use sdk_tests::{
         config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},
         tests::helpers::read_pem_file,
@@ -279,8 +279,8 @@ mod tests {
         let sdk = SDK::new(None, None);
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
-        let purse_uref = sdk
+        let account = public_key_from_secret_key(&private_key).unwrap();
+        let purse_uref = *sdk
             .get_account(
                 None,
                 Some(account),

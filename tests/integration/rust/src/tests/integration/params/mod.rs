@@ -11,7 +11,7 @@ pub mod test_module {
     };
 
     pub async fn test_deploy_params() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -27,7 +27,7 @@ pub mod test_module {
     }
 
     pub async fn test_deploy_params_defaults() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::default();
         deploy_params.set_chain_name(&config.chain_name);
         deploy_params.set_session_account(&config.account);
@@ -44,7 +44,7 @@ pub mod test_module {
     }
 
     pub async fn test_session_params() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
@@ -65,7 +65,7 @@ pub mod test_module {
     }
 
     pub async fn test_dictionary_item_params() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let mut dictionary_item_params = DictionaryItemStrParams::default();
         //  dictionary_item_params.
         assert!(dictionary_item_params.account_named_key().is_none());

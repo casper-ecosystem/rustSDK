@@ -148,7 +148,6 @@ pub fn deploy_str_params_to_casper_client(deploy_params: &DeployStrParams) -> _D
 #[cfg(test)]
 mod tests {
     use super::*;
-    use once_cell::sync::OnceCell;
 
     #[test]
     fn test_deploy_str_params_to_casper_client() {

@@ -33,10 +33,25 @@ e2e-test:
 doc:
 	cargo doc --package casper-rust-wasm-sdk --no-deps
 	cp -r target/doc/* docs/api-rust/
-	cd examples/frontend/angular npm typedoc --out docs/api-wasm pkg/casper_rust_wasm_sdk.d.ts
+	npx typedoc --name api-wasm --out docs/api-wasm pkg/casper_rust_wasm_sdk.d.ts
 
 build: pack doc
 	cd examples/frontend/angular/ && npm run build && cd .
 	cd examples/frontend/react/ && npm run build && cd .
 	cd examples/desktop/node/ && npx tsc index.ts && cd .
 	cd examples/desktop/electron && npm run build && cd .
+
+format:
+	cargo fmt
+
+lint: format clippy
+
+clippy:
+	cargo clippy --target wasm32-unknown-unknown --bins -- -D warnings
+	cargo clippy --lib -- -D warnings
+	cargo clippy --no-default-features --lib -- -D warnings
+
+check-lint: clippy
+	cargo fmt -- --check
+
+.PHONY: format lint check clippy

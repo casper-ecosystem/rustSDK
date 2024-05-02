@@ -11,7 +11,7 @@ pub mod test_module {
     };
 
     pub async fn test_make_deploy() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -33,7 +33,7 @@ pub mod test_module {
     }
 
     pub async fn test_make_transfer() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -58,7 +58,7 @@ pub mod test_module {
     }
 
     pub async fn test_sign_deploy() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
