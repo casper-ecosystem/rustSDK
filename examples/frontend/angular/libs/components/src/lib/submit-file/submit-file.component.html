@@ -1,0 +1,17 @@
+<ng-template #template>
+  <div class="col-sm-2 mt-2">
+    <input
+      class="visually-hidden"
+      name="deploy_file"
+      #deployFileElt
+      type="file"
+      id="deployFileElt"
+      (change)="onDeployFileSelected($event)"
+      accept=".json, .txt, .deploy"
+      e2e-id="deployFileElt"
+    />
+    <button class="btn btn-secondary" (click)="deployFileClick()">
+      Load deploy file
+    </button>
+  </div>
+</ng-template>

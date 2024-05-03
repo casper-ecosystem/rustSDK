@@ -25,6 +25,7 @@
             #inputTemplate
             [parentForm]="form"
             [inputField]="field.textarea"
+            (update_deploy_json)="updateDeployJson($event)"
           ></ui-textarea>
           <ng-container
             *ngTemplateOutlet="

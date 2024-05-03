@@ -105,31 +105,35 @@ pub fn json_pretty_print_js_alias(value: JsValue, verbosity: Option<Verbosity>) 
 /// # Returns
 ///
 /// A JsValue containing the corresponding public key.
-/// If an error occurs during the conversion, JsValue::null() is returned.
+/// If an error occurs during the conversion, JavaScript error is returned.
 #[wasm_bindgen(js_name = "privateToPublicKey")]
-pub fn secret_to_public_key(secret_key: &str) -> JsValue {
+pub fn secret_to_public_key(secret_key: &str) -> Result<JsValue, JsValue> {
     let public_key = public_key_from_secret_key(secret_key);
     if let Err(err) = public_key {
-        error(&format!("Error loading secret key: {:?}", err));
-        return JsValue::null();
+        let error_text = format!("Error loading secret key: {:?}", err);
+        error(&error_text);
+        return Err(JsValue::from_str(&error_text)); // Throw a JavaScript error
     }
-    JsValue::from_serde(&public_key.unwrap()).unwrap_or_else(|err| {
-        error(&format!("Error serializing public key: {:?}", err));
-        JsValue::null()
-    })
+    Ok(
+        JsValue::from_serde(&public_key.unwrap()).unwrap_or_else(|err| {
+            let error_text = format!("Error serializing public key: {:?}", err);
+            error(&error_text);
+            JsValue::from_str(&error_text) // Return an Ok variant containing JsValue
+        }),
+    )
 }
 
 /// Generates a secret key using the Ed25519 algorithm and returns it as a PEM-encoded string.
 ///
 /// # Returns
 ///
-/// A `JsValue` containing the PEM-encoded secret key or `JsValue::null()` if an error occurs.
+/// A `JsValue` containing the PEM-encoded secret key or a JavaScript error if an error occurs.
 ///
 /// # Errors
 ///
 /// Returns an error if the secret key generation or serialization fails.
 #[wasm_bindgen(js_name = "generatePrivateKey")]
-pub fn generate_ed25519_js_alias() -> JsValue {
+pub fn generate_ed25519_js_alias() -> Result<JsValue, JsValue> {
     let secret_key = secret_key_generate()
         .map_err(|err| {
             error(&format!("Error in secret_key_generate: {:?}", err));
@@ -137,26 +141,30 @@ pub fn generate_ed25519_js_alias() -> JsValue {
         })
         .and_then(|secret_key| secret_key.to_pem());
     if let Err(err) = secret_key {
-        error(&format!("Error creating secret key: {:?}", err));
-        return JsValue::null();
+        let error_text = format!("Error creating secret key: {:?}", err);
+        error(&error_text);
+        return Err(JsValue::from_str(&error_text)); // Throw a JavaScript error
     }
-    JsValue::from_serde(&secret_key.unwrap()).unwrap_or_else(|err| {
-        error(&format!("Error serializing secret key: {:?}", err));
-        JsValue::null()
-    })
+    Ok(
+        JsValue::from_serde(&secret_key.unwrap()).unwrap_or_else(|err| {
+            let error_text = format!("Error serializing secret key: {:?}", err);
+            error(&error_text);
+            JsValue::from_str(&error_text)
+        }),
+    )
 }
 
 /// Generates a secret key using the secp256k1 algorithm and returns it as a PEM-encoded string.
 ///
 /// # Returns
 ///
-/// A `JsValue` containing the PEM-encoded secret key or `JsValue::null()` if an error occurs.
+/// A `JsValue` containing the PEM-encoded secret key or a JavaScript error if an error occurs.
 ///
 /// # Errors
 ///
 /// Returns an error if the secret key generation or serialization fails.
 #[wasm_bindgen(js_name = "generatePrivateKey_secp256k1")]
-pub fn generate_secp256k1_js_alias() -> JsValue {
+pub fn generate_secp256k1_js_alias() -> Result<JsValue, JsValue> {
     let secret_key = secret_key_secp256k1_generate()
         .map_err(|err| {
             error(&format!(
@@ -167,13 +175,17 @@ pub fn generate_secp256k1_js_alias() -> JsValue {
         })
         .and_then(|secret_key| secret_key.to_pem());
     if let Err(err) = secret_key {
-        error(&format!("Error creating secret key: {:?}", err));
-        return JsValue::null();
+        let error_text = format!("Error creating secret key: {:?}", err);
+        error(&error_text);
+        return Err(JsValue::from_str(&error_text)); // Throw a JavaScript error
     }
-    JsValue::from_serde(&secret_key.unwrap()).unwrap_or_else(|err| {
-        error(&format!("Error serializing secret key: {:?}", err));
-        JsValue::null()
-    })
+    Ok(
+        JsValue::from_serde(&secret_key.unwrap()).unwrap_or_else(|err| {
+            let error_text = format!("Error serializing secret key: {:?}", err);
+            error(&error_text);
+            JsValue::from_str(&error_text)
+        }),
+    )
 }
 
 /// Converts a formatted account hash to a base64-encoded string (cep-18 key encoding).

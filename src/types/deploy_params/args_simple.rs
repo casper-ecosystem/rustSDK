@@ -43,13 +43,7 @@ impl FromIterator<JsValue> for ArgsSimple {
     fn from_iter<I: IntoIterator<Item = JsValue>>(iter: I) -> Self {
         let args: Vec<String> = iter
             .into_iter()
-            .map(|value| {
-                if let Some(str_value) = value.as_string() {
-                    str_value
-                } else {
-                    String::from("")
-                }
-            })
+            .map(|value| value.as_string().unwrap_or_default())
             .collect();
         ArgsSimple { args }
     }

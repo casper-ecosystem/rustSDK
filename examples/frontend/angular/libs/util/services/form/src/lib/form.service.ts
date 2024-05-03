@@ -27,8 +27,8 @@ export class FormService {
         state.action && (this.action = state.action);
         this.initializeForm();
       }
-      this.action && this.updateForm();
       state && (this.state = state);
+      this.action && this.updateForm();
     });
     this.form = this.defaultForm;
   }
@@ -98,8 +98,8 @@ export class FormService {
     }
     const disabledTargets: string[] = [];
     fields.forEach((row) => {
-      row.forEach(({ input }) => {
-        const name = input?.controlName;
+      row.forEach(({ input, textarea }) => {
+        const name = input?.controlName || textarea?.controlName;
         if (!name) {
           return;
         }
@@ -107,14 +107,21 @@ export class FormService {
         if (!control) {
           return;
         }
-        if (input.enabled_when) {
+
+        if (textarea) {
+          const state = textarea?.state_name || [];
+          const stateName = state && state.find(name => this.state[name as keyof State]);
+          const updateValue = stateName ? this.state[stateName as keyof State] : '';
+          control.setValue(updateValue);
+        }
+        else if (input && input.enabled_when) {
           if (this.select_dict_identifier && !input.enabled_when?.includes(this.select_dict_identifier)) {
             control.disable();
           } else if (this.select_dict_identifier) {
             control.enable();
           }
         }
-        else if (input.disabled_when) {
+        else if (input && input.disabled_when) {
           const fieldName: string = control.value && input.disabled_when?.find(field => field.includes('value'));
           const targetControlName = fieldName && fieldName.split('.')[0];
           const targetControl = targetControlName && this.form?.get(targetControlName);

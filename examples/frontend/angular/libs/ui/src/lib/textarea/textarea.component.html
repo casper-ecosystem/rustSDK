@@ -12,6 +12,7 @@
             inputField.class || 'form-control',
             isInvalid(inputField.controlName) ? 'is-invalid' : ''
           ]"
+          (change)="updateState($event)"
         >
         </textarea>
         <label *ngIf="inputField.placeholder" [for]="inputField.id">{{

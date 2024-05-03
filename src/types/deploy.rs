@@ -454,7 +454,7 @@ impl Deploy {
     #[wasm_bindgen(js_name = "addSignature")]
     pub fn add_signature(&self, public_key: &str, signature: &str) -> Deploy {
         // Serialize the existing approvals to JSON
-        let casper_deploy: _Deploy = self.0.clone().into();
+        let casper_deploy: _Deploy = self.0.clone();
         let existing_approvals_json = casper_deploy
             .approvals()
             .iter()
