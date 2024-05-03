@@ -1,10 +1,9 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ResultService } from './result.service';
-import { Result } from './result';
 import { Subscription } from 'rxjs';
 import { UtilHihlightWebworkerModule } from '@util/hightlight-webworker';
-import { jsonPrettyPrint } from 'casper-sdk';
+import { Verbosity, jsonPrettyPrint } from 'casper-sdk';
+import { Result, ResultService } from '@util/result';
 
 @Component({
   selector: 'comp-result',
@@ -42,7 +41,7 @@ export class ResultComponent implements AfterViewInit, OnDestroy {
   }
 
   copy(value: string): void {
-    this.resultService.copyClipboard(jsonPrettyPrint(JSON.parse(value), 1));
+    this.resultService.copyClipboard(jsonPrettyPrint(JSON.parse(value), Verbosity.High));
   }
 
   reset() {

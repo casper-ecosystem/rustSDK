@@ -57,7 +57,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     console.info(this.sdk);
-  };
+  }
 
   ngOnDestroy() {
     this.stateSubscription && this.stateSubscription.unsubscribe();

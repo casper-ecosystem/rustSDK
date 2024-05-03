@@ -44,10 +44,10 @@ doc:
 	npx typedoc --name api-wasm --out docs/api-wasm pkg/casper_rust_wasm_sdk.d.ts
 
 build: pack
-	cd examples/frontend/angular/ && npm ci && npm run build && cd .
-	cd examples/frontend/react/ && npm ci && npm run build && cd .
-	cd examples/desktop/node/ && npm ci && npx tsc index.ts && cd .
-	cd examples/desktop/electron && npm ci && npm run build && cd .
+	cd examples/frontend/angular/ && npm install && npm run build && cd .
+	cd examples/frontend/react/ && npm install && npm run build && cd .
+	cd examples/desktop/node/ && npm install && npx tsc index.ts && cd .
+	cd examples/desktop/electron && npm install && npm run build && cd .
 
 format:
 	cargo fmt

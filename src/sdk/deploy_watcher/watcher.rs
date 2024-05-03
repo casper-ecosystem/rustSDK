@@ -19,7 +19,6 @@ use wasm_bindgen_futures::future_to_promise;
 
 const DEFAULT_TIMEOUT_MS: u64 = 60000;
 
-#[wasm_bindgen]
 impl SDK {
     /// Creates a new DeployWatcher instance to watch deploys.
     ///
@@ -35,25 +34,6 @@ impl SDK {
         DeployWatcher::new(events_url.to_string(), timeout_duration)
     }
 
-    /// Creates a new DeployWatcher instance to watch deploys (JavaScript-friendly).
-    ///
-    /// # Arguments
-    ///
-    /// * `events_url` - The URL to monitor for deploy events.
-    /// * `timeout_duration` - An optional timeout duration in seconds.
-    ///
-    /// # Returns
-    ///
-    /// A `DeployWatcher` instance.
-    #[wasm_bindgen(js_name = "watchDeploy")]
-    pub fn watch_deploy_js_alias(
-        &self,
-        events_url: &str,
-        timeout_duration: Option<u32>,
-    ) -> DeployWatcher {
-        self.watch_deploy(events_url, timeout_duration.map(Into::into))
-    }
-
     /// Waits for a deploy event to be processed asynchronously.
     ///
     /// # Arguments
@@ -65,7 +45,6 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing either the processed `EventParseResult` or an error message.
-    #[cfg(not(target_arch = "wasm32"))]
     pub async fn wait_deploy(
         &self,
         events_url: &str,
@@ -78,6 +57,58 @@ impl SDK {
             timeout_duration,
         )
         .await
+    }
+
+    /// Internal function to wait for a deploy event.
+    ///
+    /// # Arguments
+    ///
+    /// * `events_url` - The URL to monitor for deploy events.
+    /// * `deploy_hash` - The deploy hash to wait for.
+    /// * `timeout_duration` - An optional timeout duration in milliseconds.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either the processed `EventParseResult` or an error message.
+    async fn wait_deploy_internal(
+        events_url: String,
+        deploy_hash: String,
+        timeout_duration: Option<u64>,
+    ) -> Result<EventParseResult, String> {
+        let watcher = DeployWatcher::new(events_url, timeout_duration);
+        let result = watcher.start_internal(Some(deploy_hash)).await;
+        match result {
+            Some(event_parse_results) => {
+                if let Some(event_parse_result) = event_parse_results.first() {
+                    return Ok(event_parse_result.clone());
+                }
+                Err("No first event result".to_string())
+            }
+            None => Err("No event result found".to_string()),
+        }
+    }
+}
+
+#[wasm_bindgen]
+impl SDK {
+    /// Creates a new DeployWatcher instance to watch deploys (JavaScript-friendly).
+    ///
+    /// # Arguments
+    ///
+    /// * `events_url` - The URL to monitor for deploy events.
+    /// * `timeout_duration` - An optional timeout duration in seconds.
+    ///
+    /// # Returns
+    ///
+    /// A `DeployWatcher` instance.
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "watchDeploy")]
+    pub fn watch_deploy_js_alias(
+        &self,
+        events_url: &str,
+        timeout_duration: Option<u32>,
+    ) -> DeployWatcher {
+        self.watch_deploy(events_url, timeout_duration.map(Into::into))
     }
 
     /// Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
@@ -116,35 +147,6 @@ impl SDK {
         };
 
         future_to_promise(future)
-    }
-
-    /// Internal function to wait for a deploy event.
-    ///
-    /// # Arguments
-    ///
-    /// * `events_url` - The URL to monitor for deploy events.
-    /// * `deploy_hash` - The deploy hash to wait for.
-    /// * `timeout_duration` - An optional timeout duration in milliseconds.
-    ///
-    /// # Returns
-    ///
-    /// A `Result` containing either the processed `EventParseResult` or an error message.
-    async fn wait_deploy_internal(
-        events_url: String,
-        deploy_hash: String,
-        timeout_duration: Option<u64>,
-    ) -> Result<EventParseResult, String> {
-        let watcher = DeployWatcher::new(events_url, timeout_duration);
-        let result = watcher.start_internal(Some(deploy_hash)).await;
-        match result {
-            Some(event_parse_results) => {
-                if let Some(event_parse_result) = event_parse_results.first() {
-                    return Ok(event_parse_result.clone());
-                }
-                Err("No first event result".to_string())
-            }
-            None => Err("No event result found".to_string()),
-        }
     }
 }
 

@@ -56,6 +56,7 @@ export class FormComponent implements AfterViewInit, OnDestroy {
 
   private setStateSubscription() {
     this.stateSubscription = this.stateService.getState().subscribe((state: State) => {
+      console.log(state);
       state.action && (this.action = state.action);
       this.changeDetectorRef.markForCheck();
     });
@@ -70,6 +71,7 @@ export class FormComponent implements AfterViewInit, OnDestroy {
 
   async onDeployFileSelected(deploy_json: string) {
     deploy_json = deploy_json && jsonPrettyPrint(new Deploy(deploy_json).toJson(), this.verbosity as Verbosity);
+    console.log(deploy_json);
     deploy_json && this.stateService.setState({
       deploy_json
     });
