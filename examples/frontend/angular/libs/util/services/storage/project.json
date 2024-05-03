@@ -1,0 +1,17 @@
+{
+  "name": "util-services-storage",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/util/services/storage/src",
+  "prefix": "lib",
+  "tags": ["storage"],
+  "projectType": "library",
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/util/services/storage/jest.config.ts"
+      }
+    }
+  }
+}

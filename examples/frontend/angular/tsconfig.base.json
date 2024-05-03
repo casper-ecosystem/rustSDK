@@ -20,7 +20,11 @@
       "@util/hightlight-webworker": [
         "libs/util/hihlight-webworker/src/index.ts"
       ],
-      "@util/wasm": ["libs/util/services/wasm/src/index.ts"]
+      "@util/result": ["libs/util/services/result/src/index.ts"],
+      "@util/state": ["libs/util/services/state/src/index.ts"],
+      "@util/ui": ["libs/ui/src/index.ts"],
+      "@util/wasm": ["libs/util/services/wasm/src/index.ts"],
+      "@util/storage": ["libs/util/services/storage/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -5,6 +5,7 @@ import { privateToPublicKey } from 'casper-sdk';
 import { CONFIG, EnvironmentConfig } from '@util/config';
 import { Subscription } from 'rxjs';
 import { ErrorService } from '@util/error';
+import { StorageService } from '@util/storage';
 
 @Component({
   selector: 'comp-private-key',
@@ -19,8 +20,6 @@ export class PrivateKeyComponent implements AfterViewInit, OnDestroy {
   @ViewChild('privateKeyElt') privateKeyElt!: ElementRef;
 
   private stateSubscription!: Subscription;
-
-
   private_key?: string;
   action!: string;
 
@@ -28,6 +27,7 @@ export class PrivateKeyComponent implements AfterViewInit, OnDestroy {
     @Inject(CONFIG) public readonly config: EnvironmentConfig,
     private readonly stateService: StateService,
     private readonly errorService: ErrorService,
+    private readonly storageService: StorageService,
     private readonly changeDetectorRef: ChangeDetectorRef
   ) {
   }
@@ -72,13 +72,18 @@ export class PrivateKeyComponent implements AfterViewInit, OnDestroy {
 
     } else {
       this.private_key = '';
-      this.privateKeyElt.nativeElement.value = '';
     }
 
     this.stateService.setState({
       public_key,
       private_key: this.private_key
     });
+
+    this.storageService.setState({
+      public_key,
+    });
+
+    this.privateKeyElt.nativeElement.value = '';
 
     this.changeDetectorRef.markForCheck();
   }

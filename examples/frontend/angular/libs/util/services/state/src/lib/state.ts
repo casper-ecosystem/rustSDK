@@ -1,6 +1,7 @@
 import { Verbosity } from "casper-sdk";
 
 export type State = {
+  node_address?: string;
   chain_name?: string;
   account_hash?: string;
   main_purse?: string;

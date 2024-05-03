@@ -11,6 +11,7 @@ import { ClientService } from '@util/client';
 import { FormService } from '@util/form';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ErrorService } from '@util/error';
+import { StorageService } from '@util/storage';
 
 const imports = [
   CommonModule,
@@ -52,7 +53,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly resultService: ResultService,
     private readonly stateService: StateService,
     private readonly formService: FormService,
-    private readonly errorService: ErrorService
+    private readonly errorService: ErrorService,
+    private readonly storageService: StorageService,
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -71,7 +73,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async ngAfterViewInit() {
     const no_mark_for_check = true;
-    const action = this.config['default_action'].toString();
+    const action = this.storageService.get('action') || this.config['default_action'].toString();
     try {
       const get_node_status = await this.get_node_status();
       if (get_node_status) {
@@ -93,6 +95,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       action
     });
     await this.handleAction(action);
+    this.storageService.setState({
+      action
+    });
   }
 
   async submitAction(action: string) {

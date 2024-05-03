@@ -17,25 +17,35 @@ export const config: EnvironmentConfig = {
   action_needs_private_key,
   action_needs_public_key,
   networks: {
-    localhost: {
+    ntcl: {
       node_address: 'http://localhost:11101',
+      stream_address: 'http://localhost:18101/events/main',
+      chain_name: 'casper-net-1'
+    },
+    'node-launcher': {
+      node_address: 'http://localhost:7777',
+      stream_address: 'http://localhost:9999/events/main',
       chain_name: 'casper-net-1'
     },
     integration: {
       node_address: 'https://rpc.integration.casperlabs.io',
+      stream_address: 'https://events.integration.casperlabs.io/events/main',
       chain_name: 'integration-test'
     },
     testnet: {
       node_address: 'https://rpc.testnet.casperlabs.io',
+      stream_address: 'https://events.testnet.casperlabs.io/events/main',
       chain_name: 'casper-test'
     },
     mainnet: {
       node_address: 'https://rpc.mainnet.casperlabs.io',
+      stream_address: 'https://events.mainnet.casperlabs.io/events/main',
       chain_name: 'casper'
     },
-    ip: {
+    custom: {
       node_address: 'http://3.136.227.9:7777',
-      chain_name: 'integration-test'
+      stream_address: 'http://3.136.227.9:9999/events/main',
+      chain_name: 'casper-test'
     },
   },
   default_port: '7777',

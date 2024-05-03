@@ -4,6 +4,7 @@ import { State, StateService } from '@util/state';
 import { Subscription } from 'rxjs';
 import { ClientService } from '@util/client';
 import { CONFIG, EnvironmentConfig } from '@util/config';
+import { StorageService } from '@util/storage';
 
 @Component({
   selector: 'comp-public-key',
@@ -27,11 +28,19 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
     @Inject(CONFIG) public readonly config: EnvironmentConfig,
     private readonly stateService: StateService,
     private readonly clientService: ClientService,
+    private readonly storageService: StorageService,
     private readonly changeDetectorRef: ChangeDetectorRef,
   ) { }
 
   async ngAfterViewInit() {
     this.setStateSubscription();
+    this.public_key = this.storageService.get('public_key') || this.public_key;
+    if (this.public_key) {
+      await this.updateAccount();
+      this.stateService.setState({
+        public_key: this.public_key
+      });
+    }
   }
 
   ngOnDestroy() {
@@ -45,6 +54,8 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
         state.public_key && (this.public_key = state.public_key);
         state.private_key && (this.private_key = state.private_key);
         await this.updateAccount();
+      } else if (state.public_key) {
+        state.public_key && (this.public_key = state.public_key);
       }
       this.changeDetectorRef.markForCheck();
     });
@@ -52,13 +63,16 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
 
   async onPublicKeyChange() {
     const public_key: string = this.publicKeyElt && this.publicKeyElt.nativeElement.value.toString().trim();
-    if (public_key !== this.public_key) {
-      const private_key = '';
-      this.stateService.setState({
-        public_key,
-        private_key
-      });
-    }
+    this.public_key = '';
+    const private_key = '';
+    this.stateService.setState({
+      public_key,
+      private_key
+    });
+    this.storageService.setState({
+      public_key
+    });
+
   }
 
   isInvalid(): boolean {
@@ -76,6 +90,10 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
     const account_hash = get_account?.account?.account_hash;
     const main_purse = get_account?.account?.main_purse;
     this.stateService.setState({
+      account_hash,
+      main_purse
+    });
+    this.storageService.setState({
       account_hash,
       main_purse
     });

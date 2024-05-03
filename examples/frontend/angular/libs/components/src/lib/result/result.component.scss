@@ -5,6 +5,12 @@ code {
   max-width: 100%;
 }
 
+.card {
+  max-height: calc(95vh - 20px);
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
 :host ::ng-deep {
   .hljs-string {
     @media (max-width: 767px) {

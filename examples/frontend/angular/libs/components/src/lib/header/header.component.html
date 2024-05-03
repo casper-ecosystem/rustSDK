@@ -30,7 +30,7 @@
         <select
           id="selectNetworkElt"
           class="form-select form-control form-control-sm"
-          (change)="selectNetwork()"
+          (change)="selectNetwork($event)"
           #selectNetworkElt
           e2e-id="selectNetworkElt"
         >
@@ -54,6 +54,45 @@
             </option>
           </optgroup>
         </select>
+      </div>
+      <div
+        class="input-group mt-2 justify-content-between"
+        *ngIf="network.name === 'custom'"
+      >
+        <div class="col-7">
+          <label class="input-group-text" for="customNetworkElt">
+            <span class="d-none d-md-inline d-lg-none">Net.</span>
+            <span class="d-md-none d-lg-inline">Network</span>
+          </label>
+          <input
+            type="search"
+            class="form-control form-control-xs"
+            name="customNetwork"
+            [value]="node_address || ''"
+            (change)="onCustomNetworkChange($event)"
+            id="customNetworkElt"
+            #publicKeyElt
+            e2e-id="customNetworkElt"
+            [ngClass]="[isCustomNetworkInvalid() ? 'is-invalid' : '']"
+          />
+        </div>
+        <div class="col-4">
+          <label class="input-group-text" for="publicKeyElt">
+            <span class="d-none d-md-inline d-lg-none">Chai.</span>
+            <span class="d-md-none d-lg-inline">Chain</span>
+          </label>
+          <input
+            type="search"
+            class="form-control form-control-xs"
+            name="customChain"
+            [value]="chain_name || ''"
+            (change)="onCcustomChainChange($event)"
+            id="customChainElt"
+            #publicKeyElt
+            e2e-id="customChainElt"
+            [ngClass]="[iscustomChainInvalid() ? 'is-invalid' : '']"
+          />
+        </div>
       </div>
     </form>
   </div>
