@@ -11,8 +11,6 @@ use super::{
 };
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::insert_js_value_arg;
-#[cfg(target_arch = "wasm32")]
-use crate::helpers::insert_js_value_arg;
 use crate::{
     debug::error,
     helpers::{
@@ -21,9 +19,13 @@ use crate::{
     },
     make_deploy, make_transfer,
 };
-use casper_client::types::{Deploy as _Deploy, DeployBuilder, ExecutableDeployItem};
-use casper_client::types::{TimeDiff, Timestamp, MAX_SERIALIZED_SIZE_OF_DEPLOY};
-use casper_types::{bytesrepr::Bytes as _Bytes, AsymmetricType, RuntimeArgs, SecretKey, U512};
+use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
+use casper_types::{
+    bytesrepr::{self, Bytes as _Bytes},
+    transaction::Deploy as _Deploy,
+    DeployApprovalsHash, DeployBuilder, DeployFootprint, ExecutableDeployItem, Phase, RuntimeArgs,
+    SecretKey, TimeDiff, Timestamp, U512,
+};
 use chrono::{DateTime, Utc};
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;

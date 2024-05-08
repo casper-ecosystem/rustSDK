@@ -6,15 +6,13 @@ use blake2::{
     digest::{Update, VariableOutput},
     VarBlake2b,
 };
-use casper_client::{
-    cli::JsonArg,
-    types::{Deploy, TimeDiff, Timestamp},
-};
+use casper_client::cli::JsonArg;
 use casper_types::{
     account::{AccountHash as _AccountHash, FromStrError},
     bytesrepr::ToBytes,
-    cl_value_to_json as cl_value_to_json_from_casper_types, CLValue, ErrorExt, Key as _Key,
-    NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs, SecretKey,
+    cl_value_to_json as cl_value_to_json_from_casper_types, CLValue, DeployBuilder, ErrorExt,
+    Key as _Key, NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs, SecretKey, TimeDiff,
+    Timestamp,
 };
 use chrono::{DateTime, SecondsFormat, Utc};
 #[cfg(target_arch = "wasm32")]
