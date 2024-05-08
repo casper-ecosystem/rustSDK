@@ -78,14 +78,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       const get_node_status = await this.get_node_status();
       if (get_node_status) {
         await this.get_state_root_hash(no_mark_for_check);
-        this.stateService.setState({
-          action
-        });
       }
     } catch (error) {
       console.error(error);
       this.errorService.setError(error as string);
     }
+    this.stateService.setState({
+      action
+    });
     this.setStateSubscription();
   }
 
@@ -113,7 +113,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     const fn = (this as unknown as { [key: string]: () => Promise<void>; })[action];
     if (fn && typeof fn === 'function') {
       if (exec) {
-        await fn.bind(this)();
+        try {
+          await fn.bind(this)();
+        }
+        catch (error) {
+          this.errorService.setError(error as string);
+        }
       }
     } else {
       const error = `Method ${action} is not defined on the component.`;

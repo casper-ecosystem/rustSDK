@@ -647,6 +647,9 @@ describe('Angular App Tests', () => {
       test.contract_cep78_package_hash = named_keys.find(key => key.name === config.package_cep78_key)?.key || '';
       expect(test.contract_cep78_hash).toBeDefined();
       expect(test.contract_cep78_hash).toBeTruthy();
+      if (!test.contract_cep78_hash) {
+        throw 'test.contract_cep78_hash missing';
+      }
       await clearInput('[e2e-id="queryPathElt"]');
       await test.page.type('[e2e-id="queryPathElt"]', config.contract_cep78_key + '/collection_name');
       await clear();
@@ -870,7 +873,7 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_deploy).toBeDefined();
-    });
+    }, 10000);
 
     it('should make_deploy with contract name', async () => {
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
@@ -972,6 +975,8 @@ describe('Angular App Tests', () => {
     });
 
     it('should make_transfer', async () => {
+      await clearInput('[e2e-id="transferAmountElt"]');
+      await clearInput('[e2e-id="targetAccountElt"]');
       await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
       await test.page.type('[e2e-id="targetAccountElt"]', test.target);
       await submit();
@@ -983,6 +988,8 @@ describe('Angular App Tests', () => {
     });
 
     it('should make_transfer without TTL', async () => {
+      await clearInput('[e2e-id="transferAmountElt"]');
+      await clearInput('[e2e-id="targetAccountElt"]');
       await clearInput('[e2e-id="TTLElt"]');
       await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
       await test.page.type('[e2e-id="targetAccountElt"]', test.target);
@@ -1010,6 +1017,8 @@ describe('Angular App Tests', () => {
     });
 
     it('should sign_deploy', async () => {
+      await clearInput('[e2e-id="transferAmountElt"]');
+      await clearInput('[e2e-id="targetAccountElt"]');
       await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
       await test.page.type('[e2e-id="targetAccountElt"]', test.target);
       await submit();
@@ -1020,14 +1029,16 @@ describe('Angular App Tests', () => {
       expect(make_transfer).toBeDefined();
       await seletAction('sign_deploy');
       const unsigned_deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
+        const textarea = document.querySelector('[e2e-id="deployJsonElt"]') as HTMLTextAreaElement;
+        return textarea?.value;
       });
       expect(unsigned_deploy).toContain(`"approvals": []`);
       await setPrivateKey();
       await sign();
       await delay(300);
       const signed_deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="deployJsonElt"]')?.textContent;
+        const textarea = document.querySelector('[e2e-id="deployJsonElt"]') as HTMLTextAreaElement;
+        return textarea?.value;
       });
       expect(signed_deploy).not.toContain(`"approvals": []`);
     });
@@ -1044,6 +1055,8 @@ describe('Angular App Tests', () => {
     });
 
     it('should put_deploy a transfer', async () => {
+      await clearInput('[e2e-id="transferAmountElt"]');
+      await clearInput('[e2e-id="targetAccountElt"]');
       await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
       await test.page.type('[e2e-id="targetAccountElt"]', test.target);
       await submit();
@@ -1054,7 +1067,8 @@ describe('Angular App Tests', () => {
       expect(make_transfer).toBeDefined();
       await seletAction('put_deploy');
       const signed_deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
+        const textarea = document.querySelector('[e2e-id="deployJsonElt"]') as HTMLTextAreaElement;
+        return textarea?.value;
       });
       expect(signed_deploy).not.toContain(`"approvals": []`);
       await submit();

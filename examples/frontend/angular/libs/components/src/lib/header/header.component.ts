@@ -23,7 +23,7 @@ export class HeaderComponent implements AfterViewInit {
   chain_name = this.env['chain_name'].toString();
   node_address = this.env['node_address'].toString();
   network: Network = {
-    name: 'default',
+    name: this.config['default_network'].toString(),
     node_address: this.env['node_address'].toString(),
     chain_name: this.env['chain_name'].toString()
   };
@@ -48,10 +48,10 @@ export class HeaderComponent implements AfterViewInit {
     }));
 
     if (!(this.env['production'] as unknown as boolean)) {
-      const network = this.networks.find(x => x.name == 'custom');
+      const network = this.networks.find(x => x.name == this.config['default_network'].toString());
       if (network) {
-        network.chain_name = this.storageService.get('chain_name') || this.chain_name;
-        network.node_address = this.storageService.get('node_address') || this.node_address;
+        network.chain_name = this.chain_name;
+        network.node_address = this.node_address;
       }
     }
 

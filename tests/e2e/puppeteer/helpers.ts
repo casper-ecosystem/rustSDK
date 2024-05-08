@@ -75,6 +75,7 @@ export async function seletAction(action: string) {
     return (document.querySelector('[e2e-id="selectActionElt"]') as HTMLSelectElement).value;
   });
   expect(action_selected).toBe(action);
+  await delay(100);
 }
 
 export async function setPrivateKey() {
@@ -195,7 +196,7 @@ function readPEMFile(key_path?: string, copy?: boolean): string {
     return data;
   } catch (error) {
     console.error('Error:', error);
-    return "";
+    throw error;
   }
 }
 

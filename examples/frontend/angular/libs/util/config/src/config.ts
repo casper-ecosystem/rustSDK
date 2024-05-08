@@ -17,14 +17,14 @@ export const config: EnvironmentConfig = {
   action_needs_private_key,
   action_needs_public_key,
   networks: {
-    ntcl: {
-      node_address: 'http://localhost:11101',
-      stream_address: 'http://localhost:18101/events/main',
-      chain_name: 'casper-net-1'
-    },
     'node-launcher': {
       node_address: 'http://localhost:7777',
       stream_address: 'http://localhost:9999/events/main',
+      chain_name: 'casper-net-1'
+    },
+    ntcl: {
+      node_address: 'http://localhost:11101',
+      stream_address: 'http://localhost:18101/events/main',
       chain_name: 'casper-net-1'
     },
     integration: {
@@ -50,4 +50,5 @@ export const config: EnvironmentConfig = {
   },
   default_port: '7777',
   default_protocol: 'http://',
+  default_network: 'custom',
 };
