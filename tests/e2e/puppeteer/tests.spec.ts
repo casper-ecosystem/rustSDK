@@ -299,8 +299,10 @@ describe('Angular App Tests', () => {
       await seletAction('get_block_transfers');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await delay(200);
     });
     afterEach(async () => {
+      await delay(200);
       await clear();
     });
 
