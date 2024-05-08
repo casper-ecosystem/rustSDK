@@ -36,11 +36,11 @@
         >
           <optgroup label="default">
             <option
-              [value]="network.name"
+              [value]="network?.name"
               [selected]="network.node_address === node_address"
               *ngFor="let network of networks; index as i"
             >
-              {{ network.name }} ({{ network.node_address }})
+              {{ network?.name }} ({{ network.node_address }})
             </option>
           </optgroup>
           <optgroup label="fetched" *ngIf="peers">
@@ -56,7 +56,7 @@
       </div>
       <div
         class="input-group mt-2 justify-content-between"
-        *ngIf="network.name === 'custom'"
+        *ngIf="network?.name === 'custom'"
       >
         <div class="col-7">
           <label class="input-group-text" for="customNetworkElt">

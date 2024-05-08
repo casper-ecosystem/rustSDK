@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, Input, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { CONFIG, ENV, EnvironmentConfig, Network } from '@util/config';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import { CONFIG, EnvironmentConfig, Network } from '@util/config';
 import { PeerEntry, SDK } from 'casper-sdk';
 import { SDK_TOKEN } from '@util/wasm';
 import { StateService } from '@util/state';
@@ -20,41 +20,29 @@ export class HeaderComponent implements AfterViewInit {
 
   @Input() peers!: PeerEntry[];
 
-  chain_name = this.env['chain_name'].toString();
-  node_address = this.env['node_address'].toString();
-  network: Network = {
-    name: this.config['default_network'].toString(),
-    node_address: this.env['node_address'].toString(),
-    chain_name: this.env['chain_name'].toString()
-  };
-
-  networks!: Network[];
+  networks: Network[] = this.config['networks'] as Network[];
+  network: Network = this.config['network'] as Network;
+  chain_name: string = this.network.chain_name;
+  node_address: string = this.network.node_address;
   customNetwork!: string;
+
+  private local_host = [this.config['default_protocol'], this.config['localhost'], ':', this.config['app_port']].join('');
+  private window!: (Window & typeof globalThis) | null;
+  private is_electron!: boolean;
 
   constructor(
     @Inject(SDK_TOKEN) private readonly sdk: SDK,
     @Inject(CONFIG) public readonly config: EnvironmentConfig,
-    @Inject(ENV) public readonly env: EnvironmentConfig,
+    @Inject(DOCUMENT) private document: Document,
     private readonly stateService: StateService,
     private readonly storageService: StorageService,
     private readonly changeDetectorRef: ChangeDetectorRef
   ) {
+    this.window = this.document.defaultView;
+    this.is_electron = this.isElectron();
   }
 
   async ngAfterViewInit() {
-    this.networks = Object.entries(this.config['networks']).map(([name, network]) => ({
-      name,
-      ...network,
-    }));
-
-    if (!(this.env['production'] as unknown as boolean)) {
-      const network = this.networks.find(x => x.name == this.config['default_network'].toString());
-      if (network) {
-        network.chain_name = this.chain_name;
-        network.node_address = this.node_address;
-      }
-    }
-
     if (this.storageService.get('chain_name') && this.storageService.get('node_address')) {
       this.chain_name = this.storageService.get('chain_name') || this.chain_name;
       this.node_address = this.storageService.get('node_address') || this.node_address;
@@ -65,8 +53,7 @@ export class HeaderComponent implements AfterViewInit {
       chain_name: this.chain_name,
       node_address: this.node_address,
     });
-
-    this.sdk.setNodeAddress(this.node_address);
+    this.setNodeAddress();
     this.changeDetectorRef.markForCheck();
   }
 
@@ -76,7 +63,7 @@ export class HeaderComponent implements AfterViewInit {
     this.network = network;
     this.chain_name = network.chain_name;
     this.node_address = network.node_address;
-    this.sdk.setNodeAddress(this.node_address);
+    this.setNodeAddress();
     this.stateService.setState({
       chain_name: network.chain_name
     });
@@ -127,5 +114,18 @@ export class HeaderComponent implements AfterViewInit {
 
   iscustomChainInvalid() {
     return false;
+  }
+
+  private isElectron(): boolean {
+    return typeof this.window !== 'undefined' && window.location?.origin?.startsWith('file://');
+  }
+
+  private setNodeAddress() {
+    if ((this.is_electron)) {
+      this.sdk.setNodeAddress(this.node_address);
+    } else {
+      const network = this.networks.find(x => x.node_address == this.node_address);
+      network && this.sdk.setNodeAddress([this.local_host, network?.name].join('/'));
+    }
   }
 }
