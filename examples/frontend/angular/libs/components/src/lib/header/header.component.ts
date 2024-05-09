@@ -26,7 +26,6 @@ export class HeaderComponent implements AfterViewInit {
   node_address: string = this.network.node_address;
   customNetwork!: string;
 
-  private local_host = [this.config['default_protocol'], this.config['localhost'], ':', this.config['app_port']].join('');
   private window!: (Window & typeof globalThis) | null;
   private is_electron!: boolean;
 
@@ -125,7 +124,7 @@ export class HeaderComponent implements AfterViewInit {
       this.sdk.setNodeAddress(this.node_address);
     } else {
       const network = this.networks.find(x => x.node_address == this.node_address);
-      network && this.sdk.setNodeAddress([this.local_host, network?.name].join('/'));
+      network && this.sdk.setNodeAddress([this.window?.location?.href, network?.name].join(''));
     }
   }
 }
