@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, Input, ViewChild } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
-import { CONFIG, EnvironmentConfig, Network } from '@util/config';
+import { CONFIG, ENV, EnvironmentConfig, Network } from '@util/config';
 import { PeerEntry, SDK } from 'casper-sdk';
 import { SDK_TOKEN } from '@util/wasm';
 import { StateService } from '@util/state';
@@ -28,10 +28,12 @@ export class HeaderComponent implements AfterViewInit {
 
   private window!: (Window & typeof globalThis) | null;
   private is_electron!: boolean;
+  private is_production: boolean = this.env['production'] as unknown as boolean;
 
   constructor(
     @Inject(SDK_TOKEN) private readonly sdk: SDK,
     @Inject(CONFIG) public readonly config: EnvironmentConfig,
+    @Inject(ENV) public readonly env: EnvironmentConfig,
     @Inject(DOCUMENT) private document: Document,
     private readonly stateService: StateService,
     private readonly storageService: StorageService,
@@ -124,7 +126,12 @@ export class HeaderComponent implements AfterViewInit {
       this.sdk.setNodeAddress(this.node_address);
     } else {
       const network = this.networks.find(x => x.node_address == this.node_address);
-      network && this.sdk.setNodeAddress([this.window?.location?.href, network?.name].join(''));
+      if (this.is_production && network && ['ntcl', 'node-launcher'].includes(network?.name)) {
+        this.sdk.setNodeAddress(this.node_address);
+      } else {
+        network && this.sdk.setNodeAddress([this.window?.location?.href, network?.name].join(''));
+      }
+
     }
   }
 }
