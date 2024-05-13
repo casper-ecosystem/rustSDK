@@ -1,0 +1,48 @@
+FROM --platform=linux/amd64 node:22.1.0-alpine3.19 as build
+
+ENV NODE_ENV "production"
+ARG BUILD_CONFIGURATION=production
+
+WORKDIR /app
+
+COPY ./examples/frontend/angular .
+COPY pkg pkg
+
+RUN rm package-lock.json
+# Until pkg is npm copy files and change path to root
+RUN sed -i 's|\"casper-sdk\": \"file:\(\.\.\/\)\+pkg\"|\"casper-sdk\": \"file:pkg\"|' package.json
+RUN sed -i 's/"input": "\(\.\.\/\)\+pkg"/\"input": "pkg"/g' project.json
+
+# optional
+# Build proxy from template
+RUN npm run build-proxy-conf
+# Proxy localhost to gateway
+RUN if [ "$BUILD_CONFIGURATION" = "docker" ]; then \
+  sed -i 's|http://localhost|http://172.17.0.1|g' proxy.conf.json; \
+  fi
+
+RUN npm install --verbose
+
+# Build for docker env and remove devDependencies
+RUN npm run build -- --configuration=$BUILD_CONFIGURATION --verbose \
+  && npm prune --production
+
+FROM --platform=linux/amd64 node:22.1.0-alpine3.19
+
+WORKDIR /app
+
+COPY --from=build --chown=node:node /app/dist/casper ./dist/
+COPY --from=build --chown=node:node /app/proxy.conf.json .
+
+# Install express and http-proxy-middleware packages
+RUN npm install express http-proxy-middleware
+
+# Copy the custom server script
+COPY ./docker/server-prod.js .
+
+EXPOSE 8080
+
+# Exposing another port needs server-prod.jsto get the exposed port
+# ENV PORT 8080
+
+CMD ["node", "server-prod.js"]

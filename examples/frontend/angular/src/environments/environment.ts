@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  default_network: 'dev'
+  default_network: 'dev',
+  localhost_to_gateway: true
 };
 
 /*

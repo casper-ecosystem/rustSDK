@@ -1,0 +1,13 @@
+services:
+  casper-webclient:
+    container_name: casper-webclient
+    image: casper-webclient:latest
+    build:
+      dockerfile: ./docker/Dockerfile.cicd
+      context: ../
+    ports:
+      - "8080:8080"
+
+# Build and run image with Dockerfile
+# docker build -t casper-webclient . --force-rm
+# docker container run -t -i --rm -h casper-webclient -p 4200:4200 casper-webclient

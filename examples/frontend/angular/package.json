@@ -4,10 +4,10 @@
   "license": "MIT",
   "scripts": {
     "build-proxy-conf": "node build-proxy-conf.js",
-    "start": "nx serve",
+    "start": "nx serve --host 0.0.0.0",
     "build": "nx build",
     "test": "nx test",
-    "serve": "nx serve --prod=true"
+    "serve": "nx serve --host 0.0.0.0 --prod=true"
   },
   "private": true,
   "dependencies": {

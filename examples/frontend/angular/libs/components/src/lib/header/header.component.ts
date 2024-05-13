@@ -29,6 +29,7 @@ export class HeaderComponent implements AfterViewInit {
   private window!: (Window & typeof globalThis) | null;
   private is_electron!: boolean;
   private is_production: boolean = this.env['production'] as unknown as boolean;
+  private localhost_to_gateway: boolean = this.env['localhost_to_gateway'] as unknown as boolean;
 
   constructor(
     @Inject(SDK_TOKEN) private readonly sdk: SDK,
@@ -126,7 +127,7 @@ export class HeaderComponent implements AfterViewInit {
       this.sdk.setNodeAddress(this.node_address);
     } else {
       const network = this.networks.find(x => x.node_address == this.node_address);
-      if (this.is_production && network && ['ntcl', 'node-launcher'].includes(network?.name)) {
+      if (this.is_production && !this.localhost_to_gateway && network && ['ntcl', 'node-launcher'].includes(network?.name)) {
         this.sdk.setNodeAddress(this.node_address);
       } else {
         network && this.sdk.setNodeAddress([this.window?.location?.href, network?.name].join(''));

@@ -63,3 +63,39 @@ check-lint: clippy
 	cargo fmt -- --check
 
 .PHONY: format lint check clippy
+
+DEV_DC = docker compose -f $(CURRENT_DIR)/docker/docker-compose.dev.yml
+
+CICD_DC = docker compose -f $(CURRENT_DIR)/docker/docker-compose.cicd.yml
+
+docker-build:
+	$(DEV_DC) build
+
+docker-up:
+	$(DEV_DC) up
+
+docker-start:
+	$(DEV_DC) up --build --remove-orphans -d
+
+docker-stop:
+	$(DEV_DC) stop
+
+docker-start-prod:
+	$(CICD_DC) build --build-arg BUILD_CONFIGURATION=docker
+	$(CICD_DC) up --remove-orphans -d
+
+docker-stop-prod:
+	$(CICD_DC) stop
+
+docker-deploy-prod:
+	rm webclient.tar
+	$(CICD_DC) build --build-arg BUILD_CONFIGURATION=production
+	docker save -o webclient.tar casper-webclient:latest
+	scp webclient.tar ubuntu@casper-box:/home/ubuntu/webclient/webclient.tar
+	ssh ubuntu@casper-box "sudo docker tag casper-webclient:latest casper-webclient:old"
+	ssh ubuntu@casper-box "sudo docker image rm -f casper-webclient:latest"
+	ssh ubuntu@casper-box "sudo docker load -i /home/ubuntu/webclient/webclient.tar"
+	ssh ubuntu@casper-box "sudo docker image rm -f casper-webclient:old"
+	ssh ubuntu@casper-box "sudo docker compose -f /home/ubuntu/webclient/docker-compose.yml up -d --force-recreate"
+
+.PHONY: docker-build docker-start docker-stop docker-start-prod docker-stop-prod
