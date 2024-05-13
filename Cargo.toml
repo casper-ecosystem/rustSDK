@@ -34,7 +34,7 @@ once_cell = { version = "1.18.0", default-features = false }
 chrono = "0.4.31"
 num-traits = "0.2"
 humantime = "2"
-thiserror = "=1.0.34"
+thiserror = "1"
 base16 = "0.2.1"
 base64 = { version = "0.21.2", default-features = false, features = ["alloc"] }
 hex = { version = "0.4.3", default-features = false }
