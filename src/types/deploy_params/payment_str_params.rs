@@ -16,7 +16,6 @@ pub struct PaymentStrParams {
     payment_path: OnceCell<String>,
     payment_args_simple: OnceCell<ArgsSimple>,
     payment_args_json: OnceCell<String>,
-    payment_args_complex: OnceCell<String>,
     payment_version: OnceCell<String>,
     payment_entry_point: OnceCell<String>,
 }
@@ -34,7 +33,6 @@ impl PaymentStrParams {
         payment_path: Option<String>,
         payment_args_simple: Option<Array>,
         payment_args_json: Option<String>,
-        payment_args_complex: Option<String>,
         payment_version: Option<String>,
         payment_entry_point: Option<String>,
     ) -> Self {
@@ -62,9 +60,6 @@ impl PaymentStrParams {
         };
         if let Some(payment_args_json) = payment_args_json {
             payment_params.set_payment_args_json(&payment_args_json);
-        };
-        if let Some(payment_args_complex) = payment_args_complex {
-            payment_params.set_payment_args_complex(&payment_args_complex);
         };
         if let Some(payment_version) = payment_version {
             payment_params.set_payment_version(&payment_version);
@@ -166,18 +161,6 @@ impl PaymentStrParams {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn payment_args_complex(&self) -> Option<String> {
-        self.payment_args_complex.get().cloned()
-    }
-
-    #[wasm_bindgen(setter)]
-    pub fn set_payment_args_complex(&self, payment_args_complex: &str) {
-        self.payment_args_complex
-            .set(payment_args_complex.to_string())
-            .unwrap();
-    }
-
-    #[wasm_bindgen(getter)]
     pub fn payment_version(&self) -> Option<String> {
         self.payment_version.get().cloned()
     }
@@ -220,7 +203,6 @@ pub fn payment_str_params_to_casper_client(
             get_str_or_default(payment_params.payment_entry_point.get()),
             payment_args_simple,
             get_str_or_default(payment_params.payment_args_json.get()),
-            get_str_or_default(payment_params.payment_args_complex.get()),
         );
     }
 
@@ -229,7 +211,6 @@ pub fn payment_str_params_to_casper_client(
             payment_path.as_str(),
             payment_args_simple,
             get_str_or_default(payment_params.payment_args_json.get()),
-            get_str_or_default(payment_params.payment_args_complex.get()),
         );
     }
 
@@ -239,7 +220,6 @@ pub fn payment_str_params_to_casper_client(
             get_str_or_default(payment_params.payment_entry_point.get()),
             payment_args_simple,
             get_str_or_default(payment_params.payment_args_json.get()),
-            get_str_or_default(payment_params.payment_args_complex.get()),
         );
     }
 
@@ -250,7 +230,6 @@ pub fn payment_str_params_to_casper_client(
             get_str_or_default(payment_params.payment_entry_point.get()),
             payment_args_simple,
             get_str_or_default(payment_params.payment_args_json.get()),
-            get_str_or_default(payment_params.payment_args_complex.get()),
         );
     }
 
@@ -261,7 +240,6 @@ pub fn payment_str_params_to_casper_client(
             get_str_or_default(payment_params.payment_entry_point.get()),
             payment_args_simple,
             get_str_or_default(payment_params.payment_args_json.get()),
-            get_str_or_default(payment_params.payment_args_complex.get()),
         );
     }
 
@@ -272,7 +250,6 @@ pub fn payment_str_params_to_casper_client(
             get_str_or_default(payment_params.payment_entry_point.get()),
             payment_args_simple,
             get_str_or_default(payment_params.payment_args_json.get()),
-            get_str_or_default(payment_params.payment_args_complex.get()),
         );
     }
 

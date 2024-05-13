@@ -16,7 +16,6 @@ pub struct SessionStrParams {
     session_bytes: OnceCell<Bytes>,
     session_args_simple: OnceCell<ArgsSimple>,
     session_args_json: OnceCell<String>,
-    session_args_complex: OnceCell<String>,
     session_version: OnceCell<String>,
     session_entry_point: OnceCell<String>,
     is_session_transfer: OnceCell<bool>,
@@ -35,7 +34,6 @@ impl SessionStrParams {
         session_bytes: Option<Bytes>,
         session_args_simple: Option<Array>,
         session_args_json: Option<String>,
-        session_args_complex: Option<String>,
         session_version: Option<String>,
         session_entry_point: Option<String>,
         is_session_transfer: Option<bool>,
@@ -64,9 +62,6 @@ impl SessionStrParams {
         };
         if let Some(session_args_json) = session_args_json {
             session_params.set_session_args_json(&session_args_json);
-        };
-        if let Some(session_args_complex) = session_args_complex {
-            session_params.set_session_args_complex(&session_args_complex);
         };
         if let Some(session_version) = session_version {
             session_params.set_session_version(&session_version);
@@ -179,19 +174,6 @@ impl SessionStrParams {
             .unwrap();
     }
 
-    // Getter and setter for session_args_complex field
-    #[wasm_bindgen(getter)]
-    pub fn session_args_complex(&self) -> Option<String> {
-        self.session_args_complex.get().cloned()
-    }
-
-    #[wasm_bindgen(setter)]
-    pub fn set_session_args_complex(&self, session_args_complex: &str) {
-        self.session_args_complex
-            .set(session_args_complex.to_string())
-            .unwrap();
-    }
-
     // Getter and setter for session_version field
     #[wasm_bindgen(getter)]
     pub fn session_version(&self) -> Option<String> {
@@ -253,7 +235,6 @@ pub fn session_str_params_to_casper_client(
             session_path,
             session_args_simple,
             get_str_or_default(session_params.session_args_json.get()),
-            get_str_or_default(session_params.session_args_complex.get()),
         );
     }
 
@@ -262,7 +243,6 @@ pub fn session_str_params_to_casper_client(
             (*session_bytes).clone().into(),
             session_args_simple,
             get_str_or_default(session_params.session_args_json.get()),
-            get_str_or_default(session_params.session_args_complex.get()),
         );
     }
 
@@ -272,7 +252,6 @@ pub fn session_str_params_to_casper_client(
             get_str_or_default(session_params.session_entry_point.get()),
             session_args_simple,
             get_str_or_default(session_params.session_args_json.get()),
-            get_str_or_default(session_params.session_args_complex.get()),
         );
     }
 
@@ -282,7 +261,6 @@ pub fn session_str_params_to_casper_client(
             get_str_or_default(session_params.session_entry_point.get()),
             session_args_simple,
             get_str_or_default(session_params.session_args_json.get()),
-            get_str_or_default(session_params.session_args_complex.get()),
         );
     }
 
@@ -293,7 +271,6 @@ pub fn session_str_params_to_casper_client(
             get_str_or_default(session_params.session_entry_point.get()),
             session_args_simple,
             get_str_or_default(session_params.session_args_json.get()),
-            get_str_or_default(session_params.session_args_complex.get()),
         );
     }
 
@@ -304,7 +281,6 @@ pub fn session_str_params_to_casper_client(
             get_str_or_default(session_params.session_entry_point.get()),
             session_args_simple,
             get_str_or_default(session_params.session_args_json.get()),
-            get_str_or_default(session_params.session_args_complex.get()),
         );
     }
 
@@ -312,7 +288,6 @@ pub fn session_str_params_to_casper_client(
     _SessionStrParams::with_transfer(
         session_args_simple,
         get_str_or_default(session_params.session_args_json.get()),
-        get_str_or_default(session_params.session_args_complex.get()),
     )
 }
 

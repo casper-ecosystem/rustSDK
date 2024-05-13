@@ -1,7 +1,14 @@
-use casper_client::{cli::CliError, cli::JsonArgsError, Error};
-use casper_types::{CLValueError, KeyFromStrError, UIntParseError, URefFromStrError};
+use casper_client::{
+    cli::JsonArgsError,
+    cli::{CliError, FromDecStrErr},
+    Error,
+};
+use casper_types::{
+    addressable_entity::FromStrError, CLValueError, DigestError, KeyFromStrError, UIntParseError,
+    URefFromStrError,
+};
 use humantime::{DurationError, TimestampError};
-use std::num::ParseIntError;
+use std::{num::ParseIntError, str::ParseBoolError};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -21,7 +28,7 @@ pub enum SdkError {
     #[error("Failed to parse {context} as an account hash: {error}")]
     FailedToParseAccountHash {
         context: &'static str,
-        error: casper_types::addressable_entity::FromStrError,
+        error: FromStrError,
     },
 
     #[error("Failed to parse '{context}' as a uref: {error}")]
@@ -55,10 +62,28 @@ pub enum SdkError {
     },
 
     #[error("Failed to parse '{context}' as a hash digest: {error:?}")]
-    FailedToParseDigest {
-        context: String,
-        error: casper_types::DigestError,
+    FailedToParseDigest { context: String, error: DigestError },
+
+    #[error("failed to parse {context} as an addressable entity hash: {error}")]
+    FailedToParseAddressableEntityHash {
+        context: &'static str,
+        error: FromStrError,
     },
+
+    #[error("failed to parse '{context}' as a bool: {error}")]
+    FailedToParseBool {
+        context: &'static str,
+        error: ParseBoolError,
+    },
+
+    #[error("failed to parse '{context}' as an integer: {error}")]
+    FailedToParseDec {
+        context: &'static str,
+        error: FromDecStrErr,
+    },
+
+    #[error("Failed to parse a package address")]
+    FailedToParsePackageAddr,
 
     #[error("Failed to parse state identifier")]
     FailedToParseStateIdentifier,
@@ -146,6 +171,16 @@ impl From<CliError> for SdkError {
             }
             CliError::JsonArgs(json_args_error) => SdkError::JsonArgs(json_args_error),
             CliError::Core(core_error) => SdkError::Core(core_error),
+            CliError::FailedToParseAddressableEntityHash { context, error } => {
+                SdkError::FailedToParseAddressableEntityHash { context, error }
+            }
+            CliError::FailedToParseBool { context, error } => {
+                SdkError::FailedToParseBool { context, error }
+            }
+            CliError::FailedToParseDec { context, error } => {
+                SdkError::FailedToParseDec { context, error }
+            }
+            CliError::FailedToParsePackageAddr => SdkError::FailedToParsePackageAddr,
         }
     }
 }

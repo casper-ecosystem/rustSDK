@@ -7,7 +7,7 @@ use crate::types::deploy_params::{
 };
 use crate::{debug::error, types::sdk_error::SdkError, SDK};
 use casper_client::{
-    cli::make_deploy, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
+    cli::deploy::make_deploy, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;

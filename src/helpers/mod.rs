@@ -8,8 +8,7 @@ use blake2::{
 };
 use casper_client::cli::JsonArg;
 use casper_types::{
-    account::{AccountHash as _AccountHash, FromStrError},
-    bytesrepr::ToBytes,
+    account::AccountHash as _AccountHash, addressable_entity::FromStrError, bytesrepr::ToBytes,
     cl_value_to_json as cl_value_to_json_from_casper_types, CLValue, DeployBuilder, ErrorExt,
     Key as _Key, NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs, SecretKey, TimeDiff,
     Timestamp,

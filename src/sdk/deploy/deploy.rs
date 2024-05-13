@@ -14,7 +14,7 @@ use crate::{
     SDK,
 };
 use casper_client::{
-    cli::make_deploy, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
+    cli::deploy::make_deploy, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;

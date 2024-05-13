@@ -13,7 +13,7 @@ use crate::{
     SDK,
 };
 use casper_client::{
-    cli::make_transfer, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
+    cli::deploy::make_transfer, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
 };
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]

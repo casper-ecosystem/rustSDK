@@ -16,7 +16,7 @@ use crate::{
     SDK,
 };
 use casper_client::{
-    cli::make_transfer, rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
+    cli::deploy::make_transfer, rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
     SuccessResponse,
 };
 use rand::Rng;

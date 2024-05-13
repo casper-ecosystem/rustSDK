@@ -90,9 +90,9 @@ impl Key {
         }
     }
 
-    #[wasm_bindgen(js_name = "fromSystemContractRegistry")]
+    #[wasm_bindgen(js_name = "fromSystemEntityRegistry")]
     pub fn from_system_contract_registry() -> Key {
-        Key(_Key::SystemContractRegistry)
+        Key(_Key::SystemEntityRegistry)
     }
 
     #[wasm_bindgen(js_name = "fromEraSummary")]

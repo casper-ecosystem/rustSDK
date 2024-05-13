@@ -11,7 +11,7 @@ use crate::{
     },
     SDK,
 };
-use casper_client::cli::make_transfer as client_make_transfer;
+use casper_client::cli::deploy::make_transfer as client_make_transfer;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;

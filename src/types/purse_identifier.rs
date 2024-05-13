@@ -45,6 +45,7 @@ impl fmt::Display for PurseIdentifier {
             }
             _PurseIdentifier::MainPurseUnderAccountHash(hash) => write!(f, "{}", hash),
             _PurseIdentifier::PurseUref(uref) => write!(f, "{}", uref),
+            _PurseIdentifier::MainPurseUnderEntityAddr(entity_addr) => write!(f, "{}", entity_addr),
         }
     }
 }

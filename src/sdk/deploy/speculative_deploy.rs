@@ -17,7 +17,7 @@ use crate::{
     SDK,
 };
 use casper_client::{
-    cli::make_deploy, rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
+    cli::deploy::make_deploy, rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
     SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]

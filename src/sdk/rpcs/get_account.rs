@@ -8,7 +8,7 @@ use crate::{
     },
     SDK,
 };
-use casper_client::cli::parse_account_identifier;
+use casper_client::cli::parse::account_identifier as parse_account_identifier;
 use casper_client::{
     cli::get_account as get_account_cli, get_account as get_account_lib,
     rpcs::results::GetAccountResult as _GetAccountResult, JsonRpcId, SuccessResponse,

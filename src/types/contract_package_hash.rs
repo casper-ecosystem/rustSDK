@@ -1,6 +1,7 @@
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
-    ContractPackageHash as _ContractPackageHash,
+    contracts::ContractPackageHash as _ContractPackageHash,
+    PackageHash,
 };
 use wasm_bindgen::prelude::*;
 
@@ -61,6 +62,21 @@ impl FromBytes for ContractPackageHash {
     fn from_bytes(bytes: &[u8]) -> Result<(Self, &[u8]), bytesrepr::Error> {
         let (contract_package_hash, remainder) = _ContractPackageHash::from_bytes(bytes)?;
         Ok((ContractPackageHash(contract_package_hash), remainder))
+    }
+}
+
+impl From<ContractPackageHash> for PackageHash {
+    fn from(contract_package_hash: ContractPackageHash) -> Self {
+        PackageHash::new(contract_package_hash.0.value())
+    }
+}
+
+impl From<PackageHash> for ContractPackageHash {
+    fn from(addressable_entity_hash: PackageHash) -> Self {
+        let bytes = addressable_entity_hash
+            .to_bytes()
+            .expect("Failed to convert PackageHash to bytes");
+        ContractPackageHash::from_bytes(bytes)
     }
 }
 

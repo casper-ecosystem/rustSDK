@@ -8,7 +8,7 @@ use crate::{
     types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
-use casper_client::cli::parse_purse_identifier;
+use casper_client::cli::parse::purse_identifier as parse_purse_identifier;
 use casper_client::{
     cli::query_balance as query_balance_cli, query_balance as query_balance_lib,
     rpcs::results::QueryBalanceResult as _QueryBalanceResult, JsonRpcId, SuccessResponse,
