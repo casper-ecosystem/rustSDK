@@ -1122,7 +1122,7 @@ pub const ARGS_JSON: &str = r#"[
 {"name": "metadata_mutability", "type": "U8", "value": 0},
 {"name": "events_mode", "type": "U8", "value": 1}
 ]"#;
-pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "300000000000";
+pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
 pub const CEP78_CONTRACT: &str = "cep78.wasm";
 pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 
@@ -1215,7 +1215,7 @@ session_params.session_args_json = JSON.stringify([
   {"name": "metadata_mutability", "type": "U8", "value": 0},
   {"name": "events_mode", "type": "U8", "value": 1}
 ]);
-const payment_amount = '300000000000';
+const payment_amount = '500000000000';
 
 const buffer = await loadFile();
 const wasm = buffer && new Uint8Array(buffer);
@@ -1444,6 +1444,13 @@ make integration-test
 [configured in config](tests/integration/rust/src/config.rs)
 
 - [Jest/Puppeteer E2E tests](tests/e2e/) can be run with
+
+```shell
+cd tests/e2e/puppeteer
+npm install
+```
+
+then
 
 ```shell
 make e2e-test
