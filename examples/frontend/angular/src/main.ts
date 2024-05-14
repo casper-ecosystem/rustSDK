@@ -7,6 +7,7 @@ import { config, CONFIG, ENV, Network } from '@util/config';
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { Verbosity } from 'casper-sdk';
+import { ResultModule } from '@util/result';
 
 let networks: Network[] = Object.entries(config['networks']).map(([name, network]) => ({
   name,
@@ -30,6 +31,7 @@ const providers: Array<Provider | EnvironmentProviders> = [
   importProvidersFrom([
     HttpClientModule,
     WasmModule,
+    ResultModule
   ]),
 ];
 

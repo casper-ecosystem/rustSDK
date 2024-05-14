@@ -1,0 +1,47 @@
+<div class="input-group">
+  <label class="input-group-text" for="selectActionElt">Action</label>
+  <select
+    id="selectActionElt"
+    class="form-select form-control form-control-sm"
+    (change)="selectAction($event)"
+    #selectActionElt
+    e2e-id="selectActionElt"
+  >
+    <option></option>
+    <optgroup label="rpc">
+      <option
+        [value]="sdk_method"
+        [selected]="action === sdk_method"
+        *ngFor="let sdk_method of sdk_rpc_methods; index as i"
+      >
+        {{ sdk_method }}
+      </option>
+    </optgroup>
+    <optgroup label="deploy utils">
+      <option
+        [value]="sdk_method"
+        [selected]="action === sdk_method"
+        *ngFor="let sdk_method of sdk_deploy_utils_methods; index as i"
+      >
+        {{ sdk_method }}
+      </option>
+    </optgroup>
+    <optgroup label="deploy">
+      <option
+        [value]="sdk_method"
+        [selected]="action === sdk_method"
+        *ngFor="let sdk_method of sdk_deploy_methods; index as i"
+      >
+        {{ sdk_method }}
+      </option>
+    </optgroup>
+    <optgroup label="contract">
+      <option
+        [value]="sdk_method"
+        *ngFor="let sdk_method of sdk_contract_methods; index as i"
+      >
+        {{ sdk_method }}
+      </option>
+    </optgroup>
+  </select>
+</div>

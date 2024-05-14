@@ -16,7 +16,10 @@
     "baseUrl": ".",
     "paths": {
       "@components": ["libs/components/src/index.ts"],
+      "@util/client": ["libs/util/services/client/src/index.ts"],
       "@util/config": ["libs/util/config/src/index.ts"],
+      "@util/error": ["libs/util/services/error/src/index.ts"],
+      "@util/form": ["libs/util/services/form/src/index.ts"],
       "@util/hightlight-webworker": [
         "libs/util/hihlight-webworker/src/index.ts"
       ],

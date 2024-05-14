@@ -1,0 +1,21 @@
+<input
+  class="visually-hidden"
+  name="private_key"
+  #privateKeyElt
+  type="file"
+  id="privateKeyElt"
+  (change)="onPemSelected($event)"
+  accept=".pem"
+  e2e-id="privateKeyElt"
+/>
+<button
+  class="btn"
+  [ngClass]="[isInvalid() ? 'btn-warning' : 'btn-secondary']"
+  (click)="onPrivateKeyClick()"
+  *ngIf="!private_key"
+>
+  Load Private Key
+</button>
+<button class="btn btn-light" (click)="onPrivateKeyClick()" *ngIf="private_key">
+  Private Key Loaded
+</button>

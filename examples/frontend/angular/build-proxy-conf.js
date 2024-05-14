@@ -1,6 +1,6 @@
 const fs = require('fs');
 const dotenv = require('dotenv');
-require('dotenv').config({ path: '../../../.env' });
+dotenv.config({ path: '../../../.env' });
 
 const templatePath = './proxy.conf.template.json';
 const outputPath = './proxy.conf.json';
