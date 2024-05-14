@@ -18,11 +18,12 @@
   "build": {
     "appId": "com.example.myapp",
     "productName": "Casper Webclient",
+    "compression": "maximum",
     "directories": {
       "output": "release"
     },
     "win": {
-      "target": "nsis",
+      "target": "portable",
       "icon": "favicon.png"
     },
     "linux": {
