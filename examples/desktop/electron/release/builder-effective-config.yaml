@@ -2,9 +2,10 @@ directories:
   output: release
   buildResources: build
 appId: com.example.myapp
-productName: Casper
+productName: Casper Webclient
+compression: maximum
 win:
-  target: nsis
+  target: portable
   icon: favicon.png
 linux:
   category: Network
@@ -19,8 +20,4 @@ files:
 extraFiles:
   - from: ./../../frontend/angular/dist/casper
     to: frontend/angular/dist/casper
-<<<<<<< HEAD
-electronVersion: 26.1.0
-=======
-electronVersion: 29.1.1
->>>>>>> e374407 (CI CD + tests + remove docs (#37))
+electronVersion: 30.0.4
