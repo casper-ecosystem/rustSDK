@@ -1,6 +1,6 @@
 {
   "name": "casper-webclient",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Casper Client Demo app",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "com.example.myapp",
-    "productName": "Casper",
+    "productName": "Casper Webclient",
     "directories": {
       "output": "release"
     },
