@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { SDK, PeerEntry, wallet_sign, Transaction } from "casper-sdk";
+import { SDK, PeerEntry } from "casper-sdk";
 import { ResultComponent, HeaderComponent, ErrorComponent, StatusComponent, ActionComponent, SubmitActionComponent, PublicKeyComponent, SecretKeyComponent, FormComponent } from '@components';
 import { Subscription } from 'rxjs';
 import { State, StateService } from '@util/state';
