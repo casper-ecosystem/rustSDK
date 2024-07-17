@@ -63,7 +63,7 @@ impl CasperWallet {
             return Err(JsError::new("Could not connect to the wallet"));
         }
 
-        let public_key = self.get_public_key_or_active(public_key).await?;
+        let public_key = self.get_public_or_active_key(public_key).await?;
 
         let deploy_json = deploy
             .to_json_string()
@@ -161,7 +161,7 @@ impl CasperWallet {
             return Err(JsError::new("Could not connect to the wallet"));
         }
 
-        let public_key = self.get_public_key_or_active(public_key).await?;
+        let public_key = self.get_public_or_active_key(public_key).await?;
 
         let sign = JsFuture::from(
             self.provider
@@ -291,7 +291,7 @@ impl CasperWallet {
         Ok(true)
     }
 
-    async fn get_public_key_or_active(
+    async fn get_public_or_active_key(
         &self,
         provided_public_key: Option<String>,
     ) -> Result<PublicKey, JsError> {
