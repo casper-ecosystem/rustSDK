@@ -38,5 +38,15 @@
     >Sign
   </comp-submit-action>
 
+  <button
+    *ngIf="['sign_deploy', 'sign_transaction'].includes(action)"
+    type="button"
+    class="btn"
+    [class]="'btn-warning mt-3 ms-3'"
+    (click)="walletSign($event, action)"
+    [attr.e2e]="'wallet_sign'"
+  >
+    Casper Wallet Sign
+  </button>
   <comp-result></comp-result>
 </main>

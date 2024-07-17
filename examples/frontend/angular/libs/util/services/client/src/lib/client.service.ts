@@ -6,7 +6,7 @@ import { FormService } from '@util/form';
 import { ResultService } from '@util/result';
 import { State, StateService } from '@util/state';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockHash, BlockIdentifier, Bytes, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash, TransactionCategory, PricingMode } from 'casper-sdk';
+import { BlockHash, BlockIdentifier, Bytes, CasperWallet, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash, TransactionCategory, PricingMode } from 'casper-sdk';
 
 @Injectable({
   providedIn: 'root'
@@ -905,6 +905,70 @@ export class ClientService {
     this.getIdentifier('transactionJson')?.setValue(this.transaction_json);
     this.updateTransactionJson(this.transaction_json);
   }
+
+  async wallet_sign_deploy() {
+    const deploy_to_sign: string = this.getIdentifier('deployJson')?.value?.trim();
+    if (!deploy_to_sign) {
+      const err = "deploy_to_sign is missing";
+      this.errorService.setError(err.toString());
+      return;
+    }
+
+    let deploy;
+    try {
+      deploy = new Deploy(JSON.parse(deploy_to_sign));
+
+    } catch (err) {
+      err && this.errorService.setError(err as string);
+      return;
+    }
+
+    try {
+      const wallet = new CasperWallet();
+      // Two ways to sign, either signDeploy or signMessage + add signature
+      deploy = await wallet.signDeploy(deploy, this.public_key);
+      // if (this.public_key) {
+      //   const signature = await wallet.signMessage(deploy.hash.toString(), this.public_key);
+      //   signature && (deploy = deploy.addSignature(this.public_key, signature));
+      // }
+    } catch (err) {
+      err && this.errorService.setError(err as string);
+      return;
+    }
+    this.deploy_json = jsonPrettyPrint(deploy.toJson(), this.verbosity as Verbosity);
+    this.getIdentifier('deployJson')?.setValue(this.deploy_json);
+    this.updateDeployJson(this.deploy_json);
+  }
+
+  async wallet_sign_transaction() {
+    const transaction_to_sign: string = this.getIdentifier('transactionJson')?.value?.trim();
+    if (!transaction_to_sign) {
+      const err = "transaction_to_sign is missing";
+      this.errorService.setError(err.toString());
+      return;
+    }
+
+    let transaction;
+    try {
+      transaction = new Transaction(JSON.parse(transaction_to_sign));
+
+    } catch (err) {
+      err && this.errorService.setError(err as string);
+      return;
+    }
+
+    try {
+      const wallet = new CasperWallet();
+      transaction = await wallet.signTransaction(transaction, this.public_key);
+    } catch (err) {
+      err && this.errorService.setError(err as string);
+      return;
+    }
+    this.transaction_json = jsonPrettyPrint(transaction.toJson(), this.verbosity as Verbosity);
+    this.getIdentifier('transactionJson')?.setValue(this.transaction_json);
+    this.updateTransactionJson(this.transaction_json);
+  }
+
 
   private updateDeployJson(deploy_json: string) {
     deploy_json && this.stateService.setState({

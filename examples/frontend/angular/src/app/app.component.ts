@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { SDK, PeerEntry } from "casper-sdk";
+import { SDK, PeerEntry, wallet_sign, Transaction } from "casper-sdk";
 import { ResultComponent, HeaderComponent, ErrorComponent, StatusComponent, ActionComponent, SubmitActionComponent, PublicKeyComponent, SecretKeyComponent, FormComponent } from '@components';
 import { Subscription } from 'rxjs';
 import { State, StateService } from '@util/state';
@@ -76,7 +76,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     const action = this.storageService.get('action') || this.config['default_action'].toString();
     try {
       if (action == this.config['default_action'].toString()) {
-        await this.get_node_status();
+        await this.handleAction(action, true);
       }
       await this.get_state_root_hash(no_mark_for_check);
 
@@ -109,6 +109,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  async walletSign(_$event: Event, action: string) {
+    console.log(action);
+    this.clientService.wallet_sign_deploy();
+  }
 
   private async handleAction(action: string, exec?: boolean) {
     const fn = (this as unknown as { [key: string]: () => Promise<void>; })[action];
