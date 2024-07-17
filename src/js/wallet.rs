@@ -35,7 +35,7 @@ impl CasperWallet {
     /// # Arguments
     ///
     /// * `deploy` - The deploy object to be signed.
-    /// * `public_key_str` - An optional public key string. If `None`, the active public key is used.
+    /// * `public_key` - An optional public key string. If `None`, the active public key is used.
     ///
     /// # Returns
     ///
@@ -55,7 +55,7 @@ impl CasperWallet {
     pub async fn sign_deploy(
         &self,
         deploy: Deploy,
-        public_key_str: Option<String>,
+        public_key: Option<String>,
     ) -> Result<Deploy, JsError> {
         let is_connected = self.request_connection().await.unwrap_or(false);
 
@@ -63,7 +63,7 @@ impl CasperWallet {
             return Err(JsError::new("Could not connect to the wallet"));
         }
 
-        let public_key = self.get_public_key_or_active(public_key_str).await?;
+        let public_key = self.get_public_key_or_active(public_key).await?;
 
         let deploy_json = deploy
             .to_json_string()
@@ -108,7 +108,7 @@ impl CasperWallet {
     /// # Arguments
     ///
     /// * `deploy_hash` - The deploy hash string to be signed.
-    /// * `public_key_str` - An optional public key string. If `None`, the active public key is used.
+    /// * `public_key` - An optional public key string. If `None`, the active public key is used.
     ///
     /// # Returns
     ///
@@ -122,9 +122,9 @@ impl CasperWallet {
     pub async fn sign_deploy_hash_js_alias(
         &self,
         deploy_hash: String,
-        public_key_str: Option<String>,
+        public_key: Option<String>,
     ) -> Result<String, JsError> {
-        self.sign_message(deploy_hash, public_key_str).await
+        self.sign_message(deploy_hash, public_key).await
     }
 
     /// Signs a message with the provided or active public key.
@@ -135,7 +135,7 @@ impl CasperWallet {
     /// # Arguments
     ///
     /// * `message` - The message string to be signed.
-    /// * `public_key_str` - An optional public key string. If `None`, the active public key is used.
+    /// * `public_key` - An optional public key string. If `None`, the active public key is used.
     ///
     /// # Returns
     ///
@@ -154,14 +154,14 @@ impl CasperWallet {
     pub async fn sign_message(
         &self,
         message: String,
-        public_key_str: Option<String>,
+        public_key: Option<String>,
     ) -> Result<String, JsError> {
         let is_connected = self.request_connection().await.unwrap_or(false);
         if !is_connected {
             return Err(JsError::new("Could not connect to the wallet"));
         }
 
-        let public_key = self.get_public_key_or_active(public_key_str).await?;
+        let public_key = self.get_public_key_or_active(public_key).await?;
 
         let sign = JsFuture::from(
             self.provider
@@ -295,9 +295,9 @@ impl CasperWallet {
         &self,
         provided_public_key: Option<String>,
     ) -> Result<PublicKey, JsError> {
-        let public_key_str = if let Some(public_key_str) = provided_public_key {
-            if !public_key_str.is_empty() {
-                public_key_str
+        let public_key = if let Some(public_key) = provided_public_key {
+            if !public_key.is_empty() {
+                public_key
             } else {
                 self.get_active_public_key().await?
             }
@@ -305,10 +305,10 @@ impl CasperWallet {
             self.get_active_public_key().await?
         };
 
-        PublicKey::new(&public_key_str).map_err(|err| {
+        PublicKey::new(&public_key).map_err(|err| {
             JsError::new(&format!(
                 "Failed to create Public key from {}: {:?}",
-                public_key_str, err
+                public_key, err
             ))
         })
     }
