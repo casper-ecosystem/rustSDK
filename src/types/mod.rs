@@ -30,3 +30,4 @@ pub mod transaction_hash;
 pub mod transaction_params;
 pub mod uref;
 pub mod verbosity;
+pub mod wallet;
