@@ -75,10 +75,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     const no_mark_for_check = true;
     const action = this.storageService.get('action') || this.config['default_action'].toString();
     try {
-      const get_node_status = await this.get_node_status();
-      if (get_node_status) {
-        await this.get_state_root_hash(no_mark_for_check);
+      if (action == this.config['default_action'].toString()) {
+        await this.handleAction(action, true);
       }
+      await this.get_state_root_hash(no_mark_for_check);
     } catch (error) {
       console.error(error);
       this.errorService.setError(error as string);
@@ -108,6 +108,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  async walletSign() {
+    this.clientService.wallet_sign_deploy();
+  }
 
   private async handleAction(action: string, exec?: boolean) {
     const fn = (this as unknown as { [key: string]: () => Promise<void>; })[action];

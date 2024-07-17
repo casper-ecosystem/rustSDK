@@ -1,7 +1,7 @@
 use crate::types::{account_hash::AccountHash, purse_identifier::PurseIdentifier, uref::URef};
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
-    PublicKey as _PublicKey,
+    PublicKey as _PublicKey, ED25519_TAG, SECP256K1_TAG, SYSTEM_TAG,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -39,6 +39,15 @@ impl PublicKey {
         };
 
         Ok(PublicKey(public_key))
+    }
+
+    pub fn tag(&self) -> u8 {
+        match self.0.clone() {
+            _PublicKey::System => SYSTEM_TAG,
+            _PublicKey::Ed25519(_) => ED25519_TAG,
+            _PublicKey::Secp256k1(_) => SECP256K1_TAG,
+            _ => unimplemented!(),
+        }
     }
 }
 

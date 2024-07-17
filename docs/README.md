@@ -1429,6 +1429,26 @@ You can download an alpha version of the app illustrating the SDK here:
 
 - [TS helpers](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/modules.html#Functions)
 
+## Casper Wallet
+
+In Typescript the `window.CasperWalletProvider` is wrapped into `CasperWallet` Class.
+Two ways to sign a deploy, either signDeploy
+
+```ts
+deploy = await wallet.signDeploy(deploy, public_key); // public_key can be undefined for current active address in the wallet
+```
+
+or signDeployHash and adding signature to the deploy
+
+```ts
+const public_key = await wallet.getActivePublicKey();
+const signature = await wallet.signDeployHash(
+  deploy.hash.toString(),
+  public_key
+);
+signature && (deploy = deploy.addSignature(public_key, signature));
+```
+
 ## Testing
 
 Tests are run against NCTL by default. Alternately, you may configure another network in corresponding configuration. Tests assume a `secret_key.pem` will be located in the root `tests` directory, or one level higher at `../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/`. This path can be changed in the configuration or .env file.

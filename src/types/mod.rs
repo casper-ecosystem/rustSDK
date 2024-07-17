@@ -22,3 +22,4 @@ pub mod purse_identifier;
 pub mod sdk_error;
 pub mod uref;
 pub mod verbosity;
+pub mod wallet;

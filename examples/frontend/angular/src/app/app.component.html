@@ -28,6 +28,7 @@
       </div>
     </div>
   </div>
+  <comp-error></comp-error>
   <comp-form [form]="form" (wasm_selected)="onWasmSelected($event)"></comp-form>
   <comp-submit-action
     *ngIf="['sign_deploy'].includes(action)"
@@ -36,6 +37,15 @@
     [e2e]="'sign'"
     >Sign
   </comp-submit-action>
-  <comp-error></comp-error>
+  <button
+    *ngIf="['sign_deploy'].includes(action)"
+    type="button"
+    class="btn"
+    [class]="'btn-warning mt-3 ms-3'"
+    (click)="walletSign()"
+    [attr.e2e]="'wallet_sign'"
+  >
+    Casper Wallet Sign
+  </button>
   <comp-result></comp-result>
 </main>
