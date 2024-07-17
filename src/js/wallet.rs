@@ -87,7 +87,7 @@ impl CasperWallet {
         if signature_response.is_cancelled() {
             return Err(JsError::new(&format!(
                 "Could not sign deploy for key {}",
-                public_key.to_string()
+                public_key
             )));
         }
 
@@ -178,7 +178,7 @@ impl CasperWallet {
         if signature_response.is_cancelled() {
             return Err(JsError::new(&format!(
                 "Could not sign deploy for key {}",
-                public_key.to_string()
+                public_key
             )));
         }
         let signature = format!(
