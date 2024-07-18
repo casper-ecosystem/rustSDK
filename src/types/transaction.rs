@@ -567,6 +567,10 @@ impl Transaction {
         serde_json::to_string(&self.0).map_err(SdkError::from)
     }
 
+    pub fn from_json_string(json_str: &str) -> Result<Deploy, SdkError> {
+        serde_json::from_str(json_str).map_err(Into::into)
+    }
+
     pub fn compute_approvals_hash(&self) -> Result<ApprovalsHash, bytesrepr::Error> {
         self.0.clone().compute_approvals_hash()
     }
