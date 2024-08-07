@@ -586,6 +586,10 @@ impl Deploy {
         serde_json::to_string(&self.0).map_err(SdkError::from)
     }
 
+    pub fn from_json_string(json_str: &str) -> Result<Deploy, SdkError> {
+        serde_json::from_str(json_str).map_err(Into::into)
+    }
+
     // pub fn footprint(&self) -> DeployFootprint {
     //     let deploy: _Deploy = self.0.clone();
     //     match deploy.footprint() {
