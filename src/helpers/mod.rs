@@ -134,6 +134,7 @@ pub fn make_dictionary_item_key<V: ToBytes>(key: Key, value: &V) -> String {
 /// # Arguments
 ///
 /// * `formatted_account_hash` - A hex-formatted string representing the account hash.
+///
 /// Example: "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
 ///
 /// # Returns
