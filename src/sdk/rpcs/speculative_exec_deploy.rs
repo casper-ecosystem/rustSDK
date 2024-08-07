@@ -1,10 +1,8 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_hash::BlockHash;
-#[cfg(target_arch = "wasm32")]
-use crate::types::block_identifier::BlockIdentifier;
 use crate::types::deploy::Deploy;
 use crate::{
-    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
+    types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
 use casper_client::{
@@ -51,7 +49,7 @@ impl SpeculativeExecResult {
     /// Get the block hash.
     #[wasm_bindgen(getter)]
     pub fn block_hash(&self) -> BlockHash {
-        self.0.block_hash.into()
+        self.0.execution_result.block_hash.into()
     }
 
     /// Get the execution result.
@@ -77,12 +75,6 @@ pub struct GetSpeculativeExecDeployOptions {
 
     /// The deploy to execute.
     pub deploy: Option<Deploy>,
-
-    /// The block identifier as a string.
-    pub maybe_block_id_as_string: Option<String>,
-
-    /// The block identifier.
-    pub maybe_block_identifier: Option<BlockIdentifier>,
 
     /// The node address.
     pub node_address: Option<String>,
@@ -125,8 +117,6 @@ impl SDK {
         let GetSpeculativeExecDeployOptions {
             deploy_as_string,
             deploy,
-            maybe_block_id_as_string,
-            maybe_block_identifier,
             verbosity,
             node_address,
         } = options.unwrap_or_default();
@@ -140,16 +130,8 @@ impl SDK {
             return Err(JsError::new(&err));
         };
 
-        let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
-            Some(BlockIdentifierInput::BlockIdentifier(
-                maybe_block_identifier,
-            ))
-        } else {
-            maybe_block_id_as_string.map(BlockIdentifierInput::String)
-        };
-
         let result = self
-            .speculative_exec_deploy(deploy, maybe_block_identifier, verbosity, node_address)
+            .speculative_exec_deploy(deploy, verbosity, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -167,7 +149,6 @@ impl SDK {
     /// # Arguments
     ///
     /// * `deploy` - The deploy to execute.
-    /// * `maybe_block_identifier` - The block identifier.
     /// * `verbosity` - The verbosity level for logging.
     /// * `node_address` - The address of the node to connect to.
     ///
@@ -179,24 +160,14 @@ impl SDK {
     pub async fn speculative_exec_deploy(
         &self,
         deploy: Deploy,
-        maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         //log("speculative_exec_deploy!");
 
-        let maybe_block_identifier =
-            if let Some(BlockIdentifierInput::BlockIdentifier(maybe_block_identifier)) =
-                maybe_block_identifier
-            {
-                Some(maybe_block_identifier)
-            } else {
-                None
-            };
         speculative_exec_deploy_lib(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             &self.get_node_address(node_address),
-            maybe_block_identifier.map(Into::into),
             self.get_verbosity(verbosity).into(),
             deploy.into(),
         )
@@ -211,11 +182,8 @@ mod tests {
     use super::*;
     use crate::{
         helpers::public_key_from_secret_key,
-        types::{
-            block_identifier::BlockIdentifier,
-            deploy_params::{
-                deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-            },
+        types::deploy_params::{
+            deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         },
     };
     use sdk_tests::{
@@ -251,7 +219,7 @@ mod tests {
         let error_message = "builder error";
 
         // Act
-        let result = sdk.speculative_exec_deploy(deploy, None, None, None).await;
+        let result = sdk.speculative_exec_deploy(deploy, None, None).await;
 
         // Assert
         assert!(result.is_err());
@@ -267,42 +235,9 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _) = get_network_constants();
         let deploy = get_deploy();
-        let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
-
         // Act
         let result = sdk
-            .speculative_exec_deploy(
-                deploy,
-                Some(block_identifier),
-                verbosity,
-                Some(default_speculative_address),
-            )
-            .await;
-
-        // Assert
-        assert!(result.is_ok());
-    }
-
-    #[tokio::test]
-    #[ignore]
-    async fn _test_speculative_exec_deploy_with_block_identifier() {
-        // Arrange
-        let sdk = SDK::new(None, None);
-        let verbosity = Some(Verbosity::High);
-        let (_, _, default_speculative_address, _) = get_network_constants();
-        let deploy = get_deploy();
-        let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
-
-        // Act
-        let result = sdk
-            .speculative_exec_deploy(
-                deploy,
-                Some(block_identifier),
-                verbosity,
-                Some(default_speculative_address),
-            )
+            .speculative_exec_deploy(deploy, verbosity, Some(default_speculative_address))
             .await;
 
         // Assert
@@ -317,7 +252,7 @@ mod tests {
         let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act
-        let result = sdk.speculative_exec_deploy(deploy, None, None, None).await;
+        let result = sdk.speculative_exec_deploy(deploy, None, None).await;
 
         // Assert
         assert!(result.is_err());

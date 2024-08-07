@@ -1,10 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::rpcs::speculative_exec::SpeculativeExecTxnResult;
-#[cfg(target_arch = "wasm32")]
-use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     types::{
-        block_identifier::BlockIdentifierInput,
         sdk_error::SdkError,
         transaction_params::{
             transaction_builder_params::{
@@ -34,8 +31,6 @@ impl SDK {
     ///
     /// * `builder_params` - Transaction Builder parameters.
     /// * `transaction_params` - Transactionment parameters for the transaction.
-    /// * `maybe_block_id_as_string` - An optional block ID as a string.
-    /// * `maybe_block_identifier` - Optional block identifier.
     /// * `verbosity` - Optional verbosity level.
     /// * `node_address` - Optional node address.
     ///
@@ -48,26 +43,11 @@ impl SDK {
         &self,
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
-        maybe_block_id_as_string: Option<String>,
-        maybe_block_identifier: Option<BlockIdentifier>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SpeculativeExecTxnResult, JsError> {
-        let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
-            Some(BlockIdentifierInput::BlockIdentifier(
-                maybe_block_identifier,
-            ))
-        } else {
-            maybe_block_id_as_string.map(BlockIdentifierInput::String)
-        };
         let result = self
-            .speculative_transaction(
-                builder_params,
-                transaction_params,
-                maybe_block_identifier,
-                verbosity,
-                node_address,
-            )
+            .speculative_transaction(builder_params, transaction_params, verbosity, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -86,7 +66,6 @@ impl SDK {
     ///
     /// * `builder_params` - Transaction Builder parameters.
     /// * `transaction_params` - Transactionment parameters for the transaction.
-    /// * `maybe_block_identifier` - Optional block identifier.
     /// * `verbosity` - Optional verbosity level.
     /// * `node_address` - Optional node address.
     ///
@@ -97,7 +76,6 @@ impl SDK {
         &self,
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
-        maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecTxnResult>, SdkError> {
@@ -112,14 +90,9 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.speculative_exec(
-            transaction.unwrap().into(),
-            maybe_block_identifier,
-            verbosity,
-            node_address,
-        )
-        .await
-        .map_err(SdkError::from)
+        self.speculative_exec(transaction.unwrap().into(), verbosity, node_address)
+            .await
+            .map_err(SdkError::from)
     }
 }
 
@@ -127,8 +100,7 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::{
-        helpers::public_key_from_secret_key,
-        types::{block_identifier::BlockIdentifier, transaction_category::TransactionCategory},
+        helpers::public_key_from_secret_key, types::transaction_category::TransactionCategory,
     };
     use once_cell::sync::Lazy;
     use sdk_tests::{
@@ -183,39 +155,6 @@ mod tests {
             .speculative_transaction(
                 get_builder_params().clone(),
                 transaction_params,
-                None,
-                verbosity,
-                Some(default_speculative_address),
-            )
-            .await;
-
-        // Assert
-        assert!(result.is_ok());
-    }
-
-    #[tokio::test]
-    #[ignore]
-    async fn _test_speculative_transaction_with_block_identifier() {
-        // Arrange
-        let sdk = SDK::new(None, None);
-        let verbosity = Some(Verbosity::High);
-        let (_, _, default_speculative_address, chain_name) = get_network_constants();
-        let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
-        let secret_key = get_user_secret_key(None).unwrap();
-
-        let mut transaction_params = TransactionStrParams::default();
-        transaction_params.set_secret_key(&secret_key);
-        transaction_params.set_chain_name(&chain_name);
-        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
-        transaction_params.set_session_args_simple(ARGS.to_vec());
-
-        // Act
-        let result = sdk
-            .speculative_transaction(
-                get_builder_params().clone(),
-                transaction_params,
-                Some(block_identifier),
                 verbosity,
                 Some(default_speculative_address),
             )
@@ -245,7 +184,6 @@ mod tests {
             .speculative_transaction(
                 get_builder_params().clone(),
                 transaction_params,
-                None,
                 verbosity,
                 Some(default_speculative_address),
             )
@@ -275,7 +213,6 @@ mod tests {
             .speculative_transaction(
                 get_builder_params().clone(),
                 transaction_params,
-                None,
                 verbosity,
                 Some(default_speculative_address),
             )

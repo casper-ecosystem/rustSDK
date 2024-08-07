@@ -658,12 +658,10 @@ const makeTransactionFields: InputContainer[][] = [
 ];
 
 const speculativeDeployFields: InputContainer[][] = [
-  ...getBlockFields,
   ...makeDeployFields
 ];
 
 const speculativeTransactionFields: InputContainer[][] = [
-  ...getBlockFields,
   ...makeTransactionFields
 ];
 
@@ -686,13 +684,11 @@ const callEntrypointFieldsDeploy: InputContainer[][] = [
 ];
 
 const speculativeExecDeployFields: InputContainer[][] = [
-  ...getBlockFields,
   [{ file_button: true }],
   [{ textarea: deployJson, required: true }],
 ];
 
 const speculativeExecFields: InputContainer[][] = [
-  ...getBlockFields,
   [{ file_button: true }],
   [{ textarea: transactionJson, required: true }],
 ];

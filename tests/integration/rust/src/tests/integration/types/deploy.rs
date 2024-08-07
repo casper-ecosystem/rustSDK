@@ -14,12 +14,13 @@ pub mod test_module_deploy {
         types::{
             contract_hash::ContractHash,
             contract_package_hash::ContractPackageHash,
+            deploy::Deploy,
             deploy_params::{
                 deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
                 session_str_params::SessionStrParams,
             },
+            public_key::PublicKey,
         },
-        types::{deploy::Deploy, public_key::PublicKey},
     };
     use std::thread;
 
@@ -651,12 +652,24 @@ pub mod test_module_deploy {
             signature.to_string()
         );
     }
+
+    pub async fn test_ryo() {
+        let json_str = r#"{"hash":"dfa2a0035ff9d218525586f40b961c81477fadee75845298405615a07787ee3d","header":{"account":"0203917a090d7d06e7f06071ef4f5f0ea95cb60d85ae0995ff640c1ee64d0aa3f644","timestamp":"2024-07-18T20:42:24.000Z","ttl":"30m","gas_price":1,"body_hash":"cb22f16338e81ade0b67c066c15698c2d27f9c13dbfbcd9db7111a37a28ce665","dependencies":[],"chain_name":"casper-net-1"},"payment":{"ModuleBytes":{"module_bytes":"","args":[["amount",{"cl_type":"U512","bytes":"0400e1f505","parsed":"100000000"}]]}},"session":{"Transfer":{"args":[["amount",{"cl_type":"U512","bytes":"0400f90295","parsed":"2500000000"}],["target",{"cl_type":"PublicKey","bytes":"013e49d6d001e63cd25729483b0346bca8716f53a060e34a02c9a376d9ed295cc9","parsed":"013e49d6d001e63cd25729483b0346bca8716f53a060e34a02c9a376d9ed295cc9"}],["id",{"cl_type":{"Option":"U64"},"bytes":"016341c2355d6cf3e7","parsed":16713821789691724000}]]}},"approvals":[{"signer":"0203917a090d7d06e7f06071ef4f5f0ea95cb60d85ae0995ff640c1ee64d0aa3f644","signature":"02da245d6c47319f9ae0ee6cb0e7dbd8dd9eed9cfc27424c9ab00f69a60d9afe98b96fcae51a1d5f2ccaad96d04416656720e10b25830f1092f5773503ef42df94"}]}"#;
+        let deploy = Deploy::from_json_string(json_str).unwrap();
+        let is_valid = deploy.is_valid();
+        dbg!(is_valid);
+    }
 }
 
 #[cfg(test)]
 mod tests_deploy {
     use super::test_module_deploy::*;
     use tokio::test;
+
+    #[test]
+    pub async fn test_ryo_test() {
+        test_ryo().await;
+    }
 
     #[test]
     pub async fn test_deploy_type_test() {

@@ -1,10 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::rpcs::speculative_exec_deploy::SpeculativeExecResult;
-#[cfg(target_arch = "wasm32")]
-use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     types::{
-        block_identifier::BlockIdentifierInput,
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
             payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
@@ -32,8 +29,6 @@ impl SDK {
     /// * `deploy_params` - Deployment parameters for the deploy.
     /// * `session_params` - Session parameters for the deploy.
     /// * `payment_params` - Payment parameters for the deploy.
-    /// * `maybe_block_id_as_string` - An optional block ID as a string.
-    /// * `maybe_block_identifier` - Optional block identifier.
     /// * `verbosity` - Optional verbosity level.
     /// * `node_address` - Optional node address.
     ///
@@ -48,24 +43,14 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-        maybe_block_id_as_string: Option<String>,
-        maybe_block_identifier: Option<BlockIdentifier>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SpeculativeExecResult, JsError> {
-        let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
-            Some(BlockIdentifierInput::BlockIdentifier(
-                maybe_block_identifier,
-            ))
-        } else {
-            maybe_block_id_as_string.map(BlockIdentifierInput::String)
-        };
         let result = self
             .speculative_deploy(
                 deploy_params,
                 session_params,
                 payment_params,
-                maybe_block_identifier,
                 verbosity,
                 node_address,
             )
@@ -88,7 +73,6 @@ impl SDK {
     /// * `deploy_params` - Deployment parameters for the deploy.
     /// * `session_params` - Session parameters for the deploy.
     /// * `payment_params` - Payment parameters for the deploy.
-    /// * `maybe_block_identifier` - Optional block identifier.
     /// * `verbosity` - Optional verbosity level.
     /// * `node_address` - Optional node address.
     ///
@@ -102,7 +86,6 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-        maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
@@ -119,14 +102,9 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.speculative_exec_deploy(
-            deploy.unwrap().into(),
-            maybe_block_identifier,
-            verbosity,
-            node_address,
-        )
-        .await
-        .map_err(SdkError::from)
+        self.speculative_exec_deploy(deploy.unwrap().into(), verbosity, node_address)
+            .await
+            .map_err(SdkError::from)
     }
 }
 
@@ -134,7 +112,7 @@ impl SDK {
 #[allow(deprecated)]
 mod tests {
     use super::*;
-    use crate::{helpers::public_key_from_secret_key, types::block_identifier::BlockIdentifier};
+    use crate::helpers::public_key_from_secret_key;
     use sdk_tests::{
         config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, WASM_PATH},
         tests::helpers::{get_network_constants, get_user_secret_key, read_wasm_file},
@@ -185,40 +163,6 @@ mod tests {
                 deploy_params,
                 get_session_params().clone(),
                 payment_params,
-                None,
-                verbosity,
-                Some(default_speculative_address),
-            )
-            .await;
-
-        // Assert
-        assert!(result.is_ok());
-    }
-
-    #[tokio::test]
-    #[ignore]
-    async fn _test_speculative_deploy_with_block_identifier() {
-        // Arrange
-        let sdk = SDK::new(None, None);
-        let verbosity = Some(Verbosity::High);
-        let (_, _, default_speculative_address, chain_name) = get_network_constants();
-        let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
-        let secret_key = get_user_secret_key(None).unwrap();
-        let account = public_key_from_secret_key(&secret_key).unwrap();
-
-        let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None, None);
-        let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(PAYMENT_AMOUNT);
-
-        // Act
-        let result = sdk
-            .speculative_deploy(
-                deploy_params,
-                get_session_params().clone(),
-                payment_params,
-                Some(block_identifier),
                 verbosity,
                 Some(default_speculative_address),
             )
@@ -245,7 +189,6 @@ mod tests {
                 deploy_params,
                 get_session_params().clone(),
                 payment_params,
-                None,
                 verbosity,
                 Some(default_speculative_address),
             )
@@ -274,7 +217,6 @@ mod tests {
                 deploy_params,
                 get_session_params().clone(),
                 payment_params,
-                None,
                 verbosity,
                 Some(default_speculative_address),
             )

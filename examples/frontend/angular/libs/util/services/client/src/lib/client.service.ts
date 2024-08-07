@@ -388,18 +388,10 @@ export class ClientService {
     try {
       let result;
       if (speculative) {
-        const maybe_block_options = {
-          maybe_block_id_as_string: undefined,
-          maybe_block_identifier: undefined,
-        };
-        this.getIdentifieBlock(maybe_block_options);
-        const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
         result = await this.sdk.speculative_deploy(
           deploy_params,
           session_params,
           payment_params,
-          maybe_block_id_as_string,
-          maybe_block_identifier
         );
       }
       else if (deploy_result) {
@@ -469,17 +461,9 @@ export class ClientService {
     try {
       let result;
       if (speculative) {
-        const maybe_block_options = {
-          maybe_block_id_as_string: undefined,
-          maybe_block_identifier: undefined,
-        };
-        this.getIdentifieBlock(maybe_block_options);
-        const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
         result = await this.sdk.speculative_transaction(
           builder_params,
           transaction_params,
-          maybe_block_id_as_string,
-          maybe_block_identifier
         );
       }
       else if (deploy_result) {
@@ -622,20 +606,12 @@ export class ClientService {
     try {
       let result;
       if (speculative) {
-        const maybe_block_options = {
-          maybe_block_id_as_string: undefined,
-          maybe_block_identifier: undefined,
-        };
-        this.getIdentifieBlock(maybe_block_options);
-        const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
         result = await this.sdk.speculative_transfer(
           transfer_amount,
           target_account,
           undefined, // transfer_id
           deploy_params,
           payment_params,
-          maybe_block_id_as_string,
-          maybe_block_identifier
         );
       }
       else if (deploy_result) {
@@ -704,20 +680,12 @@ export class ClientService {
     try {
       let result;
       if (speculative) {
-        const maybe_block_options = {
-          maybe_block_id_as_string: undefined,
-          maybe_block_identifier: undefined,
-        };
-        this.getIdentifieBlock(maybe_block_options);
-        const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
         result = await this.sdk.speculative_transfer_transaction(
           undefined,
           target_account,
           transfer_amount,
           transaction_params,
           undefined, // transfer_id
-          maybe_block_id_as_string,
-          maybe_block_identifier
         );
       }
       else if (deploy_result) {
@@ -812,7 +780,6 @@ export class ClientService {
     const speculative_exec_deploy_options = this.sdk.get_speculative_exec_deploy_options({
       deploy: signed_deploy.toJson()
     });
-    this.getIdentifieBlock(speculative_exec_deploy_options);
     const speculative_exec_deploy = await this.sdk.speculative_exec_deploy(speculative_exec_deploy_options);
     speculative_exec_deploy && this.resultService.setResult(speculative_exec_deploy.toJson());
     return speculative_exec_deploy;
@@ -829,7 +796,6 @@ export class ClientService {
     const speculative_exec_options = this.sdk.get_speculative_exec_options({
       transaction: signed_transaction.toJson()
     });
-    this.getIdentifieBlock(speculative_exec_options);
     const speculative_exec = await this.sdk.speculative_exec(speculative_exec_options);
     speculative_exec && this.resultService.setResult(speculative_exec.toJson());
     return speculative_exec;

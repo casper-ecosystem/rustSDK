@@ -1,10 +1,8 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_hash::BlockHash;
-#[cfg(target_arch = "wasm32")]
-use crate::types::block_identifier::BlockIdentifier;
 use crate::types::transaction::Transaction;
 use crate::{
-    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
+    types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
 use casper_client::{
@@ -51,7 +49,7 @@ impl SpeculativeExecTxnResult {
     /// Get the block hash.
     #[wasm_bindgen(getter)]
     pub fn block_hash(&self) -> BlockHash {
-        self.0.block_hash.into()
+        self.0.execution_result.block_hash.into()
     }
 
     /// Get the execution result.
@@ -77,12 +75,6 @@ pub struct GetSpeculativeExecTxnOptions {
 
     /// The transaction to execute.
     pub transaction: Option<Transaction>,
-
-    /// The block identifier as a string.
-    pub maybe_block_id_as_string: Option<String>,
-
-    /// The block identifier.
-    pub maybe_block_identifier: Option<BlockIdentifier>,
 
     /// The node address.
     pub node_address: Option<String>,
@@ -121,8 +113,6 @@ impl SDK {
         let GetSpeculativeExecTxnOptions {
             transaction_as_string,
             transaction,
-            maybe_block_id_as_string,
-            maybe_block_identifier,
             verbosity,
             node_address,
         } = options.unwrap_or_default();
@@ -136,16 +126,8 @@ impl SDK {
             return Err(JsError::new(&err));
         };
 
-        let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
-            Some(BlockIdentifierInput::BlockIdentifier(
-                maybe_block_identifier,
-            ))
-        } else {
-            maybe_block_id_as_string.map(BlockIdentifierInput::String)
-        };
-
         let result = self
-            .speculative_exec(transaction, maybe_block_identifier, verbosity, node_address)
+            .speculative_exec(transaction, verbosity, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -163,7 +145,6 @@ impl SDK {
     /// # Arguments
     ///
     /// * `transaction` - The transaction to execute.
-    /// * `maybe_block_identifier` - The block identifier.
     /// * `verbosity` - The verbosity level for logging.
     /// * `node_address` - The address of the node to connect to.
     ///
@@ -173,24 +154,14 @@ impl SDK {
     pub async fn speculative_exec(
         &self,
         transaction: Transaction,
-        maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecTxnResult>, SdkError> {
         //log("speculative_exec!");
 
-        let maybe_block_identifier =
-            if let Some(BlockIdentifierInput::BlockIdentifier(maybe_block_identifier)) =
-                maybe_block_identifier
-            {
-                Some(maybe_block_identifier)
-            } else {
-                None
-            };
         speculative_exec_lib(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             &self.get_node_address(node_address),
-            maybe_block_identifier.map(Into::into),
             self.get_verbosity(verbosity).into(),
             transaction.into(),
         )
@@ -204,10 +175,7 @@ mod tests {
     use super::*;
     use crate::{
         helpers::public_key_from_secret_key,
-        types::{
-            block_identifier::BlockIdentifier,
-            transaction_params::transaction_str_params::TransactionStrParams,
-        },
+        types::transaction_params::transaction_str_params::TransactionStrParams,
     };
     use sdk_tests::{
         config::TRANSFER_AMOUNT,
@@ -243,7 +211,7 @@ mod tests {
         let error_message = "builder error";
 
         // Act
-        let result = sdk.speculative_exec(transaction, None, None, None).await;
+        let result = sdk.speculative_exec(transaction, None, None).await;
 
         // Assert
         assert!(result.is_err());
@@ -259,46 +227,14 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _) = get_network_constants();
         let transaction = get_transaction();
-        let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
 
         // Act
         let result = sdk
-            .speculative_exec(
-                transaction,
-                Some(block_identifier),
-                verbosity,
-                Some(default_speculative_address),
-            )
+            .speculative_exec(transaction, verbosity, Some(default_speculative_address))
             .await;
 
         // Assert
         // dbg!(result);
-        assert!(result.is_ok());
-    }
-
-    #[tokio::test]
-    #[ignore]
-    async fn _test_speculative_exec_with_block_identifier() {
-        // Arrange
-        let sdk = SDK::new(None, None);
-        let verbosity = Some(Verbosity::High);
-        let (_, _, default_speculative_address, _) = get_network_constants();
-        let transaction = get_transaction();
-        let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
-
-        // Act
-        let result = sdk
-            .speculative_exec(
-                transaction,
-                Some(block_identifier),
-                verbosity,
-                Some(default_speculative_address),
-            )
-            .await;
-
-        // Assert
         assert!(result.is_ok());
     }
 
@@ -310,7 +246,7 @@ mod tests {
         let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act
-        let result = sdk.speculative_exec(transaction, None, None, None).await;
+        let result = sdk.speculative_exec(transaction, None, None).await;
 
         // Assert
         assert!(result.is_err());

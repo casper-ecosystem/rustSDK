@@ -106,14 +106,7 @@ pub mod test_module {
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let deploy = create_test_sdk(Some(config))
-            .speculative_deploy(
-                deploy_params,
-                session_params,
-                payment_params,
-                None,
-                None,
-                None,
-            )
+            .speculative_deploy(deploy_params, session_params, payment_params, None, None)
             .await;
         assert!(!deploy
             .as_ref()
@@ -152,7 +145,6 @@ pub mod test_module {
                 None,
                 deploy_params,
                 payment_params,
-                None,
                 None,
                 None,
             )

@@ -101,7 +101,6 @@ pub mod test_module {
                 builder_params,
                 transaction_params,
                 None,
-                None,
                 Some(config.speculative_address),
             )
             .await;
@@ -116,6 +115,7 @@ pub mod test_module {
             .as_ref()
             .unwrap()
             .result
+            .execution_result
             .block_hash
             .to_hex_string()
             .is_empty());
@@ -138,7 +138,6 @@ pub mod test_module {
                 transaction_params,
                 None,
                 None,
-                None,
                 Some(config.speculative_address),
             )
             .await;
@@ -153,6 +152,7 @@ pub mod test_module {
             .as_ref()
             .unwrap()
             .result
+            .execution_result
             .block_hash
             .to_hex_string()
             .is_empty());
