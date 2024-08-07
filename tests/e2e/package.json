@@ -17,7 +17,7 @@
     "ts-node": "^10.9.2"
   },
   "dependencies": {
-    "puppeteer": "^23.0.1",
+    "puppeteer": "22.15.0",
     "casper-rust-wasm-sdk": "file:../../pkg-nodejs",
     "dotenv": "^16.4.5"
   }
