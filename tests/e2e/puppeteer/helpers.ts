@@ -69,7 +69,7 @@ export async function getResult() {
 }
 
 export async function seletAction(action: string) {
-  await delay(350);
+  await delay(300);
   await variables.page.waitForSelector('[e2e-id="state_root_hash"]');
   await variables.page.waitForSelector('[e2e-id="selectActionElt"]');
   await variables.page.select('[e2e-id="selectActionElt"]', action);
