@@ -142,7 +142,7 @@ mod tests {
     async fn test_call_entrypoint_deploy_with_valid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _, chain_name) = get_network_constants();
+        let (node_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -179,7 +179,7 @@ mod tests {
     async fn test_call_entrypoint_deploy_with_invalid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _, chain_name) = get_network_constants();
+        let (node_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -226,7 +226,7 @@ mod tests {
     async fn test_call_entrypoint_deploy_without_secret_key() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _, chain_name) = get_network_constants();
+        let (node_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -271,7 +271,7 @@ mod tests {
     async fn test_call_entrypoint_deploy_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 

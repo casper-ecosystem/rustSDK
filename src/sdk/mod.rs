@@ -1,3 +1,4 @@
+pub mod binary_port;
 #[allow(hidden_glob_reexports)]
 pub(crate) mod deploy;
 pub mod rpcs;

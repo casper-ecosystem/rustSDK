@@ -265,7 +265,7 @@ mod tests {
 
     async fn get_main_purse() -> URef {
         let sdk = SDK::new(None, None);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -314,7 +314,7 @@ mod tests {
     async fn test_get_balance_with_purse_uref() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
         let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
 
         // Act
@@ -330,7 +330,7 @@ mod tests {
     async fn test_get_balance_with_purse_uref_as_string() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
         let purse_uref =
             GetBalanceInput::PurseUrefAsString(get_main_purse().await.to_formatted_string());
 
@@ -347,7 +347,7 @@ mod tests {
     async fn test_get_balance_with_state_root_hash() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
 
         let state_root_hash: Digest = sdk
             .get_state_root_hash(None, Some(Verbosity::High), Some(node_address.clone()))

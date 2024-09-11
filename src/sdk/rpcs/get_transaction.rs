@@ -236,7 +236,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let transaction_hash = TransactionHash::from_raw(&[1u8; 32]).unwrap();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -252,7 +252,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, chain_name) = get_network_constants();
+        let (node_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
@@ -292,7 +292,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, chain_name) = get_network_constants();
+        let (node_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();

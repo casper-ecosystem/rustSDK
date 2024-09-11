@@ -71,7 +71,7 @@ mod tests {
     async fn test_sign_transaction_with_valid_params() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
@@ -110,7 +110,7 @@ mod tests {
     async fn test_sign_transaction_with_invalid_signature() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();

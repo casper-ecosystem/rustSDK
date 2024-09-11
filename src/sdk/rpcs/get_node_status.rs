@@ -1,6 +1,15 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::{digest::Digest, public_key::PublicKey};
-use crate::{types::verbosity::Verbosity, SDK};
+use crate::{
+    debug::log,
+    types::{sdk_error::SdkError, verbosity::Verbosity},
+    SDK,
+};
+use casper_binary_port::{InformationRequestTag, NodeStatus};
+use casper_binary_port_access::{
+    communication::{parse_response, send_request},
+    utils::make_information_get_request,
+};
 use casper_client::{
     get_node_status, rpcs::results::GetNodeStatusResult as _GetNodeStatusResult, Error, JsonRpcId,
     SuccessResponse,
@@ -172,6 +181,18 @@ impl SDK {
     ) -> Result<GetNodeStatusResult, JsError> {
         self.get_node_status_js_alias(verbosity, node_address).await
     }
+
+    #[wasm_bindgen(js_name = "get_binary_node_status")]
+    pub async fn get_binary_node_status_js_alias(
+        &self,
+        node_address: Option<String>,
+    ) -> Result<JsValue, JsError> {
+        log(&format!("{:?}", node_address));
+        let result = self.get_binary_node_status(node_address).await;
+        result
+            .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
+            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+    }
 }
 
 impl SDK {
@@ -202,6 +223,43 @@ impl SDK {
         )
         .await
     }
+
+    pub async fn get_binary_node_status(
+        &self,
+        binary_port_address: Option<String>,
+    ) -> Result<NodeStatus, SdkError> {
+        let request = make_information_get_request(InformationRequestTag::NodeStatus, &[])
+            .map_err(|e| SdkError::CustomError {
+                context: "Failed to create information get request",
+                error: e.to_string(),
+            })?;
+
+        let response = send_request(&self.get_node_address(binary_port_address), request)
+            .await
+            .map_err(|e| SdkError::CustomError {
+                context: "Failed to send request",
+                error: e.to_string(),
+            })?;
+
+        if !response.response().is_success() {
+            let error_code = response.error_code();
+            return Err(SdkError::Response(format!(
+                "({}) {}",
+                error_code,
+                casper_binary_port::ErrorCode::try_from(error_code)
+                    .map_or("Unknown error code".to_string(), |code| code.to_string())
+            )));
+        }
+
+        let node_status = parse_response::<NodeStatus>(response.response()).map_err(|e| {
+            SdkError::CustomError {
+                context: "Failed to parse node status response",
+                error: e.to_string(),
+            }
+        })?;
+
+        node_status.ok_or_else(|| SdkError::Response("Unable to read last node status".to_string()))
+    }
 }
 
 #[cfg(test)]
@@ -229,7 +287,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk.get_node_status(verbosity, Some(node_address)).await;

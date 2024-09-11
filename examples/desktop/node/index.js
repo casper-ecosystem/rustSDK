@@ -110,6 +110,23 @@ var example3 = function () { return __awaiter(void 0, void 0, void 0, function (
         }
     });
 }); };
+var example31 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var get_binary_node_status, peers;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, sdk.get_binary_node_status("127.0.0.1:28101")];
+            case 1:
+                get_binary_node_status = _a.sent();
+                console.log(get_binary_node_status);
+                peers = get_binary_node_status.peers;
+                peers.forEach(function (peer) {
+                    console.log(peer);
+                });
+                return [2 /*return*/];
+        }
+    });
+}); };
+example31();
 // get_block
 var example4 = function () { return __awaiter(void 0, void 0, void 0, function () {
     var get_block, block, block_hash;

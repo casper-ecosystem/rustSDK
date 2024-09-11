@@ -61,6 +61,17 @@ const example3 = async () => {
   });
 };
 
+const example31 = async () => {
+  const get_binary_node_status = await sdk.get_binary_node_status("127.0.0.1:28101");
+  console.log(get_binary_node_status);
+  const peers = get_binary_node_status.peers;
+  peers.forEach((peer) => {
+    console.log(peer);
+  });
+};
+
+example31();
+
 // get_block
 const example4 = async () => {
   const get_block = await sdk.get_block();

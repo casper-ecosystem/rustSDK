@@ -134,7 +134,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
 
         let dictionary_item = get_dictionary_item(false).await;
 
@@ -166,7 +166,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
         let state_root_hash = "";
 
         // Act
@@ -187,7 +187,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
         let state_root_hash = "";
 
         // Act
@@ -209,7 +209,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
         let state_root_hash = "";
 
         // Act
@@ -231,7 +231,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
 
         let error_message =
             "Failed to parse dictionary item address as a key: unknown prefix for key";

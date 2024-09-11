@@ -292,7 +292,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let entity_identifier = get_entity_identifier();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -314,7 +314,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let entity_identifier_as_string = get_entity_identifier().to_string();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -339,7 +339,7 @@ mod tests {
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let entity_identifier = get_entity_identifier();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk

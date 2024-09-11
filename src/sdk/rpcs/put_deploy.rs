@@ -111,7 +111,7 @@ mod tests {
     fn get_deploy() -> Deploy {
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
         let deploy_params =
             DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None, None);
         let payment_params = PaymentStrParams::default();
@@ -148,7 +148,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
         let deploy = get_deploy();
 
         // Act

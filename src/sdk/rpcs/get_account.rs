@@ -304,7 +304,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let account_identifier = get_account_identifier();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -328,7 +328,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let account_identifier_as_string = get_account_identifier().to_string();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -355,7 +355,7 @@ mod tests {
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let account_identifier = get_account_identifier();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk

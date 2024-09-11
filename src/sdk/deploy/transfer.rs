@@ -140,7 +140,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, chain_name) = get_network_constants();
+        let (node_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
@@ -172,7 +172,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, chain_name) = get_network_constants();
+        let (node_address, _, _, _, chain_name) = get_network_constants();
 
         let error_message = "Invalid Deploy";
 
@@ -207,7 +207,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, chain_name) = get_network_constants();
+        let (node_address, _, _, _, chain_name) = get_network_constants();
 
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
         let secret_key = get_user_secret_key(None).unwrap();

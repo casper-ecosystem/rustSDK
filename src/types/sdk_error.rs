@@ -183,6 +183,10 @@ pub enum SdkError {
 
     #[error(transparent)]
     Core(#[from] CasperClientError),
+
+    /// Error when handling the response from the binary port.
+    #[error("Failed to handle response: {0}")]
+    Response(String),
 }
 
 impl From<CLValueError> for SdkError {

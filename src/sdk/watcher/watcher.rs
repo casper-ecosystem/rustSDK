@@ -910,7 +910,7 @@ mod tests {
     #[test]
     fn test_new() {
         // Arrange
-        let (_, events_url, _, _) = get_network_constants();
+        let (_, events_url, _, _, _) = get_network_constants();
         let timeout_duration = 5000;
 
         // Act
@@ -929,7 +929,7 @@ mod tests {
     #[test]
     fn test_new_default_timeout() {
         // Arrange
-        let (_, events_url, _, _) = get_network_constants();
+        let (_, events_url, _, _, _) = get_network_constants();
 
         // Act
         let watcher = Watcher::new(events_url.clone(), None);
@@ -960,7 +960,7 @@ mod tests {
     #[allow(deprecated)]
     async fn test_process_events_legacy() {
         // Arrange
-        let (_, events_url, _, _) = get_network_constants();
+        let (_, events_url, _, _, _) = get_network_constants();
         let watcher = Watcher::new(events_url, None);
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
 
@@ -985,7 +985,7 @@ mod tests {
     #[tokio::test]
     async fn test_process_events() {
         // Arrange
-        let (_, events_url, _, _) = get_network_constants();
+        let (_, events_url, _, _, _) = get_network_constants();
         let watcher = Watcher::new(events_url, None);
         let transaction_hash = "8c6823d9480eee9fe0cfb5ed1fbf77f928cc6af21121298c05b4e3d87a328271";
 
@@ -1010,7 +1010,7 @@ mod tests {
     #[tokio::test]
     async fn test_start_timeout() {
         // Arrange
-        let (_, events_url, _, _) = get_network_constants();
+        let (_, events_url, _, _, _) = get_network_constants();
         let watcher = Watcher::new(events_url, Some(1));
 
         // Act
@@ -1027,7 +1027,7 @@ mod tests {
     #[test]
     fn test_stop() {
         // Arrange
-        let (_, events_url, _, _) = get_network_constants();
+        let (_, events_url, _, _, _) = get_network_constants();
         let watcher = Watcher::new(events_url, None);
         assert!(*watcher.active.borrow());
 
@@ -1041,7 +1041,7 @@ mod tests {
     #[test]
     fn test_subscribe() {
         // Arrange
-        let (_, events_url, _, _) = get_network_constants();
+        let (_, events_url, _, _, _) = get_network_constants();
         let mut watcher = Watcher::new(events_url, None);
         let transaction_hash = "8c6823d9480eee9fe0cfb5ed1fbf77f928cc6af21121298c05b4e3d87a328271";
 
@@ -1071,7 +1071,7 @@ mod tests {
     #[test]
     fn test_unsubscribe() {
         // Arrange
-        let (_, events_url, _, _) = get_network_constants();
+        let (_, events_url, _, _, _) = get_network_constants();
         let mut watcher = Watcher::new(events_url, None);
         let transaction_hash = "8c6823d9480eee9fe0cfb5ed1fbf77f928cc6af21121298c05b4e3d87a328271";
 
@@ -1104,7 +1104,7 @@ mod tests {
     fn test_sdk_watch_deploy_retunrs_instance() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, events_url, _, _) = get_network_constants();
+        let (_, events_url, _, _, _) = get_network_constants();
         let timeout_duration = 5000;
 
         // Act
@@ -1124,7 +1124,7 @@ mod tests {
     fn test_sdk_watch_transaction_retunrs_instance() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, events_url, _, _) = get_network_constants();
+        let (_, events_url, _, _, _) = get_network_constants();
         let timeout_duration = 5000;
 
         // Act
@@ -1145,7 +1145,7 @@ mod tests {
     async fn test_wait_deploy_timeout() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, events_url, _, _) = get_network_constants();
+        let (_, events_url, _, _, _) = get_network_constants();
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
         let timeout_duration = Some(5000);
 
@@ -1165,7 +1165,7 @@ mod tests {
     async fn test_wait_transaction_timeout() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, events_url, _, _) = get_network_constants();
+        let (_, events_url, _, _, _) = get_network_constants();
         let transaction_hash = "8c6823d9480eee9fe0cfb5ed1fbf77f928cc6af21121298c05b4e3d87a328271";
         let timeout_duration = Some(5000);
 

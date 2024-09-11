@@ -138,7 +138,7 @@ mod tests {
     async fn test_make_transfer_with_valid_transfer_params() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -164,7 +164,7 @@ mod tests {
     async fn test_make_transfer_with_valid_transfer_params_without_secret_key() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -189,7 +189,7 @@ mod tests {
     async fn test_make_transfer_with_invalid_transfer_params() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();

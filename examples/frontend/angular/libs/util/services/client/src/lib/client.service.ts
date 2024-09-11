@@ -164,6 +164,8 @@ export class ClientService {
 
   async get_node_status() {
     const get_node_status = await this.sdk.get_node_status();
+    const get_binary_node_status = await this.sdk.get_binary_node_status("127.0.0.1:28101");
+    console.log(get_binary_node_status);
     get_node_status && this.resultService.setResult(get_node_status.toJson());
     return get_node_status;
   }

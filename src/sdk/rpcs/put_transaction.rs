@@ -112,7 +112,7 @@ mod tests {
     fn get_transaction() -> Transaction {
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
 
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&secret_key);
@@ -150,7 +150,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (node_address, _, _, _, _) = get_network_constants();
         let transaction = get_transaction();
 
         // Act

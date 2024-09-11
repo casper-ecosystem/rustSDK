@@ -1,5 +1,7 @@
 use self::intern::{create_test_sdk, install_cep78};
-use crate::config::{CONTRACT_CEP78_KEY, PACKAGE_CEP78_KEY, SPECULATIVE_ADDRESS};
+use crate::config::{
+    BINARY_PORT_ADDRESS, CONTRACT_CEP78_KEY, PACKAGE_CEP78_KEY, SPECULATIVE_ADDRESS,
+};
 use crate::config::{
     DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_SECRET_KEY_NAME,
     DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
@@ -225,19 +227,22 @@ pub(crate) mod intern {
     }
 }
 
-pub fn get_network_constants() -> (String, String, String, String) {
+pub fn get_network_constants() -> (String, String, String, String, String) {
     let default_node_address =
         env::var("NODE_ADDRESS").unwrap_or_else(|_| DEFAULT_NODE_ADDRESS.to_string());
     let default_event_address =
         env::var("EVENT_ADDRESS").unwrap_or_else(|_| DEFAULT_EVENT_ADDRESS.to_string());
     let default_speculative_address =
         env::var("SPECULATIVE_ADDRESS").unwrap_or_else(|_| SPECULATIVE_ADDRESS.to_string());
+    let default_binary_port_address =
+        env::var("BINARY_PORT_ADDRESS").unwrap_or_else(|_| BINARY_PORT_ADDRESS.to_string());
     let chain_name = env::var("CHAIN_NAME").unwrap_or_else(|_| DEFAULT_CHAIN_NAME.to_string());
 
     (
         default_node_address,
         default_event_address,
         default_speculative_address,
+        default_binary_port_address,
         chain_name,
     )
 }

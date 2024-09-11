@@ -28,7 +28,7 @@ pub async fn install_cep78() -> String {
     let account = public_key_from_secret_key(&secret_key).unwrap();
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
-    let (node_address, event_address, _, chain_name) = get_network_constants();
+    let (node_address, event_address, _, _, chain_name) = get_network_constants();
     install_cep78_if_needed(
         &account,
         &secret_key,
@@ -46,7 +46,7 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
     use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     static mut CONTRACT_CEP78_KEY: Option<String> = None;
-    let (node_address, event_address, _, chain_name) = get_network_constants();
+    let (node_address, event_address, _, _, chain_name) = get_network_constants();
 
     unsafe {
         if CONTRACT_CEP78_KEY.is_none() {
