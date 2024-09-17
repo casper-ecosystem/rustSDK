@@ -27,7 +27,7 @@ impl SDK {
     /// * `transaction_params` - The transaction parameters.
     /// * `maybe_id` - An optional transfer ID (defaults to a random number).
     /// * `verbosity` - The verbosity level for logging (optional).
-    /// * `node_address` - The address of the node to connect to (optional).
+    /// * `rpc_address` - The address of the node to connect to (optional).
     ///
     /// # Returns
     ///
@@ -42,7 +42,7 @@ impl SDK {
         transaction_params: TransactionStrParams,
         maybe_id: Option<String>,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<PutTransactionResult, JsError> {
         let result = self
             .transfer_transaction(
@@ -52,7 +52,7 @@ impl SDK {
                 transaction_params,
                 maybe_id,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await;
         match result {
@@ -76,7 +76,7 @@ impl SDK {
     /// * `transaction_params` - The transaction parameters.
     /// * `maybe_id` - An optional transfer ID (defaults to a random number).
     /// * `verbosity` - The verbosity level for logging (optional).
-    /// * `node_address` - The address of the node to connect to (optional).
+    /// * `rpc_address` - The address of the node to connect to (optional).
     ///
     /// # Returns
     ///
@@ -90,7 +90,7 @@ impl SDK {
         transaction_params: TransactionStrParams,
         maybe_id: Option<String>,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_PutTransactionResult>, SdkError> {
         //log("transfer!");
         let transaction = make_transfer_transaction(
@@ -101,7 +101,7 @@ impl SDK {
             maybe_id,
         )?;
 
-        self.put_transaction(transaction, verbosity, node_address)
+        self.put_transaction(transaction, verbosity, rpc_address)
             .await
             .map_err(SdkError::from)
     }
@@ -120,9 +120,9 @@ mod tests {
     #[tokio::test]
     async fn test_transfer_with_valid_transfer_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
@@ -141,7 +141,7 @@ mod tests {
                 transaction_params,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -152,9 +152,9 @@ mod tests {
     #[tokio::test]
     async fn test_transfer_with_valid_transfer_params_without_secret_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let error_message = "the transaction was invalid: invalid associated keys";
 
@@ -175,7 +175,7 @@ mod tests {
                 transaction_params,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -188,9 +188,9 @@ mod tests {
     #[tokio::test]
     async fn test_transfer_with_invalid_transfer_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         let error_message = "The transaction sent to the network had an invalid chain name";
         let secret_key = get_user_secret_key(None).unwrap();
@@ -209,7 +209,7 @@ mod tests {
                 transaction_params,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
         // Assert

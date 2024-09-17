@@ -75,7 +75,7 @@ pub struct GetBlockTransfersOptions {
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
     pub verbosity: Option<Verbosity>,
-    pub node_address: Option<String>,
+    pub rpc_address: Option<String>,
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -121,7 +121,7 @@ impl SDK {
             maybe_block_id_as_string,
             maybe_block_identifier,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
@@ -133,7 +133,7 @@ impl SDK {
         };
 
         let result = self
-            .get_block_transfers(maybe_block_identifier, verbosity, node_address)
+            .get_block_transfers(maybe_block_identifier, verbosity, rpc_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -163,7 +163,7 @@ impl SDK {
     ///
     /// * `maybe_block_identifier` - An optional `BlockIdentifierInput` specifying the block identifier.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -176,14 +176,14 @@ impl SDK {
         &self,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetBlockTransfersResult>, SdkError> {
         //log("get_block_transfers!");
 
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_block_transfers_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &maybe_block_id,
             )
@@ -200,7 +200,7 @@ impl SDK {
                 };
             get_block_transfers_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
             )
@@ -219,7 +219,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_block_transfers_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         // Act
@@ -234,11 +234,11 @@ mod tests {
     #[tokio::test]
     async fn test_get_block_transfers_with_block_id_string() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let result = sdk
-            .get_block(None, verbosity, Some(node_address.clone()))
+            .get_block(None, verbosity, Some(rpc_address.clone()))
             .await;
         let block_hash = BlockHash::from(
             *result
@@ -254,7 +254,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_block_transfers(Some(block_identifier), verbosity, Some(node_address))
+            .get_block_transfers(Some(block_identifier), verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -264,15 +264,15 @@ mod tests {
     #[tokio::test]
     async fn test_get_block_transfers_with_block_identifier() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
-            .get_block_transfers(Some(block_identifier), verbosity, Some(node_address))
+            .get_block_transfers(Some(block_identifier), verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -281,7 +281,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_block_transfers_with_error() {
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
 

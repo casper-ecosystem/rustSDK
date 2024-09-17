@@ -68,7 +68,7 @@ pub struct GetTransactionOptions {
     pub transaction_hash_as_string: Option<String>,
     pub transaction_hash: Option<TransactionHash>,
     pub finalized_approvals: Option<bool>,
-    pub node_address: Option<String>,
+    pub rpc_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -124,7 +124,7 @@ impl SDK {
             transaction_hash,
             finalized_approvals,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         let transaction_hash = if let Some(transaction_hash_as_string) = transaction_hash_as_string
@@ -144,7 +144,7 @@ impl SDK {
                 transaction_hash,
                 finalized_approvals,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await;
         match result {
@@ -176,7 +176,7 @@ impl SDK {
     /// * `transaction_hash` - The transaction hash.
     /// * `finalized_approvals` - An optional boolean indicating finalized approvals.
     /// * `verbosity` - An optional verbosity level.
-    /// * `node_address` - An optional node address.
+    /// * `rpc_address` - An optional rpc address.
     ///
     /// # Returns
     ///
@@ -186,12 +186,12 @@ impl SDK {
         transaction_hash: TransactionHash,
         finalized_approvals: Option<bool>,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetTransactionResult>, Error> {
         //log("get_transaction!");
         get_transaction(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            &self.get_node_address(node_address),
+            &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
             transaction_hash.into(),
             finalized_approvals.unwrap_or_default(),
@@ -215,7 +215,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_transaction_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let transaction_hash = TransactionHash::from_raw(&[1u8; 32]).unwrap();
         let error_message = "builder error";
 
@@ -233,14 +233,14 @@ mod tests {
     #[tokio::test]
     async fn test_get_transaction_with_invalid_transaction_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let transaction_hash = TransactionHash::from_raw(&[1u8; 32]).unwrap();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
-            .get_transaction(transaction_hash, None, verbosity, Some(node_address))
+            .get_transaction(transaction_hash, None, verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -250,9 +250,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_transaction_with_valid_transaction_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
@@ -270,7 +270,7 @@ mod tests {
                 transaction_params,
                 None,
                 verbosity,
-                Some(node_address.clone()),
+                Some(rpc_address.clone()),
             )
             .await
             .unwrap();
@@ -279,7 +279,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_transaction(transaction_hash.into(), None, verbosity, Some(node_address))
+            .get_transaction(transaction_hash.into(), None, verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -290,9 +290,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_transaction_with_finalized_approvals() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
@@ -310,7 +310,7 @@ mod tests {
                 transaction_params,
                 None,
                 verbosity,
-                Some(node_address.clone()),
+                Some(rpc_address.clone()),
             )
             .await
             .unwrap();
@@ -324,7 +324,7 @@ mod tests {
                 transaction_hash.into(),
                 Some(finalized_approvals),
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -335,7 +335,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_transaction_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let transaction_hash = TransactionHash::from_raw(&[1u8; 32]).unwrap();
         let error_message = "error sending request for url (http://localhost/rpc)";
 

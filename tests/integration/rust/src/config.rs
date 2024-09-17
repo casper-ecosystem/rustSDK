@@ -8,7 +8,7 @@ use lazy_static::lazy_static;
 use std::time::{self, Duration};
 use tokio::sync::Mutex;
 
-pub const DEFAULT_NODE_ADDRESS: &str = "http://localhost:11101";
+pub const DEFAULT_RPC_ADDRESS: &str = "http://localhost:11101";
 pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
 pub const SPECULATIVE_ADDRESS: &str = "http://127.0.0.1:25101";
 pub const BINARY_PORT_ADDRESS: &str = "127.0.0.1:28101";
@@ -60,9 +60,10 @@ pub const ARGS_JSON: &str = r#"[
 
 #[derive(Clone, Debug)]
 pub struct TestConfig {
+    pub rpc_address: Option<String>,
     pub node_address: Option<String>,
-    pub verbosity: Option<Verbosity>,
     pub event_address: String,
+    pub verbosity: Option<Verbosity>,
     pub speculative_address: String,
     pub binary_port_address: String,
     pub chain_name: String,
@@ -94,10 +95,10 @@ pub async fn initialize_test_config(
     dotenv().ok();
 
     let (
-        default_node_address,
+        default_rpc_address,
         default_event_address,
         default_speculative_address,
-        default_binary_port_address,
+        default_node_address,
         chain_name,
     ) = get_network_constants();
 
@@ -112,7 +113,7 @@ pub async fn initialize_test_config(
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
 
-    let purse_uref = get_main_purse(&account, &default_node_address).await;
+    let purse_uref = get_main_purse(&account, &default_rpc_address).await;
 
     let mut transaction_hash = String::from("");
     let mut contract_cep78_key = String::from(
@@ -131,13 +132,13 @@ pub async fn initialize_test_config(
             &account,
             &secret_key,
             None,
-            (&default_node_address, &default_event_address, &chain_name),
+            (&default_rpc_address, &default_event_address, &chain_name),
         )
         .await
         .unwrap();
 
         let (_contract_cep78_key, _contract_cep78_package_hash) =
-            get_contract_cep78_hash_keys(&account_hash, &default_node_address).await;
+            get_contract_cep78_hash_keys(&account_hash, &default_rpc_address).await;
 
         contract_cep78_key = _contract_cep78_key;
         contract_cep78_package_hash = _contract_cep78_package_hash;
@@ -149,7 +150,7 @@ pub async fn initialize_test_config(
             &account,
             &account_hash,
             &secret_key,
-            (&default_node_address, &default_event_address, &chain_name),
+            (&default_rpc_address, &default_event_address, &chain_name),
         )
         .await;
 
@@ -158,27 +159,28 @@ pub async fn initialize_test_config(
             DICTIONARY_NAME,
             DICTIONARY_ITEM_KEY,
             None,
-            Some(default_node_address.clone()),
+            Some(default_rpc_address.clone()),
         )
         .await;
 
         dictionary_uref = get_dictionnary_uref(
             &contract_cep78_key,
             DICTIONARY_NAME,
-            Some(default_node_address.clone()),
+            Some(default_rpc_address.clone()),
         )
         .await;
     }
 
-    let (block_hash, block_height) = get_block(&default_node_address).await;
+    let (block_hash, block_height) = get_block(&default_rpc_address).await;
     *block_hash_initialized_guard = true;
 
     let config = TestConfig {
+        rpc_address: Some(default_rpc_address.to_string()),
         node_address: Some(default_node_address.to_string()),
         verbosity: Some(Verbosity::High),
         event_address: default_event_address,
         speculative_address: default_speculative_address,
-        binary_port_address: default_binary_port_address,
+        binary_port_address: default_node_address,
         account,
         secret_key,
         chain_name,

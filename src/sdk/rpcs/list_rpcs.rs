@@ -67,7 +67,7 @@ impl SDK {
     /// # Arguments
     ///
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -80,9 +80,9 @@ impl SDK {
     pub async fn list_rpcs_js_alias(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<ListRpcsResult, JsError> {
-        let result = self.list_rpcs(verbosity, node_address).await;
+        let result = self.list_rpcs(verbosity, rpc_address).await;
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
@@ -99,7 +99,7 @@ impl SDK {
     /// # Arguments
     ///
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -111,12 +111,12 @@ impl SDK {
     pub async fn list_rpcs(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_ListRpcsResult>, Error> {
         //log("list_rpcs!");
         list_rpcs(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            &self.get_node_address(node_address),
+            &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
         )
         .await
@@ -131,7 +131,7 @@ mod tests {
     #[tokio::test]
     async fn test_list_rpcs_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         // Act
@@ -146,12 +146,12 @@ mod tests {
     #[tokio::test]
     async fn test_list_rpcs_with_specific_arguments() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
-        let result = sdk.list_rpcs(verbosity, Some(node_address)).await;
+        let result = sdk.list_rpcs(verbosity, Some(rpc_address)).await;
 
         // Assert
         assert!(result.is_ok());
@@ -159,7 +159,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_list_rpcs_with_error() {
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
 

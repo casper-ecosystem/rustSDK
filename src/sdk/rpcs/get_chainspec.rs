@@ -63,7 +63,7 @@ impl SDK {
     /// # Arguments
     ///
     /// * `verbosity` - An optional `Verbosity` parameter.
-    /// * `node_address` - An optional node address as a string.
+    /// * `rpc_address` - An optional rpc address as a string.
     ///
     /// # Returns
     ///
@@ -72,9 +72,9 @@ impl SDK {
     pub async fn get_chainspec_js_alias(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<GetChainspecResult, JsError> {
-        let result = self.get_chainspec(verbosity, node_address).await;
+        let result = self.get_chainspec(verbosity, rpc_address).await;
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
@@ -90,9 +90,9 @@ impl SDK {
     pub async fn info_get_chainspec(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<GetChainspecResult, JsError> {
-        self.get_chainspec_js_alias(verbosity, node_address).await
+        self.get_chainspec_js_alias(verbosity, rpc_address).await
     }
 }
 
@@ -103,7 +103,7 @@ impl SDK {
     /// # Arguments
     ///
     /// * `verbosity` - An optional `Verbosity` parameter.
-    /// * `node_address` - An optional node address as a string.
+    /// * `rpc_address` - An optional rpc address as a string.
     ///
     /// # Returns
     ///
@@ -111,12 +111,12 @@ impl SDK {
     pub async fn get_chainspec(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetChainspecResult>, Error> {
         //log("get_chainspec!");
         get_chainspec(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            &self.get_node_address(node_address),
+            &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
         )
         .await
@@ -131,7 +131,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_chainspec_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         // Act
@@ -146,12 +146,12 @@ mod tests {
     #[tokio::test]
     async fn test_get_chainspec_with_specific_arguments() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
-        let result = sdk.get_chainspec(verbosity, Some(node_address)).await;
+        let result = sdk.get_chainspec(verbosity, Some(rpc_address)).await;
 
         // Assert
         assert!(result.is_ok());
@@ -159,7 +159,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_chainspec_with_error() {
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
 

@@ -30,7 +30,7 @@ impl SDK {
     /// * `session_params` - Session parameters for the deploy.
     /// * `payment_params` - Payment parameters for the deploy.
     /// * `verbosity` - Optional verbosity level.
-    /// * `node_address` - Optional node address.
+    /// * `rpc_address` - Optional rpc address.
     ///
     /// # Returns
     ///
@@ -44,7 +44,7 @@ impl SDK {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SpeculativeExecResult, JsError> {
         let result = self
             .speculative_deploy(
@@ -52,7 +52,7 @@ impl SDK {
                 session_params,
                 payment_params,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await;
         match result {
@@ -74,7 +74,7 @@ impl SDK {
     /// * `session_params` - Session parameters for the deploy.
     /// * `payment_params` - Payment parameters for the deploy.
     /// * `verbosity` - Optional verbosity level.
-    /// * `node_address` - Optional node address.
+    /// * `rpc_address` - Optional rpc address.
     ///
     /// # Returns
     ///
@@ -87,7 +87,7 @@ impl SDK {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         // log("speculative_deploy!");
         let deploy = make_deploy(
@@ -102,7 +102,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.speculative_exec_deploy(deploy.unwrap().into(), verbosity, node_address)
+        self.speculative_exec_deploy(deploy.unwrap().into(), verbosity, rpc_address)
             .await
             .map_err(SdkError::from)
     }
@@ -145,7 +145,7 @@ mod tests {
     #[ignore]
     async fn _test_speculative_deploy_with_valid_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _, chain_name) = get_network_constants();
 
@@ -175,7 +175,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_deploy_with_valid_params_without_secret_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _, chain_name) = get_network_constants();
 
@@ -201,7 +201,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_deploy_with_invalid_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _, _) = get_network_constants();
 

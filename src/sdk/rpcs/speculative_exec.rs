@@ -76,8 +76,8 @@ pub struct GetSpeculativeExecTxnOptions {
     /// The transaction to execute.
     pub transaction: Option<Transaction>,
 
-    /// The node address.
-    pub node_address: Option<String>,
+    /// The rpc address.
+    pub rpc_address: Option<String>,
 
     /// The verbosity level for logging.
     pub verbosity: Option<Verbosity>,
@@ -114,7 +114,7 @@ impl SDK {
             transaction_as_string,
             transaction,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         let transaction = if let Some(transaction_as_string) = transaction_as_string {
@@ -127,7 +127,7 @@ impl SDK {
         };
 
         let result = self
-            .speculative_exec(transaction, verbosity, node_address)
+            .speculative_exec(transaction, verbosity, rpc_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -146,7 +146,7 @@ impl SDK {
     ///
     /// * `transaction` - The transaction to execute.
     /// * `verbosity` - The verbosity level for logging.
-    /// * `node_address` - The address of the node to connect to.
+    /// * `rpc_address` - The address of the node to connect to.
     ///
     /// # Returns
     ///
@@ -155,13 +155,13 @@ impl SDK {
         &self,
         transaction: Transaction,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecTxnResult>, SdkError> {
         //log("speculative_exec!");
 
         speculative_exec_lib(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            &self.get_node_address(node_address),
+            &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
             transaction.into(),
         )
@@ -206,7 +206,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_exec_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let transaction = get_transaction();
         let error_message = "builder error";
 
@@ -223,7 +223,7 @@ mod tests {
     #[ignore]
     async fn _test_speculative_exec() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _, _) = get_network_constants();
         let transaction = get_transaction();
@@ -241,7 +241,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_exec_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let transaction = get_transaction();
         let error_message = "error sending request for url (http://localhost/rpc)";
 

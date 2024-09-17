@@ -75,7 +75,7 @@ pub struct GetAccountOptions {
     pub account_identifier_as_string: Option<String>,
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
-    pub node_address: Option<String>,
+    pub rpc_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -103,7 +103,7 @@ impl SDK {
     ///   - `maybe_block_id_as_string`: Optional string representation of the block ID.
     ///   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
     ///   - `verbosity`: Verbosity level for the output.
-    ///   - `node_address`: Address of the node to query.
+    ///   - `rpc_address`: Address of the node to query.
     ///
     /// # Returns
     ///
@@ -126,7 +126,7 @@ impl SDK {
             maybe_block_id_as_string,
             maybe_block_identifier,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
@@ -143,7 +143,7 @@ impl SDK {
                 account_identifier_as_string,
                 maybe_block_identifier,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await;
         match result {
@@ -176,7 +176,7 @@ impl SDK {
     /// * `account_identifier_as_string` - An optional string representing the account identifier.
     /// * `maybe_block_identifier` - An optional `BlockIdentifierInput` for specifying a block identifier.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -193,7 +193,7 @@ impl SDK {
         account_identifier_as_string: Option<String>,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetAccountResult>, SdkError> {
         let account_identifier = if let Some(account_identifier) = account_identifier {
             account_identifier
@@ -214,7 +214,7 @@ impl SDK {
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_account_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &maybe_block_id,
                 &account_identifier.to_string(),
@@ -232,7 +232,7 @@ impl SDK {
                 };
             get_account_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
                 account_identifier.into(),
@@ -265,7 +265,7 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_account_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
         let account_identifier = get_account_identifier();
 
@@ -284,7 +284,7 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_account_with_missing_account() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "Error: Missing account identifier";
 
         // Act
@@ -301,10 +301,10 @@ mod tests {
     #[ignore]
     async fn _test_get_account_with_account_identifier() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let account_identifier = get_account_identifier();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -313,7 +313,7 @@ mod tests {
                 None,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
         // Assert
@@ -325,10 +325,10 @@ mod tests {
     #[ignore]
     async fn _test_get_account_with_account_identifier_as_string() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let account_identifier_as_string = get_account_identifier().to_string();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -337,7 +337,7 @@ mod tests {
                 Some(account_identifier_as_string),
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -350,12 +350,12 @@ mod tests {
     #[ignore]
     async fn _test_get_account_with_block_identifier() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let account_identifier = get_account_identifier();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -364,7 +364,7 @@ mod tests {
                 None,
                 Some(block_identifier),
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -376,7 +376,7 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_account_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let account_identifier = get_account_identifier();
         let error_message = "error sending request for url (http://localhost/rpc)";
 

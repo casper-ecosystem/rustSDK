@@ -32,7 +32,7 @@ impl SDK {
     /// * `deploy_params` - The deployment parameters.
     /// * `payment_params` - The payment parameters.
     /// * `verbosity` - The verbosity level for logging (optional).
-    /// * `node_address` - The address of the node to connect to (optional).
+    /// * `rpc_address` - The address of the node to connect to (optional).
     ///
     /// # Returns
     ///
@@ -48,7 +48,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SpeculativeExecResult, JsError> {
         let result = self
             .speculative_transfer(
@@ -58,7 +58,7 @@ impl SDK {
                 deploy_params,
                 payment_params,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await;
         match result {
@@ -82,7 +82,7 @@ impl SDK {
     /// * `deploy_params` - The deployment parameters.
     /// * `payment_params` - The payment parameters.
     /// * `verbosity` - The verbosity level for logging (optional).
-    /// * `node_address` - The address of the node to connect to (optional).
+    /// * `rpc_address` - The address of the node to connect to (optional).
     ///
     /// # Returns
     ///
@@ -97,7 +97,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         // log("speculative_transfer!");
         let transfer_id = if let Some(transfer_id) = transfer_id {
@@ -119,7 +119,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.speculative_exec_deploy(deploy.unwrap().into(), verbosity, node_address)
+        self.speculative_exec_deploy(deploy.unwrap().into(), verbosity, rpc_address)
             .await
             .map_err(SdkError::from)
     }
@@ -139,7 +139,7 @@ mod tests {
     #[ignore]
     async fn _test_speculative_transfer_with_valid_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _, chain_name) = get_network_constants();
 
@@ -171,7 +171,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_transfer_with_valid_params_without_secret_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _, chain_name) = get_network_constants();
 
@@ -202,7 +202,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_transfer_with_invalid_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _, chain_name) = get_network_constants();
 

@@ -69,7 +69,7 @@ pub struct GetDeployOptions {
     pub deploy_hash_as_string: Option<String>,
     pub deploy_hash: Option<DeployHash>,
     pub finalized_approvals: Option<bool>,
-    pub node_address: Option<String>,
+    pub rpc_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -120,7 +120,7 @@ impl SDK {
             deploy_hash,
             finalized_approvals,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         let err_msg = "Error: Missing deploy hash as string or deploy hash".to_string();
@@ -134,7 +134,7 @@ impl SDK {
         };
 
         let result = self
-            .get_deploy(deploy_hash, finalized_approvals, verbosity, node_address)
+            .get_deploy(deploy_hash, finalized_approvals, verbosity, rpc_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -164,7 +164,7 @@ impl SDK {
     /// * `deploy_hash` - The deploy hash.
     /// * `finalized_approvals` - An optional boolean indicating finalized approvals.
     /// * `verbosity` - An optional verbosity level.
-    /// * `node_address` - An optional node address.
+    /// * `rpc_address` - An optional rpc address.
     ///
     /// # Returns
     ///
@@ -176,12 +176,12 @@ impl SDK {
         deploy_hash: DeployHash,
         finalized_approvals: Option<bool>,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDeployResult>, Error> {
         //log("get_deploy!");
         get_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            &self.get_node_address(node_address),
+            &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
             deploy_hash.into(),
             finalized_approvals.unwrap_or_default(),
@@ -208,7 +208,7 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_deploy_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
         let error_message = "builder error";
 
@@ -225,14 +225,14 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_deploy_with_invalid_deploy_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
-            .get_deploy(deploy_hash, None, verbosity, Some(node_address))
+            .get_deploy(deploy_hash, None, verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -243,9 +243,9 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_deploy_with_valid_deploy_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
@@ -262,7 +262,7 @@ mod tests {
                 deploy_params,
                 payment_params,
                 verbosity,
-                Some(node_address.clone()),
+                Some(rpc_address.clone()),
             )
             .await
             .unwrap();
@@ -271,7 +271,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_deploy(deploy_hash.into(), None, verbosity, Some(node_address))
+            .get_deploy(deploy_hash.into(), None, verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -282,9 +282,9 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_deploy_with_finalized_approvals() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
@@ -301,7 +301,7 @@ mod tests {
                 deploy_params,
                 payment_params,
                 verbosity,
-                Some(node_address.clone()),
+                Some(rpc_address.clone()),
             )
             .await
             .unwrap();
@@ -315,7 +315,7 @@ mod tests {
                 deploy_hash.into(),
                 Some(finalized_approvals),
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -327,7 +327,7 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_deploy_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
         let error_message = "error sending request for url (http://localhost/rpc)";
 

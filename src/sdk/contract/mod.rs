@@ -28,16 +28,16 @@ pub async fn install_cep78() -> String {
     let account = public_key_from_secret_key(&secret_key).unwrap();
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
-    let (node_address, event_address, _, _, chain_name) = get_network_constants();
+    let (rpc_address, event_address, _, _, chain_name) = get_network_constants();
     install_cep78_if_needed(
         &account,
         &secret_key,
         Some(WASM_PATH),
-        (&node_address, &event_address, &chain_name),
+        (&rpc_address, &event_address, &chain_name),
     )
     .await;
     let (contract_cep78_key, _contract_cep78_package_hash) =
-        get_contract_cep78_hash_keys(&account_hash, &node_address).await;
+        get_contract_cep78_hash_keys(&account_hash, &rpc_address).await;
     contract_cep78_key
 }
 
@@ -46,7 +46,7 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
     use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     static mut CONTRACT_CEP78_KEY: Option<String> = None;
-    let (node_address, event_address, _, _, chain_name) = get_network_constants();
+    let (rpc_address, event_address, _, _, chain_name) = get_network_constants();
 
     unsafe {
         if CONTRACT_CEP78_KEY.is_none() {
@@ -60,7 +60,7 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
                 &account,
                 &account_hash,
                 &secret_key,
-                (&node_address, &event_address, &chain_name),
+                (&rpc_address, &event_address, &chain_name),
             )
             .await;
             CONTRACT_CEP78_KEY = Some(contract_cep78_key);

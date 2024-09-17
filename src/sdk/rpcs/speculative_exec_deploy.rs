@@ -76,8 +76,8 @@ pub struct GetSpeculativeExecDeployOptions {
     /// The deploy to execute.
     pub deploy: Option<Deploy>,
 
-    /// The node address.
-    pub node_address: Option<String>,
+    /// The rpc address.
+    pub rpc_address: Option<String>,
 
     /// The verbosity level for logging.
     pub verbosity: Option<Verbosity>,
@@ -118,7 +118,7 @@ impl SDK {
             deploy_as_string,
             deploy,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         let deploy = if let Some(deploy_as_string) = deploy_as_string {
@@ -131,7 +131,7 @@ impl SDK {
         };
 
         let result = self
-            .speculative_exec_deploy(deploy, verbosity, node_address)
+            .speculative_exec_deploy(deploy, verbosity, rpc_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -150,7 +150,7 @@ impl SDK {
     ///
     /// * `deploy` - The deploy to execute.
     /// * `verbosity` - The verbosity level for logging.
-    /// * `node_address` - The address of the node to connect to.
+    /// * `rpc_address` - The address of the node to connect to.
     ///
     /// # Returns
     ///
@@ -161,13 +161,13 @@ impl SDK {
         &self,
         deploy: Deploy,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         //log("speculative_exec_deploy!");
 
         speculative_exec_deploy_lib(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            &self.get_node_address(node_address),
+            &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
             deploy.into(),
         )
@@ -214,7 +214,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_exec_deploy_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let deploy = get_deploy();
         let error_message = "builder error";
 
@@ -231,7 +231,7 @@ mod tests {
     #[ignore]
     async fn _test_speculative_exec_deploy() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _, _) = get_network_constants();
         let deploy = get_deploy();
@@ -247,7 +247,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_exec_deploy_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let deploy = get_deploy();
         let error_message = "error sending request for url (http://localhost/rpc)";
 

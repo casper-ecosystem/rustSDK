@@ -20,7 +20,7 @@ impl SDK {
     ///
     /// * `deploy` - The `Deploy` object to be sent.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -34,9 +34,9 @@ impl SDK {
         &self,
         deploy: Deploy,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
-        let result = self.put_deploy(deploy, verbosity, node_address).await;
+        let result = self.put_deploy(deploy, verbosity, rpc_address).await;
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
@@ -53,9 +53,9 @@ impl SDK {
         &self,
         deploy: Deploy,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
-        self.put_deploy_js_alias(deploy, verbosity, node_address)
+        self.put_deploy_js_alias(deploy, verbosity, rpc_address)
             .await
     }
 }
@@ -67,7 +67,7 @@ impl SDK {
     ///
     /// * `deploy` - The `Deploy` object to be sent.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -80,12 +80,12 @@ impl SDK {
         &self,
         deploy: Deploy,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_PutDeployResult>, Error> {
         //log("account_put_deploy!");
         put_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            &self.get_node_address(node_address),
+            &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
             deploy.into(),
         )
@@ -130,7 +130,7 @@ mod tests {
     #[tokio::test]
     async fn test_put_deploy_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
         let deploy = get_deploy();
 
@@ -146,13 +146,13 @@ mod tests {
     #[tokio::test]
     async fn test_put_deploy() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let deploy = get_deploy();
 
         // Act
-        let result = sdk.put_deploy(deploy, verbosity, Some(node_address)).await;
+        let result = sdk.put_deploy(deploy, verbosity, Some(rpc_address)).await;
 
         // Assert
         assert!(result.is_ok());
@@ -161,7 +161,7 @@ mod tests {
     #[tokio::test]
     async fn test_put_deploy_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let error_message = "error sending request for url (http://localhost/rpc)";
         let deploy = get_deploy();
 

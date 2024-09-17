@@ -47,16 +47,16 @@ describe('Angular App Tests', () => {
       await getResult();
     });
 
-    it('should have chain_name and node_address', async () => {
+    it('should have chain_name and rpc_address', async () => {
       await test.page.waitForSelector('[e2e-id="selectActionElt"]');
       const chainname = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="chain_name"]')?.textContent;
       });
-      const node_address = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="node_address"]')?.textContent;
+      const rpc_address = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="rpc_address"]')?.textContent;
       });
       expect(chainname).toBe(config.chain_name);
-      expect(node_address).toBe(config.app_address);
+      expect(rpc_address).toBe(config.app_address);
     });
 
     it('should clear result', async () => {

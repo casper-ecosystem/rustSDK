@@ -26,6 +26,7 @@ pub async fn run_tests_or_examples() {
 pub async fn _run_example_1() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
     use casper_rust_wasm_sdk::types::transaction_hash::TransactionHash;
@@ -50,6 +51,7 @@ pub async fn _run_example_1() {
 pub async fn _run_example_2() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -65,6 +67,7 @@ pub async fn _run_example_2() {
 pub async fn _run_example_3() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -80,6 +83,7 @@ pub async fn _run_example_3() {
 pub async fn _run_example_4() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -99,6 +103,7 @@ pub async fn _run_example_4() {
 pub async fn _run_example_5() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -135,6 +140,7 @@ pub async fn _run_example_5() {
 pub async fn _run_example_6() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -182,6 +188,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 pub async fn _run_example_7() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -222,6 +229,7 @@ pub async fn _run_example_7() {
 pub async fn _run_example_8() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -268,6 +276,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 pub async fn _run_example_9() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -315,6 +324,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 pub async fn _run_example_10() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -360,6 +370,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 pub async fn _run_example_11() -> Result<(), String> {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -456,6 +467,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 pub async fn _run_example_12() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -526,6 +538,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 pub async fn _run_example_13() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -569,6 +582,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 pub async fn _run_example_14() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -610,6 +624,7 @@ pub async fn _run_example_14() {
 pub async fn _run_example_1_legacy() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
     use casper_rust_wasm_sdk::types::deploy_hash::DeployHash;
@@ -634,6 +649,7 @@ pub async fn _run_example_1_legacy() {
 pub async fn _run_example_5_legacy() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -679,6 +695,7 @@ pub async fn _run_example_5_legacy() {
 pub async fn _run_example_6_legacy() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -737,6 +754,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 pub async fn _run_example_7_legacy() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -781,6 +799,7 @@ pub async fn _run_example_7_legacy() {
 pub async fn _run_example_8_legacy() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -828,6 +847,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 pub async fn _run_example_9_legacy() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -879,6 +899,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 pub async fn _run_example_10_legacy() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -929,6 +950,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 pub async fn _run_example_11_legacy() -> Result<(), String> {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 
@@ -1029,6 +1051,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 pub async fn _run_example_12_legacy() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
+        None,
         Some(Verbosity::High),
     );
 

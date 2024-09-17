@@ -32,7 +32,7 @@ impl SDK {
     /// * `builder_params` - Transaction Builder parameters.
     /// * `transaction_params` - Transactionment parameters for the transaction.
     /// * `verbosity` - Optional verbosity level.
-    /// * `node_address` - Optional node address.
+    /// * `rpc_address` - Optional rpc address.
     ///
     /// # Returns
     ///
@@ -44,10 +44,10 @@ impl SDK {
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SpeculativeExecTxnResult, JsError> {
         let result = self
-            .speculative_transaction(builder_params, transaction_params, verbosity, node_address)
+            .speculative_transaction(builder_params, transaction_params, verbosity, rpc_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -67,7 +67,7 @@ impl SDK {
     /// * `builder_params` - Transaction Builder parameters.
     /// * `transaction_params` - Transactionment parameters for the transaction.
     /// * `verbosity` - Optional verbosity level.
-    /// * `node_address` - Optional node address.
+    /// * `rpc_address` - Optional rpc address.
     ///
     /// # Returns
     ///
@@ -77,7 +77,7 @@ impl SDK {
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecTxnResult>, SdkError> {
         // log("speculative_transaction!");
         let transaction = make_transaction(
@@ -90,7 +90,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.speculative_exec(transaction.unwrap().into(), verbosity, node_address)
+        self.speculative_exec(transaction.unwrap().into(), verbosity, rpc_address)
             .await
             .map_err(SdkError::from)
     }
@@ -138,7 +138,7 @@ mod tests {
     #[ignore]
     async fn _test_speculative_transaction_with_valid_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _, chain_name) = get_network_constants();
 
@@ -167,7 +167,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_transaction_with_valid_params_without_secret_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
@@ -196,7 +196,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_transaction_with_invalid_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, _, chain_name) = get_network_constants();
 

@@ -76,7 +76,7 @@ impl SDK {
     /// * `session_params` - Session parameters.
     /// * `payment_params` - Payment parameters.
     /// * `verbosity` - An optional verbosity level.
-    /// * `node_address` - An optional node address.
+    /// * `rpc_address` - An optional rpc address.
     ///
     /// # Returns
     ///
@@ -88,7 +88,7 @@ impl SDK {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
         let result = self
             .deploy(
@@ -96,7 +96,7 @@ impl SDK {
                 session_params,
                 payment_params,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await;
         match result {
@@ -118,7 +118,7 @@ impl SDK {
     /// * `session_params` - Session parameters.
     /// * `payment_params` - Payment parameters.
     /// * `verbosity` - An optional verbosity level.
-    /// * `node_address` - An optional node address.
+    /// * `rpc_address` - An optional rpc address.
     ///
     /// # Returns
     ///
@@ -129,7 +129,7 @@ impl SDK {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("deploy!");
         let deploy = make_deploy(
@@ -145,7 +145,7 @@ impl SDK {
         }
 
         // Send the deploy to the network and handle any errors.
-        self.put_deploy(deploy.unwrap().into(), verbosity, node_address)
+        self.put_deploy(deploy.unwrap().into(), verbosity, rpc_address)
             .await
             .map_err(SdkError::from)
     }
@@ -186,9 +186,9 @@ mod tests {
     #[tokio::test]
     async fn test_deploy_with_valid_deploy_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -205,7 +205,7 @@ mod tests {
                 get_session_params().clone(),
                 payment_params,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -216,9 +216,9 @@ mod tests {
     #[tokio::test]
     async fn test_deploy_with_valid_deploy_params_without_secret_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let error_message = "Invalid Deploy";
 
@@ -236,7 +236,7 @@ mod tests {
                 get_session_params().clone(),
                 payment_params,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -249,9 +249,9 @@ mod tests {
     #[tokio::test]
     async fn test_deploy_with_invalid_deploy_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
         let secret_key = get_user_secret_key(None).unwrap();
@@ -269,7 +269,7 @@ mod tests {
                 get_session_params().clone(),
                 payment_params,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
         // Assert

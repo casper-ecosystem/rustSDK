@@ -76,7 +76,7 @@ pub struct GetBalanceOptions {
     pub state_root_hash: Option<Digest>,
     pub purse_uref_as_string: Option<String>,
     pub purse_uref: Option<URef>,
-    pub node_address: Option<String>,
+    pub rpc_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -122,7 +122,7 @@ impl SDK {
             purse_uref_as_string,
             purse_uref,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         let purse_uref = if let Some(purse_uref) = purse_uref {
@@ -135,7 +135,7 @@ impl SDK {
         };
 
         let result = if let Some(hash) = state_root_hash {
-            self.get_balance(hash, purse_uref, verbosity, node_address)
+            self.get_balance(hash, purse_uref, verbosity, rpc_address)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
             let hash = if !hash.is_empty() {
@@ -146,10 +146,10 @@ impl SDK {
             } else {
                 "".to_string()
             };
-            self.get_balance(&*hash, purse_uref, verbosity, node_address)
+            self.get_balance(&*hash, purse_uref, verbosity, rpc_address)
                 .await
         } else {
-            self.get_balance("", purse_uref, verbosity, node_address)
+            self.get_balance("", purse_uref, verbosity, rpc_address)
                 .await
         };
 
@@ -197,7 +197,7 @@ impl SDK {
     /// * `state_root_hash` - The state root hash to query for balance information.
     /// * `purse_uref` - The purse uref specifying the purse for which to retrieve the balance.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -211,16 +211,12 @@ impl SDK {
         state_root_hash: impl ToDigest,
         purse_uref: GetBalanceInput,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetBalanceResult>, SdkError> {
         //log("get_balance!");
         let state_root_hash = if state_root_hash.is_empty() {
             let state_root_hash = self
-                .get_state_root_hash(
-                    None,
-                    None,
-                    Some(self.get_node_address(node_address.clone())),
-                )
+                .get_state_root_hash(None, None, Some(self.get_rpc_address(rpc_address.clone())))
                 .await;
 
             match state_root_hash {
@@ -237,7 +233,7 @@ impl SDK {
         match purse_uref {
             GetBalanceInput::PurseUref(purse_uref) => get_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 state_root_hash.into(),
                 purse_uref.into(),
@@ -246,7 +242,7 @@ impl SDK {
             .map_err(SdkError::from),
             GetBalanceInput::PurseUrefAsString(purse_uref) => get_balance_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &state_root_hash.to_string(),
                 &purse_uref,
@@ -264,13 +260,13 @@ mod tests {
     use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     async fn get_main_purse() -> URef {
-        let sdk = SDK::new(None, None);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let entity_result = sdk
-            .get_entity(None, Some(account), None, None, Some(node_address))
+            .get_entity(None, Some(account), None, None, Some(rpc_address))
             .await
             .unwrap()
             .result
@@ -290,7 +286,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_balance_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
         let error_message = "builder error";
 
@@ -313,13 +309,13 @@ mod tests {
     #[tokio::test]
     async fn test_get_balance_with_purse_uref() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
 
         // Act
         let result = sdk
-            .get_balance("", purse_uref, None, Some(node_address))
+            .get_balance("", purse_uref, None, Some(rpc_address))
             .await;
 
         // Assert
@@ -329,14 +325,14 @@ mod tests {
     #[tokio::test]
     async fn test_get_balance_with_purse_uref_as_string() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let purse_uref =
             GetBalanceInput::PurseUrefAsString(get_main_purse().await.to_formatted_string());
 
         // Act
         let result = sdk
-            .get_balance("", purse_uref, None, Some(node_address))
+            .get_balance("", purse_uref, None, Some(rpc_address))
             .await;
 
         // Assert
@@ -346,11 +342,11 @@ mod tests {
     #[tokio::test]
     async fn test_get_balance_with_state_root_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         let state_root_hash: Digest = sdk
-            .get_state_root_hash(None, Some(Verbosity::High), Some(node_address.clone()))
+            .get_state_root_hash(None, Some(Verbosity::High), Some(rpc_address.clone()))
             .await
             .unwrap()
             .result
@@ -365,7 +361,7 @@ mod tests {
                 state_root_hash.to_digest(),
                 purse_uref,
                 None,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -376,7 +372,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_balance_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let error_message = "error sending request for url (http://localhost/rpc)";
         let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
         // Act

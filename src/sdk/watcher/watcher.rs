@@ -1103,7 +1103,7 @@ mod tests {
     #[allow(deprecated)]
     fn test_sdk_watch_deploy_retunrs_instance() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let (_, events_url, _, _, _) = get_network_constants();
         let timeout_duration = 5000;
 
@@ -1123,7 +1123,7 @@ mod tests {
     #[test]
     fn test_sdk_watch_transaction_retunrs_instance() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let (_, events_url, _, _, _) = get_network_constants();
         let timeout_duration = 5000;
 
@@ -1144,7 +1144,7 @@ mod tests {
     #[allow(deprecated)]
     async fn test_wait_deploy_timeout() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let (_, events_url, _, _, _) = get_network_constants();
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
         let timeout_duration = Some(5000);
@@ -1164,7 +1164,7 @@ mod tests {
     #[tokio::test]
     async fn test_wait_transaction_timeout() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let (_, events_url, _, _, _) = get_network_constants();
         let transaction_hash = "8c6823d9480eee9fe0cfb5ed1fbf77f928cc6af21121298c05b4e3d87a328271";
         let timeout_duration = Some(5000);

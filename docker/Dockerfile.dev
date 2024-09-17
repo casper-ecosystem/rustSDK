@@ -3,7 +3,7 @@ FROM --platform=linux/amd64 node:22.1.0-alpine3.19
 ENV NODE_ENV "development"
 
 # /dev/rpc network adress (optional)
-ENV NODE_ADDRESS "http://localhost:11101"
+ENV RPC_ADDRESS "http://localhost:11101"
 
 WORKDIR /app
 

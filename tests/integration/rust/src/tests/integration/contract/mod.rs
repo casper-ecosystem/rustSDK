@@ -86,7 +86,7 @@ pub mod test_module {
             DICTIONARY_NAME,
             DICTIONARY_ITEM_KEY,
             Some(state_root_hash),
-            config.node_address,
+            config.rpc_address,
         )
         .await;
         assert_eq!(config.dictionary_key, dictionnary_key);

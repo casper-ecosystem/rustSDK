@@ -48,7 +48,7 @@
     }
   },
   "/dev/rpc": {
-    "target": "${NODE_ADDRESS}",
+    "target": "${RPC_ADDRESS}",
     "secure": false,
     "changeOrigin": false,
     "pathRewrite": {

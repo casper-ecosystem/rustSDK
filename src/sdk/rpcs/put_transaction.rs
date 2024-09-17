@@ -22,7 +22,7 @@ impl SDK {
     ///
     /// * `transaction` - The `Transaction` object to be sent.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -36,10 +36,10 @@ impl SDK {
         &self,
         transaction: Transaction,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<PutTransactionResult, JsError> {
         let result = self
-            .put_transaction(transaction, verbosity, node_address)
+            .put_transaction(transaction, verbosity, rpc_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -57,9 +57,9 @@ impl SDK {
         &self,
         transaction: Transaction,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<PutTransactionResult, JsError> {
-        self.put_transaction_js_alias(transaction, verbosity, node_address)
+        self.put_transaction_js_alias(transaction, verbosity, rpc_address)
             .await
     }
 }
@@ -71,7 +71,7 @@ impl SDK {
     ///
     /// * `transaction` - The `Transaction` object to be sent.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -84,12 +84,12 @@ impl SDK {
         &self,
         transaction: Transaction,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_PutTransactionResult>, Error> {
         //log("account_put_transaction!");
         put_transaction(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            &self.get_node_address(node_address),
+            &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
             transaction.into(),
         )
@@ -132,7 +132,7 @@ mod tests {
     #[tokio::test]
     async fn test_put_transaction_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
         let transaction = get_transaction();
 
@@ -148,14 +148,14 @@ mod tests {
     #[tokio::test]
     async fn test_put_transaction() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let transaction = get_transaction();
 
         // Act
         let result = sdk
-            .put_transaction(transaction, verbosity, Some(node_address))
+            .put_transaction(transaction, verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -165,7 +165,7 @@ mod tests {
     #[tokio::test]
     async fn test_put_transaction_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let error_message = "error sending request for url (http://localhost/rpc)";
         let transaction = get_transaction();
 

@@ -39,7 +39,7 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
   async ngAfterViewInit(): Promise<void> {
     this.sdk_methods = Object.getOwnPropertyNames(Object.getPrototypeOf(this.sdk))
       .filter(name => typeof (this.sdk as any)[name] === 'function')
-      .filter(name => !['free', 'constructor', '__destroy_into_raw', 'getNodeAddress', 'setNodeAddress', 'getVerbosity', 'setVerbosity', 'watchDeploy', 'waitDeploy'].includes(name))
+      .filter(name => !['free', 'constructor', '__destroy_into_raw', 'getRPCAddress', 'setRPCAddress', 'getVerbosity', 'setVerbosity', 'watchDeploy', 'waitDeploy'].includes(name))
       .filter(name => !name.endsWith('_options'))
       .filter(name => !name.startsWith('chain_'))
       .filter(name => !name.startsWith('state_'))

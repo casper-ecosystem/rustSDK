@@ -73,7 +73,7 @@ pub struct QueryBalanceOptions {
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
     pub maybe_block_id_as_string: Option<String>,
-    pub node_address: Option<String>,
+    pub rpc_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -121,7 +121,7 @@ impl SDK {
             state_root_hash,
             maybe_block_id_as_string,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         let result = if let Some(hash) = state_root_hash {
@@ -132,7 +132,7 @@ impl SDK {
                 Some(hash.to_string()),
                 None,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await
         } else if let Some(hash) = state_root_hash_as_string {
@@ -143,7 +143,7 @@ impl SDK {
                 Some(hash.to_string()),
                 None,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await
         } else if let Some(maybe_block_id_as_string) = maybe_block_id_as_string {
@@ -154,7 +154,7 @@ impl SDK {
                 None,
                 Some(maybe_block_id_as_string),
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await
         } else {
@@ -165,7 +165,7 @@ impl SDK {
                 None,
                 None,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await
         };
@@ -190,7 +190,7 @@ impl SDK {
     /// * `state_root_hash` - An optional string representing a state root hash.
     /// * `maybe_block_id` - An optional string representing a block identifier.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -208,7 +208,7 @@ impl SDK {
         state_root_hash: Option<String>,
         maybe_block_id: Option<String>,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_QueryBalanceResult>, SdkError> {
         //log("query_balance!");
 
@@ -232,7 +232,7 @@ impl SDK {
         if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
             query_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 Some(maybe_global_state_identifier.into()),
                 purse_identifier.into(),
@@ -242,7 +242,7 @@ impl SDK {
         } else if maybe_global_state_identifier.is_none() {
             query_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 None,
                 purse_identifier.into(),
@@ -252,7 +252,7 @@ impl SDK {
         } else if let Some(state_root_hash) = state_root_hash {
             query_balance_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 "",
                 &state_root_hash,
@@ -263,7 +263,7 @@ impl SDK {
         } else {
             query_balance_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &maybe_block_id.unwrap_or_default(),
                 "",
@@ -295,7 +295,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         // Act
@@ -320,7 +320,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_with_missing_purse() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "Error: Missing purse identifier";
 
         // Act
@@ -338,10 +338,10 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_with_global_state_identifier() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let global_state_identifier = GlobalStateIdentifier::from_block_height(1);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         // Act
         let result = sdk
             .query_balance(
@@ -351,7 +351,7 @@ mod tests {
                 None,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -362,11 +362,11 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_with_state_root_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let state_root_hash: Digest = sdk
-            .get_state_root_hash(None, verbosity, Some(node_address.clone()))
+            .get_state_root_hash(None, verbosity, Some(rpc_address.clone()))
             .await
             .unwrap()
             .result
@@ -383,7 +383,7 @@ mod tests {
                 Some(state_root_hash.to_string()),
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -394,9 +394,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_with_block_id() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -407,7 +407,7 @@ mod tests {
                 None,
                 Some("1".to_string()),
                 verbosity,
-                Some(node_address.clone()),
+                Some(rpc_address.clone()),
             )
             .await;
 
@@ -418,9 +418,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_with_purse_identifier() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -431,7 +431,7 @@ mod tests {
                 None,
                 None,
                 verbosity,
-                Some(node_address.clone()),
+                Some(rpc_address.clone()),
             )
             .await;
 
@@ -442,9 +442,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_with_purse_identifier_as_string() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -455,7 +455,7 @@ mod tests {
                 None,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -466,7 +466,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
 

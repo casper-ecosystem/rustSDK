@@ -62,7 +62,7 @@ impl SDK {
     /// # Arguments
     ///
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -75,9 +75,9 @@ impl SDK {
     pub async fn get_validator_changes_js_alias(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<GetValidatorChangesResult, JsError> {
-        let result = self.get_validator_changes(verbosity, node_address).await;
+        let result = self.get_validator_changes(verbosity, rpc_address).await;
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
@@ -93,9 +93,9 @@ impl SDK {
     pub async fn info_get_validator_change(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<GetValidatorChangesResult, JsError> {
-        self.get_validator_changes_js_alias(verbosity, node_address)
+        self.get_validator_changes_js_alias(verbosity, rpc_address)
             .await
     }
 }
@@ -106,7 +106,7 @@ impl SDK {
     /// # Arguments
     ///
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -118,12 +118,12 @@ impl SDK {
     pub async fn get_validator_changes(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetValidatorChangesResult>, Error> {
         //log("get_validator_changes!");
         get_validator_changes(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            &self.get_node_address(node_address),
+            &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
         )
         .await
@@ -138,7 +138,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_validator_changes_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         // Act
@@ -153,13 +153,13 @@ mod tests {
     #[tokio::test]
     async fn test_get_validator_changes_with_specific_arguments() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
-            .get_validator_changes(verbosity, Some(node_address))
+            .get_validator_changes(verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -168,7 +168,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_validator_changes_with_error() {
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
 

@@ -23,7 +23,7 @@ export class HeaderComponent implements AfterViewInit {
   networks: Network[] = this.config['networks'] as Network[];
   network: Network = this.config['network'] as Network;
   chain_name: string = this.network.chain_name;
-  node_address: string = this.network.node_address;
+  rpc_address: string = this.network.rpc_address;
   customNetwork!: string;
 
   private window!: (Window & typeof globalThis) | null;
@@ -45,17 +45,17 @@ export class HeaderComponent implements AfterViewInit {
   }
 
   async ngAfterViewInit() {
-    if (this.storageService.get('chain_name') && this.storageService.get('node_address')) {
+    if (this.storageService.get('chain_name') && this.storageService.get('rpc_address')) {
       this.chain_name = this.storageService.get('chain_name') || this.chain_name;
-      this.node_address = this.storageService.get('node_address') || this.node_address;
-      this.network = this.networks.find(x => x.node_address == this.node_address) || this.network;
+      this.rpc_address = this.storageService.get('rpc_address') || this.rpc_address;
+      this.network = this.networks.find(x => x.rpc_address == this.rpc_address) || this.network;
     }
 
     this.stateService.setState({
       chain_name: this.chain_name,
-      node_address: this.node_address,
+      rpc_address: this.rpc_address,
     });
-    this.setNodeAddress();
+    this.setRPCAddress();
     this.changeDetectorRef.markForCheck();
   }
 
@@ -64,13 +64,13 @@ export class HeaderComponent implements AfterViewInit {
     network = network && this.networks.find(x => x.name == network);
     this.network = network;
     this.chain_name = network.chain_name;
-    this.node_address = network.node_address;
-    this.setNodeAddress();
+    this.rpc_address = network.rpc_address;
+    this.setRPCAddress();
     this.stateService.setState({
       chain_name: network.chain_name
     });
     this.storageService.setState({
-      node_address: this.node_address,
+      rpc_address: this.rpc_address,
       chain_name: this.chain_name
     });
   }
@@ -82,16 +82,16 @@ export class HeaderComponent implements AfterViewInit {
   }
 
   onCustomNetworkChange($event: Event) {
-    this.node_address = ($event.target as HTMLInputElement)?.value || this.network.node_address;
+    this.rpc_address = ($event.target as HTMLInputElement)?.value || this.network.rpc_address;
     const customNetwork = this.networks.find(network => network.name === 'custom');
     if (customNetwork) {
-      customNetwork.node_address = this.node_address;
-      this.sdk.setNodeAddress(this.node_address);
+      customNetwork.rpc_address = this.rpc_address;
+      this.sdk.setRPCAddress(this.rpc_address);
       this.stateService.setState({
-        node_address: this.node_address
+        rpc_address: this.rpc_address
       });
       this.storageService.setState({
-        node_address: this.node_address
+        rpc_address: this.rpc_address
       });
     }
   }
@@ -122,15 +122,15 @@ export class HeaderComponent implements AfterViewInit {
     return typeof this.window !== 'undefined' && window.location?.origin?.startsWith('file://');
   }
 
-  private setNodeAddress() {
+  private setRPCAddress() {
     if ((this.is_electron)) {
-      this.sdk.setNodeAddress(this.node_address);
+      this.sdk.setRPCAddress(this.rpc_address);
     } else {
-      const network = this.networks.find(x => x.node_address == this.node_address);
+      const network = this.networks.find(x => x.rpc_address == this.rpc_address);
       if (this.is_production && !this.localhost_to_gateway && network && ['ntcl', 'node-launcher'].includes(network?.name)) {
-        this.sdk.setNodeAddress(this.node_address);
+        this.sdk.setRPCAddress(this.rpc_address);
       } else {
-        network && this.sdk.setNodeAddress([this.window?.location?.href, network?.name].join(''));
+        network && this.sdk.setRPCAddress([this.window?.location?.href, network?.name].join(''));
       }
 
     }

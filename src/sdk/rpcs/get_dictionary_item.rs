@@ -87,7 +87,7 @@ pub struct GetDictionaryItemOptions {
     pub state_root_hash: Option<Digest>,
     pub dictionary_item_params: Option<DictionaryItemStrParams>,
     pub dictionary_item_identifier: Option<DictionaryItemIdentifier>,
-    pub node_address: Option<String>,
+    pub rpc_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -136,7 +136,7 @@ impl SDK {
             dictionary_item_params,
             dictionary_item_identifier,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         let dictionary_item = if let Some(identifier) = dictionary_item_identifier {
@@ -149,13 +149,13 @@ impl SDK {
         };
 
         let result = if let Some(hash) = state_root_hash {
-            self.get_dictionary_item(hash, dictionary_item, verbosity, node_address)
+            self.get_dictionary_item(hash, dictionary_item, verbosity, rpc_address)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
-            self.get_dictionary_item(hash.as_str(), dictionary_item, verbosity, node_address)
+            self.get_dictionary_item(hash.as_str(), dictionary_item, verbosity, rpc_address)
                 .await
         } else {
-            self.get_dictionary_item("", dictionary_item, verbosity, node_address)
+            self.get_dictionary_item("", dictionary_item, verbosity, rpc_address)
                 .await
         };
 
@@ -192,7 +192,7 @@ impl SDK {
     /// * `state_root_hash` - A `ToDigest` implementation for specifying the state root hash.
     /// * `dictionary_item` - A `DictionaryItemInput` enum specifying the dictionary item to retrieve.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -206,17 +206,13 @@ impl SDK {
         state_root_hash: impl ToDigest,
         dictionary_item_input: DictionaryItemInput,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
         // log("state_get_dictionary_item!");
 
         let state_root_hash = if state_root_hash.is_empty() {
             let state_root_hash = self
-                .get_state_root_hash(
-                    None,
-                    None,
-                    Some(self.get_node_address(node_address.clone())),
-                )
+                .get_state_root_hash(None, None, Some(self.get_rpc_address(rpc_address.clone())))
                 .await;
 
             match state_root_hash {
@@ -234,7 +230,7 @@ impl SDK {
         match dictionary_item_input {
             DictionaryItemInput::Params(dictionary_item_params) => get_dictionary_item_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &state_root_hash.to_string(),
                 dictionary_item_str_params_to_casper_client(&dictionary_item_params),
@@ -243,7 +239,7 @@ impl SDK {
             .map_err(SdkError::from),
             DictionaryItemInput::Identifier(dictionary_item_identifier) => get_dictionary_item_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 state_root_hash.into(),
                 dictionary_item_identifier.into(),
@@ -263,7 +259,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         // Act
@@ -285,12 +281,12 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_state_root_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let dictionary_item = get_dictionary_item(false).await;
         let state_root_hash: Digest = sdk
-            .get_state_root_hash(None, verbosity, Some(node_address.clone()))
+            .get_state_root_hash(None, verbosity, Some(rpc_address.clone()))
             .await
             .unwrap()
             .result
@@ -304,7 +300,7 @@ mod tests {
                 state_root_hash,
                 dictionary_item,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -315,9 +311,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_empty_state_root_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -325,7 +321,7 @@ mod tests {
                 "",
                 get_dictionary_item(false).await,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -336,9 +332,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_valid_identifier_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -346,7 +342,7 @@ mod tests {
                 "",
                 get_dictionary_item(false).await,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -357,9 +353,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_valid_params_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -367,7 +363,7 @@ mod tests {
                 "",
                 get_dictionary_item(true).await,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -378,9 +374,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_invalid_params_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         let error_message =
             "Failed to parse dictionary item address as a key: unknown prefix for key";
@@ -394,7 +390,7 @@ mod tests {
                 state_root_hash,
                 DictionaryItemInput::Params(params),
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -407,7 +403,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act

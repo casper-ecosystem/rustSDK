@@ -31,7 +31,7 @@ impl SDK {
     /// * `deploy_params` - The deployment parameters.
     /// * `payment_params` - The payment parameters.
     /// * `verbosity` - The verbosity level for logging (optional).
-    /// * `node_address` - The address of the node to connect to (optional).
+    /// * `rpc_address` - The address of the node to connect to (optional).
     ///
     /// # Returns
     ///
@@ -47,7 +47,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
         let result = self
             .transfer(
@@ -57,7 +57,7 @@ impl SDK {
                 deploy_params,
                 payment_params,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await;
         match result {
@@ -81,7 +81,7 @@ impl SDK {
     /// * `deploy_params` - The deployment parameters.
     /// * `payment_params` - The payment parameters.
     /// * `verbosity` - The verbosity level for logging (optional).
-    /// * `node_address` - The address of the node to connect to (optional).
+    /// * `rpc_address` - The address of the node to connect to (optional).
     ///
     /// # Returns
     ///
@@ -96,7 +96,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("transfer!");
         let transfer_id = if let Some(transfer_id) = transfer_id {
@@ -118,7 +118,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.put_deploy(deploy.unwrap().into(), verbosity, node_address)
+        self.put_deploy(deploy.unwrap().into(), verbosity, rpc_address)
             .await
             .map_err(SdkError::from)
     }
@@ -138,9 +138,9 @@ mod tests {
     #[tokio::test]
     async fn test_transfer_with_valid_transfer_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
@@ -159,7 +159,7 @@ mod tests {
                 deploy_params,
                 payment_params,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -170,9 +170,9 @@ mod tests {
     #[tokio::test]
     async fn test_transfer_with_valid_transfer_params_without_secret_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let error_message = "Invalid Deploy";
 
@@ -192,7 +192,7 @@ mod tests {
                 deploy_params,
                 payment_params,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -205,9 +205,9 @@ mod tests {
     #[tokio::test]
     async fn test_transfer_with_invalid_transfer_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
         let secret_key = get_user_secret_key(None).unwrap();
@@ -227,7 +227,7 @@ mod tests {
                 deploy_params,
                 payment_params,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
         // Assert

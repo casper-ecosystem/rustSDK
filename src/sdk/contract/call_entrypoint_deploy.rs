@@ -23,7 +23,7 @@ impl SDK {
     /// * `deploy_params` - The deploy parameters.
     /// * `session_params` - The session parameters.
     /// * `payment_amount` - The payment amount as a string.
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -40,13 +40,13 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_amount: &str,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(payment_amount);
 
         let result = self
-            .call_entrypoint_deploy(deploy_params, session_params, payment_params, node_address)
+            .call_entrypoint_deploy(deploy_params, session_params, payment_params, rpc_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -68,7 +68,7 @@ impl SDK {
     /// * `deploy_params` - The deploy parameters.
     /// * `session_params` - The session parameters.
     /// * `payment_params` - The payment parameters.
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -84,7 +84,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("call_entrypoint_deploy!");
         let deploy = make_deploy(
@@ -95,7 +95,7 @@ impl SDK {
             false,
         )?;
 
-        self.put_deploy(deploy.into(), None, node_address)
+        self.put_deploy(deploy.into(), None, rpc_address)
             .await
             .map_err(SdkError::from)
     }
@@ -119,7 +119,7 @@ mod tests {
     #[tokio::test]
     async fn test_call_entrypoint_deploy_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let deploy_params = DeployStrParams::new("", "", None, None, None, None);
         let session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
@@ -141,8 +141,8 @@ mod tests {
     #[tokio::test]
     async fn test_call_entrypoint_deploy_with_valid_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -165,7 +165,7 @@ mod tests {
                 deploy_params,
                 session_params,
                 payment_params,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -178,8 +178,8 @@ mod tests {
     #[tokio::test]
     async fn test_call_entrypoint_deploy_with_invalid_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -212,7 +212,7 @@ mod tests {
                 deploy_params,
                 session_params,
                 payment_params,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -225,8 +225,8 @@ mod tests {
     #[tokio::test]
     async fn test_call_entrypoint_deploy_without_secret_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -257,7 +257,7 @@ mod tests {
                 deploy_params,
                 session_params,
                 payment_params,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -270,7 +270,7 @@ mod tests {
     #[tokio::test]
     async fn test_call_entrypoint_deploy_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let (_, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();

@@ -181,7 +181,7 @@ export function deleteFile(filePathToDelete: string) {
 
 export async function get_state_root_hash() {
   const get_state_root_hash_options = variables.sdk.get_state_root_hash_options({
-    node_address: config.node_address
+    rpc_address: config.rpc_address
   });
   const get_state_root_hash_result = await variables.sdk.get_state_root_hash(get_state_root_hash_options);
   variables.state_root_hash_default = get_state_root_hash_result?.state_root_hash.toString();
@@ -227,7 +227,7 @@ function writeFile(content: string, dest: string) {
 
 export async function get_block() {
   const chain_get_block_options = variables.sdk.get_block_options({
-    node_address: config.node_address
+    rpc_address: config.rpc_address
   });
   const block_result = await variables.sdk.get_block(chain_get_block_options);
   variables.block_hash = block_result?.block?.hash?.toString();

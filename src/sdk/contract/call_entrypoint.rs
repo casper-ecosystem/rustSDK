@@ -21,7 +21,7 @@ impl SDK {
     ///
     /// * `transaction_params` - Transaction parameters.
     /// * `builder_params` - Transaction Builder parameters.
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -35,10 +35,10 @@ impl SDK {
         &self,
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<PutTransactionResult, JsError> {
         let result = self
-            .call_entrypoint(builder_params, transaction_params, node_address)
+            .call_entrypoint(builder_params, transaction_params, rpc_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -59,7 +59,7 @@ impl SDK {
     ///
     /// * `builder_params` - Transaction Builder parameters.
     /// * `transaction_params` - Transaction parameters.
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -72,10 +72,10 @@ impl SDK {
         &self,
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_PutTransactionResult>, SdkError> {
         //log("call_entrypoint!");;
-        self.transaction(builder_params, transaction_params, None, node_address)
+        self.transaction(builder_params, transaction_params, None, rpc_address)
             .await
     }
 }
@@ -103,7 +103,7 @@ mod tests {
     #[tokio::test]
     async fn test_call_entrypoint_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let builder_params = TransactionBuilderParams::default();
         let transaction_params = TransactionStrParams::default();
 
@@ -124,8 +124,8 @@ mod tests {
     #[tokio::test]
     async fn test_call_entrypoint_with_valid_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
 
         let mut transaction_params = TransactionStrParams::default();
@@ -141,7 +141,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(builder_params, transaction_params, Some(node_address))
+            .call_entrypoint(builder_params, transaction_params, Some(rpc_address))
             .await;
 
         // Assert
@@ -153,8 +153,8 @@ mod tests {
     #[tokio::test]
     async fn test_call_entrypoint_with_invalid_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
 
         let error_message = "the transaction was invalid: no such contract at hash";
@@ -173,7 +173,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(builder_params, transaction_params, Some(node_address))
+            .call_entrypoint(builder_params, transaction_params, Some(rpc_address))
             .await;
 
         // Assert
@@ -185,8 +185,8 @@ mod tests {
     #[tokio::test]
     async fn test_call_entrypoint_without_secret_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (node_address, _, _, _, chain_name) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -208,7 +208,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(builder_params, transaction_params, Some(node_address))
+            .call_entrypoint(builder_params, transaction_params, Some(rpc_address))
             .await;
 
         // Assert
@@ -220,7 +220,7 @@ mod tests {
     #[tokio::test]
     async fn test_call_entrypoint_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let (_, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
 

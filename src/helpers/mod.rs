@@ -2,6 +2,7 @@ use crate::types::account_hash::AccountHash;
 use crate::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
 use base64::engine::general_purpose;
 use base64::Engine;
+use bigdecimal::BigDecimal;
 use blake2::{
     digest::{Update, VariableOutput},
     VarBlake2b,
@@ -15,9 +16,9 @@ use casper_types::{
 use chrono::{DateTime, SecondsFormat, Utc};
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
-use rust_decimal::prelude::*;
 use serde::Serialize;
 use serde_json::Value;
+use std::str::FromStr;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::{JsCast, JsValue};
 
@@ -338,10 +339,12 @@ pub fn hex_to_string(hex_string: &str) -> String {
 ///
 /// A string representing the CSPR amount.
 pub fn motes_to_cspr(motes: &str) -> Result<String, SdkError> {
-    match Decimal::from_str(motes) {
+    match BigDecimal::from_str(motes) {
         Ok(motes_decimal) => {
-            let cspr_decimal = motes_decimal / Decimal::new(1_000_000_000, 0);
-            let formatted_cspr = cspr_decimal.to_string();
+            let divisor = BigDecimal::from(1_000_000_000);
+            let cspr_decimal = &motes_decimal / divisor;
+            let formatted_cspr = format!("{:.2}", cspr_decimal);
+
             if formatted_cspr.ends_with(".00") {
                 Ok(formatted_cspr.replace(".00", ""))
             } else {
@@ -349,7 +352,7 @@ pub fn motes_to_cspr(motes: &str) -> Result<String, SdkError> {
             }
         }
         Err(err) => Err(SdkError::CustomError {
-            context: "Failed to parse input as Decimal",
+            context: "Failed to parse input as BigDecimal",
             error: format!("{:?}", err),
         }),
     }

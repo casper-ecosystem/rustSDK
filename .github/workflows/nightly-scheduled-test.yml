@@ -13,7 +13,7 @@ jobs:
         os: [ubuntu-20.04, ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     env:
-      NODE_ADDRESS: http://127.0.0.1:7777/rpc
+      RPC_ADDRESS: http://127.0.0.1:7777/rpc
       EVENT_ADDRESS: http://127.0.0.1:9999/events/main
       # WARNING: These accounts, and their private keys, are publicly known.
       # Any funds sent to them on Mainnet or any other live network WILL BE LOST.

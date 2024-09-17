@@ -60,7 +60,7 @@ impl SDK {
     /// # Arguments
     ///
     /// * `verbosity` - Optional verbosity level.
-    /// * `node_address` - Optional node address.
+    /// * `rpc_address` - Optional rpc address.
     ///
     /// # Returns
     ///
@@ -69,9 +69,9 @@ impl SDK {
     pub async fn get_peers_js_alias(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<GetPeersResult, JsError> {
-        let result = self.get_peers(verbosity, node_address).await;
+        let result = self.get_peers(verbosity, rpc_address).await;
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
@@ -87,9 +87,9 @@ impl SDK {
     pub async fn info_get_peers(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<GetPeersResult, JsError> {
-        self.get_peers_js_alias(verbosity, node_address).await
+        self.get_peers_js_alias(verbosity, rpc_address).await
     }
 }
 
@@ -99,7 +99,7 @@ impl SDK {
     /// # Arguments
     ///
     /// * `verbosity` - Optional verbosity level.
-    /// * `node_address` - Optional node address.
+    /// * `rpc_address` - Optional rpc address.
     ///
     /// # Returns
     ///
@@ -107,11 +107,11 @@ impl SDK {
     pub async fn get_peers(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetPeersResult>, Error> {
         get_peers(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            &self.get_node_address(node_address),
+            &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
         )
         .await
@@ -126,7 +126,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_peers_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         // Act
@@ -141,12 +141,12 @@ mod tests {
     #[tokio::test]
     async fn test_get_peers_with_specific_arguments() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
-        let result = sdk.get_peers(verbosity, Some(node_address)).await;
+        let result = sdk.get_peers(verbosity, Some(rpc_address)).await;
 
         // Assert
         assert!(result.is_ok());
@@ -154,7 +154,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_peers_with_error() {
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
 

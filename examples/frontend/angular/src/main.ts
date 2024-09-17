@@ -2,7 +2,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { enableProdMode, EnvironmentProviders, importProvidersFrom, Provider } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { NODE_ADDRESS, VERBOSITY, WASM_ASSET_PATH, WasmModule } from '@util/wasm';
+import { RPC_ADDRESS, VERBOSITY, WASM_ASSET_PATH, WasmModule } from '@util/wasm';
 import { config, CONFIG, ENV, Network } from '@util/config';
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
@@ -26,7 +26,7 @@ const providers: Array<Provider | EnvironmentProviders> = [
   { provide: ENV, useValue: environment },
   { provide: CONFIG, useValue: config },
   { provide: WASM_ASSET_PATH, useValue: config['wasm_asset_path'] as string },
-  { provide: NODE_ADDRESS, useValue: (config['network'] as Network)?.node_address },
+  { provide: RPC_ADDRESS, useValue: (config['network'] as Network)?.rpc_address },
   { provide: VERBOSITY, useValue: Verbosity[config['verbosity'] as Verbosity] },
   importProvidersFrom([
     HttpClientModule,

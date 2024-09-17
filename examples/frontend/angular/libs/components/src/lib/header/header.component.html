@@ -13,9 +13,9 @@
     >
     <span
       class="badge rounded-pill bg-success mb-2 ellipsis-container px-2 me-xl-3"
-      e2e-id="node_address"
-      [hidden]="!node_address"
-      >{{ node_address }}</span
+      e2e-id="rpc_address"
+      [hidden]="!rpc_address"
+      >{{ rpc_address }}</span
     >
   </div>
   <div class="col-12 col-md-6 col-lg-5">
@@ -37,16 +37,16 @@
           <optgroup label="default">
             <option
               [value]="network?.name"
-              [selected]="network.node_address === node_address"
+              [selected]="network.rpc_address === rpc_address"
               *ngFor="let network of networks; index as i"
             >
-              {{ network?.name }} ({{ network.node_address }})
+              {{ network?.name }} ({{ network.rpc_address }})
             </option>
           </optgroup>
           <optgroup label="fetched" *ngIf="peers">
             <option
               [value]="changePort(peer)"
-              [selected]="changePort(peer) === node_address"
+              [selected]="changePort(peer) === rpc_address"
               *ngFor="let peer of peers; index as i"
             >
               {{ changePort(peer) }} ({{ chain_name }})
@@ -67,7 +67,7 @@
             type="search"
             class="form-control form-control-xs"
             name="customNetwork"
-            [value]="node_address || ''"
+            [value]="rpc_address || ''"
             (change)="onCustomNetworkChange($event)"
             id="customNetworkElt"
             #publicKeyElt

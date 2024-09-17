@@ -30,7 +30,7 @@ pub struct QueryContractKeyOptions {
     pub maybe_block_id_as_string: Option<String>,
     pub path_as_string: Option<String>,
     pub path: Option<Path>,
-    pub node_address: Option<String>,
+    pub rpc_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -88,7 +88,7 @@ impl SDK {
                 path_input,
                 maybe_block_identifier,
                 options.verbosity,
-                options.node_address,
+                options.rpc_address,
             )
             .await;
         match result {
@@ -119,7 +119,7 @@ impl SDK {
         path: PathIdentifierInput,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_QueryGlobalStateResult>, SdkError> {
         let path_string = match path {
             PathIdentifierInput::Path(ref path_struct) => {
@@ -149,7 +149,7 @@ impl SDK {
                 entity_identifier_as_string,
                 maybe_block_identifier,
                 verbosity,
-                node_address.clone(),
+                rpc_address.clone(),
             )
             .await
             .map_err(SdkError::from);
@@ -185,7 +185,7 @@ impl SDK {
             state_root_hash: None,
             maybe_block_id: None,
             verbosity,
-            node_address,
+            rpc_address,
         })
         .await
         .map_err(SdkError::from)
@@ -212,7 +212,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_key_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         let path = PathIdentifierInput::String("installer".to_string());
@@ -231,7 +231,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_key_with_missing_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "Invalid argument 'get_entity': Error: Missing entity identifier";
 
         let path = PathIdentifierInput::String("installer".to_string());
@@ -250,15 +250,15 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_key_with_entity_identifier_as_string() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         let entity = get_entity_input().await;
 
         let path = PathIdentifierInput::String("installer".to_string());
 
-        let (_, block_height) = get_block(&node_address.clone()).await;
+        let (_, block_height) = get_block(&rpc_address.clone()).await;
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(block_height));
 
@@ -270,7 +270,7 @@ mod tests {
                 path,
                 Some(block_identifier),
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -281,15 +281,15 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_key_with_global_state_identifier() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         let entity = get_entity_input().await;
 
         let path = PathIdentifierInput::String("installer".to_string());
 
-        let (_, block_height) = get_block(&node_address.clone()).await;
+        let (_, block_height) = get_block(&rpc_address.clone()).await;
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(block_height));
         // Act
@@ -300,7 +300,7 @@ mod tests {
                 path,
                 Some(block_identifier),
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -311,9 +311,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_key_with_missing_path() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         let entity = get_entity_input().await;
         let error_message = "Invalid argument 'Path': Path is empty";
@@ -323,14 +323,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .query_contract_key(
-                Some(entity),
-                None,
-                path,
-                None,
-                verbosity,
-                Some(node_address),
-            )
+            .query_contract_key(Some(entity), None, path, None, verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -342,9 +335,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_key_with_missing_path_as_string() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         let entity = get_entity_input().await;
         let error_message = "Invalid argument 'Path string': Path string is empty";
@@ -353,14 +346,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .query_contract_key(
-                Some(entity),
-                None,
-                path,
-                None,
-                verbosity,
-                Some(node_address),
-            )
+            .query_contract_key(Some(entity), None, path, None, verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -372,9 +358,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_key_with_path_as_string() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         let entity = get_entity_input().await;
 
@@ -383,14 +369,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .query_contract_key(
-                Some(entity),
-                None,
-                path,
-                None,
-                verbosity,
-                Some(node_address),
-            )
+            .query_contract_key(Some(entity), None, path, None, verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -399,7 +378,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_query_contract_key_with_error() {
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
         let entity = get_entity_input().await;

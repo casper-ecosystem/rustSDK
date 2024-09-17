@@ -29,7 +29,7 @@ pub mod test_module {
         let config: TestConfig = get_config(true).await;
 
         let peers = create_test_sdk(None)
-            .get_peers(None, config.node_address)
+            .get_peers(None, config.rpc_address)
             .await;
 
         let peers = peers.unwrap();
@@ -223,7 +223,7 @@ pub mod test_module {
     pub async fn test_get_chainspec() {
         let config: TestConfig = get_config(true).await;
         let get_chainspec = create_test_sdk(None)
-            .get_chainspec(None, config.node_address)
+            .get_chainspec(None, config.rpc_address)
             .await;
 
         let get_chainspec = get_chainspec.unwrap();
@@ -338,7 +338,7 @@ pub mod test_module {
     pub async fn test_get_era_info(maybe_block_identifier: Option<BlockIdentifierInput>) {
         let config: TestConfig = get_config(true).await;
         let get_era_info = create_test_sdk(None)
-            .get_era_info(maybe_block_identifier, None, config.node_address)
+            .get_era_info(maybe_block_identifier, None, config.rpc_address)
             .await;
         let get_era_info = get_era_info.unwrap();
         assert!(!get_era_info.result.api_version.to_string().is_empty());
@@ -347,7 +347,7 @@ pub mod test_module {
     pub async fn test_get_era_summary(maybe_block_identifier: Option<BlockIdentifierInput>) {
         let config: TestConfig = get_config(true).await;
         let get_era_summary = create_test_sdk(None)
-            .get_era_summary(maybe_block_identifier, None, config.node_address)
+            .get_era_summary(maybe_block_identifier, None, config.rpc_address)
             .await;
 
         let get_era_summary = get_era_summary.unwrap();
@@ -363,7 +363,7 @@ pub mod test_module {
     pub async fn test_get_node_status() {
         let config: TestConfig = get_config(true).await;
         let get_node_status = create_test_sdk(None)
-            .get_node_status(None, config.node_address)
+            .get_node_status(None, config.rpc_address)
             .await;
         let get_node_status = get_node_status.unwrap();
         assert!(!get_node_status.result.api_version.to_string().is_empty());
@@ -373,7 +373,7 @@ pub mod test_module {
     pub async fn test_get_state_root_hash() {
         let config: TestConfig = get_config(true).await;
         let get_state_root_hash = create_test_sdk(None)
-            .get_state_root_hash(None, None, config.node_address)
+            .get_state_root_hash(None, None, config.rpc_address)
             .await;
 
         let state_root_hash: Digest = get_state_root_hash
@@ -388,7 +388,7 @@ pub mod test_module {
     pub async fn test_get_validator_changes() {
         let config: TestConfig = get_config(true).await;
         let validator_changes = create_test_sdk(None)
-            .get_validator_changes(None, config.node_address)
+            .get_validator_changes(None, config.rpc_address)
             .await;
         let validator_changes = validator_changes.unwrap();
         assert!(!validator_changes.result.api_version.to_string().is_empty());
@@ -398,7 +398,7 @@ pub mod test_module {
     pub async fn test_list_rpcs() {
         let config: TestConfig = get_config(true).await;
         let list_rpcs = create_test_sdk(None)
-            .list_rpcs(None, config.node_address)
+            .list_rpcs(None, config.rpc_address)
             .await;
         let list_rpcs = list_rpcs.unwrap();
         assert!(!list_rpcs.result.api_version.to_string().is_empty());
@@ -455,7 +455,7 @@ pub mod test_module {
             maybe_global_state_identifier,
             state_root_hash: None,
             maybe_block_id: None,
-            node_address: None,
+            rpc_address: None,
             verbosity: None,
         };
         let query_global_state = create_test_sdk(Some(config.clone()))
@@ -511,7 +511,7 @@ pub mod test_module {
             maybe_global_state_identifier,
             state_root_hash: None,
             maybe_block_id: None,
-            node_address: config.node_address.to_owned(),
+            rpc_address: config.rpc_address.to_owned(),
             verbosity: config.verbosity.to_owned(),
         };
         let query_global_state = sdk.query_global_state(query_params).await;

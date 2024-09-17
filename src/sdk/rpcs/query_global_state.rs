@@ -78,7 +78,7 @@ pub struct QueryGlobalStateOptions {
     pub key: Option<Key>,
     pub path_as_string: Option<String>,
     pub path: Option<Path>,
-    pub node_address: Option<String>,
+    pub rpc_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -162,7 +162,7 @@ pub struct QueryGlobalStateParams {
     pub maybe_global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash: Option<String>,
     pub maybe_block_id: Option<String>,
-    pub node_address: Option<String>,
+    pub rpc_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -190,7 +190,7 @@ impl SDK {
             path_as_string,
             path,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         let key = if let Some(key) = key {
@@ -230,7 +230,7 @@ impl SDK {
                 },
                 maybe_block_id: None,
                 verbosity,
-                node_address,
+                rpc_address,
             }
         } else if let Some(hash) = state_root_hash_as_string {
             let state_root_hash_str = hash.to_string();
@@ -245,7 +245,7 @@ impl SDK {
                 },
                 maybe_block_id: None,
                 verbosity,
-                node_address,
+                rpc_address,
             }
         } else if let Some(maybe_block_id_as_string) = maybe_block_id_as_string {
             QueryGlobalStateParams {
@@ -255,7 +255,7 @@ impl SDK {
                 state_root_hash: None,
                 maybe_block_id: Some(maybe_block_id_as_string),
                 verbosity,
-                node_address,
+                rpc_address,
             }
         } else {
             QueryGlobalStateParams {
@@ -265,7 +265,7 @@ impl SDK {
                 state_root_hash: None,
                 maybe_block_id: None,
                 verbosity,
-                node_address,
+                rpc_address,
             }
         };
         Ok(query_params)
@@ -293,7 +293,7 @@ impl SDK {
             state_root_hash,
             maybe_block_id,
             verbosity,
-            node_address,
+            rpc_address,
         } = query_params;
 
         let key = match key {
@@ -329,7 +329,7 @@ impl SDK {
         if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
             query_global_state_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 maybe_global_state_identifier.into(),
                 key.unwrap().into(),
@@ -344,7 +344,7 @@ impl SDK {
         } else if let Some(state_root_hash) = state_root_hash {
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 "",
                 &state_root_hash,
@@ -356,7 +356,7 @@ impl SDK {
         } else if let Some(maybe_block_id) = maybe_block_id {
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &maybe_block_id,
                 "",
@@ -367,11 +367,7 @@ impl SDK {
             .map_err(SdkError::from)
         } else {
             let state_root_hash = self
-                .get_state_root_hash(
-                    None,
-                    None,
-                    Some(self.get_node_address(node_address.clone())),
-                )
+                .get_state_root_hash(None, None, Some(self.get_rpc_address(rpc_address.clone())))
                 .await;
 
             let state_root_hash_as_string: String = match state_root_hash {
@@ -385,7 +381,7 @@ impl SDK {
 
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 "",
                 &state_root_hash_as_string,
@@ -414,7 +410,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_global_state_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "Failed to parse state identifier";
 
         // Act
@@ -426,7 +422,7 @@ mod tests {
                 state_root_hash: None,
                 maybe_block_id: None,
                 verbosity: None,
-                node_address: None,
+                rpc_address: None,
             })
             .await;
 
@@ -439,7 +435,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_global_state_with_missing_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message =
             "Invalid argument 'query_global_state': Error: Missing key from formatted string";
 
@@ -452,7 +448,7 @@ mod tests {
                 state_root_hash: None,
                 maybe_block_id: None,
                 verbosity: None,
-                node_address: None,
+                rpc_address: None,
             })
             .await;
 
@@ -465,10 +461,10 @@ mod tests {
     #[tokio::test]
     async fn test_query_global_state_with_global_state_identifier() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let global_state_identifier = GlobalStateIdentifier::from_block_height(1);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -479,7 +475,7 @@ mod tests {
                 state_root_hash: None,
                 maybe_block_id: None,
                 verbosity,
-                node_address: Some(node_address),
+                rpc_address: Some(rpc_address),
             })
             .await;
 
@@ -490,11 +486,11 @@ mod tests {
     #[tokio::test]
     async fn test_query_global_state_with_state_root_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let state_root_hash: Digest = sdk
-            .get_state_root_hash(None, verbosity, Some(node_address.clone()))
+            .get_state_root_hash(None, verbosity, Some(rpc_address.clone()))
             .await
             .unwrap()
             .result
@@ -510,7 +506,7 @@ mod tests {
                 state_root_hash: Some(state_root_hash.to_string()),
                 maybe_block_id: None,
                 verbosity,
-                node_address: Some(node_address),
+                rpc_address: Some(rpc_address),
             })
             .await;
 
@@ -521,9 +517,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_global_state_with_block_id() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -534,7 +530,7 @@ mod tests {
                 state_root_hash: None,
                 maybe_block_id: Some("1".to_string()),
                 verbosity,
-                node_address: Some(node_address),
+                rpc_address: Some(rpc_address),
             })
             .await;
 
@@ -544,7 +540,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_query_global_state_with_error() {
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
         // Act
@@ -558,7 +554,7 @@ mod tests {
                 ),
                 maybe_block_id: None,
                 verbosity: None,
-                node_address: None,
+                rpc_address: None,
             })
             .await;
 
