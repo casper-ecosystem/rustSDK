@@ -370,20 +370,6 @@ pub mod test_module {
         assert!(!get_node_status.result.chainspec_name.to_string().is_empty());
     }
 
-    pub async fn test_get_binary_node_status() {
-        let config: TestConfig = get_config(true).await;
-        let get_binary_node_status = create_test_sdk(None)
-            .get_binary_node_status(Some(config.binary_port_address))
-            .await;
-        let get_binary_node_status = get_binary_node_status.unwrap();
-        assert!(!get_binary_node_status
-            .protocol_version
-            .to_string()
-            .is_empty());
-        assert!(!get_binary_node_status.chainspec_name.to_string().is_empty());
-        dbg!(get_binary_node_status);
-    }
-
     pub async fn test_get_state_root_hash() {
         let config: TestConfig = get_config(true).await;
         let get_state_root_hash = create_test_sdk(None)
@@ -663,10 +649,6 @@ mod tests {
     #[test]
     pub async fn test_get_node_status_test() {
         test_get_node_status().await;
-    }
-    #[test]
-    pub async fn test_get_binary_node_status_test() {
-        test_get_binary_node_status().await;
     }
     #[test]
     pub async fn test_get_state_root_hash_test() {

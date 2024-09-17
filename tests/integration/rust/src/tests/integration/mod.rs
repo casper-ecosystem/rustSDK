@@ -1,3 +1,4 @@
+pub mod binary_port;
 pub mod contract;
 pub mod deploy;
 pub mod deploy_utils;

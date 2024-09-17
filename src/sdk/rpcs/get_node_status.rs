@@ -1,9 +1,8 @@
 #[cfg(target_arch = "wasm32")]
+use crate::types::sdk_error::SdkError;
+#[cfg(target_arch = "wasm32")]
 use crate::types::{digest::Digest, public_key::PublicKey};
-use crate::{
-    types::{sdk_error::SdkError, verbosity::Verbosity},
-    SDK,
-};
+use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_node_status, rpcs::results::GetNodeStatusResult as _GetNodeStatusResult, Error, JsonRpcId,
     SuccessResponse,
