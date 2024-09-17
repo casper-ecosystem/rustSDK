@@ -26,9 +26,9 @@ impl SDK {
     /// Returns the latest switch block header.
     pub async fn get_binary_latest_switch_block_header(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<Option<BlockHeader>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match latest_switch_block_header(&node_address).await {
             Ok(block_header) => Ok(block_header),
             Err(err) => Err(SdkError::CustomError {
@@ -41,9 +41,9 @@ impl SDK {
     /// Returns the latest block header.
     pub async fn get_binary_latest_block_header(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<Option<BlockHeader>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match latest_block_header(&node_address).await {
             Ok(block_header) => Ok(block_header),
             Err(err) => Err(SdkError::CustomError {
@@ -56,10 +56,10 @@ impl SDK {
     /// Returns the block header at the given height.
     pub async fn get_binary_block_header_by_height(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         height: u64,
     ) -> Result<Option<BlockHeader>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match block_header_by_height(&node_address, height).await {
             Ok(block_header) => Ok(block_header),
             Err(err) => Err(SdkError::CustomError {
@@ -72,10 +72,10 @@ impl SDK {
     /// Returns the block header with the given hash.
     pub async fn get_binary_block_header_by_hash(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         hash: BlockHash,
     ) -> Result<Option<BlockHeader>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match block_header_by_hash(&node_address, hash).await {
             Ok(block_header) => Ok(block_header),
             Err(err) => Err(SdkError::CustomError {
@@ -88,9 +88,9 @@ impl SDK {
     /// Returns the latest signed block along with signatures.
     pub async fn get_binary_latest_signed_block(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<Option<SignedBlock>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match latest_signed_block(&node_address).await {
             Ok(signed_block) => Ok(signed_block),
             Err(err) => Err(SdkError::CustomError {
@@ -103,10 +103,10 @@ impl SDK {
     /// Returns the signed block at the given height.
     pub async fn get_binary_signed_block_by_height(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         height: u64,
     ) -> Result<Option<SignedBlock>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match signed_block_by_height(&node_address, height).await {
             Ok(signed_block) => Ok(signed_block),
             Err(err) => Err(SdkError::CustomError {
@@ -119,10 +119,10 @@ impl SDK {
     /// Returns the signed block with the given hash.
     pub async fn get_binary_signed_block_by_hash(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         hash: BlockHash,
     ) -> Result<Option<SignedBlock>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match signed_block_by_hash(&node_address, hash).await {
             Ok(signed_block) => Ok(signed_block),
             Err(err) => Err(SdkError::CustomError {
@@ -135,11 +135,11 @@ impl SDK {
     /// Returns the transaction by its hash.
     pub async fn get_binary_transaction_by_hash(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         hash: TransactionHash,
         with_finalized_approvals: bool,
     ) -> Result<Option<TransactionWithExecutionInfo>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match transaction_by_hash(&node_address, hash, with_finalized_approvals).await {
             Ok(transaction) => Ok(transaction),
             Err(err) => Err(SdkError::CustomError {
@@ -150,11 +150,8 @@ impl SDK {
     }
 
     /// Returns the peer list.
-    pub async fn get_binary_peers(
-        &self,
-        binary_port_address: Option<String>,
-    ) -> Result<Peers, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+    pub async fn get_binary_peers(&self, node_address: Option<String>) -> Result<Peers, SdkError> {
+        let node_address = self.get_node_address(node_address);
         match peers(&node_address).await {
             Ok(peers) => Ok(peers),
             Err(err) => Err(SdkError::CustomError {
@@ -167,9 +164,9 @@ impl SDK {
     /// Returns the node uptime.
     pub async fn get_binary_uptime(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<Uptime, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match uptime(&node_address).await {
             Ok(uptime) => Ok(uptime),
             Err(err) => Err(SdkError::CustomError {
@@ -182,9 +179,9 @@ impl SDK {
     /// Returns the last progress recorded by the node.
     pub async fn get_binary_last_progress(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<LastProgress, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match last_progress(&node_address).await {
             Ok(progress) => Ok(progress),
             Err(err) => Err(SdkError::CustomError {
@@ -197,9 +194,9 @@ impl SDK {
     /// Returns the current reactor state.
     pub async fn get_binary_reactor_state(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<ReactorStateName, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match reactor_state(&node_address).await {
             Ok(state) => Ok(state),
             Err(err) => Err(SdkError::CustomError {
@@ -212,9 +209,9 @@ impl SDK {
     /// Returns the network name.
     pub async fn get_binary_network_name(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<NetworkName, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match network_name(&node_address).await {
             Ok(network_name) => Ok(network_name),
             Err(err) => Err(SdkError::CustomError {
@@ -227,9 +224,9 @@ impl SDK {
     /// Returns the last consensus validator changes.
     pub async fn get_binary_consensus_validator_changes(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<ConsensusValidatorChanges, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match consensus_validator_changes(&node_address).await {
             Ok(changes) => Ok(changes),
             Err(err) => Err(SdkError::CustomError {
@@ -242,9 +239,9 @@ impl SDK {
     /// Returns the block synchronizer status.
     pub async fn get_binary_block_synchronizer_status(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<BlockSynchronizerStatus, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match block_synchronizer_status(&node_address).await {
             Ok(status) => Ok(status),
             Err(err) => Err(SdkError::CustomError {
@@ -257,9 +254,9 @@ impl SDK {
     /// Returns the available block range.
     pub async fn get_binary_available_block_range(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<AvailableBlockRange, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match available_block_range(&node_address).await {
             Ok(block_range) => Ok(block_range),
             Err(err) => Err(SdkError::CustomError {
@@ -272,9 +269,9 @@ impl SDK {
     /// Returns information about the next upgrade point.
     pub async fn get_binary_next_upgrade(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<Option<NextUpgrade>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match next_upgrade(&node_address).await {
             Ok(upgrade) => Ok(upgrade),
             Err(err) => Err(SdkError::CustomError {
@@ -287,9 +284,9 @@ impl SDK {
     /// Returns the consensus status.
     pub async fn get_binary_consensus_status(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<ConsensusStatus, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match consensus_status(&node_address).await {
             Ok(status) => Ok(status),
             Err(err) => Err(SdkError::CustomError {
@@ -302,9 +299,9 @@ impl SDK {
     /// Returns the raw chainspec bytes and additional configuration.
     pub async fn get_binary_chainspec_raw_bytes(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<ChainspecRawBytes, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match chainspec_raw_bytes(&node_address).await {
             Ok(bytes) => Ok(bytes),
             Err(err) => Err(SdkError::CustomError {
@@ -317,10 +314,10 @@ impl SDK {
     /// Retrieves the node status.
     pub async fn get_binary_node_status(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<NodeStatus, SdkError> {
         // Get the node address, falling back to self's default if not provided
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
 
         match node_status(&node_address).await {
             Ok(status) => Ok(status),
@@ -334,11 +331,11 @@ impl SDK {
     /// Retrieves the reward for the given validator at the given era.
     pub async fn get_binary_get_validator_reward_by_era(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         validator_key: PublicKey,
         era: EraId,
     ) -> Result<Option<RewardResponse>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
 
         match validator_reward_by_era(&node_address, validator_key, era).await {
             Ok(reward) => Ok(reward),
@@ -352,11 +349,11 @@ impl SDK {
     /// Retrieves the reward for the given validator at the era containing the block at given height.
     pub async fn get_binary_get_validator_reward_by_block_height(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         validator_key: PublicKey,
         block_height: u64,
     ) -> Result<Option<RewardResponse>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
 
         match validator_reward_by_block_height(&node_address, validator_key, block_height).await {
             Ok(reward) => Ok(reward),
@@ -370,11 +367,11 @@ impl SDK {
     /// Retrieves the reward for the given validator at the era containing the block with given hash.
     pub async fn get_binary_get_validator_reward_by_block_hash(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         validator_key: PublicKey,
         block_hash: BlockHash,
     ) -> Result<Option<RewardResponse>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
 
         match validator_reward_by_block_hash(&node_address, validator_key, block_hash).await {
             Ok(reward) => Ok(reward),
@@ -388,12 +385,12 @@ impl SDK {
     /// Retrieves the reward for the given delegator at the given era.
     pub async fn get_binary_get_delegator_reward_by_era(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         validator_key: PublicKey,
         delegator_key: PublicKey,
         era: EraId,
     ) -> Result<Option<RewardResponse>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
 
         match delegator_reward_by_era(&node_address, validator_key, delegator_key, era).await {
             Ok(reward) => Ok(reward),
@@ -407,12 +404,12 @@ impl SDK {
     /// Retrieves the reward for the given delegator at the era containing the block at given height.
     pub async fn get_binary_get_delegator_reward_by_block_height(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         validator_key: PublicKey,
         delegator_key: PublicKey,
         block_height: u64,
     ) -> Result<Option<RewardResponse>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
 
         match delegator_reward_by_block_height(
             &node_address,
@@ -433,12 +430,12 @@ impl SDK {
     /// Retrieves the reward for the given delegator at the era containing the block with given hash.
     pub async fn get_binary_get_delegator_reward_by_block_hash(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         validator_key: PublicKey,
         delegator_key: PublicKey,
         block_hash: BlockHash,
     ) -> Result<Option<RewardResponse>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
 
         match delegator_reward_by_block_hash(
             &node_address,
@@ -459,11 +456,11 @@ impl SDK {
     /// Reads a record from the node.
     pub async fn get_binary_read_record(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         record_id: RecordId,
         key: &[u8],
     ) -> Result<Vec<u8>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match read_record(&node_address, record_id, key).await {
             Ok(record) => Ok(record),
             Err(err) => Err(SdkError::CustomError {
@@ -476,11 +473,11 @@ impl SDK {
     /// Retrieves an item from the global state using the most recent state root hash.
     pub async fn get_binary_global_state_item(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         key: Key,
         path: Vec<String>,
     ) -> Result<Option<GlobalStateQueryResult>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match global_state_item(&node_address, key, path).await {
             Ok(item) => Ok(item),
             Err(err) => Err(SdkError::CustomError {
@@ -493,12 +490,12 @@ impl SDK {
     /// Retrieves an item from the global state using a specific state root hash.
     pub async fn get_binary_global_state_item_by_state_root_hash(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         state_root_hash: Digest,
         key: Key,
         path: Vec<String>,
     ) -> Result<Option<GlobalStateQueryResult>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match global_state_item_by_state_root_hash(&node_address, state_root_hash, key, path).await
         {
             Ok(item) => Ok(item),
@@ -512,12 +509,12 @@ impl SDK {
     /// Retrieves an item from the global state using a block hash.
     pub async fn get_binary_global_state_item_by_block_hash(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         block_hash: BlockHash,
         key: Key,
         path: Vec<String>,
     ) -> Result<Option<GlobalStateQueryResult>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match global_state_item_by_block_hash(&node_address, block_hash, key, path).await {
             Ok(item) => Ok(item),
             Err(err) => Err(SdkError::CustomError {
@@ -530,12 +527,12 @@ impl SDK {
     /// Retrieves an item from the global state using a block height.
     pub async fn get_binary_global_state_item_by_block_height(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         block_height: u64,
         key: Key,
         path: Vec<String>,
     ) -> Result<Option<GlobalStateQueryResult>, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match global_state_item_by_block_height(&node_address, block_height, key, path).await {
             Ok(item) => Ok(item),
             Err(err) => Err(SdkError::CustomError {
@@ -548,10 +545,10 @@ impl SDK {
     /// Attempts to send a transaction to the node for inclusion.
     pub async fn get_binary_try_accept_transaction(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         transaction: Transaction,
     ) -> Result<(), SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match try_accept_transaction(&node_address, transaction).await {
             Ok(_) => Ok(()),
             Err(err) => Err(SdkError::CustomError {
@@ -564,10 +561,10 @@ impl SDK {
     /// Attempts to send a transaction to the node for speculative execution.
     pub async fn get_binary_try_speculative_execution(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
         transaction: Transaction,
     ) -> Result<SpeculativeExecutionResult, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match try_speculative_execution(&node_address, transaction).await {
             Ok(result) => Ok(result),
             Err(err) => Err(SdkError::CustomError {
@@ -580,9 +577,9 @@ impl SDK {
     /// Retrieves the protocol version from the node.
     pub async fn get_binary_get_protocol_version(
         &self,
-        binary_port_address: Option<String>,
+        node_address: Option<String>,
     ) -> Result<ProtocolVersion, SdkError> {
-        let node_address = self.get_node_address(binary_port_address);
+        let node_address = self.get_node_address(node_address);
         match protocol_version(&node_address).await {
             Ok(version) => Ok(version),
             Err(err) => Err(SdkError::CustomError {

@@ -6,12 +6,12 @@ use casper_rust_wasm_sdk::types::verbosity::Verbosity;
 use casper_rust_wasm_sdk::{helpers::public_key_from_secret_key, types::public_key::PublicKey};
 use lazy_static::lazy_static;
 use std::time::{self, Duration};
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, RwLock};
 
 pub const DEFAULT_RPC_ADDRESS: &str = "http://localhost:11101";
 pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
 pub const SPECULATIVE_ADDRESS: &str = "http://127.0.0.1:25101";
-pub const BINARY_PORT_ADDRESS: &str = "127.0.0.1:28101";
+pub const DEFAULT_NODE_ADDRESS: &str = "127.0.0.1:28101";
 pub const DEFAULT_CHAIN_NAME: &str = "casper-net-1";
 pub const DEFAULT_SECRET_KEY_NAME: &str = "secret_key.pem";
 // TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static erroring with runtime dropped the dispatch task
@@ -65,7 +65,6 @@ pub struct TestConfig {
     pub event_address: String,
     pub verbosity: Option<Verbosity>,
     pub speculative_address: String,
-    pub binary_port_address: String,
     pub chain_name: String,
     pub secret_key: String,
     pub account: String,
@@ -81,9 +80,17 @@ pub struct TestConfig {
     pub contract_cep78_package_hash: String,
 }
 
+#[derive(PartialEq, Eq)]
+pub(crate) enum InitializationState {
+    NotInitialized,
+    PartiallyInitialized, // dummy config
+    InstallComplete,      // install cep_78 has occured
+}
+
 lazy_static! {
-    pub static ref CONFIG: Mutex<Option<TestConfig>> = Mutex::new(None);
-    pub static ref BLOCK_HASH_INITIALIZED: Mutex<bool> = Mutex::new(false);
+    pub(crate) static ref CONFIG: Mutex<Option<TestConfig>> = Mutex::new(None);
+    pub(crate) static ref INITIALIZATION_STATE: RwLock<InitializationState> =
+        RwLock::new(InitializationState::NotInitialized);
 }
 
 pub async fn initialize_test_config(
@@ -91,6 +98,13 @@ pub async fn initialize_test_config(
 ) -> Result<TestConfig, Box<dyn std::error::Error>> {
     use crate::tests::helpers::{get_contract_cep78_hash_keys, install_cep78_if_needed, mint_nft};
     use dotenvy::dotenv;
+
+    let mut initialization_state = INITIALIZATION_STATE.write().await;
+
+    if *initialization_state == InitializationState::InstallComplete {
+        // If already fully initialized, skip initialization
+        return Ok(CONFIG.lock().await.clone().unwrap());
+    }
 
     dotenv().ok();
 
@@ -102,10 +116,6 @@ pub async fn initialize_test_config(
         chain_name,
     ) = get_network_constants();
 
-    let mut block_hash_initialized_guard = BLOCK_HASH_INITIALIZED.lock().await;
-    if *block_hash_initialized_guard {
-        return Err("initialize_test_config called after block_hash already initialized".into());
-    }
     let secret_key = get_user_secret_key(None).unwrap();
     let secret_key_target_account = get_user_secret_key(Some("user-2"))?;
     let account = public_key_from_secret_key(&secret_key).unwrap();
@@ -125,6 +135,8 @@ pub async fn initialize_test_config(
         String::from("dictionary-035b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7");
     let mut dictionary_uref =
         String::from("uref-045b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7-001");
+
+    *initialization_state = InitializationState::PartiallyInitialized;
 
     if !skip_install {
         println!("install_cep78");
@@ -169,10 +181,10 @@ pub async fn initialize_test_config(
             Some(default_rpc_address.clone()),
         )
         .await;
+        *initialization_state = InitializationState::InstallComplete;
     }
 
     let (block_hash, block_height) = get_block(&default_rpc_address).await;
-    *block_hash_initialized_guard = true;
 
     let config = TestConfig {
         rpc_address: Some(default_rpc_address.to_string()),
@@ -180,7 +192,6 @@ pub async fn initialize_test_config(
         verbosity: Some(Verbosity::High),
         event_address: default_event_address,
         speculative_address: default_speculative_address,
-        binary_port_address: default_node_address,
         account,
         secret_key,
         chain_name,
@@ -199,13 +210,26 @@ pub async fn initialize_test_config(
 }
 
 pub async fn get_config(skip_install: bool) -> TestConfig {
-    initialize_test_config_if_needed(skip_install).await;
-    CONFIG.lock().await.clone().unwrap()
-}
-
-async fn initialize_test_config_if_needed(skip_install: bool) {
     let mut config_guard = CONFIG.lock().await;
-    if config_guard.is_none() {
-        *config_guard = Some(initialize_test_config(skip_install).await.unwrap());
+    // Acquire the initialization state
+    let initialization_state = INITIALIZATION_STATE.read().await;
+
+    // If the initialization state is NotInitialized, initialize based on `skip_install`
+    if *initialization_state == InitializationState::NotInitialized {
+        drop(initialization_state);
+        let config = initialize_test_config(skip_install).await.unwrap();
+        *config_guard = Some(config.clone());
+        return config;
     }
+    // Else if the initialization state is PartiallyInitialized and `skip_install` is false,
+    // reinitialize with installation
+    else if *initialization_state == InitializationState::PartiallyInitialized && !skip_install {
+        drop(initialization_state);
+        let config = initialize_test_config(false).await.unwrap();
+        *config_guard = Some(config.clone());
+        return config;
+    }
+
+    // If the state is InstallComplete or no action is needed, return the existing config
+    config_guard.clone().unwrap()
 }

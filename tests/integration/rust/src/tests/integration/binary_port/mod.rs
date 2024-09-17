@@ -5,8 +5,8 @@ pub mod test_module {
 
     pub async fn test_get_binary_node_status() {
         let config: TestConfig = get_config(true).await;
-        let get_binary_node_status = create_test_sdk(None)
-            .get_binary_node_status(Some(config.binary_port_address))
+        let get_binary_node_status = create_test_sdk(Some(config))
+            .get_binary_node_status(None)
             .await;
         let get_binary_node_status = get_binary_node_status.unwrap();
         assert!(!get_binary_node_status

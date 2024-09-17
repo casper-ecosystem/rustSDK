@@ -1,6 +1,6 @@
 use self::intern::{create_test_sdk, install_cep78};
 use crate::config::{
-    BINARY_PORT_ADDRESS, CONTRACT_CEP78_KEY, PACKAGE_CEP78_KEY, SPECULATIVE_ADDRESS,
+    CONTRACT_CEP78_KEY, DEFAULT_NODE_ADDRESS, PACKAGE_CEP78_KEY, SPECULATIVE_ADDRESS,
 };
 use crate::config::{
     DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_RPC_ADDRESS, DEFAULT_SECRET_KEY_NAME,
@@ -235,7 +235,7 @@ pub fn get_network_constants() -> (String, String, String, String, String) {
     let default_speculative_address =
         env::var("SPECULATIVE_ADDRESS").unwrap_or_else(|_| SPECULATIVE_ADDRESS.to_string());
     let default_node_address =
-        env::var("BINARY_PORT_ADDRESS").unwrap_or_else(|_| BINARY_PORT_ADDRESS.to_string());
+        env::var("DEFAULT_NODE_ADDRESS").unwrap_or_else(|_| DEFAULT_NODE_ADDRESS.to_string());
     let chain_name = env::var("CHAIN_NAME").unwrap_or_else(|_| DEFAULT_CHAIN_NAME.to_string());
 
     (

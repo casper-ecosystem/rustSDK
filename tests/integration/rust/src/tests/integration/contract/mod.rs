@@ -28,6 +28,87 @@ pub mod test_module {
     };
 
     #[allow(deprecated)]
+    pub async fn test_install_deploy() -> String {
+        let config: TestConfig = get_config(true).await;
+        let deploy_params = DeployStrParams::new(
+            &config.chain_name,
+            &config.account,
+            Some(config.secret_key.clone()),
+            None,
+            Some(TTL.to_string()),
+            None,
+        );
+        let mut session_params = SessionStrParams::default();
+
+        let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
+            Ok(module_bytes) => module_bytes,
+            Err(err) => {
+                eprintln!("Error reading file: {:?}", err);
+                return String::from("");
+            }
+        };
+        session_params.set_session_bytes(module_bytes.into());
+        let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
+        session_params.set_session_args(args_simple);
+
+        let install = create_test_sdk(Some(config))
+            .install_deploy(deploy_params, session_params, PAYMENT_AMOUNT, None)
+            .await;
+        assert!(!install
+            .as_ref()
+            .unwrap()
+            .result
+            .api_version
+            .to_string()
+            .is_empty());
+
+        let deploy_hash_as_hex_string =
+            install.as_ref().unwrap().result.deploy_hash.to_hex_string();
+        assert!(!deploy_hash_as_hex_string.is_empty());
+        deploy_hash_as_hex_string
+    }
+
+    pub async fn test_install_transaction() -> String {
+        let config: TestConfig = get_config(true).await;
+        let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
+        let mut transaction_params = TransactionStrParams::default();
+        transaction_params.set_chain_name(&config.chain_name);
+        transaction_params.set_initiator_addr(&config.account);
+        transaction_params.set_secret_key(&config.secret_key);
+        transaction_params.set_session_args_simple(args_simple);
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
+        transaction_params.set_ttl(Some(TTL.to_string()));
+
+        let transaction_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
+            Ok(transaction_bytes) => transaction_bytes,
+            Err(err) => {
+                eprintln!("Error reading file: {:?}", err);
+                return String::from("");
+            }
+        };
+
+        let install = create_test_sdk(Some(config))
+            .install(transaction_params, transaction_bytes.into(), None)
+            .await;
+        assert!(!install
+            .as_ref()
+            .unwrap()
+            .result
+            .api_version
+            .to_string()
+            .is_empty());
+
+        let transaction_hash_as_hex_string = install
+            .as_ref()
+            .unwrap()
+            .result
+            .transaction_hash
+            .to_hex_string();
+        assert!(!transaction_hash_as_hex_string.is_empty());
+        transaction_hash_as_hex_string
+    }
+
+    #[allow(deprecated)]
     pub async fn test_call_entrypoint_deploy() {
         let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
@@ -190,87 +271,6 @@ pub mod test_module {
         //     .is_account_kind());
     }
 
-    #[allow(deprecated)]
-    pub async fn test_install_deploy() -> String {
-        let config: TestConfig = get_config(true).await;
-        let deploy_params = DeployStrParams::new(
-            &config.chain_name,
-            &config.account,
-            Some(config.secret_key.clone()),
-            None,
-            Some(TTL.to_string()),
-            None,
-        );
-        let mut session_params = SessionStrParams::default();
-
-        let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
-            Ok(module_bytes) => module_bytes,
-            Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
-                return String::from("");
-            }
-        };
-        session_params.set_session_bytes(module_bytes.into());
-        let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-        session_params.set_session_args(args_simple);
-
-        let install = create_test_sdk(Some(config))
-            .install_deploy(deploy_params, session_params, PAYMENT_AMOUNT, None)
-            .await;
-        assert!(!install
-            .as_ref()
-            .unwrap()
-            .result
-            .api_version
-            .to_string()
-            .is_empty());
-
-        let deploy_hash_as_hex_string =
-            install.as_ref().unwrap().result.deploy_hash.to_hex_string();
-        assert!(!deploy_hash_as_hex_string.is_empty());
-        deploy_hash_as_hex_string
-    }
-
-    pub async fn test_install_transaction() -> String {
-        let config: TestConfig = get_config(true).await;
-        let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-        let mut transaction_params = TransactionStrParams::default();
-        transaction_params.set_chain_name(&config.chain_name);
-        transaction_params.set_initiator_addr(&config.account);
-        transaction_params.set_secret_key(&config.secret_key);
-        transaction_params.set_session_args_simple(args_simple);
-        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
-        transaction_params.set_ttl(Some(TTL.to_string()));
-
-        let transaction_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
-            Ok(transaction_bytes) => transaction_bytes,
-            Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
-                return String::from("");
-            }
-        };
-
-        let install = create_test_sdk(Some(config))
-            .install(transaction_params, transaction_bytes.into(), None)
-            .await;
-        assert!(!install
-            .as_ref()
-            .unwrap()
-            .result
-            .api_version
-            .to_string()
-            .is_empty());
-
-        let transaction_hash_as_hex_string = install
-            .as_ref()
-            .unwrap()
-            .result
-            .transaction_hash
-            .to_hex_string();
-        assert!(!transaction_hash_as_hex_string.is_empty());
-        transaction_hash_as_hex_string
-    }
-
     pub async fn test_call_entrypoint_transaction() {
         let config: TestConfig = get_config(false).await;
         let transaction_params = TransactionStrParams::default();
@@ -316,12 +316,12 @@ mod tests {
         test_install_deploy().await;
     }
     #[test]
-    pub async fn test_call_entrypoint_deploy_test() {
-        test_call_entrypoint_deploy().await;
-    }
-    #[test]
     pub async fn test_install_transaction_test() {
         test_install_transaction().await;
+    }
+    #[test]
+    pub async fn test_call_entrypoint_deploy_test() {
+        test_call_entrypoint_deploy().await;
     }
     #[test]
     pub async fn test_call_entrypoint_transaction_test() {
