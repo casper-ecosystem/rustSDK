@@ -589,3 +589,24 @@ impl SDK {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sdk_tests::tests::helpers::get_network_constants;
+
+    #[tokio::test]
+    async fn test_get_binary_node_status_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let get_binary_node_status = sdk.get_binary_node_status(Some(node_address)).await;
+
+        let get_binary_node_status = get_binary_node_status.unwrap();
+        assert!(!get_binary_node_status
+            .protocol_version
+            .to_string()
+            .is_empty());
+        assert!(!get_binary_node_status.chainspec_name.to_string().is_empty());
+    }
+}
