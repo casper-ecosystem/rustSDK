@@ -592,8 +592,326 @@ impl SDK {
 
 #[cfg(test)]
 mod tests {
+    use crate::{
+        helpers::{public_key_from_secret_key, secret_key_from_pem},
+        types::transaction_params::transaction_str_params::TransactionStrParams,
+    };
+
     use super::*;
-    use sdk_tests::tests::helpers::get_network_constants;
+    use casper_types::bytesrepr::ToBytes;
+    use sdk_tests::{
+        config::TRANSFER_AMOUNT,
+        tests::helpers::{get_network_constants, get_user_secret_key},
+    };
+
+    #[tokio::test]
+    async fn test_get_binary_latest_switch_block_header_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk
+            .get_binary_latest_switch_block_header(Some(node_address))
+            .await;
+
+        let block_header = result.unwrap();
+        assert!(block_header.is_some());
+        let block_header = block_header.unwrap();
+
+        assert!(!block_header.body_hash().to_string().is_empty());
+        assert!(block_header.height() > 0);
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_latest_block_header_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk.get_binary_latest_block_header(Some(node_address)).await;
+
+        let block_header = result.unwrap();
+        assert!(block_header.is_some());
+        let block_header = block_header.unwrap();
+
+        assert!(!block_header.body_hash().to_string().is_empty());
+        assert!(block_header.height() > 0);
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_block_header_by_height_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        let block_height = 1; // Sample block height
+
+        let result = sdk
+            .get_binary_block_header_by_height(Some(node_address), block_height)
+            .await;
+
+        let block_header = result.unwrap();
+        assert!(block_header.is_some());
+        let block_header = block_header.unwrap();
+
+        assert!(!block_header.body_hash().to_string().is_empty());
+        assert_eq!(block_header.height(), block_height);
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_block_header_by_hash_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        let block_height = 1; // Sample block height
+
+        let result = sdk
+            .get_binary_block_header_by_height(Some(node_address.clone()), block_height)
+            .await;
+
+        let block_header = result.unwrap();
+        assert!(block_header.is_some());
+        let block_header = block_header.unwrap();
+        let block_hash = block_header.block_hash();
+
+        assert!(!block_hash.to_string().is_empty());
+        dbg!(block_hash);
+
+        let result = sdk
+            .get_binary_block_header_by_hash(Some(node_address), block_hash.clone())
+            .await;
+        dbg!(result);
+        // TODO check
+        // let block_header = result.unwrap();
+        // assert!(block_header.is_some());
+        // let block_header = block_header.unwrap();
+
+        // assert_eq!(
+        //     block_header.body_hash().to_string(),
+        //     block_hash.to_hex_string()
+        // );
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_latest_signed_block_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk.get_binary_latest_signed_block(Some(node_address)).await;
+        let signed_block = result.unwrap();
+        assert!(signed_block.is_some());
+        let signed_block = signed_block.unwrap();
+        assert!(!signed_block.block().hash().to_string().is_empty());
+        assert!(signed_block.block().height() > 0);
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_signed_block_by_height_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        let block_height = 1;
+
+        let result = sdk
+            .get_binary_signed_block_by_height(Some(node_address), block_height)
+            .await;
+        let signed_block = result.unwrap();
+        assert!(signed_block.is_some());
+        let signed_block = signed_block.unwrap();
+        assert_eq!(signed_block.block().height(), block_height);
+        assert!(!signed_block.block().hash().to_string().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_signed_block_by_hash_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        let block_height = 1;
+
+        let result = sdk
+            .get_binary_signed_block_by_height(Some(node_address.clone()), block_height)
+            .await;
+        let signed_block = result.unwrap();
+        assert!(signed_block.is_some());
+        let signed_block = signed_block.unwrap();
+        assert_eq!(signed_block.block().height(), block_height);
+        let block_hash = signed_block.block().hash();
+        assert!(!block_hash.to_string().is_empty());
+
+        dbg!(block_hash);
+
+        let result = sdk
+            .get_binary_signed_block_by_hash(Some(node_address), block_hash.clone())
+            .await;
+
+        dbg!(result);
+        // TODO check
+        // let signed_block = result.unwrap();
+        // assert!(signed_block.is_some());
+        // let signed_block = signed_block.unwrap();
+        // assert_eq!(
+        //     signed_block.block().hash().to_string(),
+        //     block_hash.to_hex_string()
+        // );
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_transaction_by_hash_success() {
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, node_address, chain_name) = get_network_constants();
+
+        let secret_key = get_user_secret_key(None).unwrap();
+        let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
+
+        let transaction_params = TransactionStrParams::default();
+        transaction_params.set_secret_key(&secret_key);
+        transaction_params.set_chain_name(&chain_name);
+        transaction_params.set_payment_amount(TRANSFER_AMOUNT);
+
+        let transfer = sdk
+            .transfer_transaction(
+                None,
+                &initiator_addr, // self transfer
+                TRANSFER_AMOUNT,
+                transaction_params,
+                None,
+                None,
+                Some(rpc_address.clone()),
+            )
+            .await
+            .unwrap();
+        let transaction_hash = transfer.result.transaction_hash;
+        assert!(!transaction_hash.to_string().is_empty());
+
+        dbg!(transaction_hash);
+
+        let result = sdk
+            .get_binary_transaction_by_hash(Some(node_address), transaction_hash.clone(), false)
+            .await;
+        dbg!(result);
+        // TODO check
+        // let transaction = result.unwrap();
+        // assert!(transaction.is_some());
+        // let transaction = transaction.unwrap();
+        // dbg!(transaction);
+        // assert_eq!(
+        //     transaction.into_inner().to_string(),
+        //     transaction_hash
+        // );
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_peers_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk.get_binary_peers(Some(node_address)).await;
+        let peers = result.unwrap();
+        assert!(!peers.into_inner().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_uptime_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk.get_binary_uptime(Some(node_address)).await;
+        let uptime = result.unwrap();
+        assert!(!uptime.into_inner().to_string().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_last_progress_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk.get_binary_last_progress(Some(node_address)).await;
+        let progress = result.unwrap();
+        assert!(!progress.into_inner().to_string().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_reactor_state_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk.get_binary_reactor_state(Some(node_address)).await;
+        let state = result.unwrap();
+        assert!(!state.into_inner().to_string().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_network_name_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk.get_binary_network_name(Some(node_address)).await;
+        let network_name = result.unwrap();
+        assert!(!network_name.into_inner().to_string().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_consensus_validator_changes_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk
+            .get_binary_consensus_validator_changes(Some(node_address))
+            .await;
+        let changes = result.unwrap();
+        // Todo check empty
+        assert!(changes.into_inner().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_block_synchronizer_status_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk
+            .get_binary_block_synchronizer_status(Some(node_address))
+            .await;
+        let status = result.unwrap();
+        assert!(!status.to_bytes().unwrap().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_available_block_range_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk
+            .get_binary_available_block_range(Some(node_address))
+            .await;
+        let block_range = result.unwrap();
+        assert!(block_range.low() <= block_range.high());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_next_upgrade_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk.get_binary_next_upgrade(Some(node_address)).await;
+        let upgrade = result.unwrap();
+        // TODO check
+        assert!(upgrade.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_consensus_status_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk.get_binary_consensus_status(Some(node_address)).await;
+        let status = result.unwrap();
+        assert!(!status.validator_public_key().to_string().is_empty());
+        assert!(status.round_length().is_some())
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_chainspec_raw_bytes_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk.get_binary_chainspec_raw_bytes(Some(node_address)).await;
+        let chainspec = result.unwrap();
+        assert!(!chainspec.chainspec_bytes().is_empty());
+    }
 
     #[tokio::test]
     async fn test_get_binary_node_status_success() {
@@ -608,5 +926,395 @@ mod tests {
             .to_string()
             .is_empty());
         assert!(!get_binary_node_status.chainspec_name.to_string().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_get_validator_reward_by_era_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        // TODO Get validator key
+        let secret_key = get_user_secret_key(None).unwrap();
+        let secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let validator_key = PublicKey::from(&secret_key_from_pem);
+        let era = EraId::new(1);
+
+        let result = sdk
+            .get_binary_get_validator_reward_by_era(Some(node_address), validator_key, era)
+            .await;
+
+        dbg!(result);
+        // TODO
+        // let reward = result.unwrap();
+        // assert!(reward.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_get_validator_reward_by_block_height_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        // TODO Get validator key
+        let secret_key = get_user_secret_key(None).unwrap();
+        let secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let validator_key = PublicKey::from(&secret_key_from_pem);
+        let block_height = 1;
+
+        let result = sdk
+            .get_binary_get_validator_reward_by_block_height(
+                Some(node_address),
+                validator_key,
+                block_height,
+            )
+            .await;
+        dbg!(result);
+        // TODO
+        // let reward = result.unwrap();
+        // assert!(reward.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_get_validator_reward_by_block_hash_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        // TODO Get validator key
+        let secret_key = get_user_secret_key(None).unwrap();
+        let secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let validator_key = PublicKey::from(&secret_key_from_pem);
+
+        let block_height = 1;
+
+        let result = sdk
+            .get_binary_signed_block_by_height(Some(node_address.clone()), block_height)
+            .await;
+        let signed_block = result.unwrap();
+        assert!(signed_block.is_some());
+        let signed_block = signed_block.unwrap();
+        assert_eq!(signed_block.block().height(), block_height);
+        let block_hash = signed_block.block().hash();
+        assert!(!block_hash.to_string().is_empty());
+
+        dbg!(block_hash.clone());
+
+        let result = sdk
+            .get_binary_get_validator_reward_by_block_hash(
+                Some(node_address),
+                validator_key,
+                *block_hash,
+            )
+            .await;
+        dbg!(result);
+        // TODO
+        // let reward = result.unwrap();
+        // assert!(reward.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_get_delegator_reward_by_era_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        // TODO Get validator key
+        let secret_key = get_user_secret_key(None).unwrap();
+        let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let validator_key = PublicKey::from(&validator_secret_key_from_pem);
+
+        // TODO Get Delegator key
+        let secret_key = get_user_secret_key(Some("user-2")).unwrap();
+        let delegator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let delegator_key = PublicKey::from(&delegator_secret_key_from_pem);
+
+        let era = EraId::new(1);
+
+        let result = sdk
+            .get_binary_get_delegator_reward_by_era(
+                Some(node_address),
+                validator_key,
+                delegator_key,
+                era,
+            )
+            .await;
+        dbg!(result);
+        // TODO
+        // let reward = result.unwrap();
+        // assert!(reward.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_get_delegator_reward_by_block_height_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        // TODO Get validator key
+        let secret_key = get_user_secret_key(None).unwrap();
+        let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let validator_key = PublicKey::from(&validator_secret_key_from_pem);
+
+        // TODO Get Delegator key
+        let secret_key = get_user_secret_key(Some("user-2")).unwrap();
+        let delegator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let delegator_key = PublicKey::from(&delegator_secret_key_from_pem);
+        let block_height = 1;
+
+        let result = sdk
+            .get_binary_get_delegator_reward_by_block_height(
+                Some(node_address),
+                validator_key,
+                delegator_key,
+                block_height,
+            )
+            .await;
+        dbg!(result);
+        // TODO
+        // let reward = result.unwrap();
+        // assert!(reward.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_get_delegator_reward_by_block_hash_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        // TODO Get validator key
+        let secret_key = get_user_secret_key(None).unwrap();
+        let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let validator_key = PublicKey::from(&validator_secret_key_from_pem);
+
+        // TODO Get Delegator key
+        let secret_key = get_user_secret_key(Some("user-2")).unwrap();
+        let delegator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let delegator_key = PublicKey::from(&delegator_secret_key_from_pem);
+
+        let block_height = 1;
+
+        let result = sdk
+            .get_binary_signed_block_by_height(Some(node_address.clone()), block_height)
+            .await;
+        let signed_block = result.unwrap();
+        assert!(signed_block.is_some());
+        let signed_block = signed_block.unwrap();
+        assert_eq!(signed_block.block().height(), block_height);
+        let block_hash = signed_block.block().hash();
+        assert!(!block_hash.to_string().is_empty());
+
+        dbg!(block_hash.clone());
+
+        let result = sdk
+            .get_binary_get_delegator_reward_by_block_hash(
+                Some(node_address),
+                validator_key,
+                delegator_key,
+                *block_hash,
+            )
+            .await;
+        dbg!(result);
+        // TODO
+        // let reward = result.unwrap();
+        // assert!(reward.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_read_record_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        let record_id = RecordId::BlockHeader;
+        let key = b"record_key";
+
+        let result = sdk
+            .get_binary_read_record(Some(node_address), record_id, key)
+            .await;
+        dbg!(result);
+        // TODO
+        // let reward = result.unwrap();
+        // assert!(reward.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_global_state_item_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let secret_key = get_user_secret_key(None).unwrap();
+        let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let validator_key = PublicKey::from(&validator_secret_key_from_pem);
+
+        let key = Key::Account(validator_key.to_account_hash());
+
+        let path = vec![];
+
+        let result = sdk
+            .get_binary_global_state_item(Some(node_address), key, path)
+            .await;
+        let item = result.unwrap();
+        assert!(item.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_global_state_item_by_state_root_hash_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let secret_key = get_user_secret_key(None).unwrap();
+        let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let validator_key = PublicKey::from(&validator_secret_key_from_pem);
+
+        let key = Key::Account(validator_key.to_account_hash());
+        let path = vec![];
+        let height = 1;
+
+        let result = sdk
+            .get_binary_block_header_by_height(Some(node_address.clone()), height)
+            .await;
+
+        let block_header = result.unwrap();
+        assert!(block_header.is_some());
+        let block_header = block_header.unwrap();
+        let state_root_hash = block_header.state_root_hash();
+
+        assert!(!state_root_hash.to_string().is_empty());
+
+        let result = sdk
+            .get_binary_global_state_item_by_state_root_hash(
+                Some(node_address),
+                *state_root_hash,
+                key,
+                path,
+            )
+            .await;
+        let item = result.unwrap();
+        assert!(item.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_global_state_item_by_block_hash_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let validator_key = PublicKey::from(&validator_secret_key_from_pem);
+
+        let key = Key::Account(validator_key.to_account_hash());
+        let path = vec![];
+
+        let block_height = 1;
+
+        let result = sdk
+            .get_binary_block_header_by_height(Some(node_address.clone()), block_height)
+            .await;
+
+        let block_header = result.unwrap();
+        assert!(block_header.is_some());
+        let block_header = block_header.unwrap();
+        let block_hash = block_header.block_hash();
+
+        assert!(!block_hash.to_string().is_empty());
+
+        let result = sdk
+            .get_binary_global_state_item_by_block_hash(Some(node_address), block_hash, key, path)
+            .await;
+        let item = result.unwrap();
+        assert!(item.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_global_state_item_by_block_height_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
+        let validator_key = PublicKey::from(&validator_secret_key_from_pem);
+
+        let key = Key::Account(validator_key.to_account_hash());
+        let path = vec![];
+
+        let block_height = 1;
+
+        let result = sdk
+            .get_binary_global_state_item_by_block_height(
+                Some(node_address),
+                block_height,
+                key,
+                path,
+            )
+            .await;
+        let item = result.unwrap();
+        assert!(item.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_try_accept_transaction_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, chain_name) = get_network_constants();
+
+        let secret_key = get_user_secret_key(None).unwrap();
+        let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
+
+        let transaction_params = TransactionStrParams::default();
+        transaction_params.set_secret_key(&secret_key);
+        transaction_params.set_chain_name(&chain_name);
+        transaction_params.set_payment_amount(TRANSFER_AMOUNT);
+
+        let make_transfer_transaction = sdk
+            .make_transfer_transaction(
+                None,
+                &initiator_addr, // self transfer
+                TRANSFER_AMOUNT,
+                transaction_params,
+                None,
+            )
+            .unwrap();
+        assert!(!make_transfer_transaction.hash().to_string().is_empty());
+
+        let result = sdk
+            .get_binary_try_accept_transaction(Some(node_address), make_transfer_transaction.into())
+            .await;
+
+        dbg!(result);
+        // TODO
+        // let reward = result.unwrap();
+        // assert!(reward.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_try_speculative_execution_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, chain_name) = get_network_constants();
+
+        let secret_key = get_user_secret_key(None).unwrap();
+        let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
+
+        let transaction_params = TransactionStrParams::default();
+        transaction_params.set_secret_key(&secret_key);
+        transaction_params.set_chain_name(&chain_name);
+        transaction_params.set_payment_amount(TRANSFER_AMOUNT);
+
+        let make_transfer_transaction = sdk
+            .make_transfer_transaction(
+                None,
+                &initiator_addr, // self transfer
+                TRANSFER_AMOUNT,
+                transaction_params,
+                None,
+            )
+            .unwrap();
+        assert!(!make_transfer_transaction.hash().to_string().is_empty());
+
+        let result = sdk
+            .get_binary_try_speculative_execution(
+                Some(node_address),
+                make_transfer_transaction.into(),
+            )
+            .await;
+        dbg!(result);
+        // TODO
+        // let reward = result.unwrap();
+        // assert!(reward.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_get_binary_get_protocol_version_success() {
+        let sdk = SDK::new(None, None, None);
+        let (_, _, _, node_address, _) = get_network_constants();
+
+        let result = sdk
+            .get_binary_get_protocol_version(Some(node_address))
+            .await;
+        let protocol_version = result.unwrap();
+        assert!(!protocol_version.value().to_string().is_empty());
     }
 }
