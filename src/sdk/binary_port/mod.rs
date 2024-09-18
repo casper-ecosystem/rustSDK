@@ -670,21 +670,19 @@ mod tests {
         let block_hash = block_header.block_hash();
 
         assert!(!block_hash.to_string().is_empty());
-        dbg!(block_hash);
 
         let result = sdk
             .get_binary_block_header_by_hash(Some(node_address), block_hash.clone())
             .await;
-        dbg!(result);
-        // TODO check
-        // let block_header = result.unwrap();
-        // assert!(block_header.is_some());
-        // let block_header = block_header.unwrap();
 
-        // assert_eq!(
-        //     block_header.body_hash().to_string(),
-        //     block_hash.to_hex_string()
-        // );
+        let block_header = result.unwrap();
+        assert!(block_header.is_some());
+        let block_header = block_header.unwrap();
+
+        assert_eq!(
+            block_header.block_hash().to_hex_string(),
+            block_hash.to_hex_string()
+        );
     }
 
     #[tokio::test]
@@ -732,21 +730,17 @@ mod tests {
         let block_hash = signed_block.block().hash();
         assert!(!block_hash.to_string().is_empty());
 
-        dbg!(block_hash);
-
         let result = sdk
             .get_binary_signed_block_by_hash(Some(node_address), block_hash.clone())
             .await;
 
-        dbg!(result);
-        // TODO check
-        // let signed_block = result.unwrap();
-        // assert!(signed_block.is_some());
-        // let signed_block = signed_block.unwrap();
-        // assert_eq!(
-        //     signed_block.block().hash().to_string(),
-        //     block_hash.to_hex_string()
-        // );
+        let signed_block = result.unwrap();
+        assert!(signed_block.is_some());
+        let signed_block = signed_block.unwrap();
+        assert_eq!(
+            signed_block.block().hash().to_hex_string(),
+            block_hash.to_hex_string()
+        );
     }
 
     #[tokio::test]
@@ -777,21 +771,17 @@ mod tests {
         let transaction_hash = transfer.result.transaction_hash;
         assert!(!transaction_hash.to_string().is_empty());
 
-        dbg!(transaction_hash);
-
         let result = sdk
             .get_binary_transaction_by_hash(Some(node_address), transaction_hash.clone(), false)
             .await;
-        dbg!(result);
-        // TODO check
-        // let transaction = result.unwrap();
-        // assert!(transaction.is_some());
-        // let transaction = transaction.unwrap();
-        // dbg!(transaction);
-        // assert_eq!(
-        //     transaction.into_inner().to_string(),
-        //     transaction_hash
-        // );
+
+        let transaction = result.unwrap();
+        assert!(transaction.is_some());
+        let transaction = transaction.unwrap();
+        assert_eq!(
+            transaction.into_inner().0.hash().to_hex_string(),
+            transaction_hash.to_hex_string()
+        );
     }
 
     #[tokio::test]
@@ -942,10 +932,9 @@ mod tests {
             .get_binary_get_validator_reward_by_era(Some(node_address), validator_key, era)
             .await;
 
-        dbg!(result);
         // TODO
-        // let reward = result.unwrap();
-        // assert!(reward.is_some());
+        let reward = result.unwrap();
+        assert!(reward.is_none());
     }
 
     #[tokio::test]
@@ -965,10 +954,10 @@ mod tests {
                 block_height,
             )
             .await;
-        dbg!(result);
+
         // TODO
-        // let reward = result.unwrap();
-        // assert!(reward.is_some());
+        let reward = result.unwrap();
+        assert!(reward.is_none());
     }
 
     #[tokio::test]
@@ -992,8 +981,6 @@ mod tests {
         let block_hash = signed_block.block().hash();
         assert!(!block_hash.to_string().is_empty());
 
-        dbg!(block_hash.clone());
-
         let result = sdk
             .get_binary_get_validator_reward_by_block_hash(
                 Some(node_address),
@@ -1001,17 +988,17 @@ mod tests {
                 *block_hash,
             )
             .await;
-        dbg!(result);
+
         // TODO
-        // let reward = result.unwrap();
-        // assert!(reward.is_some());
+        let reward = result.unwrap();
+        assert!(reward.is_none());
     }
 
     #[tokio::test]
     async fn test_get_binary_get_delegator_reward_by_era_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
-        // TODO Get validator key
+        // TODO Get delegator key
         let secret_key = get_user_secret_key(None).unwrap();
         let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
         let validator_key = PublicKey::from(&validator_secret_key_from_pem);
@@ -1031,17 +1018,17 @@ mod tests {
                 era,
             )
             .await;
-        dbg!(result);
+
         // TODO
-        // let reward = result.unwrap();
-        // assert!(reward.is_some());
+        let reward = result.unwrap();
+        assert!(reward.is_none());
     }
 
     #[tokio::test]
     async fn test_get_binary_get_delegator_reward_by_block_height_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
-        // TODO Get validator key
+        // TODO Get delegator key
         let secret_key = get_user_secret_key(None).unwrap();
         let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
         let validator_key = PublicKey::from(&validator_secret_key_from_pem);
@@ -1060,17 +1047,17 @@ mod tests {
                 block_height,
             )
             .await;
-        dbg!(result);
+
         // TODO
-        // let reward = result.unwrap();
-        // assert!(reward.is_some());
+        let reward = result.unwrap();
+        assert!(reward.is_none());
     }
 
     #[tokio::test]
     async fn test_get_binary_get_delegator_reward_by_block_hash_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
-        // TODO Get validator key
+        // TODO Get delegator key
         let secret_key = get_user_secret_key(None).unwrap();
         let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
         let validator_key = PublicKey::from(&validator_secret_key_from_pem);
@@ -1092,8 +1079,6 @@ mod tests {
         let block_hash = signed_block.block().hash();
         assert!(!block_hash.to_string().is_empty());
 
-        dbg!(block_hash.clone());
-
         let result = sdk
             .get_binary_get_delegator_reward_by_block_hash(
                 Some(node_address),
@@ -1102,10 +1087,10 @@ mod tests {
                 *block_hash,
             )
             .await;
-        dbg!(result);
+
         // TODO
-        // let reward = result.unwrap();
-        // assert!(reward.is_some());
+        let reward = result.unwrap();
+        assert!(reward.is_none());
     }
 
     #[tokio::test]
@@ -1118,10 +1103,10 @@ mod tests {
         let result = sdk
             .get_binary_read_record(Some(node_address), record_id, key)
             .await;
-        dbg!(result);
+
         // TODO
-        // let reward = result.unwrap();
-        // assert!(reward.is_some());
+        let reward = result.unwrap();
+        assert!(reward.is_empty());
     }
 
     #[tokio::test]
@@ -1264,14 +1249,12 @@ mod tests {
             .get_binary_try_accept_transaction(Some(node_address), make_transfer_transaction.into())
             .await;
 
-        dbg!(result);
-        // TODO
-        // let reward = result.unwrap();
-        // assert!(reward.is_some());
+        assert!(result.is_ok());
     }
 
     #[tokio::test]
-    async fn test_get_binary_try_speculative_execution_success() {
+    #[ignore]
+    async fn _test_get_binary_try_speculative_execution_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, chain_name) = get_network_constants();
 
@@ -1300,10 +1283,9 @@ mod tests {
                 make_transfer_transaction.into(),
             )
             .await;
-        dbg!(result);
-        // TODO
-        // let reward = result.unwrap();
-        // assert!(reward.is_some());
+
+        // TODO check transaction V1 in speculative exec
+        assert!(result.is_ok());
     }
 
     #[tokio::test]

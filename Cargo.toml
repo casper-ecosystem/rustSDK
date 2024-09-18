@@ -24,7 +24,7 @@ exclude = [
 casper-types = { version = "5.0.0", default-features = false, git = "https://github.com/casper-network/casper-node", branch = "rustSDK-feat-2.0" }
 casper-client = { version = "2.0.0", default-features = false, git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "rustSDK-feat-2.0" }
 casper-binary-port = { version = "1.0.0", git = "https://github.com/casper-network/casper-node.git", branch = "rustSDK-feat-2.0" }
-casper-binary-port-access = { version = "0.1.0", path = "../casper-binary-port-client/binary_port_access" }
+casper-binary-port-access = { git = "ssh://git@github.com/casper-ecosystem/casper-binary-port-client.git", branch = "rustSDK-feat-2.0" }
 rand = { version = "0.8.5", default-features = false }
 wasm-bindgen = "*"
 wasm-bindgen-futures = "*"
@@ -72,4 +72,4 @@ dotenvy = "0.15.7"
 casper-types = { version = "5.0.0", git = "https://github.com/casper-network/casper-node", branch = "rustSDK-feat-2.0" }
 casper-client = { version = "2.0.0", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "rustSDK-feat-2.0" }
 casper-binary-port = { version = "1.0.0", git = "https://github.com/casper-network/casper-node", branch = "rustSDK-feat-2.0" }
-casper-binary-port-access = { version = "0.1.0", path = "../casper-binary-port-client/binary_port_access" }
+casper-binary-port-access = { git = "ssh://git@github.com/casper-ecosystem/casper-binary-port-client.git", branch = "rustSDK-feat-2.0" }
