@@ -71,7 +71,7 @@ dotenvy = "0.15.7"
 
 
 [patch.crates-io]
-casper-types = { version = "5.0.0", git = "https://github.com/casper-network/casper-node", branch = "rustSDK-feat-2.0" }
-casper-client = { version = "2.0.0", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "rustSDK-feat-2.0" }
-casper-binary-port = { version = "1.0.0", git = "https://github.com/casper-network/casper-node", branch = "rustSDK-feat-2.0" }
-casper-binary-port-access = { git = "ssh://git@github.com/casper-ecosystem/casper-binary-port-client.git", branch = "rustSDK-feat-2.0" }
+casper-types = { version = "5.0.0", git = "https://github.com/casper-network/casper-node", branch = "feat-2.0" }
+casper-client = { version = "2.0.0", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "feat-track-node-2.0" }
+casper-binary-port = { version = "1.0.0", git = "https://github.com/casper-network/casper-node", branch = "feat-2.0" }
+casper-binary-port-access = { version = "0.1.0", git = "ssh://git@github.com/casper-ecosystem/casper-binary-port-client", branch = "rustSDK-feat-2.0" }

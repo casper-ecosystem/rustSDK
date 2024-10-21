@@ -2413,21 +2413,21 @@ export class SDK {
    */
   query_contract_key(options?: queryContractKeyOptions): Promise<QueryGlobalStateResult>;
   /**
-   * JS function for speculative transfer transaction.
+   * JS function for transaction transferring funds.
    *
    * # Arguments
    *
    * * `maybe_source` - Optional transfer source uref.
    * * `target_account` - The target account.
    * * `amount` - The amount to transfer.
+   * * `transaction_params` - The transaction parameters.
    * * `maybe_id` - An optional transfer ID (defaults to a random number).
-   * * `transaction_params` - The transactionment parameters.
    * * `verbosity` - The verbosity level for logging (optional).
    * * `rpc_address` - The address of the node to connect to (optional).
    *
    * # Returns
    *
-   * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+   * A `Result` containing the result of the transfer or a `JsError` in case of an error.
    * @param {URef | undefined} maybe_source
    * @param {string} target_account
    * @param {string} amount
@@ -2435,55 +2435,9 @@ export class SDK {
    * @param {string | undefined} [maybe_id]
    * @param {Verbosity | undefined} [verbosity]
    * @param {string | undefined} [rpc_address]
-   * @returns {Promise<SpeculativeExecTxnResult>}
-   */
-  speculative_transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecTxnResult>;
-  /**
-   * Calls a smart contract entry point with the specified parameters and returns the result.
-   *
-   * # Arguments
-   *
-   * * `deploy_params` - The deploy parameters.
-   * * `session_params` - The session parameters.
-   * * `payment_amount` - The payment amount as a string.
-   * * `rpc_address` - An optional rpc address to send the request to.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the call.
-   * @param {DeployStrParams} deploy_params
-   * @param {SessionStrParams} session_params
-   * @param {string} payment_amount
-   * @param {string | undefined} [rpc_address]
-   * @returns {Promise<PutDeployResult>}
-   */
-  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
-  /**
-   * Installs a smart contract with the specified parameters and returns the result.
-   *
-   * # Arguments
-   *.
-   * * `transaction_params` - Transaction parameters.
-   * * `transaction_bytes` - Transaction Bytes to install
-   * * `rpc_address` - An optional rpc address to send the request to.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the installation.
-   * @param {TransactionStrParams} transaction_params
-   * @param {Bytes} transaction_bytes
-   * @param {string | undefined} [rpc_address]
    * @returns {Promise<PutTransactionResult>}
    */
-  install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, rpc_address?: string): Promise<PutTransactionResult>;
+  transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
   /**
    * JS function for speculative transfer.
    *
@@ -2510,6 +2464,82 @@ export class SDK {
    * @returns {Promise<SpeculativeExecResult>}
    */
   speculative_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecResult>;
+  /**
+   * Puts a transaction using the provided options.
+   *
+   * # Arguments
+   *
+   * * `transaction` - The `Transaction` object to be sent.
+   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the transaction process.
+   * @param {Transaction} transaction
+   * @param {Verbosity | undefined} [verbosity]
+   * @param {string | undefined} [rpc_address]
+   * @returns {Promise<PutTransactionResult>}
+   */
+  put_transaction(transaction: Transaction, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
+  /**
+   * JavaScript Alias for `put_transaction`.
+   * @param {Transaction} transaction
+   * @param {Verbosity | undefined} [verbosity]
+   * @param {string | undefined} [rpc_address]
+   * @returns {Promise<PutTransactionResult>}
+   */
+  account_put_transaction(transaction: Transaction, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
+  /**
+   * Calls a smart contract entry point with the specified parameters and returns the result.
+   *
+   * # Arguments
+   *
+   * * `transaction_params` - Transaction parameters.
+   * * `builder_params` - Transaction Builder parameters.
+   * * `rpc_address` - An optional rpc address to send the request to.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the call.
+   * @param {TransactionBuilderParams} builder_params
+   * @param {TransactionStrParams} transaction_params
+   * @param {string | undefined} [rpc_address]
+   * @returns {Promise<PutTransactionResult>}
+   */
+  call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, rpc_address?: string): Promise<PutTransactionResult>;
+  /**
+   * Calls a smart contract entry point with the specified parameters and returns the result.
+   *
+   * # Arguments
+   *
+   * * `deploy_params` - The deploy parameters.
+   * * `session_params` - The session parameters.
+   * * `payment_amount` - The payment amount as a string.
+   * * `rpc_address` - An optional rpc address to send the request to.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the call.
+   * @param {DeployStrParams} deploy_params
+   * @param {SessionStrParams} session_params
+   * @param {string} payment_amount
+   * @param {string | undefined} [rpc_address]
+   * @returns {Promise<PutDeployResult>}
+   */
+  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
   /**
    * Parses block options from a JsValue.
    *
@@ -2641,36 +2671,6 @@ export class SDK {
    */
   account_put_deploy(deploy: Deploy, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
   /**
-   * Puts a transaction using the provided options.
-   *
-   * # Arguments
-   *
-   * * `transaction` - The `Transaction` object to be sent.
-   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the transaction process.
-   * @param {Transaction} transaction
-   * @param {Verbosity | undefined} [verbosity]
-   * @param {string | undefined} [rpc_address]
-   * @returns {Promise<PutTransactionResult>}
-   */
-  put_transaction(transaction: Transaction, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
-  /**
-   * JavaScript Alias for `put_transaction`.
-   * @param {Transaction} transaction
-   * @param {Verbosity | undefined} [verbosity]
-   * @param {string | undefined} [rpc_address]
-   * @returns {Promise<PutTransactionResult>}
-   */
-  account_put_transaction(transaction: Transaction, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
-  /**
    * Parses query balance options from a JsValue.
    *
    * # Arguments
@@ -2743,41 +2743,21 @@ export class SDK {
    */
   speculative_exec_deploy(options?: getSpeculativeExecDeployOptions): Promise<SpeculativeExecResult>;
   /**
-   * This function allows executing a transaction speculatively.
-   *
-   * # Arguments
-   *
-   * * `builder_params` - Transaction Builder parameters.
-   * * `transaction_params` - Transactionment parameters for the transaction.
-   * * `verbosity` - Optional verbosity level.
-   * * `rpc_address` - Optional rpc address.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
-   * @param {TransactionBuilderParams} builder_params
-   * @param {TransactionStrParams} transaction_params
-   * @param {Verbosity | undefined} [verbosity]
-   * @param {string | undefined} [rpc_address]
-   * @returns {Promise<SpeculativeExecTxnResult>}
-   */
-  speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecTxnResult>;
-  /**
-   * JS function for transaction transferring funds.
+   * JS function for speculative transfer transaction.
    *
    * # Arguments
    *
    * * `maybe_source` - Optional transfer source uref.
    * * `target_account` - The target account.
    * * `amount` - The amount to transfer.
-   * * `transaction_params` - The transaction parameters.
    * * `maybe_id` - An optional transfer ID (defaults to a random number).
+   * * `transaction_params` - The transactionment parameters.
    * * `verbosity` - The verbosity level for logging (optional).
    * * `rpc_address` - The address of the node to connect to (optional).
    *
    * # Returns
    *
-   * A `Result` containing the result of the transfer or a `JsError` in case of an error.
+   * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
    * @param {URef | undefined} maybe_source
    * @param {string} target_account
    * @param {string} amount
@@ -2785,9 +2765,9 @@ export class SDK {
    * @param {string | undefined} [maybe_id]
    * @param {Verbosity | undefined} [verbosity]
    * @param {string | undefined} [rpc_address]
-   * @returns {Promise<PutTransactionResult>}
+   * @returns {Promise<SpeculativeExecTxnResult>}
    */
-  transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
+  speculative_transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecTxnResult>;
   /**
    * JS function for `make_transfer`.
    *
@@ -2843,6 +2823,30 @@ export class SDK {
    */
   sign_transaction(transaction: Transaction, secret_key: string): Transaction;
   /**
+   * Installs a smart contract with the specified parameters and returns the result.
+   *
+   * # Arguments
+   *
+   * * `deploy_params` - The deploy parameters.
+   * * `session_params` - The session parameters.
+   * * `payment_amount` - The payment amount as a string.
+   * * `rpc_address` - An optional rpc address to send the request to.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the installation.
+   * @param {DeployStrParams} deploy_params
+   * @param {SessionStrParams} session_params
+   * @param {string} payment_amount
+   * @param {string | undefined} [rpc_address]
+   * @returns {Promise<PutDeployResult>}
+   */
+  install_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
+  /**
    * @param {string | undefined} [rpc_address]
    * @param {string | undefined} [node_address]
    * @param {Verbosity | undefined} [verbosity]
@@ -2875,6 +2879,26 @@ export class SDK {
    * @param {Verbosity | undefined} [verbosity]
    */
   setVerbosity(verbosity?: Verbosity): void;
+  /**
+   * This function allows executing a transaction speculatively.
+   *
+   * # Arguments
+   *
+   * * `builder_params` - Transaction Builder parameters.
+   * * `transaction_params` - Transactionment parameters for the transaction.
+   * * `verbosity` - Optional verbosity level.
+   * * `rpc_address` - Optional rpc address.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
+   * @param {TransactionBuilderParams} builder_params
+   * @param {TransactionStrParams} transaction_params
+   * @param {Verbosity | undefined} [verbosity]
+   * @param {string | undefined} [rpc_address]
+   * @returns {Promise<SpeculativeExecTxnResult>}
+   */
+  speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecTxnResult>;
   /**
    * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
    * Legacy alias
@@ -2945,30 +2969,6 @@ export class SDK {
    * @returns {Promise<Promise<any>>}
    */
   waitTransaction(events_url: string, target_hash: string, timeout_duration?: number): Promise<Promise<any>>;
-  /**
-   * Installs a smart contract with the specified parameters and returns the result.
-   *
-   * # Arguments
-   *
-   * * `deploy_params` - The deploy parameters.
-   * * `session_params` - The session parameters.
-   * * `payment_amount` - The payment amount as a string.
-   * * `rpc_address` - An optional rpc address to send the request to.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the installation.
-   * @param {DeployStrParams} deploy_params
-   * @param {SessionStrParams} session_params
-   * @param {string} payment_amount
-   * @param {string | undefined} [rpc_address]
-   * @returns {Promise<PutDeployResult>}
-   */
-  install_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
   /**
    * This function allows executing a deploy speculatively.
    *
@@ -3092,12 +3092,12 @@ export class SDK {
    */
   chain_get_era_summary(options?: getEraSummaryOptions): Promise<GetEraSummaryResult>;
   /**
-   * Calls a smart contract entry point with the specified parameters and returns the result.
+   * Installs a smart contract with the specified parameters and returns the result.
    *
    * # Arguments
-   *
+   *.
    * * `transaction_params` - Transaction parameters.
-   * * `builder_params` - Transaction Builder parameters.
+   * * `transaction_bytes` - Transaction Bytes to install
    * * `rpc_address` - An optional rpc address to send the request to.
    *
    * # Returns
@@ -3106,13 +3106,13 @@ export class SDK {
    *
    * # Errors
    *
-   * Returns a `JsError` if there is an error during the call.
-   * @param {TransactionBuilderParams} builder_params
+   * Returns a `JsError` if there is an error during the installation.
    * @param {TransactionStrParams} transaction_params
+   * @param {Bytes} transaction_bytes
    * @param {string | undefined} [rpc_address]
    * @returns {Promise<PutTransactionResult>}
    */
-  call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, rpc_address?: string): Promise<PutTransactionResult>;
+  install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, rpc_address?: string): Promise<PutTransactionResult>;
 }
 export class SessionStrParams {
   free(): void;
@@ -4432,9 +4432,12 @@ export interface InitOutput {
   readonly __wbg_peerentry_free: (a: number, b: number) => void;
   readonly peerentry_node_id: (a: number) => Array;
   readonly peerentry_address: (a: number) => Array;
-  readonly sdk_speculative_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
+  readonly sdk_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
+  readonly sdk_speculative_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
+  readonly sdk_put_transaction: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_account_put_transaction: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_call_entrypoint_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly __wbg_entityaddr_free: (a: number, b: number) => void;
   readonly entityaddr_fromFormattedStr: (a: number, b: number) => Array;
   readonly entityaddr_toFormattedString: (a: number) => Array;
@@ -4583,7 +4586,6 @@ export interface InitOutput {
   readonly transactionbuilderparams_set_maximum_delegation_amount: (a: number, b: number) => void;
   readonly transactionbuilderparams_is_install_upgrade: (a: number) => number;
   readonly transactionbuilderparams_set_is_install_upgrade: (a: number, b: number) => void;
-  readonly sdk_speculative_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
   readonly __wbg_getblockresult_free: (a: number, b: number) => void;
   readonly getblockresult_api_version: (a: number) => number;
   readonly getblockresult_block: (a: number) => number;
@@ -4611,8 +4613,6 @@ export interface InitOutput {
   readonly sdk_chain_get_state_root_hash: (a: number, b: number) => number;
   readonly sdk_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_put_transaction: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_account_put_transaction: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly __wbg_querybalanceresult_free: (a: number, b: number) => void;
   readonly querybalanceresult_api_version: (a: number) => number;
   readonly querybalanceresult_balance: (a: number) => number;
@@ -4660,11 +4660,11 @@ export interface InitOutput {
   readonly __wbg_set_getspeculativeexecdeployoptions_verbosity: (a: number, b: number) => void;
   readonly sdk_get_speculative_exec_deploy_options: (a: number, b: number) => Array;
   readonly sdk_speculative_exec_deploy: (a: number, b: number) => number;
-  readonly sdk_speculative_transaction: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
+  readonly sdk_speculative_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
   readonly sdk_make_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => Array;
   readonly sdk_sign_deploy: (a: number, b: number, c: number, d: number) => number;
   readonly sdk_sign_transaction: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_install_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly __wbg_sdk_free: (a: number, b: number) => void;
   readonly sdk_new: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_getRPCAddress: (a: number, b: number, c: number) => Array;
@@ -4747,6 +4747,7 @@ export interface InitOutput {
   readonly publickey_toAccountHash: (a: number) => number;
   readonly publickey_toPurseUref: (a: number) => number;
   readonly publickey_toJson: (a: number) => number;
+  readonly sdk_speculative_transaction: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_watchDeploy: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_watchTransaction: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_waitDeploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
@@ -4810,7 +4811,6 @@ export interface InitOutput {
   readonly __wbg_set_eventparseresult_err: (a: number, b: number, c: number) => void;
   readonly __wbg_get_eventparseresult_body: (a: number) => number;
   readonly __wbg_set_eventparseresult_body: (a: number, b: number) => void;
-  readonly sdk_install_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly __wbg_payment_free: (a: number, b: number) => void;
   readonly __wbg_publickeystring_free: (a: number, b: number) => void;
   readonly __wbg_message_free: (a: number, b: number) => void;
@@ -4869,7 +4869,7 @@ export interface InitOutput {
   readonly sdk_get_era_summary_options: (a: number, b: number) => Array;
   readonly sdk_get_era_summary: (a: number, b: number) => number;
   readonly sdk_chain_get_era_summary: (a: number, b: number) => number;
-  readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly __wbg_get_geterasummaryoptions_maybe_block_identifier: (a: number) => number;
   readonly __wbg_geterasummaryoptions_free: (a: number, b: number) => void;
   readonly __wbg_set_geterasummaryoptions_verbosity: (a: number, b: number) => void;
@@ -4897,7 +4897,7 @@ export interface InitOutput {
   readonly __wbindgen_export_2: WebAssembly.Table;
   readonly __wbindgen_export_3: WebAssembly.Table;
   readonly closure696_externref_shim: (a: number, b: number, c: number) => void;
-  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h3cb39cc3cc1617c8: (a: number, b: number) => void;
+  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hbd0b56b29fc1c3c7: (a: number, b: number) => void;
   readonly closure1046_externref_shim: (a: number, b: number, c: number) => void;
   readonly closure1060_externref_shim: (a: number, b: number, c: number) => void;
   readonly __externref_table_dealloc: (a: number) => void;
