@@ -333,8 +333,13 @@ pub mod test_module_transaction {
                 return;
             }
         };
-        transaction = transaction
-            .with_transaction_bytes(transaction_bytes.into(), Some(config.secret_key.clone()));
+        // TODO Fix is_install_upgrade
+        let is_install_upgrade = Some(true);
+        transaction = transaction.with_transaction_bytes(
+            transaction_bytes.into(),
+            is_install_upgrade,
+            Some(config.secret_key.clone()),
+        );
         assert!(transaction.verify());
 
         // TODO

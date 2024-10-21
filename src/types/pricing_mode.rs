@@ -1,6 +1,7 @@
+use casper_types::PricingMode as _PricingMode;
 use wasm_bindgen::prelude::*;
 
-#[derive(Copy, Clone, Default, Debug)]
+#[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
 #[wasm_bindgen]
 pub enum PricingMode {
     #[default]
@@ -25,12 +26,19 @@ impl PricingMode {
 //     }
 // }
 
-// impl From<_PricingMode> for PricingMode {
-//     fn from(pricing_mode: _PricingMode) -> Self {
-//         match pricing_mode {
-//             _PricingMode::Fixed => PricingMode::Fixed,
-//             _PricingMode::Classic => PricingMode::Classic,
-//             _PricingMode::Reserved => PricingMode::Reserved,
-//         }
-//     }
-// }
+impl From<_PricingMode> for PricingMode {
+    fn from(pricing_mode: _PricingMode) -> Self {
+        match pricing_mode {
+            _PricingMode::Fixed {
+                additional_computation_factor: _,
+                gas_price_tolerance: _,
+            } => PricingMode::Fixed,
+            _PricingMode::Classic {
+                payment_amount: _,
+                gas_price_tolerance: _,
+                standard_payment: _,
+            } => PricingMode::Classic,
+            _PricingMode::Reserved { receipt: _ } => PricingMode::Reserved,
+        }
+    }
+}

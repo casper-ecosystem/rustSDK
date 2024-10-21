@@ -2,8 +2,7 @@ use crate::{
     debug::error,
     types::{
         account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
-        cl::bytes::Bytes, package_hash::PackageHash, public_key::PublicKey,
-        transaction_category::TransactionCategory, uref::URef,
+        cl::bytes::Bytes, package_hash::PackageHash, public_key::PublicKey, uref::URef,
     },
 };
 use casper_client::cli::TransactionBuilderParams as _TransactionBuilderParams;
@@ -49,7 +48,7 @@ impl TransferTarget {
 #[derive(Clone, Debug, Default)]
 pub struct TransactionBuilderParams {
     kind: TransactionKind,
-    transaction_category: Option<TransactionCategory>,
+    is_install_upgrade: Option<bool>,
     transaction_bytes: Option<Bytes>,
     maybe_source: Option<URef>,
     target: Option<TransferTarget>,
@@ -92,11 +91,11 @@ impl TransactionBuilderParams {
     #[wasm_bindgen(js_name = "newSession")]
     pub fn new_session(
         transaction_bytes: Option<Bytes>,
-        transaction_category: Option<TransactionCategory>,
+        is_install_upgrade: Option<bool>,
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::Session,
-            transaction_category: Some(transaction_category.unwrap_or_default()),
+            is_install_upgrade,
             transaction_bytes,
             entry_point: None,
             maybe_source: None,
@@ -128,7 +127,8 @@ impl TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Transfer,
-            transaction_category: None,
+            is_install_upgrade: Some(false),
+            // transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source,
@@ -157,7 +157,8 @@ impl TransactionBuilderParams {
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntity,
-            transaction_category: None,
+            is_install_upgrade: Some(false),
+            // transaction_category: None,
             transaction_bytes: None,
             entry_point: Some(entry_point.to_string()),
             maybe_source: None,
@@ -186,7 +187,8 @@ impl TransactionBuilderParams {
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntityAlias,
-            transaction_category: None,
+            is_install_upgrade: Some(false),
+            // transaction_category: None,
             transaction_bytes: None,
             entry_point: Some(entry_point.to_string()),
             maybe_source: None,
@@ -218,7 +220,8 @@ impl TransactionBuilderParams {
 
         TransactionBuilderParams {
             kind: TransactionKind::Package,
-            transaction_category: None,
+            is_install_upgrade: Some(false),
+            // transaction_category: None,
             transaction_bytes: None,
             entry_point: Some(entry_point.to_string()),
             maybe_source: None,
@@ -249,7 +252,8 @@ impl TransactionBuilderParams {
         let maybe_entity_version_as_u32 = parse_maybe_entity_version(maybe_entity_version);
         TransactionBuilderParams {
             kind: TransactionKind::PackageAlias,
-            transaction_category: None,
+            is_install_upgrade: Some(false),
+            // transaction_category: None,
             transaction_bytes: None,
             entry_point: Some(entry_point.to_string()),
             maybe_source: None,
@@ -282,7 +286,8 @@ impl TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::AddBid,
-            transaction_category: None,
+            is_install_upgrade: Some(false),
+            // transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -313,7 +318,8 @@ impl TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Delegate,
-            transaction_category: None,
+            is_install_upgrade: Some(false),
+            // transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -344,7 +350,8 @@ impl TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Undelegate,
-            transaction_category: None,
+            is_install_upgrade: Some(false),
+            // transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -376,7 +383,8 @@ impl TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Redelegate,
-            transaction_category: None,
+            is_install_upgrade: Some(false),
+            // transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -403,7 +411,8 @@ impl TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::WithdrawBid,
-            transaction_category: None,
+            is_install_upgrade: Some(false),
+            // transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -537,16 +546,6 @@ impl TransactionBuilderParams {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn maybe_entity_version(&self) -> Option<u32> {
-        self.maybe_entity_version
-    }
-
-    #[wasm_bindgen(setter)]
-    pub fn set_maybe_entity_version(&mut self, maybe_entity_version: u32) {
-        self.maybe_entity_version = Some(maybe_entity_version);
-    }
-
-    #[wasm_bindgen(getter)]
     pub fn public_key(&self) -> Option<PublicKey> {
         self.public_key.clone()
     }
@@ -617,13 +616,13 @@ impl TransactionBuilderParams {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn transaction_category(&self) -> Option<TransactionCategory> {
-        self.transaction_category
+    pub fn is_install_upgrade(&self) -> Option<bool> {
+        self.is_install_upgrade
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_transaction_category(&mut self, transaction_category: TransactionCategory) {
-        self.transaction_category = Some(transaction_category);
+    pub fn set_is_install_upgrade(&mut self, is_install_upgrade: bool) {
+        self.is_install_upgrade = Some(is_install_upgrade);
     }
 }
 
@@ -633,10 +632,7 @@ pub fn transaction_builder_params_to_casper_client(
 ) -> _TransactionBuilderParams<'_> {
     match transaction_params.kind {
         TransactionKind::Session => _TransactionBuilderParams::Session {
-            transaction_category: transaction_params
-                .transaction_category
-                .unwrap_or_default()
-                .into(),
+            is_install_upgrade: transaction_params.is_install_upgrade.unwrap_or_default(),
             transaction_bytes: transaction_params
                 .transaction_bytes
                 .clone()

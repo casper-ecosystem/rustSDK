@@ -25,7 +25,7 @@ pub mod public_key;
 pub mod purse_identifier;
 pub mod sdk_error;
 pub mod transaction;
-pub mod transaction_category;
+// pub mod transaction_category;
 pub mod transaction_hash;
 pub mod transaction_params;
 pub mod uref;

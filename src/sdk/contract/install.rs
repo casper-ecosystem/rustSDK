@@ -4,7 +4,6 @@ use crate::{
     types::{
         cl::bytes::Bytes,
         sdk_error::SdkError,
-        transaction_category::TransactionCategory,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
             transaction_str_params::TransactionStrParams,
@@ -82,10 +81,10 @@ impl SDK {
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_PutTransactionResult>, SdkError> {
         //log("install!");
-        let builder_params = TransactionBuilderParams::new_session(
-            Some(transaction_bytes),
-            Some(TransactionCategory::InstallUpgrade),
-        );
+        // TODO Fix is_install_upgrade
+        let is_install_upgrade = Some(true);
+        let builder_params =
+            TransactionBuilderParams::new_session(Some(transaction_bytes), is_install_upgrade);
         self.transaction(builder_params, transaction_params, None, rpc_address)
             .await
     }

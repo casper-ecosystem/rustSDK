@@ -99,39 +99,42 @@ impl SDK {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        helpers::public_key_from_secret_key, types::transaction_category::TransactionCategory,
-    };
+    use crate::helpers::public_key_from_secret_key;
     use once_cell::sync::Lazy;
     use sdk_tests::{
         config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, WASM_PATH},
         tests::helpers::{get_network_constants, get_user_secret_key, read_wasm_file},
     };
+    use std::sync::Mutex;
 
     static ARGS: Lazy<Vec<String>> =
         Lazy::new(|| ARGS_SIMPLE.iter().map(|s| s.to_string()).collect());
 
-    fn get_builder_params() -> &'static TransactionBuilderParams {
-        static mut BUILDER_PARAMS: Option<TransactionBuilderParams> = None;
+    static BUILDER_PARAMS: Lazy<Mutex<Option<TransactionBuilderParams>>> =
+        Lazy::new(|| Mutex::new(None));
 
-        unsafe {
-            if BUILDER_PARAMS.is_none() {
-                let file_path = &format!("{WASM_PATH}{HELLO_CONTRACT}");
-                let transaction_bytes = match read_wasm_file(file_path) {
-                    Ok(transaction_bytes) => transaction_bytes,
-                    Err(err) => {
-                        eprintln!("Error reading file: {:?}", err);
-                        unimplemented!()
-                    }
-                };
-                let builder_params = TransactionBuilderParams::new_session(
-                    Some(transaction_bytes.into()),
-                    Some(TransactionCategory::InstallUpgrade),
-                );
-                BUILDER_PARAMS = Some(builder_params);
-            }
-            BUILDER_PARAMS.as_ref().unwrap()
+    fn get_builder_params() -> TransactionBuilderParams {
+        let mut builder_params = BUILDER_PARAMS.lock().unwrap();
+
+        if builder_params.is_none() {
+            let file_path = &format!("{WASM_PATH}{HELLO_CONTRACT}");
+            let transaction_bytes = match read_wasm_file(file_path) {
+                Ok(transaction_bytes) => transaction_bytes,
+                Err(err) => {
+                    eprintln!("Error reading file: {:?}", err);
+                    unimplemented!()
+                }
+            };
+            // TODO Fix is_install_upgrade
+            let is_install_upgrade = Some(true);
+            let new_builder_params = TransactionBuilderParams::new_session(
+                Some(transaction_bytes.into()),
+                is_install_upgrade,
+            );
+            *builder_params = Some(new_builder_params);
         }
+
+        builder_params.clone().unwrap()
     }
 
     #[tokio::test]

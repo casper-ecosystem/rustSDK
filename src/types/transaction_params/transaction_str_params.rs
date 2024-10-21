@@ -19,6 +19,7 @@ pub struct TransactionStrParams {
     session_args_simple: OnceCell<ArgsSimple>,
     session_args_json: OnceCell<String>,
     pricing_mode: OnceCell<PricingMode>,
+    additional_computation_factor: OnceCell<String>,
     payment_amount: OnceCell<String>,
     gas_price_tolerance: OnceCell<String>,
     receipt: OnceCell<String>,
@@ -27,6 +28,7 @@ pub struct TransactionStrParams {
 
 const DEFAULT_PRICING_MODE: PricingMode = PricingMode::Fixed;
 const DEFAULT_GAS_PRICE: u64 = DeployBuilder::DEFAULT_GAS_PRICE;
+const DEFAULT_ADDITIONAL_COMPUTATION_FACTOR: u8 = 0;
 const DEFAULT_STANDARD_PAYMENT: bool = false;
 
 #[allow(clippy::too_many_arguments)]
@@ -42,6 +44,7 @@ impl TransactionStrParams {
         session_args_simple: Option<Vec<String>>,
         session_args_json: Option<String>,
         pricing_mode: Option<PricingMode>,
+        additional_computation_factor: Option<String>,
         payment_amount: Option<String>,
         gas_price_tolerance: Option<String>,
         receipt: Option<String>,
@@ -69,6 +72,9 @@ impl TransactionStrParams {
         }
         if let Some(pricing_mode) = pricing_mode {
             transaction_params.set_pricing_mode(pricing_mode);
+        }
+        if let Some(additional_computation_factor) = additional_computation_factor {
+            transaction_params.set_additional_computation_factor(&additional_computation_factor);
         }
         if let Some(payment_amount) = payment_amount {
             transaction_params.set_payment_amount(&payment_amount);
@@ -101,6 +107,7 @@ impl TransactionStrParams {
             None, // session_args_simple
             None, // session_args_json
             None, // pricing_mode
+            None, // additional_computation_factor
             None, // payment_amount
             None, // gas_price_tolerance
             None, // receipt
@@ -226,6 +233,18 @@ impl TransactionStrParams {
     }
 
     #[wasm_bindgen(getter)]
+    pub fn additional_computation_factor(&self) -> Option<String> {
+        self.additional_computation_factor.get().cloned()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_additional_computation_factor(&self, additional_computation_factor: &str) {
+        self.additional_computation_factor
+            .set(additional_computation_factor.to_string())
+            .unwrap();
+    }
+
+    #[wasm_bindgen(getter)]
     pub fn payment_amount(&self) -> Option<String> {
         self.payment_amount.get().cloned()
     }
@@ -307,6 +326,15 @@ pub fn transaction_str_params_to_casper_client(
         _ => PricingMode::FIXED,
     };
 
+    if transaction_params
+        .additional_computation_factor
+        .get()
+        .is_none()
+    {
+        transaction_params
+            .set_additional_computation_factor(&DEFAULT_ADDITIONAL_COMPUTATION_FACTOR.to_string());
+    }
+
     _TransactionStrParams {
         chain_name: get_str_or_default(transaction_params.chain_name.get()),
         initiator_addr: get_str_or_default(transaction_params.initiator_addr.get()).to_string(),
@@ -316,6 +344,9 @@ pub fn transaction_str_params_to_casper_client(
         session_args_simple,
         session_args_json: get_str_or_default(transaction_params.session_args_json.get()),
         pricing_mode,
+        additional_computation_factor: get_str_or_default(
+            transaction_params.additional_computation_factor.get(),
+        ),
         payment_amount: get_str_or_default(transaction_params.payment_amount.get()),
         gas_price_tolerance: get_str_or_default(transaction_params.gas_price_tolerance.get()),
         receipt: get_str_or_default(transaction_params.receipt.get()),
@@ -357,6 +388,9 @@ mod tests {
         let pricing_mode = OnceCell::new();
         pricing_mode.set(PricingMode::Classic).unwrap();
 
+        let additional_computation_factor = OnceCell::new();
+        additional_computation_factor.set("0".to_string()).unwrap();
+
         let payment_amount = OnceCell::new();
         payment_amount.set("amount".to_string()).unwrap();
 
@@ -378,6 +412,7 @@ mod tests {
             session_args_simple,
             session_args_json,
             pricing_mode,
+            additional_computation_factor,
             payment_amount,
             gas_price_tolerance,
             receipt,
@@ -396,6 +431,7 @@ mod tests {
         assert_eq!(result.pricing_mode, "classic");
         assert_eq!(result.payment_amount, "amount");
         assert_eq!(result.gas_price_tolerance, "1");
+        assert_eq!(result.additional_computation_factor, "0");
         assert_eq!(result.receipt, "receipt");
         assert_eq!(result.standard_payment, "true");
     }
@@ -419,6 +455,7 @@ mod tests {
         transaction_params.set_session_args_json("json");
         transaction_params.set_gas_price_tolerance("1");
         transaction_params.set_pricing_mode(PricingMode::Fixed);
+        transaction_params.set_additional_computation_factor("1");
 
         transaction_params.set_payment_amount("amount");
 
@@ -438,6 +475,7 @@ mod tests {
         assert_eq!(result.pricing_mode, "fixed");
         assert_eq!(result.payment_amount, "amount");
         assert_eq!(result.gas_price_tolerance, "1");
+        assert_eq!(result.additional_computation_factor, "1");
         assert_eq!(result.receipt, "receipt");
         assert_eq!(result.standard_payment, "true");
     }

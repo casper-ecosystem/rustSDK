@@ -63,7 +63,6 @@ pub fn get_current_timestamp(timestamp: Option<String>) -> String {
 /// # Returns
 ///
 /// A hexadecimal string representing the Blake2b hash of the input metadata.
-
 pub fn get_blake2b_hash(meta_data: &str) -> String {
     let mut result = [0; BLAKE2B_DIGEST_LENGTH];
     let mut hasher = VarBlake2b::new(BLAKE2B_DIGEST_LENGTH).expect("should create hasher");

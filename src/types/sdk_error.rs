@@ -22,6 +22,9 @@ pub enum SdkError {
     #[error("Failed to serde_json serialization")]
     SerializationError(serde_json::Error),
 
+    #[error("Failed to deserialize field at index {index}: {error}")]
+    FieldDeserialization { index: u16, error: String },
+
     #[error("Failed to parse {context} as a key: {error}")]
     FailedToParseKey {
         context: &'static str,
@@ -156,8 +159,8 @@ pub enum SdkError {
     FailedToParseTransferTarget,
 
     /// Failed to parse transaction category.
-    #[error("Failed to parse a transaction category")]
-    FailedToParseTransactionCategory,
+    // #[error("Failed to parse a transaction category")]
+    // FailedToParseTransactionCategory,
 
     /// Failed to parse a validator public key.
     #[error("Failed to parse a validator public key")]
@@ -255,9 +258,6 @@ impl From<CliError> for SdkError {
             }
             CliError::FailedToParsePackageAddr => SdkError::FailedToParsePackageAddr,
             CliError::FailedToParseTransferTarget => SdkError::FailedToParseTransferTarget,
-            CliError::FailedToParseTransactionCategory => {
-                SdkError::FailedToParseTransactionCategory
-            }
             CliError::FailedToParseValidatorPublicKey => SdkError::FailedToParseValidatorPublicKey,
         }
     }

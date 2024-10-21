@@ -113,32 +113,35 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::helpers::public_key_from_secret_key;
+    use once_cell::sync::Lazy;
     use sdk_tests::{
         config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, WASM_PATH},
         tests::helpers::{get_network_constants, get_user_secret_key, read_wasm_file},
     };
+    use std::sync::Mutex;
 
-    fn get_session_params() -> &'static SessionStrParams {
-        static mut SESSION_PARAMS: Option<SessionStrParams> = None;
+    static SESSION_PARAMS: Lazy<Mutex<Option<SessionStrParams>>> = Lazy::new(|| Mutex::new(None));
 
-        unsafe {
-            if SESSION_PARAMS.is_none() {
-                let mut session_params = SessionStrParams::default();
-                let file_path = &format!("{WASM_PATH}{HELLO_CONTRACT}");
-                let module_bytes = match read_wasm_file(file_path) {
-                    Ok(module_bytes) => module_bytes,
-                    Err(err) => {
-                        eprintln!("Error reading file: {:?}", err);
-                        unimplemented!()
-                    }
-                };
-                session_params.set_session_bytes(module_bytes.into());
-                let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-                session_params.set_session_args(args_simple);
-                SESSION_PARAMS = Some(session_params);
-            }
-            SESSION_PARAMS.as_ref().unwrap()
+    fn get_session_params() -> SessionStrParams {
+        let mut session_params = SESSION_PARAMS.lock().unwrap();
+
+        if session_params.is_none() {
+            let mut new_session_params = SessionStrParams::default();
+            let file_path = &format!("{WASM_PATH}{HELLO_CONTRACT}");
+            let module_bytes = match read_wasm_file(file_path) {
+                Ok(module_bytes) => module_bytes,
+                Err(err) => {
+                    eprintln!("Error reading file: {:?}", err);
+                    unimplemented!()
+                }
+            };
+            new_session_params.set_session_bytes(module_bytes.into());
+            let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
+            new_session_params.set_session_args(args_simple);
+            *session_params = Some(new_session_params);
         }
+
+        session_params.clone().unwrap()
     }
 
     #[tokio::test]

@@ -120,6 +120,7 @@ pub mod test_module {
             None,
             None,
             None,
+            None,
             Some(PAYMENT_AMOUNT.to_string()),
             None,
             None,
