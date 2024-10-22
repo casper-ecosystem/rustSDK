@@ -42,7 +42,6 @@ pub async fn _run_example_1() {
 
     let transaction = get_transaction.unwrap().result.transaction;
     let timestamp = transaction.timestamp();
-    // let header = transaction.header();
     let hash = transaction.hash().to_hex_string();
     println!("{timestamp} {hash}");
 }

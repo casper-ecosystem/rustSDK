@@ -1,7 +1,7 @@
-import { Verbosity, TransactionCategory, PricingMode } from "casper-sdk";
+import { Verbosity, PricingMode } from "casper-sdk";
 
 export type EnvironmentConfig = {
-  [key: string]: string | object | Verbosity | TransactionCategory | PricingMode;
+  [key: string]: string | object | Verbosity | boolean | PricingMode;
 };
 
 const action_needs_secret_key = ['deploy', 'transfer', 'put_deploy', 'speculative_deploy', 'speculative_transfer', 'speculative_exec_deploy', 'sign_deploy', 'call_entrypoint_deploy', 'install'];
@@ -16,7 +16,8 @@ export const config: EnvironmentConfig = {
   standard_payment_amount: '100000000',
   default_pricing_mode: PricingMode.Fixed,
   default_gas_price_tolerance: '1',
-  default_transaction_category: TransactionCategory.InstallUpgrade,
+  default_additional_computation_factor: '0',
+  default_is_install_upgrade: true,
   action_needs_secret_key,
   action_needs_public_key,
   networks: {

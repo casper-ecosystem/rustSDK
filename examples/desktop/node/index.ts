@@ -36,9 +36,8 @@ const example1 = async () => {
 
   const transaction = transaction_result.transaction;
   const timestamp = transaction.timestamp;
-  const header = transaction.header;
   const hash = transaction.hash.toString();
-  console.log(timestamp, header, hash);
+  console.log(timestamp, hash);
 };
 
 // get_auction_info

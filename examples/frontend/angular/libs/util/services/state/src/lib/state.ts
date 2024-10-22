@@ -17,4 +17,5 @@ export type State = {
   select_dict_identifier?: string;
   args_simple?: string;
   args_json?: string;
+  pricing_mode?: string;
 };

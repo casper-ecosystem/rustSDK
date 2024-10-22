@@ -56,7 +56,7 @@ var sdk = new casper_sdk_1.SDK(rpc_address);
 // });
 // get_transaction
 var example1 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var transaction_hash_as_string, finalized_approvals, get_transaction_options, transaction_result, transaction, timestamp, header, hash;
+    var transaction_hash_as_string, finalized_approvals, get_transaction_options, transaction_result, transaction, timestamp, hash;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -71,9 +71,8 @@ var example1 = function () { return __awaiter(void 0, void 0, void 0, function (
                 transaction_result = _a.sent();
                 transaction = transaction_result.transaction;
                 timestamp = transaction.timestamp;
-                header = transaction.header;
                 hash = transaction.hash.toString();
-                console.log(timestamp, header, hash);
+                console.log(timestamp, hash);
                 return [2 /*return*/];
         }
     });

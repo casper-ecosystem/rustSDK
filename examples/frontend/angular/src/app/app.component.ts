@@ -110,7 +110,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async walletSign(_$event: Event, action: string) {
-    console.log(action);
     this.clientService.wallet_sign_deploy();
   }
 

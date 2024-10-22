@@ -1,5 +1,5 @@
 import { config } from "@util/config";
-import { PricingMode, TransactionCategory } from "casper-sdk";
+import { PricingMode } from "casper-sdk";
 
 export type option = {
   value: string,
@@ -248,6 +248,18 @@ const gasPriceTolerance: InputField = {
   e2e: 'gasPriceToleranceElt'
 };
 
+const additionalComputationFactor: InputField = {
+  id: 'additionalComputationFactorElt',
+  type: 'search',
+  wrap_class: 'col-xl-2 mb-2',
+  class: 'form-control',
+  label: 'Computation Factor',
+  name: 'additional_computation_factor',
+  controlName: 'additionalComputationFactor',
+  placeholder: '0, empty default',
+  e2e: 'additionalComputationFactorElt',
+  disabled_when: ['fixedPricingMode']
+};
 
 const sessionNameInput: InputField = {
   id: 'sessionNameElt',
@@ -547,10 +559,8 @@ const selectTransactionCategory: InputField = {
   controlName: 'selectTransactionCategory',
   e2e: 'selectTransactionCategoryElt',
   options: [
-    { value: TransactionCategory.InstallUpgrade.toString(), label: "Install & Upgrade", default: config['default_transaction_category'] === TransactionCategory.InstallUpgrade },
-    { value: TransactionCategory.Large.toString(), label: "Large", default: config['default_transaction_category'] === TransactionCategory.Large },
-    { value: TransactionCategory.Medium.toString(), label: "Medium", default: config['default_transaction_category'] === TransactionCategory.Medium },
-    { value: TransactionCategory.Small.toString(), label: "Small", default: config['default_transaction_category'] === TransactionCategory.Small },
+    { value: "true", label: "Install & Upgrade", default: config['default_is_install_upgrade'] === true },
+    { value: "false", label: "Session", default: config['default_is_install_upgrade'] === false },
   ],
   enabled_when: ['has_wasm']
 };
@@ -631,7 +641,7 @@ const getSpeculativeTransferFields: InputContainer[][] = [
 ];
 
 const installFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor },],
   [{ wasm_button: true }, { select: selectTransactionCategory }],
   [{ input: argsSimpleInput }],
   [{ textarea: argsJson }],
@@ -648,7 +658,7 @@ const makeDeployFields: InputContainer[][] = [
 ];
 
 const makeTransactionFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor }],
   [{ wasm_button: true }, { select: selectTransactionCategory }],
   [{ input: entityHash, required: true }, { input: callPackage }, { input: versionInput }],
   [{ input: entityAlias, required: true }],
@@ -666,7 +676,7 @@ const speculativeTransactionFields: InputContainer[][] = [
 ];
 
 const callEntrypointFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor }],
   [{ input: entityHash }, { input: callPackage }, { input: versionInput }],
   [{ input: entityAlias }],
   [{ input: entryPointInput }],

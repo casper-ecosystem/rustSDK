@@ -4,6 +4,7 @@ import { State, StateService } from '@util/state';
 import formFields, { option } from './form';
 import { CONFIG, EnvironmentConfig } from '@util/config';
 import { StorageService } from '@util/storage';
+import { PricingMode } from 'casper-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -100,6 +101,7 @@ export class FormService {
   }
 
   updateForm() {
+    console.log('updateForm');
     const fields = this.action && formFields.get(this.action);
     if (!fields) {
       return;
@@ -170,6 +172,11 @@ export class FormService {
               control.disable();
             } else if (!disabledTargets.includes(input.controlName)) {
               control.enable();
+            }
+            const fixedPricingMode = (PricingMode[this.state.pricing_mode as unknown as PricingMode] as unknown as number === PricingMode.Classic);
+            if (input?.disabled_when?.includes('fixedPricingMode') && fixedPricingMode) {
+              control.reset();
+              control.disable();
             }
           }
         }

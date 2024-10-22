@@ -6,7 +6,7 @@ import { FormService } from '@util/form';
 import { ResultService } from '@util/result';
 import { State, StateService } from '@util/state';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockHash, BlockIdentifier, Bytes, CasperWallet, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash, TransactionCategory, PricingMode, EntityAddr } from 'casper-sdk';
+import { BlockHash, BlockIdentifier, Bytes, CasperWallet, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash, PricingMode, EntityAddr } from 'casper-sdk';
 
 @Injectable({
   providedIn: 'root'
@@ -425,6 +425,7 @@ export class ClientService {
     const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
     const gas_price_tolerance: string = this.getIdentifier('gasPriceTolerance')?.value?.trim() || '';
     const pricing_mode: PricingMode = this.getIdentifier('selectPricingMode')?.value?.trim() || '';
+    const additional_computation_factor: string = this.getIdentifier('additionalComputationFactor')?.value?.trim() || '';
     if (!deploy_result && !this.public_key) {
       const err = "public_key is missing";
       err && (this.errorService.setError(err.toString()));
@@ -447,6 +448,10 @@ export class ClientService {
 
     gas_price_tolerance && (transaction_params.gas_price_tolerance = gas_price_tolerance);
     pricing_mode && (transaction_params.pricing_mode = pricing_mode);
+
+    if (pricing_mode == PricingMode.Fixed) {
+      transaction_params.additional_computation_factor = additional_computation_factor;
+    }
 
     const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
     if (!payment_amount) {
@@ -1344,8 +1349,8 @@ export class ClientService {
     }
 
     if (wasm) {
-      const transaction_category: TransactionCategory = this.getIdentifier('selectTransactionCategory')?.value?.trim();
-      builder_params = TransactionBuilderParams.newSession(Bytes.fromUint8Array(wasm), transaction_category);
+      const is_install_upgrade: boolean = this.getIdentifier('selectTransactionCategory')?.value?.trim() === 'true';
+      builder_params = TransactionBuilderParams.newSession(Bytes.fromUint8Array(wasm), is_install_upgrade);
     }
 
     return builder_params;

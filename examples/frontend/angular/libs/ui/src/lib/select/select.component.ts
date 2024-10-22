@@ -5,6 +5,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CONFIG, EnvironmentConfig } from '@util/config';
 import { State, StateService } from '@util/state';
 import { Subscription } from 'rxjs';
+import { PricingMode } from 'casper-sdk';
 
 @Component({
   selector: 'ui-select',
@@ -53,6 +54,11 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     if (name === 'select_dict_identifier') {
       this.stateService.setState({
         select_dict_identifier: value
+      });
+    }
+    if (name === 'pricing_mode') {
+      this.stateService.setState({
+        pricing_mode: PricingMode[value as unknown as number].toString()
       });
     }
   }
