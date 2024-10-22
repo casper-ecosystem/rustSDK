@@ -940,7 +940,7 @@ mod tests {
 
     #[test]
     fn test_args_to_json_array() {
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
         // Create a RuntimeArgs instance and populate it directly with CLValues
         let mut runtime_args = RuntimeArgs::new();
         runtime_args
