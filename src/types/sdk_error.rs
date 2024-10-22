@@ -158,10 +158,6 @@ pub enum SdkError {
     #[error("Failed to parse a transfer target")]
     FailedToParseTransferTarget,
 
-    /// Failed to parse transaction category.
-    // #[error("Failed to parse a transaction category")]
-    // FailedToParseTransactionCategory,
-
     /// Failed to parse a validator public key.
     #[error("Failed to parse a validator public key")]
     FailedToParseValidatorPublicKey,

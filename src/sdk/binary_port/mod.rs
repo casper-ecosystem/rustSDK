@@ -672,7 +672,7 @@ mod tests {
         assert!(!block_hash.to_string().is_empty());
 
         let result = sdk
-            .get_binary_block_header_by_hash(Some(node_address), block_hash.clone())
+            .get_binary_block_header_by_hash(Some(node_address), block_hash)
             .await;
 
         let block_header = result.unwrap();
@@ -731,7 +731,7 @@ mod tests {
         assert!(!block_hash.to_string().is_empty());
 
         let result = sdk
-            .get_binary_signed_block_by_hash(Some(node_address), block_hash.clone())
+            .get_binary_signed_block_by_hash(Some(node_address), *block_hash)
             .await;
 
         let signed_block = result.unwrap();
@@ -772,7 +772,7 @@ mod tests {
         assert!(!transaction_hash.to_string().is_empty());
 
         let result = sdk
-            .get_binary_transaction_by_hash(Some(node_address), transaction_hash.clone(), false)
+            .get_binary_transaction_by_hash(Some(node_address), transaction_hash, false)
             .await;
 
         let transaction = result.unwrap();
