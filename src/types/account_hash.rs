@@ -1,9 +1,13 @@
 use super::{public_key::PublicKey, sdk_error::SdkError};
+use blake2::{
+    digest::{Update, VariableOutput},
+    VarBlake2b,
+};
 use casper_types::account::ACCOUNT_HASH_LENGTH;
+use casper_types::BLAKE2B_DIGEST_LENGTH;
 use casper_types::{
     account::AccountHash as _AccountHash,
     bytesrepr::{self, FromBytes, ToBytes},
-    crypto,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -43,6 +47,18 @@ impl AccountHash {
         })?;
         Ok(Self(account_hash))
     }
+
+    fn custom_blake2b<T: AsRef<[u8]>>(data: T) -> [u8; BLAKE2B_DIGEST_LENGTH] {
+        let mut result = [0u8; BLAKE2B_DIGEST_LENGTH];
+        let mut hasher = VarBlake2b::new(BLAKE2B_DIGEST_LENGTH)
+            .expect("Failed to create Blake2b hasher with the specified length");
+
+        hasher.update(data);
+        hasher.finalize_variable(|res| {
+            result.copy_from_slice(res);
+        });
+        result
+    }
 }
 
 #[wasm_bindgen]
@@ -71,7 +87,8 @@ impl AccountHash {
 
     #[wasm_bindgen(js_name = "fromPublicKey")]
     pub fn from_public_key(public_key: PublicKey) -> AccountHash {
-        let account_hash = _AccountHash::from_public_key(&(public_key.into()), crypto::blake2b);
+        let account_hash =
+            _AccountHash::from_public_key(&(public_key.into()), Self::custom_blake2b);
         Self(account_hash)
     }
 
