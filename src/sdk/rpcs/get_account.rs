@@ -250,7 +250,9 @@ mod tests {
         helpers::public_key_from_secret_key,
         types::{block_identifier::BlockIdentifier, public_key::PublicKey},
     };
-    use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
+    use sdk_tests::tests::helpers::{
+        get_enable_addressable_entity, get_network_constants, get_user_secret_key,
+    };
 
     #[allow(deprecated)]
     fn get_account_identifier() -> AccountIdentifier {
@@ -298,8 +300,10 @@ mod tests {
 
     #[tokio::test]
     #[allow(deprecated)]
-    #[ignore]
     async fn _test_get_account_with_account_identifier() {
+        if get_enable_addressable_entity() {
+            return;
+        }
         // Arrange
         let sdk = SDK::new(None, None, None);
         let account_identifier = get_account_identifier();
@@ -322,8 +326,10 @@ mod tests {
 
     #[tokio::test]
     #[allow(deprecated)]
-    #[ignore]
     async fn _test_get_account_with_account_identifier_as_string() {
+        if get_enable_addressable_entity() {
+            return;
+        }
         // Arrange
         let sdk = SDK::new(None, None, None);
         let account_identifier_as_string = get_account_identifier().to_string();
@@ -347,8 +353,10 @@ mod tests {
 
     #[tokio::test]
     #[allow(deprecated)]
-    #[ignore]
     async fn _test_get_account_with_block_identifier() {
+        if get_enable_addressable_entity() {
+            return;
+        }
         // Arrange
         let sdk = SDK::new(None, None, None);
         let block_identifier =

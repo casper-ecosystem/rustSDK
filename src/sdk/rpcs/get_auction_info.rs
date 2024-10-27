@@ -221,6 +221,7 @@ mod tests {
         assert!(err_string.contains(error_message));
     }
 
+    #[ignore = "currently failing on node"]
     #[tokio::test]
     async fn test_get_auction_info_with_block_id_string() {
         // Arrange
@@ -251,6 +252,7 @@ mod tests {
         assert!(result.is_ok());
     }
 
+    #[ignore = "currently failing on node"]
     #[tokio::test]
     async fn test_get_auction_info_with_block_identifier() {
         // Arrange

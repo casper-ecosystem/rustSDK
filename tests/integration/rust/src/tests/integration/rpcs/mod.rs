@@ -485,8 +485,6 @@ pub mod test_module {
     ) {
         let config: TestConfig = get_config(true).await;
 
-        println!("install_hello_contract");
-
         let sdk = create_test_sdk(Some(config.clone()));
 
         let transaction_hash_as_string = test_install_deploy().await;
@@ -538,7 +536,10 @@ pub mod test_module {
 #[cfg(test)]
 mod tests {
     use super::test_module::*;
-    use crate::config::{get_config, TestConfig};
+    use crate::{
+        config::{get_config, TestConfig},
+        tests::helpers::get_enable_addressable_entity,
+    };
     use casper_rust_wasm_sdk::types::{
         block_hash::BlockHash, block_identifier::BlockIdentifierInput,
         global_state_identifier::GlobalStateIdentifier,
@@ -550,41 +551,58 @@ mod tests {
         test_get_peers().await;
     }
     #[test]
-    #[ignore]
     pub async fn _test_get_account_test() {
+        if get_enable_addressable_entity() {
+            return;
+        }
         test_get_account(None).await;
     }
     #[test]
-    #[ignore]
     pub async fn _test_get_account_test_with_block_identifier() {
+        if get_enable_addressable_entity() {
+            return;
+        }
         let config: TestConfig = get_config(true).await;
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_account(maybe_block_identifier).await;
     }
     #[test]
     #[allow(deprecated)]
-    #[ignore]
     pub async fn _test_get_account_with_account_hash_test() {
+        if get_enable_addressable_entity() {
+            return;
+        }
         test_get_account_with_account_hash(None).await;
     }
     #[test]
     pub async fn test_get_entity_test() {
+        if !get_enable_addressable_entity() {
+            return;
+        }
         test_get_entity(None).await;
     }
     #[test]
     pub async fn test_get_entity_test_with_block_identifier() {
+        if !get_enable_addressable_entity() {
+            return;
+        }
         let config: TestConfig = get_config(true).await;
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_entity(maybe_block_identifier).await;
     }
     #[test]
     pub async fn test_get_entity_with_account_hash_test() {
+        if !get_enable_addressable_entity() {
+            return;
+        }
         test_get_entity_with_account_hash(None).await;
     }
+    #[ignore = "currently failing on node"]
     #[test]
     pub async fn test_get_auction_info_test() {
         test_get_auction_info(None).await;
     }
+    #[ignore = "currently failing on node"]
     #[test]
     pub async fn test_get_auction_info_test_with_block_identifier() {
         let config: TestConfig = get_config(true).await;

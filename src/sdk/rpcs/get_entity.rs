@@ -243,7 +243,9 @@ mod tests {
         helpers::public_key_from_secret_key,
         types::{block_identifier::BlockIdentifier, public_key::PublicKey},
     };
-    use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
+    use sdk_tests::tests::helpers::{
+        get_enable_addressable_entity, get_network_constants, get_user_secret_key,
+    };
 
     fn get_entity_identifier() -> EntityIdentifier {
         let secret_key = get_user_secret_key(None).unwrap();
@@ -288,6 +290,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_entity_with_entity_identifier() {
+        if !get_enable_addressable_entity() {
+            return;
+        }
         // Arrange
         let sdk = SDK::new(None, None, None);
         let entity_identifier = get_entity_identifier();
@@ -310,6 +315,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_entity_with_entity_identifier_as_string() {
+        if !get_enable_addressable_entity() {
+            return;
+        }
         // Arrange
         let sdk = SDK::new(None, None, None);
         let entity_identifier_as_string = get_entity_identifier().to_string();
@@ -333,6 +341,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_entity_with_block_identifier() {
+        if !get_enable_addressable_entity() {
+            return;
+        }
         // Arrange
         let sdk = SDK::new(None, None, None);
         let block_identifier =

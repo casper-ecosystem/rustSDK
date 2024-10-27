@@ -1,6 +1,6 @@
 use self::intern::{create_test_sdk, install_cep78};
 use crate::config::{
-    CONTRACT_CEP78_KEY, DEFAULT_NODE_ADDRESS, PACKAGE_CEP78_KEY, SPECULATIVE_ADDRESS,
+    CONTRACT_CEP78_KEY, DEFAULT_ENABLE_ADDRESSABLE_ENTITY, PACKAGE_CEP78_KEY, SPECULATIVE_ADDRESS,
 };
 use crate::config::{
     DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_RPC_ADDRESS, DEFAULT_SECRET_KEY_NAME,
@@ -35,12 +35,15 @@ lazy_static! {
 }
 
 pub(crate) mod intern {
-    use super::{read_wasm_file, CEP78_REINSTALL_GUARD};
+    use super::{get_enable_addressable_entity, read_wasm_file, CEP78_REINSTALL_GUARD};
     use crate::config::{
         TestConfig, ARGS_JSON, CEP78_CONTRACT, PAYMENT_AMOUNT_CONTRACT_CEP78, WASM_PATH,
     };
     use casper_rust_wasm_sdk::{
-        rpcs::get_dictionary_item::DictionaryItemInput,
+        rpcs::{
+            get_dictionary_item::DictionaryItemInput,
+            query_global_state::{KeyIdentifierInput, QueryGlobalStateParams},
+        },
         types::{
             deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
             entity_identifier::EntityIdentifier, transaction_hash::TransactionHash,
@@ -55,11 +58,14 @@ pub(crate) mod intern {
         }
     }
 
-    pub async fn get_main_purse(account_identifier_as_string: &str, rpc_address: &str) -> String {
-        let entity_result = create_test_sdk(None)
-            .get_entity(
+    pub async fn get_main_purse(account_identifier: &str, rpc_address: &str) -> String {
+        let sdk = create_test_sdk(None);
+
+        // Choose between entity or account based on the enable flag
+        let main_purse_uref = if get_enable_addressable_entity() {
+            sdk.get_entity(
                 None,
-                Some(account_identifier_as_string.to_owned()),
+                Some(account_identifier.to_owned()),
                 None,
                 None,
                 Some(rpc_address.to_string()),
@@ -67,14 +73,30 @@ pub(crate) mod intern {
             .await
             .unwrap()
             .result
-            .entity_result;
-
-        let purse_uref = entity_result
+            .entity_result
             .addressable_entity()
             .unwrap()
             .entity
-            .main_purse();
-        purse_uref.to_formatted_string()
+            .main_purse()
+        } else {
+            #[allow(deprecated)]
+            let purse = sdk
+                .get_account(
+                    None,
+                    Some(account_identifier.to_owned()),
+                    None,
+                    None,
+                    Some(rpc_address.to_string()),
+                )
+                .await
+                .unwrap()
+                .result
+                .account
+                .main_purse();
+            purse.into()
+        };
+
+        main_purse_uref.to_formatted_string()
     }
 
     pub async fn get_dictionnary_key(
@@ -121,25 +143,63 @@ pub(crate) mod intern {
         dictionary_name: &str,
         rpc_address: Option<String>,
     ) -> String {
-        let entity_identifier = EntityIdentifier::from_formatted_str(contract_entity).ok();
-        let get_entity = create_test_sdk(None)
-            .get_entity(entity_identifier, None, None, None, rpc_address)
-            .await
-            .unwrap();
+        if get_enable_addressable_entity() {
+            let entity_identifier = EntityIdentifier::from_formatted_str(contract_entity).ok();
 
-        let entity = get_entity
-            .result
-            .entity_result
-            .addressable_entity()
-            .unwrap();
+            // Create the SDK instance
+            let sdk = create_test_sdk(None);
 
-        let named_keys = entity.named_keys.clone();
+            // Await the result and store it in a variable to avoid temporary drop issues
+            let get_entity_result = sdk
+                .get_entity(entity_identifier, None, None, None, rpc_address)
+                .await
+                .unwrap();
 
-        let (_, dictionnary_uref) = named_keys
-            .iter()
-            .find(|(key, _)| key == &dictionary_name)
-            .unwrap();
-        dictionnary_uref.to_formatted_string()
+            let entity_result = get_entity_result.result.entity_result;
+            let entity = entity_result.addressable_entity().unwrap();
+
+            let named_keys = entity.named_keys.clone();
+
+            // Use a pattern match to safely get the dictionary URef
+            let (_, dictionary_uref) = named_keys
+                .iter()
+                .find(|(key, _)| key == &dictionary_name)
+                .unwrap();
+
+            dictionary_uref.to_formatted_string()
+        } else {
+            // Prepare the query parameters
+            let query_params = QueryGlobalStateParams {
+                key: KeyIdentifierInput::String(contract_entity.to_string()),
+                path: None,
+                maybe_global_state_identifier: None,
+                state_root_hash: None,
+                maybe_block_id: None,
+                rpc_address,
+                verbosity: None,
+            };
+
+            // Create the SDK instance
+            let sdk = create_test_sdk(None);
+
+            // Await the result and store it to avoid temporary drop issues
+            let query_global_state_result = sdk.query_global_state(query_params).await.unwrap();
+
+            let named_keys = query_global_state_result
+                .result
+                .stored_value
+                .as_contract()
+                .unwrap()
+                .named_keys();
+
+            // Use a pattern match to safely get the dictionary URef
+            let (_, dictionary_uref) = named_keys
+                .iter()
+                .find(|(key, _)| key == &dictionary_name)
+                .unwrap();
+
+            dictionary_uref.to_string()
+        }
     }
 
     pub async fn install_cep78(
@@ -200,6 +260,7 @@ pub(crate) mod intern {
             .wait_transaction(event_address, &transaction_hash_as_string, None)
             .await
             .unwrap();
+
         let transaction = event_parse_result
             .body
             .unwrap()
@@ -282,6 +343,12 @@ fn get_env_key(user: &str) -> String {
     };
 
     format!("-----BEGIN PRIVATE KEY----- {secret_key} -----END PRIVATE KEY-----")
+}
+
+pub fn get_enable_addressable_entity() -> bool {
+    let enable_addressable_entity = env::var("ENABLE_ADDRESSABLE_ENTITY")
+        .unwrap_or_else(|_| DEFAULT_ENABLE_ADDRESSABLE_ENTITY.to_string());
+    enable_addressable_entity == "true"
 }
 
 fn read_pem_file(file_path: &str, secret_key_name: &str) -> Result<String, io::Error> {

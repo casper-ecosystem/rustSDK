@@ -106,7 +106,7 @@ pub(crate) fn make_transfer_transaction(
 
     let target = transfer_target(target)?;
 
-    let amount = U512::from_str(amount).map_err(|error| SdkError::FailedToDecodeHex {
+    let amount = U512::from_dec_str(amount).map_err(|error| SdkError::FailedToDecodeHex {
         context: "make_transfer_transaction",
         error: error.to_string(),
     })?;

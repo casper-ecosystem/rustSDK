@@ -58,6 +58,8 @@ pub const ARGS_JSON: &str = r#"[
 {"name": "events_mode", "type": "U8", "value": 1}
 ]"#;
 
+pub const DEFAULT_ENABLE_ADDRESSABLE_ENTITY: bool = false;
+
 #[derive(Clone, Debug)]
 pub struct TestConfig {
     pub rpc_address: Option<String>,

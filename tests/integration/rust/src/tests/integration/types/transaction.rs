@@ -21,6 +21,7 @@ pub mod test_module_transaction {
                 transaction_builder_params::TransactionBuilderParams,
                 transaction_str_params::TransactionStrParams,
             },
+            uref::URef,
         },
     };
     use std::thread;
@@ -322,9 +323,11 @@ pub mod test_module_transaction {
         assert!(transaction.verify());
 
         assert!(transaction
-            .to_json_string()
+            .target()
             .unwrap()
-            .contains("\"module_bytes\":\"00\""));
+            .to_string()
+            .contains("1 module bytes"));
+
         let file_path = &format!("{WASM_PATH}{HELLO_CONTRACT}");
         let transaction_bytes = match read_wasm_file(file_path) {
             Ok(transaction_bytes) => transaction_bytes,
@@ -333,7 +336,6 @@ pub mod test_module_transaction {
                 return;
             }
         };
-        // TODO Fix is_install_upgrade
         let is_install_upgrade = Some(true);
         transaction = transaction.with_transaction_bytes(
             transaction_bytes.into(),
@@ -342,13 +344,11 @@ pub mod test_module_transaction {
         );
         assert!(transaction.verify());
 
-        // TODO
-        // assert!(transaction.is_transaction_bytes());
-
         assert!(!transaction
-            .to_json_string()
+            .target()
             .unwrap()
-            .contains("\"module_bytes\":\"00\""));
+            .to_string()
+            .contains("1 module bytes"));
     }
 
     pub async fn test_transaction_type_with_secret_key() {
@@ -413,7 +413,7 @@ pub mod test_module_transaction {
         transaction_params.set_timestamp(Some(old_timestamp.to_string()));
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut transaction = Transaction::new_transfer(
-            None,
+            Some(URef::from_formatted_str(&config.purse_uref).unwrap()),
             &config.target_account,
             TRANSFER_AMOUNT,
             transaction_params,
@@ -454,10 +454,8 @@ pub mod test_module_transaction {
             None,
         )
         .unwrap();
-        assert!(!transaction.verify());
 
-        // TODO
-        // assert!(transaction.has_valid_hash());
+        assert!(transaction.is_standard_payment());
 
         let compute_approvals_hash = transaction.compute_approvals_hash();
         assert_eq!(transaction.initiator_addr(), config.account);
@@ -581,8 +579,7 @@ pub mod test_module_transaction {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
 
-        // TODO
-        // assert!(transaction.has_valid_hash());
+        assert!(!transaction.hash().to_string().is_empty());
 
         assert!(!transaction
             .compute_approvals_hash()

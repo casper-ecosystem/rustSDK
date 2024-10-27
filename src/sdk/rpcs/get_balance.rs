@@ -257,7 +257,9 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::helpers::public_key_from_secret_key;
-    use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
+    use sdk_tests::tests::helpers::{
+        get_enable_addressable_entity, get_network_constants, get_user_secret_key,
+    };
 
     async fn get_main_purse() -> URef {
         let sdk = SDK::new(None, None, None);
@@ -265,22 +267,27 @@ mod tests {
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
-        let entity_result = sdk
-            .get_entity(None, Some(account), None, None, Some(rpc_address))
-            .await
-            .unwrap()
-            .result
-            .entity_result;
+        let main_purse = if get_enable_addressable_entity() {
+            sdk.get_entity(None, Some(account), None, None, Some(rpc_address))
+                .await
+                .unwrap()
+                .result
+                .entity_result
+                .addressable_entity()
+                .unwrap()
+                .entity
+                .main_purse()
+        } else {
+            #[allow(deprecated)]
+            sdk.get_account(None, Some(account), None, None, Some(rpc_address))
+                .await
+                .unwrap()
+                .result
+                .account
+                .main_purse()
+        };
 
-        let purse_uref = entity_result
-            .addressable_entity()
-            .unwrap()
-            .entity
-            .main_purse();
-
-        let purse_uref_value: URef = purse_uref.into();
-
-        purse_uref_value
+        main_purse.into()
     }
 
     #[tokio::test]

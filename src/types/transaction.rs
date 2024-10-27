@@ -21,14 +21,21 @@ use crate::{
     },
     make_transaction,
     make_transfer_transaction::make_transfer_transaction,
-    types::{digest::Digest, pricing_mode::PricingMode, transaction_hash::TransactionHash},
+    types::{
+        digest::Digest,
+        pricing_mode::PricingMode,
+        transaction_hash::TransactionHash,
+        transaction_params::transaction_builder_params::{TransferTarget, TransferTargetKind},
+    },
 };
 
 use casper_types::{
+    account::AccountHash as _AccountHash,
     bytesrepr::{self, Bytes as _Bytes, ToBytes},
-    Approval, ApprovalsHash, AsymmetricType, Deploy, GasLimited, InitiatorAddr, RuntimeArgs,
-    Timestamp, Transaction as _Transaction, TransactionEntryPoint, TransactionInvocationTarget,
-    TransactionTarget, TransactionV1,
+    Approval, ApprovalsHash, AsymmetricType, Deploy, GasLimited, InitiatorAddr,
+    PublicKey as _PublicKey, RuntimeArgs, Timestamp, Transaction as _Transaction,
+    TransactionEntryPoint, TransactionInvocationTarget, TransactionTarget, TransactionV1,
+    URef as _URef, U512,
 };
 use chrono::{DateTime, Utc};
 #[cfg(target_arch = "wasm32")]
@@ -332,7 +339,7 @@ impl Transaction {
         }
         transaction.sign(&secret_key_from_pem.unwrap());
         if let Err(err) = transaction.verify() {
-            error(&format!("Transaction has not a valid: {:?}", err));
+            error(&format!("Transaction is not a valid: {:?}", err));
         }
         transaction.into()
     }
@@ -603,7 +610,6 @@ impl Transaction {
         if let Some(secret_key) = secret_key {
             transaction_params.set_secret_key(&secret_key);
         }
-
         let json_array = self.args_to_json_array(new_args);
 
         // Convert the json_array to a JSON string and set it in the transaction params
@@ -710,14 +716,14 @@ impl Transaction {
             self.initiator_addr().to_string()
         };
 
-        let transaction_params = TransactionStrParams::new_with_defaults(
+        let new_transaction_params = TransactionStrParams::new_with_defaults(
             &chain_name,
             Some(initiator_addr),
             transaction_params.secret_key(),
             Some(ttl),
         );
 
-        transaction_params.set_timestamp(Some(timestamp));
+        new_transaction_params.set_timestamp(Some(timestamp));
 
         let pricing_mode = if let Some(pricing_mode) = transaction_params.pricing_mode() {
             pricing_mode
@@ -750,29 +756,33 @@ impl Transaction {
                 self.gas_price_tolerance().to_string()
             };
 
-        transaction_params.set_pricing_mode(pricing_mode);
+        new_transaction_params.set_pricing_mode(pricing_mode);
 
         if !receipt.is_empty() {
-            transaction_params.set_receipt(&receipt);
+            new_transaction_params.set_receipt(&receipt);
         }
         if !additional_computation_factor.is_empty() {
-            transaction_params.set_additional_computation_factor(&additional_computation_factor);
+            new_transaction_params
+                .set_additional_computation_factor(&additional_computation_factor);
         }
         if !gas_price_tolerance.is_empty() {
-            transaction_params.set_gas_price_tolerance(&gas_price_tolerance);
+            new_transaction_params.set_gas_price_tolerance(&gas_price_tolerance);
         }
 
-        let json_array = self.args_to_json_array(&self.session_args());
-
-        transaction_params.set_session_args_json(
-            &serde_json::to_string(&json_array)
-                .map_err(|err| error(&format!("Failed to deserialize args: {:?}", err)))
-                .unwrap(),
-        );
+        if let Some(session_args_json) = transaction_params.session_args_json() {
+            new_transaction_params.set_session_args_json(&session_args_json);
+        } else {
+            let json_array = self.args_to_json_array(&self.session_args());
+            new_transaction_params.set_session_args_json(
+                &serde_json::to_string(&json_array)
+                    .map_err(|err| error(&format!("Failed to deserialize args: {:?}", err)))
+                    .unwrap(),
+            );
+        }
 
         let builder_params = self.make_transaction_builder_params(new_builder_params);
 
-        let transaction: Transaction = make_transaction(builder_params, transaction_params)
+        let transaction: Transaction = make_transaction(builder_params, new_transaction_params)
             .map(Into::into)
             .map_err(|err| {
                 let err_msg = format!("Error building transaction: {}", err);
@@ -780,10 +790,7 @@ impl Transaction {
                 err_msg
             })
             .unwrap();
-        // let _ = transaction.validate_transaction_size();
-
-        dbg!(transaction.clone());
-
+        // let _ = transaction.verify();
         transaction
     }
 
@@ -806,7 +813,7 @@ impl Transaction {
         let entry_point = new_entry_point.unwrap_or_else(|| self.entry_point().clone());
 
         match target {
-            TransactionTarget::Native => {
+            TransactionTarget::Native => match entry_point.as_str() {
                 // "add_bid" => TransactionBuilderParams::new_add_bid(
                 //     self.public_key().clone(),
                 //     self.delegation_rate(),
@@ -834,16 +841,64 @@ impl Transaction {
                 //     self.public_key().clone(),
                 //     &self.amount(),
                 // ),
-                // "transfer" => TransactionBuilderParams::new_transfer(
-                //     self.maybe_source(),
-                //     self.target_transfer(),
-                //     &self.amount(),
-                //     self.maybe_id(),
-                // ),
-                {
+                "transfer" => {
+                    let args = self.session_args();
+
+                    let target = args.get("target").expect("Expected 'target' argument");
+
+                    let target = if let Ok(public_key) = target.clone().into_t::<_PublicKey>() {
+                        TransferTarget::new(
+                            TransferTargetKind::PublicKey,
+                            Some(public_key.into()),
+                            None,
+                            None,
+                        )
+                    }
+                    // Try to interpret the target as an AccountHash
+                    else if let Ok(account_hash) = target.clone().into_t::<_AccountHash>() {
+                        TransferTarget::new(
+                            TransferTargetKind::AccountHash,
+                            None,
+                            Some(account_hash.into()),
+                            None,
+                        )
+                    }
+                    // Try to interpret the target as a URef
+                    else if let Ok(uref) = target.clone().into_t::<_URef>() {
+                        TransferTarget::new(TransferTargetKind::URef, None, None, Some(uref.into()))
+                    } else {
+                        unimplemented!("unimplemented target: {:?}", target);
+                    };
+
+                    // Extract the "amount" argument as a U512 and convert it to a string
+                    let amount = args
+                        .get("amount")
+                        .and_then(|cl_value| cl_value.clone().into_t::<U512>().ok())
+                        .expect("Expected 'amount' to be of type U512");
+
+                    // Extract the "id" argument as an Option<u64> if it exists
+                    let maybe_id = args
+                        .get("id")
+                        .and_then(|cl_value| cl_value.clone().into_t::<Option<u64>>().ok())
+                        .flatten();
+
+                    // Extract the "source" argument as a URef, if available
+                    let maybe_source: Option<_URef> = args
+                        .get("source")
+                        .and_then(|cl_value| cl_value.clone().into_t::<Option<_URef>>().ok())
+                        .flatten();
+
+                    TransactionBuilderParams::new_transfer(
+                        maybe_source.map(Into::into),
+                        target,
+                        &amount.to_string(),
+                        maybe_id,
+                    )
+                }
+                _ => {
                     unimplemented!("unimplemented native entry point: {}", entry_point);
                 }
-            }
+            },
             TransactionTarget::Stored { id, runtime: _ } => match id {
                 casper_types::TransactionInvocationTarget::ByHash(hash) => {
                     TransactionBuilderParams::new_invocable_entity(
@@ -878,7 +933,8 @@ impl Transaction {
                 runtime: _,
             } => {
                 let default: _Bytes = transaction_bytes.clone();
-                let new_bytes = new_transaction_bytes.unwrap();
+                let bytes_default = Bytes::default();
+                let new_bytes = new_transaction_bytes.unwrap_or(&bytes_default);
                 let new: &Bytes = new_bytes;
                 let new_transaction_bytes: _Bytes = {
                     let new_bytes: _Bytes = _Bytes::from((*new).to_vec());
@@ -936,6 +992,7 @@ impl From<TransactionV1> for Transaction {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::helpers::public_key_from_secret_key;
     use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     #[test]
@@ -980,6 +1037,50 @@ mod tests {
         assert_eq!(
             &serde_json::to_string(&generated_json).unwrap(),
             expected_json
+        );
+    }
+
+    #[test]
+    fn test_add_arg_without_secret_key() {
+        let (_, _, _, chain_name) = get_network_constants();
+        let secret_key = get_user_secret_key(None).unwrap();
+
+        let transaction_params = TransactionStrParams::default();
+        transaction_params.set_secret_key(&secret_key);
+        transaction_params.set_chain_name(&chain_name);
+
+        let builder_params = TransactionBuilderParams::default();
+        let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
+        let transaction = transaction.add_arg("foo:bool='false".to_string(), None);
+
+        assert_eq!(transaction.session_args().len(), 1);
+        let expected_inner_bytes = vec![1, 0, 0, 0, 0, 0];
+
+        assert_eq!(
+            *transaction.session_args().get("foo").unwrap().inner_bytes(),
+            expected_inner_bytes
+        );
+    }
+
+    #[test]
+    fn test_add_arg_with_secret_key() {
+        let (_, _, _, chain_name) = get_network_constants();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
+
+        let transaction_params = TransactionStrParams::default();
+        transaction_params.set_chain_name(&chain_name);
+        transaction_params.set_initiator_addr(&initiator_addr);
+
+        let builder_params = TransactionBuilderParams::default();
+        let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
+        let transaction = transaction.add_arg("foo:bool='false".to_string(), None);
+
+        let expected_inner_bytes = vec![1, 0, 0, 0, 0, 0];
+
+        assert_eq!(
+            *transaction.session_args().get("foo").unwrap().inner_bytes(),
+            expected_inner_bytes
         );
     }
 }
