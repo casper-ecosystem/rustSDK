@@ -35,7 +35,7 @@ export function provideSafeAsync<T>(
         async () => container.value = await initializer({ wasm_asset_path, rpc_address, node_address, verbosity })
       ,
       multi: true,
-      deps: [WASM_ASSET_PATH, RPC_ADDRESS, VERBOSITY],
+      deps: [WASM_ASSET_PATH, RPC_ADDRESS, NODE_ADDRESS, VERBOSITY],
     },
     {
       provide: token,

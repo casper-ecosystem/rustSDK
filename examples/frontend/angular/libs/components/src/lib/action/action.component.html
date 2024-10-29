@@ -36,6 +36,15 @@
         {{ sdk_method }}
       </option>
     </optgroup>
+    <optgroup label="binary">
+      <option
+        [value]="sdk_method"
+        [selected]="action === sdk_method"
+        *ngFor="let sdk_method of sdk_binary_methods; index as i"
+      >
+        {{ sdk_method }}
+      </option>
+    </optgroup>
     <optgroup label="deploy" class="deprecated">
       <option
         [value]="sdk_method"

@@ -101,7 +101,6 @@ export class FormService {
   }
 
   updateForm() {
-    console.log('updateForm');
     const fields = this.action && formFields.get(this.action);
     if (!fields) {
       return;

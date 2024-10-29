@@ -53,6 +53,7 @@ export const config: EnvironmentConfig = {
     },
     'dev': {
       rpc_address: 'http://localhost:4200',
+      node_address: 'localhost:4300',
       stream_address: 'http://localhost:4200/events/main',
       chain_name: 'casper-net-1'
     },

@@ -23,6 +23,7 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
   sdk_deploy_utils_methods!: string[];
   sdk_transaction_methods!: string[];
   sdk_transaction_utils_methods!: string[];
+  sdk_binary_methods!: string[];
   action!: string;
 
   @Output() select_action: EventEmitter<string> = new EventEmitter<string>();
@@ -39,7 +40,7 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
   async ngAfterViewInit(): Promise<void> {
     this.sdk_methods = Object.getOwnPropertyNames(Object.getPrototypeOf(this.sdk))
       .filter(name => typeof (this.sdk as any)[name] === 'function')
-      .filter(name => !['free', 'constructor', '__destroy_into_raw', 'getRPCAddress', 'setRPCAddress', 'getVerbosity', 'setVerbosity', 'watchDeploy', 'waitDeploy'].includes(name))
+      .filter(name => !['free', 'constructor', '__destroy_into_raw', 'getRPCAddress', 'setRPCAddress', 'getNodeAddress', 'setNodeAddress', 'getVerbosity', 'setVerbosity', 'watchDeploy', 'waitDeploy'].includes(name))
       .filter(name => !name.endsWith('_options'))
       .filter(name => !name.startsWith('chain_'))
       .filter(name => !name.startsWith('state_'))
@@ -57,11 +58,15 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
 
     this.sdk_deprecated = this.sdk_methods.filter(name => ['get_account', 'get_deploy', 'get_era_info', 'put_deploy', 'speculative_exec_deploy', 'sign_deploy', 'make_deploy', 'make_transfer', 'speculative_deploy', 'speculative_transfer', 'deploy', 'transfer', 'call_entrypoint_deploy', 'install_deploy', 'get_balance'].includes(name));
 
+    this.sdk_binary_methods = this.sdk_methods.filter(name => name.startsWith('get_binary'));
+
     this.sdk_rpc_methods = this.sdk_methods.filter(name => !this.sdk_deploy_methods.concat(
       this.sdk_deploy_utils_methods,
       this.sdk_transaction_utils_methods,
       this.sdk_transaction_methods,
-      this.sdk_contract_methods).includes(name)
+      this.sdk_contract_methods,
+      this.sdk_binary_methods
+    ).includes(name)
     );
     this.setStateSubscription();
   };

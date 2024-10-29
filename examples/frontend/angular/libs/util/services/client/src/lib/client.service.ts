@@ -6,7 +6,7 @@ import { FormService } from '@util/form';
 import { ResultService } from '@util/result';
 import { State, StateService } from '@util/state';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockHash, BlockIdentifier, Bytes, CasperWallet, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash, PricingMode, EntityAddr } from 'casper-sdk';
+import { BlockHash, BlockIdentifier, Bytes, CasperWallet, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash, PricingMode, EntityAddr, PeerEntry } from 'casper-sdk';
 
 @Injectable({
   providedIn: 'root'
@@ -151,13 +151,12 @@ export class ClientService {
   }
 
   async get_peers() {
-    const get_binary_node_status = await this.sdk.get_binary_peers('localhost:4200/localws');
-    console.log(get_binary_node_status);
-    let peers: any;
+    let peers: PeerEntry[] = [];
     try {
       const peers_result = await this.sdk.get_peers();
       peers_result && this.resultService.setResult(peers_result.toJson());
       peers_result && (peers = peers_result.peers);
+
     } catch (err) {
       err && (this.errorService.setError(err.toString()));
     }
@@ -532,7 +531,6 @@ export class ClientService {
     }
   }
 
-
   async install(wasm?: Uint8Array) {
     const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
     if (!payment_amount) {
@@ -569,7 +567,6 @@ export class ClientService {
       err && (this.errorService.setError(err.toString()));
     }
   }
-
 
   async transfer(deploy_result = true, speculative?: boolean) {
     const timestamp = getTimestamp(); // or Date.now().toString().trim(); // or undefined
@@ -723,7 +720,6 @@ export class ClientService {
     }
   }
 
-
   async put_deploy() {
     const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value?.trim();
     if (!signed_deploy_as_string) {
@@ -766,7 +762,6 @@ export class ClientService {
     put_transaction && this.resultService.setResult(put_transaction.toJson());
     return put_transaction;
   }
-
 
   async speculative_exec_deploy() {
     const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value?.trim();
@@ -942,7 +937,6 @@ export class ClientService {
     this.updateTransactionJson(this.transaction_json);
   }
 
-
   private updateDeployJson(deploy_json: string) {
     deploy_json && this.stateService.setState({
       deploy_json
@@ -976,7 +970,6 @@ export class ClientService {
     const deploy_result = false;
     await this.transfer_transaction(deploy_result);
   }
-
 
   async speculative_transfer() {
     const speculative = true;
@@ -1066,7 +1059,6 @@ export class ClientService {
       err && (this.errorService.setError(err.toString()));
     }
   }
-
 
   async query_contract_dict() {
     const state_root_hash: string = this.getIdentifier('stateRootHash')?.value?.trim();
@@ -1357,7 +1349,6 @@ export class ClientService {
 
     return builder_params;
   }
-
 
   private addTransactionArgs(transaction_params: TransactionStrParams): TransactionStrParams {
     const args_simple: [string] = this.getIdentifier('argsSimple')?.value?.trim()

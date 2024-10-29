@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@components": ["libs/components/src/index.ts"],
+      "@util-binary": ["libs/util/services/binary/src/index.ts"],
       "@util/client": ["libs/util/services/client/src/index.ts"],
       "@util/config": ["libs/util/config/src/index.ts"],
       "@util/error": ["libs/util/services/error/src/index.ts"],
@@ -25,9 +26,9 @@
       ],
       "@util/result": ["libs/util/services/result/src/index.ts"],
       "@util/state": ["libs/util/services/state/src/index.ts"],
+      "@util/storage": ["libs/util/services/storage/src/index.ts"],
       "@util/ui": ["libs/ui/src/index.ts"],
-      "@util/wasm": ["libs/util/services/wasm/src/index.ts"],
-      "@util/storage": ["libs/util/services/storage/src/index.ts"]
+      "@util/wasm": ["libs/util/services/wasm/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
