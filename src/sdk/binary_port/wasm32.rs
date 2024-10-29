@@ -1,11 +1,17 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::{
-    block_hash::BlockHash, digest::Digest, era_id::EraId, key::Key, public_key::PublicKey,
-    record_id::RecordId, sdk_error::SdkError, transaction::Transaction,
-    transaction_hash::TransactionHash,
+use crate::{
+    types::{
+        digest::Digest,
+        era_id::EraId,
+        hash::{block_hash::BlockHash, transaction_hash::TransactionHash},
+        key::Key,
+        public_key::PublicKey,
+        record_id::RecordId,
+        sdk_error::SdkError,
+        transaction::Transaction,
+    },
+    SDK,
 };
-#[cfg(target_arch = "wasm32")]
-use crate::SDK;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 #[cfg(target_arch = "wasm32")]

@@ -1,4 +1,7 @@
-use crate::types::{account_hash::AccountHash, purse_identifier::PurseIdentifier, uref::URef};
+use crate::types::sdk_error::SdkError;
+use crate::types::{
+    hash::account_hash::AccountHash, identifier::purse_identifier::PurseIdentifier, uref::URef,
+};
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     PublicKey as _PublicKey, ED25519_TAG, SECP256K1_TAG, SYSTEM_TAG,
@@ -8,8 +11,6 @@ use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use wasm_bindgen::prelude::*;
-
-use super::sdk_error::SdkError;
 
 #[wasm_bindgen]
 #[derive(Debug, Deserialize, Clone, Serialize, PartialEq, Eq, PartialOrd, Ord)]

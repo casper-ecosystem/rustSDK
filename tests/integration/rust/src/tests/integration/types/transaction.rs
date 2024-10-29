@@ -12,9 +12,8 @@ pub mod test_module_transaction {
         helpers::get_current_timestamp,
         types::{
             addr::entity_addr::EntityAddr,
-            addressable_entity_hash::AddressableEntityHash,
             cl::bytes::Bytes,
-            package_hash::PackageHash,
+            hash::{addressable_entity_hash::AddressableEntityHash, package_hash::PackageHash},
             public_key::PublicKey,
             transaction::Transaction,
             transaction_params::{

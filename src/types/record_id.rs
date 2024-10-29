@@ -1,7 +1,6 @@
+use crate::types::sdk_error::SdkError;
 use casper_binary_port::RecordId as _RecordId;
 use wasm_bindgen::prelude::*;
-
-use super::sdk_error::SdkError;
 
 #[wasm_bindgen]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

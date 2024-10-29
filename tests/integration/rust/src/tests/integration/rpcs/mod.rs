@@ -5,23 +5,29 @@ pub mod test_module {
         DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE,
     };
     use crate::tests::helpers::intern::create_test_sdk;
-    use crate::tests::integration::contract::test_module::test_install_deploy;
-    use crate::tests::integration::deploy::test_module::test_deploy;
-    use casper_rust_wasm_sdk::helpers::cl_value_to_json;
-    use casper_rust_wasm_sdk::types::account_hash::AccountHash;
-    use casper_rust_wasm_sdk::types::account_identifier::AccountIdentifier;
-    use casper_rust_wasm_sdk::types::entity_identifier::EntityIdentifier;
-    use casper_rust_wasm_sdk::types::transaction_hash::TransactionHash;
+    use crate::tests::integration::{
+        contract::test_module::test_install_deploy, deploy::test_module::test_deploy,
+    };
     use casper_rust_wasm_sdk::{
+        helpers::cl_value_to_json,
         rpcs::{
             get_balance::GetBalanceInput,
             get_dictionary_item::DictionaryItemInput,
             query_global_state::{KeyIdentifierInput, PathIdentifierInput, QueryGlobalStateParams},
         },
         types::{
-            block_identifier::BlockIdentifierInput, deploy_hash::DeployHash,
-            deploy_params::dictionary_item_str_params::DictionaryItemStrParams, digest::Digest,
-            global_state_identifier::GlobalStateIdentifier, public_key::PublicKey,
+            deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
+            digest::Digest,
+            hash::{
+                account_hash::AccountHash, deploy_hash::DeployHash,
+                transaction_hash::TransactionHash,
+            },
+            identifier::{
+                account_identifier::AccountIdentifier, block_identifier::BlockIdentifierInput,
+                entity_identifier::EntityIdentifier,
+                global_state_identifier::GlobalStateIdentifier,
+            },
+            public_key::PublicKey,
         },
     };
 

@@ -1,9 +1,12 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::block_identifier::BlockIdentifier;
+use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
-        account_identifier::AccountIdentifier, block_identifier::BlockIdentifierInput,
-        sdk_error::SdkError, verbosity::Verbosity,
+        identifier::{
+            account_identifier::AccountIdentifier, block_identifier::BlockIdentifierInput,
+        },
+        sdk_error::SdkError,
+        verbosity::Verbosity,
     },
     SDK,
 };
@@ -248,7 +251,7 @@ mod tests {
     use super::*;
     use crate::{
         helpers::public_key_from_secret_key,
-        types::{block_identifier::BlockIdentifier, public_key::PublicKey},
+        types::{identifier::block_identifier::BlockIdentifier, public_key::PublicKey},
     };
     use sdk_tests::tests::helpers::{
         get_enable_addressable_entity, get_network_constants, get_user_secret_key,

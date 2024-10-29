@@ -12,13 +12,13 @@ pub mod test_module_deploy {
     use casper_rust_wasm_sdk::{
         helpers::get_current_timestamp,
         types::{
-            contract_hash::ContractHash,
-            contract_package_hash::ContractPackageHash,
             deploy::Deploy,
             deploy_params::{
                 deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
                 session_str_params::SessionStrParams,
             },
+            hash::contract_hash::ContractHash,
+            hash::contract_package_hash::ContractPackageHash,
             public_key::PublicKey,
         },
     };

@@ -1,4 +1,4 @@
-use crate::types::sdk_error::SdkError;
+use crate::types::{addr::hash_addr::HashAddr, sdk_error::SdkError};
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     EntityAddr as _EntityAddr,
@@ -7,8 +7,6 @@ use casper_types::{
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
-
-use super::hash_addr::HashAddr;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]

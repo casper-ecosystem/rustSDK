@@ -1,4 +1,4 @@
-use crate::types::account_hash::AccountHash;
+use crate::types::hash::account_hash::AccountHash;
 use crate::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
 use base64::engine::general_purpose;
 use base64::Engine;

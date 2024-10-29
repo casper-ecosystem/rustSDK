@@ -1,17 +1,18 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::block_identifier::BlockIdentifier;
+use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
-        block_identifier::BlockIdentifierInput, entity_identifier::EntityIdentifier,
-        sdk_error::SdkError, verbosity::Verbosity,
+        identifier::{block_identifier::BlockIdentifierInput, entity_identifier::EntityIdentifier},
+        sdk_error::SdkError,
+        verbosity::Verbosity,
     },
     SDK,
 };
-use casper_client::cli::parse::entity_identifier as parse_entity_identifier;
 use casper_client::{
-    cli::get_entity as get_entity_cli, get_entity as get_entity_lib,
-    rpcs::results::GetAddressableEntityResult as _GetAddressableEntityResult, JsonRpcId,
-    SuccessResponse,
+    cli::{get_entity as get_entity_cli, parse::entity_identifier as parse_entity_identifier},
+    get_entity as get_entity_lib,
+    rpcs::results::GetAddressableEntityResult as _GetAddressableEntityResult,
+    JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -241,7 +242,7 @@ mod tests {
     use super::*;
     use crate::{
         helpers::public_key_from_secret_key,
-        types::{block_identifier::BlockIdentifier, public_key::PublicKey},
+        types::{identifier::block_identifier::BlockIdentifier, public_key::PublicKey},
     };
     use sdk_tests::tests::helpers::{
         get_enable_addressable_entity, get_network_constants, get_user_secret_key,

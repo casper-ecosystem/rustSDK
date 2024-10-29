@@ -1,14 +1,17 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::digest::Digest;
-use crate::types::{
-    global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
-};
 use crate::{
-    types::{sdk_error::SdkError, verbosity::Verbosity},
+    types::{
+        identifier::{
+            global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
+        },
+        sdk_error::SdkError,
+        verbosity::Verbosity,
+    },
     SDK,
 };
-use casper_client::cli::parse::purse_identifier as parse_purse_identifier;
 use casper_client::{
+    cli::parse::purse_identifier as parse_purse_identifier,
     cli::query_balance_details as query_balance_details_cli,
     query_balance_details as query_balance_details_lib,
     rpcs::results::QueryBalanceDetailsResult as _QueryBalanceDetailsResult, JsonRpcId,

@@ -1,17 +1,15 @@
 use self::intern::{create_test_sdk, install_cep78};
 use crate::config::{
-    CONTRACT_CEP78_KEY, DEFAULT_ENABLE_ADDRESSABLE_ENTITY, PACKAGE_CEP78_KEY, SPECULATIVE_ADDRESS,
+    CONTRACT_CEP78_KEY, DEFAULT_CHAIN_NAME, DEFAULT_ENABLE_ADDRESSABLE_ENTITY,
+    DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_RPC_ADDRESS, DEFAULT_SECRET_KEY_NAME,
+    DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PACKAGE_CEP78_KEY, PAYMENT_AMOUNT,
+    SPECULATIVE_ADDRESS,
 };
-use crate::config::{
-    DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_RPC_ADDRESS, DEFAULT_SECRET_KEY_NAME,
-    DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
-};
-use casper_rust_wasm_sdk::types::addr::entity_addr::EntityAddr;
 use casper_rust_wasm_sdk::{
     types::{
-        block_hash::BlockHash,
-        entity_identifier::EntityIdentifier,
-        transaction_hash::TransactionHash,
+        addr::entity_addr::EntityAddr,
+        hash::{block_hash::BlockHash, transaction_hash::TransactionHash},
+        identifier::entity_identifier::EntityIdentifier,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
             transaction_str_params::TransactionStrParams,
@@ -46,7 +44,8 @@ pub(crate) mod intern {
         },
         types::{
             deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
-            entity_identifier::EntityIdentifier, transaction_hash::TransactionHash,
+            hash::transaction_hash::TransactionHash,
+            identifier::entity_identifier::EntityIdentifier,
             transaction_params::transaction_str_params::TransactionStrParams,
         },
         SDK,

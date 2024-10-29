@@ -1,6 +1,6 @@
+use crate::types::hash::transaction_hash::TransactionHash;
 #[cfg(target_arch = "wasm32")]
 use crate::types::transaction::Transaction;
-use crate::types::transaction_hash::TransactionHash;
 use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_transaction, rpcs::results::GetTransactionResult as _GetTransactionResult, Error,

@@ -1,10 +1,16 @@
 use crate::{
     debug::error,
     types::{
-        account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
-        cl::bytes::Bytes, package_hash::PackageHash, public_key::PublicKey, uref::URef,
+        cl::bytes::Bytes,
+        hash::{
+            account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
+            package_hash::PackageHash,
+        },
+        public_key::PublicKey,
+        uref::URef,
     },
 };
+
 use casper_client::cli::TransactionBuilderParams as _TransactionBuilderParams;
 use casper_types::{TransferTarget as _TransferTarget, U512};
 use wasm_bindgen::prelude::*;

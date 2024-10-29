@@ -1,17 +1,18 @@
-use super::{
+#[cfg(target_arch = "wasm32")]
+use crate::helpers::insert_js_value_arg;
+use crate::types::{
     cl::bytes::Bytes,
-    contract_hash::ContractHash,
-    contract_package_hash::ContractPackageHash,
-    deploy_hash::DeployHash,
     deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,
     },
+    hash::{
+        contract_hash::ContractHash, contract_package_hash::ContractPackageHash,
+        deploy_hash::DeployHash,
+    },
     public_key::PublicKey,
     sdk_error::SdkError,
 };
-#[cfg(target_arch = "wasm32")]
-use crate::helpers::insert_js_value_arg;
 use crate::{
     debug::{error, log},
     helpers::{

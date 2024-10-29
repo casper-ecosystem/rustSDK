@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::transaction_hash::TransactionHash;
+use crate::types::hash::transaction_hash::TransactionHash;
 use crate::{
     types::{
         sdk_error::SdkError,

@@ -1,10 +1,15 @@
 #[cfg(target_arch = "wasm32")]
 use crate::transaction::transaction::PutTransactionResult;
-use crate::types::transaction_params::{
-    transaction_builder_params::TransactionBuilderParams,
-    transaction_str_params::TransactionStrParams,
+use crate::{
+    types::{
+        sdk_error::SdkError,
+        transaction_params::{
+            transaction_builder_params::TransactionBuilderParams,
+            transaction_str_params::TransactionStrParams,
+        },
+    },
+    SDK,
 };
-use crate::{types::sdk_error::SdkError, SDK};
 use casper_client::{
     rpcs::results::PutTransactionResult as _PutTransactionResult, SuccessResponse,
 };

@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use super::deploy::PutDeployResult;
+use crate::deploy::deploy::PutDeployResult;
 use crate::{
     types::{
         deploy_params::{

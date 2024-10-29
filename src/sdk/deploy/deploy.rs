@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::deploy_hash::DeployHash;
+use crate::types::hash::deploy_hash::DeployHash;
 use crate::{
     types::{
         deploy_params::{

@@ -1,5 +1,4 @@
-use super::args_simple::ArgsSimple;
-use crate::helpers::get_str_or_default;
+use crate::{helpers::get_str_or_default, types::deploy_params::args_simple::ArgsSimple};
 use casper_client::cli::PaymentStrParams as _PaymentStrParams;
 use js_sys::Array;
 use once_cell::sync::OnceCell;

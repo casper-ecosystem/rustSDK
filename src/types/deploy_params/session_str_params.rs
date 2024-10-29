@@ -1,5 +1,7 @@
-use super::args_simple::ArgsSimple;
-use crate::{helpers::get_str_or_default, types::cl::bytes::Bytes};
+use crate::{
+    helpers::get_str_or_default,
+    types::{cl::bytes::Bytes, deploy_params::args_simple::ArgsSimple},
+};
 use casper_client::cli::SessionStrParams as _SessionStrParams;
 use js_sys::Array;
 use once_cell::sync::OnceCell;

@@ -5,7 +5,7 @@ use crate::types::digest::Digest;
 #[cfg(target_arch = "wasm32")]
 use crate::types::{
     deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
-    dictionary_item_identifier::DictionaryItemIdentifier,
+    identifier::dictionary_item_identifier::DictionaryItemIdentifier,
 };
 use crate::{
     rpcs::get_dictionary_item::DictionaryItemInput,

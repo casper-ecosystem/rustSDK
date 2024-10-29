@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::block_hash::BlockHash;
+use crate::types::hash::block_hash::BlockHash;
 use crate::types::transaction::Transaction;
 use crate::{
     types::{sdk_error::SdkError, verbosity::Verbosity},

@@ -4,8 +4,8 @@ use crate::{
         deploy_params::dictionary_item_str_params::{
             dictionary_item_str_params_to_casper_client, DictionaryItemStrParams,
         },
-        dictionary_item_identifier::DictionaryItemIdentifier,
         digest::ToDigest,
+        identifier::dictionary_item_identifier::DictionaryItemIdentifier,
         sdk_error::SdkError,
         verbosity::Verbosity,
     },
@@ -19,7 +19,6 @@ use casper_client::{
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-
 #[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]

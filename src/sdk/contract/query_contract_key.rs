@@ -1,12 +1,13 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::block_identifier::BlockIdentifier;
+use crate::types::identifier::block_identifier::BlockIdentifier;
 #[cfg(target_arch = "wasm32")]
 use crate::{rpcs::query_global_state::QueryGlobalStateResult, types::path::Path};
 use crate::{
     rpcs::query_global_state::{KeyIdentifierInput, PathIdentifierInput, QueryGlobalStateParams},
     types::{
-        block_identifier::BlockIdentifierInput, entity_identifier::EntityIdentifier,
-        sdk_error::SdkError, verbosity::Verbosity,
+        identifier::{block_identifier::BlockIdentifierInput, entity_identifier::EntityIdentifier},
+        sdk_error::SdkError,
+        verbosity::Verbosity,
     },
     SDK,
 };
@@ -198,7 +199,7 @@ mod tests {
     use crate::{
         install_cep78,
         types::{
-            block_identifier::BlockIdentifier, entity_identifier::EntityIdentifier,
+            identifier::{block_identifier::BlockIdentifier, entity_identifier::EntityIdentifier},
             verbosity::Verbosity,
         },
     };

@@ -1,5 +1,4 @@
-use crate::types::deploy::Deploy;
-use crate::SDK;
+use crate::{types::deploy::Deploy, SDK};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 

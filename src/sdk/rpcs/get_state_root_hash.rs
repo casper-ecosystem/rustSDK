@@ -1,9 +1,12 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::block_identifier::BlockIdentifier;
-#[cfg(target_arch = "wasm32")]
 use crate::types::digest::Digest;
+#[cfg(target_arch = "wasm32")]
+use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
-    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
+    types::{
+        identifier::block_identifier::BlockIdentifierInput, sdk_error::SdkError,
+        verbosity::Verbosity,
+    },
     SDK,
 };
 use casper_client::{
@@ -236,7 +239,9 @@ impl SDK {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::types::{block_hash::BlockHash, block_identifier::BlockIdentifier};
+    use crate::types::{
+        hash::block_hash::BlockHash, identifier::block_identifier::BlockIdentifier,
+    };
     use sdk_tests::tests::helpers::get_network_constants;
 
     #[tokio::test]

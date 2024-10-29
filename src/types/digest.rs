@@ -1,4 +1,4 @@
-use super::sdk_error::SdkError;
+use crate::types::sdk_error::SdkError;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     Digest as _Digest, DigestError,

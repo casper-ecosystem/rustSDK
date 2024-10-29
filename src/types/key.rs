@@ -1,10 +1,14 @@
-use super::addr::transfer_addr::TransferAddr;
-use super::addr::{dictionary_addr::DictionaryAddr, hash_addr::HashAddr, uref_addr::URefAddr};
-use super::era_id::EraId;
-use super::{account_hash::AccountHash, deploy_hash::DeployHash, uref::URef};
-use crate::types::sdk_error::SdkError;
-use casper_types::bytesrepr::ToBytes;
-use casper_types::Key as _Key;
+use crate::types::{
+    addr::{
+        dictionary_addr::DictionaryAddr, hash_addr::HashAddr, transfer_addr::TransferAddr,
+        uref_addr::URefAddr,
+    },
+    era_id::EraId,
+    hash::{account_hash::AccountHash, deploy_hash::DeployHash},
+    sdk_error::SdkError,
+    uref::URef,
+};
+use casper_types::{bytesrepr::ToBytes, Key as _Key};
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};

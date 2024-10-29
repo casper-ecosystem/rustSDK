@@ -1,6 +1,4 @@
-use super::sdk_error::SdkError;
-use crate::types::access_rights::AccessRights;
-use crate::types::addr::uref_addr::URefAddr;
+use crate::types::{access_rights::AccessRights, addr::uref_addr::URefAddr, sdk_error::SdkError};
 use casper_types::URef as _URef;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;

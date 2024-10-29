@@ -1,16 +1,20 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::digest::Digest;
-use crate::types::{
-    global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
-};
 use crate::{
-    types::{sdk_error::SdkError, verbosity::Verbosity},
+    types::{
+        identifier::{
+            global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
+        },
+        sdk_error::SdkError,
+        verbosity::Verbosity,
+    },
     SDK,
 };
-use casper_client::cli::parse::purse_identifier as parse_purse_identifier;
 use casper_client::{
-    cli::query_balance as query_balance_cli, query_balance as query_balance_lib,
-    rpcs::results::QueryBalanceResult as _QueryBalanceResult, JsonRpcId, SuccessResponse,
+    cli::{parse::purse_identifier as parse_purse_identifier, query_balance as query_balance_cli},
+    query_balance as query_balance_lib,
+    rpcs::results::QueryBalanceResult as _QueryBalanceResult,
+    JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;

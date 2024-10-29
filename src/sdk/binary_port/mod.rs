@@ -1,5 +1,4 @@
-use super::SDK;
-use crate::types::sdk_error::SdkError;
+use crate::{types::sdk_error::SdkError, SDK};
 use casper_binary_port::{
     ConsensusStatus, ConsensusValidatorChanges, GlobalStateQueryResult, LastProgress, NetworkName,
     NodeStatus, ReactorStateName, RecordId, RewardResponse, SpeculativeExecutionResult,

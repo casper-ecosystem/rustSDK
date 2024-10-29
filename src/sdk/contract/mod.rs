@@ -88,7 +88,7 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
 
 #[cfg(test)]
 async fn get_dictionary_item_input(entity_addr: &str) -> DictionaryItemInput {
-    use crate::types::dictionary_item_identifier::DictionaryItemIdentifier;
+    use crate::types::identifier::dictionary_item_identifier::DictionaryItemIdentifier;
 
     DictionaryItemInput::Identifier(
         DictionaryItemIdentifier::new_from_entity_info(

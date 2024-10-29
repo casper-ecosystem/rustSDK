@@ -1,7 +1,8 @@
-use crate::types::digest::Digest;
-use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::{
-    types::{key::Key, path::Path, sdk_error::SdkError, verbosity::Verbosity},
+    types::{
+        digest::Digest, identifier::global_state_identifier::GlobalStateIdentifier, key::Key,
+        path::Path, sdk_error::SdkError, verbosity::Verbosity,
+    },
     SDK,
 };
 use casper_client::{

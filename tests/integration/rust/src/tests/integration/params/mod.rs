@@ -7,12 +7,12 @@ pub mod test_module {
     };
     use casper_rust_wasm_sdk::types::{
         addr::entity_addr::EntityAddr,
-        addressable_entity_hash::AddressableEntityHash,
         deploy_params::{
             deploy_str_params::DeployStrParams,
             dictionary_item_str_params::DictionaryItemStrParams,
             payment_str_params::PaymentStrParams, session_str_params::SessionStrParams,
         },
+        hash::addressable_entity_hash::AddressableEntityHash,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
             transaction_str_params::TransactionStrParams,

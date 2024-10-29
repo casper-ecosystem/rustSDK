@@ -1,8 +1,11 @@
-use super::{
-    account_hash::AccountHash,
-    addressable_entity_hash::AddressableEntityHash,
+#[cfg(target_arch = "wasm32")]
+use crate::helpers::insert_js_value_arg;
+use crate::types::{
     cl::bytes::Bytes,
-    package_hash::PackageHash,
+    hash::{
+        account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
+        package_hash::PackageHash,
+    },
     public_key::PublicKey,
     sdk_error::SdkError,
     transaction_params::{
@@ -11,8 +14,6 @@ use super::{
     },
     uref::URef,
 };
-#[cfg(target_arch = "wasm32")]
-use crate::helpers::insert_js_value_arg;
 use crate::{
     debug::{error, log},
     helpers::{
@@ -23,12 +24,11 @@ use crate::{
     make_transfer_transaction::make_transfer_transaction,
     types::{
         digest::Digest,
+        hash::transaction_hash::TransactionHash,
         pricing_mode::PricingMode,
-        transaction_hash::TransactionHash,
         transaction_params::transaction_builder_params::{TransferTarget, TransferTargetKind},
     },
 };
-
 use casper_types::{
     account::AccountHash as _AccountHash,
     bytesrepr::{self, Bytes as _Bytes, ToBytes},
@@ -1042,7 +1042,7 @@ mod tests {
 
     #[test]
     fn test_add_arg_without_secret_key() {
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
 
         let transaction_params = TransactionStrParams::default();
@@ -1064,7 +1064,7 @@ mod tests {
 
     #[test]
     fn test_add_arg_with_secret_key() {
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
 

@@ -293,7 +293,7 @@ You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io
 
 ```rust
 use casper_rust_wasm_sdk::types::{
-    transaction::Transaction, transaction_hash::TransactionHash,
+    transaction::Transaction, hash::transaction_hash::TransactionHash,
 };
 
 let transaction_hash =
@@ -314,7 +314,7 @@ println!("{timestamp} {hash}");
 #### Get deploy by deploy hash (legacy)
 
 ```rust
-use casper_rust_wasm_sdk::types::deploy_hash::DeployHash;
+use casper_rust_wasm_sdk::types::hash::deploy_hash::DeployHash;
 
 let deploy_hash =
     DeployHash::new("a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9")
@@ -633,7 +633,7 @@ console.log(transaction_hash);
 ```rust
 use casper_rust_wasm_sdk::types::{
     addr::entity_addr::EntityAddr,
-    addressable_entity_hash::AddressableEntityHash,
+    hash::addressable_entity_hash::AddressableEntityHash,
     transaction_params::{
         transaction_builder_params::TransactionBuilderParams,
         transaction_str_params::TransactionStrParams,
@@ -712,7 +712,7 @@ let sdk = SDK::new(
 );
 
 use casper_rust_wasm_sdk::types::{
-    addressable_entity_hash::AddressableEntityHash,
+    hash::addressable_entity_hash::AddressableEntityHash,
     transaction_params::{
         transaction_builder_params::TransactionBuilderParams,
         transaction_str_params::TransactionStrParams,
@@ -798,7 +798,7 @@ Puts a [`Transaction`] to the network for execution.
 
 ```rust
 use casper_rust_wasm_sdk::types::{
-    addressable_entity_hash::AddressableEntityHash,
+    hash::addressable_entity_hash::AddressableEntityHash,
     transaction_params::{
         transaction_builder_params::TransactionBuilderParams,
         transaction_str_params::TransactionStrParams,
@@ -1128,7 +1128,7 @@ console.log(results);
 use casper_rust_wasm_sdk::{
     helpers::json_pretty_print,
     types::{
-        transaction_hash::TransactionHash,
+        hash::transaction_hash::TransactionHash,
         transaction_params::transaction_str_params::TransactionStrParams,
     },
 };
@@ -1290,7 +1290,7 @@ async function loadFile() {
 
 ```rust
 use casper_rust_wasm_sdk::types::{
-    addressable_entity_hash::AddressableEntityHash,
+    hash::addressable_entity_hash::AddressableEntityHash,
     transaction_params::{
         transaction_builder_params::TransactionBuilderParams,
         transaction_str_params::TransactionStrParams,
@@ -2061,7 +2061,7 @@ console.log(results);
 use casper_rust_wasm_sdk::{
     helpers::json_pretty_print,
     types::{
-        deploy_hash::DeployHash,
+        hash::deploy_hash::DeployHash,
         deploy_params::{
             deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
             session_str_params::SessionStrParams,
@@ -2225,7 +2225,7 @@ async function loadFile() {
 
 ```rust
 use casper_rust_wasm_sdk::types::{
-    deploy_hash::DeployHash,
+    hash::deploy_hash::DeployHash,
     deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,

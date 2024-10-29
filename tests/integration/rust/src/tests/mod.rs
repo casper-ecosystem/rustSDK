@@ -29,7 +29,7 @@ pub async fn _run_example_1() {
         None,
         Some(Verbosity::High),
     );
-    use casper_rust_wasm_sdk::types::transaction_hash::TransactionHash;
+    use casper_rust_wasm_sdk::types::hash::transaction_hash::TransactionHash;
 
     let transaction_hash =
         TransactionHash::new("27d81df41801602f47cdb4618a814407daf38d0c39be32c7f6c109d7e39a3f4b")
@@ -57,7 +57,7 @@ pub async fn _run_example_2() {
     let get_auction_info = sdk.get_auction_info(None, None, None).await;
     let auction_state = get_auction_info.unwrap().result.auction_state;
     let state_root_hash = auction_state.state_root_hash();
-    println!("{:?}", state_root_hash);
+    println!("{state_root_hash}");
     let block_height = auction_state.block_height();
     println!("{block_height}");
 }
@@ -74,7 +74,19 @@ pub async fn _run_example_3() {
 
     let peers = get_peers.unwrap().result.peers;
     for peer in &peers {
-        println!("{:?}", peer)
+        println!("{:?}", peer);
+    }
+}
+
+// get_peers binary port
+pub async fn _run_example_3_binary() {
+    let sdk = SDK::new(None, Some("localhost:28101".to_string()), None);
+
+    let get_binary_peers = sdk.get_binary_peers(None).await;
+
+    let peers = get_binary_peers.unwrap().into_inner();
+    for peer in &peers {
+        println!("{:?}", peer);
     }
 }
 
@@ -95,7 +107,7 @@ pub async fn _run_example_4() {
         .unwrap()
         .block;
     let block_hash = block.hash().to_hex_string();
-    println!("{:?}", block_hash);
+    println!("{block_hash}");
 }
 
 // make_transfer_transaction
@@ -432,7 +444,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let transaction_hash = install.as_ref().unwrap().result.transaction_hash;
     // println!("{:?}", transaction_hash_result);
     let transaction_hash_as_string = transaction_hash.to_hex_string();
-    println!("wait transaction_hash {}", transaction_hash_as_string);
+    println!("wait transaction_hash {transaction_hash_as_string}");
     let event_parse_result: EventParseResult = sdk
         .wait_transaction(DEFAULT_EVENT_ADDRESS, &transaction_hash_as_string, None)
         .await
@@ -626,7 +638,7 @@ pub async fn _run_example_1_legacy() {
         None,
         Some(Verbosity::High),
     );
-    use casper_rust_wasm_sdk::types::deploy_hash::DeployHash;
+    use casper_rust_wasm_sdk::types::hash::deploy_hash::DeployHash;
 
     let deploy_hash =
         DeployHash::new("a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9")
@@ -838,7 +850,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let deploy = sdk
         .deploy(deploy_params, session_params, payment_params, None, None)
         .await;
-    println!("{:?}", deploy.as_ref().unwrap().result.deploy_hash);
+    println!("{}", deploy.as_ref().unwrap().result.deploy_hash);
 }
 
 // put_deploy
@@ -890,7 +902,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         Deploy::with_payment_and_session(deploy_params, session_params, payment_params).unwrap();
 
     let put_deploy = sdk.put_deploy(deploy, None, None).await;
-    println!("{:?}", put_deploy.as_ref().unwrap().result.deploy_hash);
+    println!("{}", put_deploy.as_ref().unwrap().result.deploy_hash);
 }
 
 // put_deploy transfer
@@ -941,7 +953,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     .unwrap();
 
     let put_deploy = sdk.put_deploy(transfer_deploy, None, None).await;
-    println!("{:?}", put_deploy.as_ref().unwrap().result.deploy_hash);
+    println!("{}", put_deploy.as_ref().unwrap().result.deploy_hash);
 }
 
 // install_deploy
@@ -1024,7 +1036,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let deploy_hash = install.as_ref().unwrap().result.deploy_hash;
     // println!("{:?}", deploy_hash_result);
     let deploy_hash_as_string = deploy_hash.to_hex_string();
-    println!("wait deploy_hash {}", deploy_hash_as_string);
+    println!("wait deploy_hash {deploy_hash_as_string}");
     let event_parse_result: EventParseResult = sdk
         .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_as_string, None)
         .await
