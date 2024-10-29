@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::sdk_error::SdkError;
-#[cfg(target_arch = "wasm32")]
 use crate::types::{digest::Digest, public_key::PublicKey};
 use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
@@ -173,17 +171,6 @@ impl SDK {
         rpc_address: Option<String>,
     ) -> Result<GetNodeStatusResult, JsError> {
         self.get_node_status_js_alias(verbosity, rpc_address).await
-    }
-
-    #[wasm_bindgen(js_name = "get_binary_node_status")]
-    pub async fn get_binary_node_status_js_alias(
-        &self,
-        node_address: Option<String>,
-    ) -> Result<JsValue, JsError> {
-        let result = self.get_binary_node_status(node_address).await;
-        result
-            .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
     }
 }
 

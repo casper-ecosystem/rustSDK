@@ -22,6 +22,8 @@ use casper_types::{
     TransactionHash,
 };
 
+pub mod wasm32;
+
 impl SDK {
     /// Returns the latest switch block header.
     pub async fn get_binary_latest_switch_block_header(
@@ -73,13 +75,13 @@ impl SDK {
     pub async fn get_binary_block_header_by_hash(
         &self,
         node_address: Option<String>,
-        hash: BlockHash,
+        block_hash: BlockHash,
     ) -> Result<Option<BlockHeader>, SdkError> {
         let node_address = self.get_node_address(node_address);
-        match block_header_by_hash(&node_address, hash).await {
+        match block_header_by_hash(&node_address, block_hash).await {
             Ok(block_header) => Ok(block_header),
             Err(err) => Err(SdkError::CustomError {
-                context: "Failed to retrieve block header by hash",
+                context: "Failed to retrieve block header by block_hash",
                 error: err.to_string(),
             }),
         }
@@ -120,13 +122,13 @@ impl SDK {
     pub async fn get_binary_signed_block_by_hash(
         &self,
         node_address: Option<String>,
-        hash: BlockHash,
+        block_hash: BlockHash,
     ) -> Result<Option<SignedBlock>, SdkError> {
         let node_address = self.get_node_address(node_address);
-        match signed_block_by_hash(&node_address, hash).await {
+        match signed_block_by_hash(&node_address, block_hash).await {
             Ok(signed_block) => Ok(signed_block),
             Err(err) => Err(SdkError::CustomError {
-                context: "Failed to retrieve signed block by hash",
+                context: "Failed to retrieve signed block by block_hash",
                 error: err.to_string(),
             }),
         }

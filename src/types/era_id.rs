@@ -19,13 +19,13 @@ impl EraId {
 }
 
 impl From<EraId> for _EraId {
-    fn from(hash_addr: EraId) -> Self {
-        hash_addr.0
+    fn from(era_id: EraId) -> Self {
+        era_id.0
     }
 }
 
 impl From<_EraId> for EraId {
-    fn from(hash_addr: _EraId) -> Self {
-        EraId(hash_addr)
+    fn from(era_id: _EraId) -> Self {
+        EraId(era_id)
     }
 }

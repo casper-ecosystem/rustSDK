@@ -40,7 +40,8 @@ var casper_sdk_1 = require("casper-sdk");
 var fs = require('fs').promises;
 var http = require('http');
 var rpc_address = 'http://localhost:11101';
-var sdk = new casper_sdk_1.SDK(rpc_address);
+var node_address = 'localhost:28101';
+var sdk = new casper_sdk_1.SDK(rpc_address, node_address);
 // const server = http.createServer(async (req, res) => {
 //   res.writeHead(200, { 'Content-Type': 'text/plain' });
 //   let peers_object = await sdk.get_peers();
@@ -109,15 +110,14 @@ var example3 = function () { return __awaiter(void 0, void 0, void 0, function (
         }
     });
 }); };
-var example31 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var get_binary_node_status, peers;
+// get_peers binary
+var example3_binary = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var peers;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, sdk.get_binary_node_status("127.0.0.1:28101")];
+            case 0: return [4 /*yield*/, sdk.get_binary_peers()];
             case 1:
-                get_binary_node_status = _a.sent();
-                console.log(get_binary_node_status);
-                peers = get_binary_node_status.peers;
+                peers = _a.sent();
                 peers.forEach(function (peer) {
                     console.log(peer);
                 });
@@ -125,7 +125,6 @@ var example31 = function () { return __awaiter(void 0, void 0, void 0, function 
         }
     });
 }); };
-example31();
 // get_block
 var example4 = function () { return __awaiter(void 0, void 0, void 0, function () {
     var get_block, block, block_hash;
@@ -830,4 +829,4 @@ var example14_legacy = function () { return __awaiter(void 0, void 0, void 0, fu
         return [2 /*return*/];
     });
 }); };
-// example1();
+example3_binary();

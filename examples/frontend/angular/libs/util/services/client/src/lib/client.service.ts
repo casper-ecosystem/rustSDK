@@ -151,6 +151,8 @@ export class ClientService {
   }
 
   async get_peers() {
+    const get_binary_node_status = await this.sdk.get_binary_peers('localhost:4200/localws');
+    console.log(get_binary_node_status);
     let peers: any;
     try {
       const peers_result = await this.sdk.get_peers();

@@ -3,7 +3,8 @@ const fs = require('fs').promises;
 const http = require('http');
 
 const rpc_address = 'http://localhost:11101';
-const sdk = new SDK(rpc_address);
+const node_address = 'localhost:28101';
+const sdk = new SDK(rpc_address, node_address);
 
 // const server = http.createServer(async (req, res) => {
 //   res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -60,16 +61,13 @@ const example3 = async () => {
   });
 };
 
-const example31 = async () => {
-  const get_binary_node_status = await sdk.get_binary_node_status("127.0.0.1:28101");
-  console.log(get_binary_node_status);
-  const peers = get_binary_node_status.peers;
+// get_peers binary
+const example3_binary = async () => {
+  const peers = await sdk.get_binary_peers();
   peers.forEach((peer) => {
     console.log(peer);
   });
 };
-
-example31();
 
 // get_block
 const example4 = async () => {
@@ -798,4 +796,4 @@ const example14_legacy = async () => {
   console.log(deploy_signed.toJson());
 };
 
-// example1();
+example3_binary();

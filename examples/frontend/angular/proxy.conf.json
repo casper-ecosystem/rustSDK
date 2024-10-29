@@ -23,6 +23,15 @@
       "^/testnet/rpc": "/rpc"
     }
   },
+  "/localws": {
+    "target": "ws://127.0.0.1:8181",
+    "secure": false,
+    "changeOrigin": false,
+    "ws": true,
+    "pathRewrite": {
+      "^/localws": ""
+    }
+  },
   "/integration/rpc": {
     "target": "https://rpc.integration.casperlabs.io",
     "secure": false,
