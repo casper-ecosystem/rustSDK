@@ -14,7 +14,8 @@ export class BinaryService {
     @Inject(SDK_TOKEN) private readonly sdk: SDK,
     private readonly resultService: ResultService,
     private readonly errorService: ErrorService,
-  ) { }
+  ) {
+  }
 
   async get_binary_latest_switch_block_header() {
     const get_binary_latest_switch_block_header = await this.sdk.get_binary_latest_switch_block_header();
@@ -65,6 +66,7 @@ export class BinaryService {
   // }
 
   async get_binary_peers() {
+    console.log(this.sdk.getNodeAddress());
     let peers: PeerEntry[] = [];
     try {
       const get_binary_peers = await this.sdk.get_binary_peers();
