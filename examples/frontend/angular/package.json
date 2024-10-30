@@ -19,7 +19,7 @@
     "@angular/platform-browser": "~18.2.9",
     "@angular/platform-browser-dynamic": "~18.2.9",
     "@angular/router": "~18.2.9",
-    "@nx/angular": "19.8.8",
+    "@nx/angular": "20.0.6",
     "casper-sdk": "file:../../../pkg",
     "highlight.js": "^11.8.0",
     "promise-worker": "^2.0.1",
