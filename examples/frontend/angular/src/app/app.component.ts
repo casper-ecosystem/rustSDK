@@ -126,7 +126,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         try {
           await fn();
         } catch (error) {
-          console.log(this.errorService);
           this.errorService.setError(error as string);
         }
       }

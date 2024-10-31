@@ -1,9 +1,11 @@
 import { Inject, Injectable } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { CONFIG, EnvironmentConfig } from '@util/config';
 import { ErrorService } from '@util/error';
+import { FormService } from '@util/form';
 import { ResultService } from '@util/result';
 import { SDK_TOKEN } from '@util/wasm';
-import { PeerEntry, SDK } from 'casper-sdk';
+import { BlockHash, EraId, hexToUint8Array, PeerEntry, PublicKey, RecordId, SDK, TransactionHash } from 'casper-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +15,7 @@ export class BinaryService {
     @Inject(CONFIG) public readonly config: EnvironmentConfig,
     @Inject(SDK_TOKEN) private readonly sdk: SDK,
     private readonly resultService: ResultService,
+    private readonly formService: FormService,
     private readonly errorService: ErrorService,
   ) {
   }
@@ -29,17 +32,21 @@ export class BinaryService {
     return get_binary_latest_block_header;
   }
 
-  // async get_binary_block_header_by_height() {
-  //   const get_binary_block_header_by_height = await this.sdk.get_binary_block_header_by_height();
-  //   get_binary_block_header_by_height && this.resultService.setResult(get_binary_block_header_by_height);
-  //   return get_binary_block_header_by_height;
-  // }
-
-  // async get_binary_block_header_by_hash() {
-  //   const get_binary_block_header_by_hash = await this.sdk.get_binary_block_header_by_hash();
-  //   get_binary_block_header_by_hash && this.resultService.setResult(get_binary_block_header_by_hash);
-  //   return get_binary_block_header_by_hash;
-  // }
+  async get_binary_block_header() {
+    const block_identifier_height: string = this.getIdentifier('blockIdentifierHeight')?.value?.trim();
+    const block_identifier_hash: string = this.getIdentifier('blockIdentifierHash')?.value?.trim();
+    if (block_identifier_hash) {
+      const get_binary_block_header_by_hash = await this.sdk.get_binary_block_header_by_hash(new BlockHash(block_identifier_hash));
+      get_binary_block_header_by_hash && this.resultService.setResult(get_binary_block_header_by_hash);
+      return get_binary_block_header_by_hash;
+    } else if (block_identifier_height) {
+      const get_binary_block_header_by_height = await this.sdk.get_binary_block_header_by_height(BigInt(block_identifier_height));
+      get_binary_block_header_by_height && this.resultService.setResult(get_binary_block_header_by_height);
+      return get_binary_block_header_by_height;
+    } else {
+      return this.get_binary_latest_block_header();
+    }
+  }
 
   async get_binary_latest_signed_block() {
     const get_binary_latest_signed_block = await this.sdk.get_binary_latest_signed_block();
@@ -47,23 +54,29 @@ export class BinaryService {
     return get_binary_latest_signed_block;
   }
 
-  // async get_binary_signed_block_by_height() {
-  //   const get_binary_signed_block_by_height = await this.sdk.get_binary_signed_block_by_height();
-  //   get_binary_signed_block_by_height && this.resultService.setResult(get_binary_signed_block_by_height);
-  //   return get_binary_signed_block_by_height;
-  // }
+  async get_binary_signed_block() {
+    const block_identifier_height: string = this.getIdentifier('blockIdentifierHeight')?.value?.trim();
+    const block_identifier_hash: string = this.getIdentifier('blockIdentifierHash')?.value?.trim();
+    if (block_identifier_hash) {
+      const get_binary_signed_block_by_hash = await this.sdk.get_binary_signed_block_by_hash(new BlockHash(block_identifier_hash));
+      get_binary_signed_block_by_hash && this.resultService.setResult(get_binary_signed_block_by_hash);
+      return get_binary_signed_block_by_hash;
+    } else if (block_identifier_height) {
+      const get_binary_signed_block_by_height = await this.sdk.get_binary_signed_block_by_height(BigInt(block_identifier_height));
+      get_binary_signed_block_by_height && this.resultService.setResult(get_binary_signed_block_by_height);
+      return get_binary_signed_block_by_height;
+    } else {
+      return this.get_binary_latest_signed_block();
+    }
+  }
 
-  // async get_binary_signed_block_by_hash() {
-  //   const get_binary_signed_block_by_hash = await this.sdk.get_binary_signed_block_by_hash();
-  //   get_binary_signed_block_by_hash && this.resultService.setResult(get_binary_signed_block_by_hash);
-  //   return get_binary_signed_block_by_hash;
-  // }
-
-  // async get_binary_transaction_by_hash() {
-  //   const get_binary_transaction_by_hash = await this.sdk.get_binary_transaction_by_hash();
-  //   get_binary_transaction_by_hash && this.resultService.setResult(get_binary_transaction_by_hash);
-  //   return get_binary_transaction_by_hash;
-  // }
+  async get_binary_transaction() {
+    const transaction_hash_hash: string = this.getIdentifier('transactionHash')?.value?.trim();
+    const finalized_approvals: boolean = this.getIdentifier('finalizedApprovals')?.value;
+    const get_binary_transaction_by_hash = await this.sdk.get_binary_transaction_by_hash(new TransactionHash(transaction_hash_hash), finalized_approvals);
+    get_binary_transaction_by_hash && this.resultService.setResult(get_binary_transaction_by_hash);
+    return get_binary_transaction_by_hash;
+  }
 
   async get_binary_peers() {
     console.log(this.sdk.getNodeAddress());
@@ -144,47 +157,67 @@ export class BinaryService {
     return get_binary_node_status;
   }
 
-  // async get_binary_get_validator_reward_by_era() {
-  //   const get_binary_get_validator_reward_by_era = await this.sdk.get_binary_get_validator_reward_by_era();
-  //   get_binary_get_validator_reward_by_era && this.resultService.setResult(get_binary_get_validator_reward_by_era);
-  //   return get_binary_get_validator_reward_by_era;
-  // }
+  async get_binary_validator_reward_by_era() {
+    const validator_key_string = this.getIdentifier('validatorKey')?.value?.trim();
+    const era_id_string: number = this.getIdentifier('eraId')?.value?.trim() as number;
+    const get_binary_validator_reward_by_era = await this.sdk.get_binary_validator_reward_by_era(new PublicKey(validator_key_string), new EraId(BigInt(era_id_string)));
+    get_binary_validator_reward_by_era && this.resultService.setResult(get_binary_validator_reward_by_era);
+    return get_binary_validator_reward_by_era;
+  }
 
-  // async get_binary_get_validator_reward_by_block_height() {
-  //   const get_binary_get_validator_reward_by_block_height = await this.sdk.get_binary_get_validator_reward_by_block_height();
-  //   get_binary_get_validator_reward_by_block_height && this.resultService.setResult(get_binary_get_validator_reward_by_block_height);
-  //   return get_binary_get_validator_reward_by_block_height;
-  // }
+  async get_binary_validator_reward() {
+    const validator_key_string = this.getIdentifier('validatorKey')?.value?.trim();
+    const block_identifier_height: string = this.getIdentifier('blockIdentifierHeight')?.value?.trim();
+    const block_identifier_hash: string = this.getIdentifier('blockIdentifierHash')?.value?.trim();
+    if (block_identifier_hash) {
+      const get_binary_validator_reward_by_block_hash = await this.sdk.get_binary_validator_reward_by_block_hash(new PublicKey(validator_key_string), new BlockHash(block_identifier_hash));
+      get_binary_validator_reward_by_block_hash && this.resultService.setResult(get_binary_validator_reward_by_block_hash);
+      return get_binary_validator_reward_by_block_hash;
+    }
+    else if (block_identifier_height) {
+      const get_binary_validator_reward_by_block_height = await this.sdk.get_binary_validator_reward_by_block_height(new PublicKey(validator_key_string), (BigInt(block_identifier_height)));
+      get_binary_validator_reward_by_block_height && this.resultService.setResult(get_binary_validator_reward_by_block_height);
+      return get_binary_validator_reward_by_block_height;
+    } else {
+      this.get_binary_validator_reward_by_era();
+    }
+  }
 
-  // async get_binary_get_validator_reward_by_block_hash() {
-  //   const get_binary_get_validator_reward_by_block_hash = await this.sdk.get_binary_get_validator_reward_by_block_hash();
-  //   get_binary_get_validator_reward_by_block_hash && this.resultService.setResult(get_binary_get_validator_reward_by_block_hash);
-  //   return get_binary_get_validator_reward_by_block_hash;
-  // }
+  async get_binary_delegator_reward_by_era() {
+    const validator_key_string = this.getIdentifier('validatorKey')?.value?.trim();
+    const delegator_key_string = this.getIdentifier('delegatorKey')?.value?.trim();
+    const era_id_string: number = this.getIdentifier('eraId')?.value?.trim() as number;
+    const get_binary_delegator_reward_by_era = await this.sdk.get_binary_delegator_reward_by_era(new PublicKey(validator_key_string), new PublicKey(delegator_key_string), new EraId(BigInt(era_id_string)));
+    get_binary_delegator_reward_by_era && this.resultService.setResult(get_binary_delegator_reward_by_era);
+    return get_binary_delegator_reward_by_era;
+  }
 
-  // async get_binary_get_delegator_reward_by_era() {
-  //   const get_binary_get_delegator_reward_by_era = await this.sdk.get_binary_get_delegator_reward_by_era();
-  //   get_binary_get_delegator_reward_by_era && this.resultService.setResult(get_binary_get_delegator_reward_by_era);
-  //   return get_binary_get_delegator_reward_by_era;
-  // }
+  async get_binary_delegator_reward() {
+    const validator_key_string = this.getIdentifier('validatorKey')?.value?.trim();
+    const delegator_key_string = this.getIdentifier('delegatorKey')?.value?.trim();
+    const block_identifier_height: string = this.getIdentifier('blockIdentifierHeight')?.value?.trim();
+    const block_identifier_hash: string = this.getIdentifier('blockIdentifierHash')?.value?.trim();
+    if (block_identifier_hash) {
+      const get_binary_delegator_reward_by_block_hash = await this.sdk.get_binary_delegator_reward_by_block_hash(new PublicKey(validator_key_string), new PublicKey(delegator_key_string), new BlockHash(block_identifier_hash));
+      get_binary_delegator_reward_by_block_hash && this.resultService.setResult(get_binary_delegator_reward_by_block_hash);
+      return get_binary_delegator_reward_by_block_hash;
+    } else if (block_identifier_height) {
+      const get_binary_delegator_reward_by_block_height = await this.sdk.get_binary_delegator_reward_by_block_height(new PublicKey(validator_key_string), new PublicKey(delegator_key_string), BigInt(block_identifier_height));
+      get_binary_delegator_reward_by_block_height && this.resultService.setResult(get_binary_delegator_reward_by_block_height);
+      return get_binary_delegator_reward_by_block_height;
+    } else {
+      this.get_binary_delegator_reward_by_era();
+    }
 
-  // async get_binary_get_delegator_reward_by_block_height() {
-  //   const get_binary_get_delegator_reward_by_block_height = await this.sdk.get_binary_get_delegator_reward_by_block_height();
-  //   get_binary_get_delegator_reward_by_block_height && this.resultService.setResult(get_binary_get_delegator_reward_by_block_height);
-  //   return get_binary_get_delegator_reward_by_block_height;
-  // }
+  }
 
-  // async get_binary_get_delegator_reward_by_block_hash() {
-  //   const get_binary_get_delegator_reward_by_block_hash = await this.sdk.get_binary_get_delegator_reward_by_block_hash();
-  //   get_binary_get_delegator_reward_by_block_hash && this.resultService.setResult(get_binary_get_delegator_reward_by_block_hash);
-  //   return get_binary_get_delegator_reward_by_block_hash;
-  // }
-
-  // async get_binary_read_record() {
-  //   const get_binary_read_record = await this.sdk.get_binary_read_record();
-  //   get_binary_read_record && this.resultService.setResult(get_binary_read_record);
-  //   return get_binary_read_record;
-  // }
+  async get_binary_read_record() {
+    const record_id_string: number = this.getIdentifier('eraId')?.value?.trim() as number;
+    const key: string = this.getIdentifier('key')?.value?.trim();
+    const get_binary_read_record = await this.sdk.get_binary_read_record(new RecordId(record_id_string), hexToUint8Array(key));
+    get_binary_read_record && this.resultService.setResult(get_binary_read_record);
+    return get_binary_read_record;
+  }
 
   // async get_binary_global_state_item() {
   //   const get_binary_nget_binary_global_state_itemode_status = await this.sdk.get_binary_global_state_item();
@@ -222,9 +255,13 @@ export class BinaryService {
   //   return get_binary_try_speculative_execution;
   // }
 
-  async get_binary_get_protocol_version() {
-    const get_binary_get_protocol_version = await this.sdk.get_binary_get_protocol_version();
-    get_binary_get_protocol_version && this.resultService.setResult(get_binary_get_protocol_version);
-    return get_binary_get_protocol_version;
+  async get_binary_protocol_version() {
+    const get_binary_protocol_version = await this.sdk.get_binary_protocol_version();
+    get_binary_protocol_version && this.resultService.setResult(get_binary_protocol_version);
+    return get_binary_protocol_version;
+  }
+
+  private getIdentifier(formControlName: string) {
+    return this.formService.form.get(formControlName) as FormControl;
   }
 }

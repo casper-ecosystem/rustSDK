@@ -17,6 +17,7 @@ import { StorageService } from '@util/storage';
 export class HeaderComponent implements AfterViewInit {
 
   @ViewChild('selectNetworkElt') selectNetworkElt!: ElementRef;
+  @ViewChild('nodeAddressElt') nodeAddressElt!: ElementRef;
 
   @Input() peers!: PeerEntry[];
 
@@ -26,6 +27,7 @@ export class HeaderComponent implements AfterViewInit {
   rpc_address: string = this.network.rpc_address;
   node_address: string = this.network.node_address;
   customNetwork!: string;
+  is_network_tab_open!: boolean;
 
   private window!: (Window & typeof globalThis) | null;
   private is_electron!: boolean;
@@ -69,8 +71,8 @@ export class HeaderComponent implements AfterViewInit {
     this.chain_name = network.chain_name;
     this.rpc_address = network.rpc_address;
     this.node_address = network.node_address;
-    console.log(this.node_address);
     this.setRPCAddress();
+    this.setNodeAddress();
     this.stateService.setState({
       chain_name: network.chain_name
     });
@@ -89,13 +91,14 @@ export class HeaderComponent implements AfterViewInit {
 
   onCustomNetworkChange($event: Event) {
     this.rpc_address = ($event.target as HTMLInputElement)?.value || this.network.rpc_address;
-    // this.node_address = ($event.target as HTMLInputElement)?.value || this.network.node_address;
+    this.node_address = this.nodeAddressElt.nativeElement.value || '';
     const customNetwork = this.networks.find(network => network.name === 'custom');
+    // Todo check
     if (customNetwork) {
       customNetwork.rpc_address = this.rpc_address;
       //  customNetwork.node_address = this.node_address;
       this.sdk.setRPCAddress(this.rpc_address);
-      //    this.sdk.setNodeAddress(this.node_address);
+      this.sdk.setNodeAddress(this.node_address);
       this.stateService.setState({
         rpc_address: this.rpc_address,
         node_address: this.node_address
@@ -125,7 +128,16 @@ export class HeaderComponent implements AfterViewInit {
     }
   }
 
+  onNodeAddressChange($event: Event) {
+    this.node_address = ($event.target as HTMLInputElement)?.value || '';
+    this.setNodeAddress();
+  }
+
   iscustomChainInvalid() {
+    return false;
+  }
+
+  isNodeAddressInvalid() {
     return false;
   }
 
@@ -135,18 +147,39 @@ export class HeaderComponent implements AfterViewInit {
 
   // TODO Refacto with proxy-everywhere
   private setRPCAddress() {
-    if ((this.is_electron)) {
-      this.sdk.setRPCAddress(this.rpc_address);
-      this.sdk.setNodeAddress(this.node_address);
-    } else {
-      const network = this.networks.find(x => x.rpc_address == this.rpc_address);
-      if (this.is_production && !this.localhost_to_gateway && network && ['ntcl', 'node-launcher'].includes(network?.name)) {
+    try {
+      if ((this.is_electron)) {
         this.sdk.setRPCAddress(this.rpc_address);
         this.sdk.setNodeAddress(this.node_address);
       } else {
-        network && this.sdk.setRPCAddress([this.window?.location?.href, network?.name].join(''));
+        const network = this.networks.find(x => x.rpc_address == this.rpc_address);
+        if (this.is_production && !this.localhost_to_gateway && network && ['ntcl', 'node-launcher'].includes(network?.name)) {
+          this.sdk.setRPCAddress(this.rpc_address);
+          this.sdk.setNodeAddress(this.node_address);
+        } else {
+          network && this.sdk.setRPCAddress([this.window?.location?.href, network?.name].join(''));
+        }
       }
-
     }
+    catch (e) {
+      console.error(e);
+      // TODO Fix bug https://github.com/rustwasm/wasm-bindgen/issues/1578
+      // recursive use of an object detected which would lead to unsafe aliasing in rust
+    }
+  }
+
+  private setNodeAddress() {
+    try {
+      this.sdk.setNodeAddress(this.node_address);
+    } catch (e) {
+      console.error(e);
+      // TODO Fix bug https://github.com/rustwasm/wasm-bindgen/issues/1578
+      // recursive use of an object detected which would lead to unsafe aliasing in rust
+    }
+  }
+
+  onSubmit(event: Event) {
+    event.preventDefault();
+    return false;
   }
 }

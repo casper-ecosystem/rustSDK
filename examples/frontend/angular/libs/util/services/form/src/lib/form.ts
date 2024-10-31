@@ -50,7 +50,7 @@ const blockIdentifierHeight: InputField = {
   name: 'block_identifier_height',
   controlName: 'blockIdentifierHeight',
   placeholder: 'Block Height',
-  e2e: 'blockIdentifierHeightElt'
+  e2e: 'blockIdentifierHeightElt',
 };
 
 const blockIdentifierHash: InputField = {
@@ -63,6 +63,66 @@ const blockIdentifierHash: InputField = {
   controlName: 'blockIdentifierHash',
   placeholder: 'Block Hash',
   e2e: 'blockIdentifierHashElt',
+};
+
+const eraId: InputField = {
+  id: 'eraId',
+  type: 'search',
+  wrap_class: 'col-lg-3 col-xl-2 mb-2',
+  class: 'form-control',
+  label: 'Era Id',
+  name: 'era_id',
+  controlName: 'eraId',
+  placeholder: 'Era Id',
+  e2e: 'eraIdElt',
+};
+
+const recordId: InputField = {
+  id: 'recordId',
+  type: 'search',
+  wrap_class: 'col-lg-3 col-xl-2 mb-2',
+  class: 'form-control',
+  label: 'Record Id',
+  name: 'record_id',
+  controlName: 'recordId',
+  placeholder: 'Record Id',
+  e2e: 'recordIdElt',
+};
+
+const validatorKey: InputField = {
+  id: 'validatorKey',
+  type: 'search',
+  wrap_class: 'col-lg-9 mb-2',
+  class: 'form-control',
+  label: 'Validator Key',
+  name: 'validator_key',
+  controlName: 'validatorKey',
+  placeholder: 'Validator Key',
+  e2e: 'validatorKeyElt',
+};
+
+const delegatorKey: InputField = {
+  id: 'delegatorKey',
+  type: 'search',
+  wrap_class: 'col-lg-9',
+  class: 'form-control',
+  label: 'Delegator Key',
+  name: 'delegator_key',
+  controlName: 'delegatorKey',
+  placeholder: 'Delegator Key',
+  e2e: 'delegatorKeyElt',
+};
+
+const key: InputField = {
+  id: 'key',
+  type: 'search',
+  wrap_class: 'col-lg-9',
+  class: 'form-control',
+  label: 'Key',
+  name: 'key',
+  controlName: 'key',
+  placeholder: 'Key',
+  e2e: 'KeyElt',
 };
 
 const accountIdentifier: InputField = {
@@ -723,6 +783,24 @@ const signTransactionFields: InputContainer[][] = [
   [{ textarea: transactionJson, required: true }],
 ];
 
+const getBinaryValidatorRewardByEraFields: InputContainer[][] = [
+  ...getBlockFields,
+  [{ input: eraId }],
+  [{ input: validatorKey, required: true }],
+];
+
+const getBinaryDelegatorRewardByEraFields: InputContainer[][] = [
+  ...getBlockFields,
+  [{ input: eraId }],
+  [{ input: validatorKey, required: true }],
+  [{ input: delegatorKey, required: true }],
+];
+
+const getBinaryReadRecordFields: InputContainer[][] = [
+  [{ input: recordId }],
+  [{ input: key }],
+];
+
 const formFields = new Map<string, InputContainer[][]>([
   ['call_entrypoint', callEntrypointFields],
   ['call_entrypoint_deploy', callEntrypointFieldsDeploy],
@@ -762,6 +840,12 @@ const formFields = new Map<string, InputContainer[][]>([
   ['transaction', makeTransactionFields],
   ['transfer', getTransferFields],
   ['transfer_transaction', getTransferFields],
+  ['get_binary_block_header', getBlockFields],
+  ['get_binary_signed_block', getBlockFields],
+  ['get_binary_transaction', getTransactionFields],
+  ['get_binary_validator_reward', getBinaryValidatorRewardByEraFields],
+  ['get_binary_delegator_reward', getBinaryDelegatorRewardByEraFields],
+  ['get_binary_read_record', getBinaryReadRecordFields],
 ]);
 
 export default formFields;

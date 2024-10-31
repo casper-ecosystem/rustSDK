@@ -17,7 +17,6 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
 
   sdk_methods!: string[];
   sdk_rpc_methods!: string[];
-  sdk_contract_methods!: string[];
   sdk_deprecated!: string[];
   sdk_deploy_methods!: string[];
   sdk_deploy_utils_methods!: string[];
@@ -60,13 +59,35 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
 
     this.sdk_binary_methods = this.sdk_methods.filter(name => name.startsWith('get_binary'));
 
-    this.sdk_rpc_methods = this.sdk_methods.filter(name => !this.sdk_deploy_methods.concat(
-      this.sdk_deploy_utils_methods,
-      this.sdk_transaction_utils_methods,
-      this.sdk_transaction_methods,
-      this.sdk_contract_methods,
-      this.sdk_binary_methods
-    ).includes(name)
+    const baseMethodsSet = new Set();
+    const rejectedMethodsSet = new Set();
+    this.sdk_binary_methods = [...new Set(
+      this.sdk_binary_methods.filter(name => {
+        if (name.endsWith('_hash') || name.endsWith('_height') || name.endsWith('_era') || name.endsWith('_state_root_hash')) {
+          rejectedMethodsSet.add(name);
+          const baseMethod = name.slice(0, name.lastIndexOf('_'));
+          baseMethodsSet.add(baseMethod.replace('_by', '').replace('_block', ''));
+          return false;
+        }
+        return true;
+      })
+    )];
+
+    // Convert the Set to an array and add the base methods to the final sdk_binary_methods
+    this.sdk_binary_methods = [...this.sdk_binary_methods, ...Array.from(baseMethodsSet) as string[]];
+
+    // Remove duplicates again to avoid any conflicts
+    this.sdk_binary_methods = [...new Set(this.sdk_binary_methods.sort())];
+
+    this.sdk_rpc_methods = this.sdk_methods.filter(name =>
+      ![
+        ...this.sdk_binary_methods,
+        ...Array.from(rejectedMethodsSet),
+        ...this.sdk_deploy_methods,
+        ...this.sdk_deploy_utils_methods,
+        ...this.sdk_transaction_utils_methods,
+        ...this.sdk_transaction_methods,
+      ].includes(name)
     );
     this.setStateSubscription();
   };

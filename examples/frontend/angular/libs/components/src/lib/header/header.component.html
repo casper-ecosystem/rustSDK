@@ -19,9 +19,10 @@
     >
   </div>
   <div class="col-12 col-md-6 col-lg-5">
-    <form class="form-inline">
+    <form class="form-inline" (submit)="onSubmit($event)">
       <div class="input-group">
         <label
+          (click)="is_network_tab_open = !is_network_tab_open"
           class="input-group-text"
           for="selectActionElt"
           for="selectNetworkElt"
@@ -70,13 +71,13 @@
             [value]="rpc_address || ''"
             (change)="onCustomNetworkChange($event)"
             id="customNetworkElt"
-            #publicKeyElt
+            #customNetworkElt
             e2e-id="customNetworkElt"
             [ngClass]="[isCustomNetworkInvalid() ? 'is-invalid' : '']"
           />
         </div>
         <div class="col-4">
-          <label class="input-group-text" for="publicKeyElt">
+          <label class="input-group-text" for="customChainElt">
             <span class="d-none d-md-inline d-lg-none">Chai.</span>
             <span class="d-md-none d-lg-inline">Chain</span>
           </label>
@@ -87,9 +88,34 @@
             [value]="chain_name || ''"
             (change)="onCcustomChainChange($event)"
             id="customChainElt"
-            #publicKeyElt
+            #customChainElt
             e2e-id="customChainElt"
             [ngClass]="[iscustomChainInvalid() ? 'is-invalid' : '']"
+          />
+        </div>
+      </div>
+      <div
+        class="input-group mt-2 justify-content-between"
+        *ngIf="is_network_tab_open"
+      >
+        <div class="col-7">
+          <label
+            class="input-group-text"
+            for="nodeAddressElt"
+            (click)="is_network_tab_open = !is_network_tab_open"
+          >
+            WS</label
+          >
+          <input
+            type="search"
+            class="form-control form-control-xs"
+            name="nodeAddress"
+            [value]="node_address || ''"
+            (change)="onNodeAddressChange($event)"
+            id="nodeAddressElt"
+            #nodeAddressElt
+            e2e-id="nodeAddressElt"
+            [ngClass]="[isNodeAddressInvalid() ? 'is-invalid' : '']"
           />
         </div>
       </div>

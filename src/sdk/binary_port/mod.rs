@@ -330,7 +330,7 @@ impl SDK {
     }
 
     /// Retrieves the reward for the given validator at the given era.
-    pub async fn get_binary_get_validator_reward_by_era(
+    pub async fn get_binary_validator_reward_by_era(
         &self,
         node_address: Option<String>,
         validator_key: PublicKey,
@@ -348,7 +348,7 @@ impl SDK {
     }
 
     /// Retrieves the reward for the given validator at the era containing the block at given height.
-    pub async fn get_binary_get_validator_reward_by_block_height(
+    pub async fn get_binary_validator_reward_by_block_height(
         &self,
         node_address: Option<String>,
         validator_key: PublicKey,
@@ -366,7 +366,7 @@ impl SDK {
     }
 
     /// Retrieves the reward for the given validator at the era containing the block with given hash.
-    pub async fn get_binary_get_validator_reward_by_block_hash(
+    pub async fn get_binary_validator_reward_by_block_hash(
         &self,
         node_address: Option<String>,
         validator_key: PublicKey,
@@ -384,7 +384,7 @@ impl SDK {
     }
 
     /// Retrieves the reward for the given delegator at the given era.
-    pub async fn get_binary_get_delegator_reward_by_era(
+    pub async fn get_binary_delegator_reward_by_era(
         &self,
         node_address: Option<String>,
         validator_key: PublicKey,
@@ -403,7 +403,7 @@ impl SDK {
     }
 
     /// Retrieves the reward for the given delegator at the era containing the block at given height.
-    pub async fn get_binary_get_delegator_reward_by_block_height(
+    pub async fn get_binary_delegator_reward_by_block_height(
         &self,
         node_address: Option<String>,
         validator_key: PublicKey,
@@ -429,7 +429,7 @@ impl SDK {
     }
 
     /// Retrieves the reward for the given delegator at the era containing the block with given hash.
-    pub async fn get_binary_get_delegator_reward_by_block_hash(
+    pub async fn get_binary_delegator_reward_by_block_hash(
         &self,
         node_address: Option<String>,
         validator_key: PublicKey,
@@ -576,7 +576,7 @@ impl SDK {
     }
 
     /// Retrieves the protocol version from the node.
-    pub async fn get_binary_get_protocol_version(
+    pub async fn get_binary_protocol_version(
         &self,
         node_address: Option<String>,
     ) -> Result<ProtocolVersion, SdkError> {
@@ -920,7 +920,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_binary_get_validator_reward_by_era_success() {
+    async fn test_get_binary_validator_reward_by_era_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
         // TODO Get validator key
@@ -930,7 +930,7 @@ mod tests {
         let era = EraId::new(1);
 
         let result = sdk
-            .get_binary_get_validator_reward_by_era(Some(node_address), validator_key, era)
+            .get_binary_validator_reward_by_era(Some(node_address), validator_key, era)
             .await;
 
         // TODO
@@ -939,7 +939,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_binary_get_validator_reward_by_block_height_success() {
+    async fn test_get_binary_validator_reward_by_block_height_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
         // TODO Get validator key
@@ -949,7 +949,7 @@ mod tests {
         let block_height = 1;
 
         let result = sdk
-            .get_binary_get_validator_reward_by_block_height(
+            .get_binary_validator_reward_by_block_height(
                 Some(node_address),
                 validator_key,
                 block_height,
@@ -962,7 +962,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_binary_get_validator_reward_by_block_hash_success() {
+    async fn test_get_binary_validator_reward_by_block_hash_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
         // TODO Get validator key
@@ -983,7 +983,7 @@ mod tests {
         assert!(!block_hash.to_string().is_empty());
 
         let result = sdk
-            .get_binary_get_validator_reward_by_block_hash(
+            .get_binary_validator_reward_by_block_hash(
                 Some(node_address),
                 validator_key,
                 *block_hash,
@@ -996,7 +996,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_binary_get_delegator_reward_by_era_success() {
+    async fn test_get_binary_delegator_reward_by_era_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
         // TODO Get delegator key
@@ -1012,7 +1012,7 @@ mod tests {
         let era = EraId::new(1);
 
         let result = sdk
-            .get_binary_get_delegator_reward_by_era(
+            .get_binary_delegator_reward_by_era(
                 Some(node_address),
                 validator_key,
                 delegator_key,
@@ -1026,7 +1026,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_binary_get_delegator_reward_by_block_height_success() {
+    async fn test_get_binary_delegator_reward_by_block_height_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
         // TODO Get delegator key
@@ -1041,7 +1041,7 @@ mod tests {
         let block_height = 1;
 
         let result = sdk
-            .get_binary_get_delegator_reward_by_block_height(
+            .get_binary_delegator_reward_by_block_height(
                 Some(node_address),
                 validator_key,
                 delegator_key,
@@ -1055,7 +1055,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_binary_get_delegator_reward_by_block_hash_success() {
+    async fn test_get_binary_delegator_reward_by_block_hash_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
         // TODO Get delegator key
@@ -1081,7 +1081,7 @@ mod tests {
         assert!(!block_hash.to_string().is_empty());
 
         let result = sdk
-            .get_binary_get_delegator_reward_by_block_hash(
+            .get_binary_delegator_reward_by_block_hash(
                 Some(node_address),
                 validator_key,
                 delegator_key,
@@ -1290,13 +1290,11 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_binary_get_protocol_version_success() {
+    async fn test_get_binary_protocol_version_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
 
-        let result = sdk
-            .get_binary_get_protocol_version(Some(node_address))
-            .await;
+        let result = sdk.get_binary_protocol_version(Some(node_address)).await;
         let protocol_version = result.unwrap();
         assert!(!protocol_version.value().to_string().is_empty());
     }

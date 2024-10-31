@@ -48,8 +48,8 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_binary_block_header_by_height")]
     pub async fn get_binary_block_header_by_height_js_alias(
         &self,
-        node_address: Option<String>,
         height: u64,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
             .get_binary_block_header_by_height(node_address, height)
@@ -62,8 +62,8 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_binary_block_header_by_hash")]
     pub async fn get_binary_block_header_by_hash_js_alias(
         &self,
-        node_address: Option<String>,
         block_hash: BlockHash,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
             .get_binary_block_header_by_hash(node_address, block_hash.into())
@@ -87,8 +87,8 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_binary_signed_block_by_height")]
     pub async fn get_binary_signed_block_by_height_js_alias(
         &self,
-        node_address: Option<String>,
         height: u64,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
             .get_binary_signed_block_by_height(node_address, height)
@@ -101,8 +101,8 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_binary_signed_block_by_hash")]
     pub async fn get_binary_signed_block_by_hash_js_alias(
         &self,
-        node_address: Option<String>,
         block_hash: BlockHash,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
             .get_binary_signed_block_by_hash(node_address, block_hash.into())
@@ -115,9 +115,9 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_binary_transaction_by_hash")]
     pub async fn get_binary_transaction_by_hash_js_alias(
         &self,
-        node_address: Option<String>,
         hash: TransactionHash,
         with_finalized_approvals: bool,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
             .get_binary_transaction_by_hash(node_address, hash.into(), with_finalized_approvals)
@@ -263,30 +263,30 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_get_validator_reward_by_era")]
-    pub async fn get_binary_get_validator_reward_by_era_js_alias(
+    #[wasm_bindgen(js_name = "get_binary_validator_reward_by_era")]
+    pub async fn get_binary_validator_reward_by_era_js_alias(
         &self,
-        node_address: Option<String>,
         validator_key: PublicKey,
         era: EraId,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
-            .get_binary_get_validator_reward_by_era(node_address, validator_key.into(), era.into())
+            .get_binary_validator_reward_by_era(node_address, validator_key.into(), era.into())
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
             .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_get_validator_reward_by_block_height")]
-    pub async fn get_binary_get_validator_reward_by_block_height_js_alias(
+    #[wasm_bindgen(js_name = "get_binary_validator_reward_by_block_height")]
+    pub async fn get_binary_validator_reward_by_block_height_js_alias(
         &self,
-        node_address: Option<String>,
         validator_key: PublicKey,
         block_height: u64,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
-            .get_binary_get_validator_reward_by_block_height(
+            .get_binary_validator_reward_by_block_height(
                 node_address,
                 validator_key.into(),
                 block_height,
@@ -297,15 +297,15 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_get_validator_reward_by_block_hash")]
-    pub async fn get_binary_get_validator_reward_by_block_hash_js_alias(
+    #[wasm_bindgen(js_name = "get_binary_validator_reward_by_block_hash")]
+    pub async fn get_binary_validator_reward_by_block_hash_js_alias(
         &self,
-        node_address: Option<String>,
         validator_key: PublicKey,
         block_hash: BlockHash,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
-            .get_binary_get_validator_reward_by_block_hash(
+            .get_binary_validator_reward_by_block_hash(
                 node_address,
                 validator_key.into(),
                 block_hash.into(),
@@ -316,16 +316,16 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_get_delegator_reward_by_era")]
-    pub async fn get_binary_get_delegator_reward_by_era_js_alias(
+    #[wasm_bindgen(js_name = "get_binary_delegator_reward_by_era")]
+    pub async fn get_binary_delegator_reward_by_era_js_alias(
         &self,
-        node_address: Option<String>,
         validator_key: PublicKey,
         delegator_key: PublicKey,
         era: EraId,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
-            .get_binary_get_delegator_reward_by_era(
+            .get_binary_delegator_reward_by_era(
                 node_address,
                 validator_key.into(),
                 delegator_key.into(),
@@ -337,16 +337,16 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_get_delegator_reward_by_block_height")]
-    pub async fn get_binary_get_delegator_reward_by_block_height_js_alias(
+    #[wasm_bindgen(js_name = "get_binary_delegator_reward_by_block_height")]
+    pub async fn get_binary_delegator_reward_by_block_height_js_alias(
         &self,
-        node_address: Option<String>,
         validator_key: PublicKey,
         delegator_key: PublicKey,
         block_height: u64,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
-            .get_binary_get_delegator_reward_by_block_height(
+            .get_binary_delegator_reward_by_block_height(
                 node_address,
                 validator_key.into(),
                 delegator_key.into(),
@@ -358,16 +358,16 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_get_delegator_reward_by_block_hash")]
-    pub async fn get_binary_get_delegator_reward_by_block_hash_js_alias(
+    #[wasm_bindgen(js_name = "get_binary_delegator_reward_by_block_hash")]
+    pub async fn get_binary_delegator_reward_by_block_hash_js_alias(
         &self,
-        node_address: Option<String>,
         validator_key: PublicKey,
         delegator_key: PublicKey,
         block_hash: BlockHash,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
-            .get_binary_get_delegator_reward_by_block_hash(
+            .get_binary_delegator_reward_by_block_hash(
                 node_address,
                 validator_key.into(),
                 delegator_key.into(),
@@ -382,9 +382,9 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_binary_read_record")]
     pub async fn get_binary_read_record_js_alias(
         &self,
-        node_address: Option<String>,
         record_id: RecordId,
         key: Vec<u8>,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
             .get_binary_read_record(node_address, record_id.into(), &key)
@@ -397,9 +397,9 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_binary_global_state_item")]
     pub async fn get_binary_global_state_item_js_alias(
         &self,
-        node_address: Option<String>,
         key: Key,
         path: Vec<String>,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
             .get_binary_global_state_item(node_address, key.into(), path)
@@ -412,10 +412,10 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_binary_global_state_item_by_state_root_hash")]
     pub async fn get_binary_global_state_item_by_state_root_hash_js_alias(
         &self,
-        node_address: Option<String>,
         state_root_hash: Digest,
         key: Key,
         path: Vec<String>,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
             .get_binary_global_state_item_by_state_root_hash(
@@ -433,10 +433,10 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_binary_global_state_item_by_block_hash")]
     pub async fn get_binary_global_state_item_by_block_hash_js_alias(
         &self,
-        node_address: Option<String>,
         block_hash: BlockHash,
         key: Key,
         path: Vec<String>,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
             .get_binary_global_state_item_by_block_hash(
@@ -454,10 +454,10 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_binary_global_state_item_by_block_height")]
     pub async fn get_binary_global_state_item_by_block_height_js_alias(
         &self,
-        node_address: Option<String>,
         block_height: u64,
         key: Key,
         path: Vec<String>,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
             .get_binary_global_state_item_by_block_height(
@@ -475,8 +475,8 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_binary_try_accept_transaction")]
     pub async fn get_binary_try_accept_transaction_js_alias(
         &self,
-        node_address: Option<String>,
         transaction: Transaction,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
             .get_binary_try_accept_transaction(node_address, transaction.into())
@@ -491,8 +491,8 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_binary_try_speculative_execution")]
     pub async fn get_binary_try_speculative_execution_js_alias(
         &self,
-        node_address: Option<String>,
         transaction: Transaction,
+        node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
             .get_binary_try_speculative_execution(node_address, transaction.into())
@@ -502,12 +502,12 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_get_protocol_version")]
-    pub async fn get_binary_get_protocol_version_js_alias(
+    #[wasm_bindgen(js_name = "get_binary_protocol_version")]
+    pub async fn get_binary_protocol_version_js_alias(
         &self,
         node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
-        let result = self.get_binary_get_protocol_version(node_address).await;
+        let result = self.get_binary_protocol_version(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
             .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))

@@ -20,7 +20,7 @@ pub use contract::*;
 
 use wasm_bindgen::prelude::*;
 
-use crate::{debug::log, types::verbosity::Verbosity};
+use crate::types::verbosity::Verbosity;
 
 #[wasm_bindgen]
 pub struct SDK {
@@ -76,7 +76,6 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "setNodeAddress")]
     pub fn set_node_address(&mut self, node_address: Option<String>) -> Result<(), String> {
-        log(&(node_address.clone().unwrap()));
         self.node_address = node_address;
         Ok(())
     }
