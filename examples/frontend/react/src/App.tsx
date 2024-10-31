@@ -420,7 +420,7 @@ function App() {
   return (
     <div className="App">
       <>
-        <img src={'./logo.png'} alt="CasperLabs"></img>
+        <img src={'./logo.svg'} alt="Casper Ecosystem"></img>
         <div className="text-start my-3 mx-4">
           <div className="my-2">
             <label className="fw-bold">State root hash</label>

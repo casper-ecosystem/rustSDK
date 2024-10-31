@@ -7,7 +7,7 @@
     "**/examples/**",
     "**/*+(index|.spec|.e2e).ts",
     "**/*.md",
-    "**/*.tsx" // Exclude any .tsx files like App.tsx if needed
+    "**/*.tsx"
   ],
   "highlightLanguages": [
     "typescript",
