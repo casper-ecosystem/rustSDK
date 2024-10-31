@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/contract/call_entrypoint.rs`."><title>call_entrypoint.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/contract/call_entrypoint.rs`."><title>call_entrypoint.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-590a400c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (759e07f06 2024-10-30)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../../static.files/storage-59e33391.js"></script><script defer src="../../../../static.files/src-script-56102188.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/contract/</div>call_entrypoint.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -255,15 +256,18 @@
 <a href="#255" id="255">255</a>
 <a href="#256" id="256">256</a>
 <a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+<a href="#258" id="258">258</a></pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::transaction::transaction::PutTransactionResult;
-<span class="kw">use </span><span class="kw">crate</span>::types::transaction_params::{
-    transaction_builder_params::TransactionBuilderParams,
-    transaction_str_params::TransactionStrParams,
+<span class="kw">use crate</span>::{
+    types::{
+        sdk_error::SdkError,
+        transaction_params::{
+            transaction_builder_params::TransactionBuilderParams,
+            transaction_str_params::TransactionStrParams,
+        },
+    },
+    SDK,
 };
-<span class="kw">use crate</span>::{types::sdk_error::SdkError, SDK};
 <span class="kw">use </span>casper_client::{
     rpcs::results::PutTransactionResult <span class="kw">as </span>_PutTransactionResult, SuccessResponse,
 };
@@ -280,7 +284,7 @@
     ///
     /// * `transaction_params` - Transaction parameters.
     /// * `builder_params` - Transaction Builder parameters.
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -294,10 +298,10 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PutTransactionResult, JsError&gt; {
         <span class="kw">let </span>result = <span class="self">self
-            </span>.call_entrypoint(builder_params, transaction_params, node_address)
+            </span>.call_entrypoint(builder_params, transaction_params, rpc_address)
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
@@ -318,7 +322,7 @@
     ///
     /// * `builder_params` - Transaction Builder parameters.
     /// * `transaction_params` - Transaction parameters.
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -331,10 +335,10 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_PutTransactionResult&gt;, SdkError&gt; {
         <span class="comment">//log("call_entrypoint!");;
-        </span><span class="self">self</span>.transaction(builder_params, transaction_params, <span class="prelude-val">None</span>, node_address)
+        </span><span class="self">self</span>.transaction(builder_params, transaction_params, <span class="prelude-val">None</span>, rpc_address)
             .<span class="kw">await
     </span>}
 }
@@ -343,9 +347,7 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use crate</span>::{
-        helpers::public_key_from_secret_key,
-        install_cep78,
-        types::{addressable_entity_hash::AddressableEntityHash, contract_hash::ContractHash},
+        helpers::public_key_from_secret_key, install_cep78, types::addr::entity_addr::EntityAddr,
     };
     <span class="kw">use </span>once_cell::sync::Lazy;
     <span class="kw">use </span>sdk_tests::{
@@ -357,19 +359,19 @@
     <span class="kw">static </span>ARGS: Lazy&lt;Vec&lt;String&gt;&gt; =
         Lazy::new(|| ARGS_SIMPLE.iter().map(|s| s.to_string()).collect());
 
-    <span class="kw">async fn </span>get_contract_hash() -&gt; String {
+    <span class="kw">async fn </span>get_entity_key() -&gt; String {
         install_cep78().<span class="kw">await
     </span>}
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_call_entrypoint_with_none_values() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>builder_params = TransactionBuilderParams::default();
         <span class="kw">let </span>transaction_params = TransactionStrParams::default();
 
         <span class="kw">let </span>error_message =
-            <span class="string">"Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty"</span>;
+            <span class="string">"transaction requires account - use `with_account` or `with_secret_key`"</span>;
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -385,8 +387,8 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_call_entrypoint_with_valid_input() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
 
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_params = TransactionStrParams::default();
@@ -395,15 +397,14 @@
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
-        <span class="kw">let </span>contract_hash = ContractHash::from_formatted_str(<span class="kw-2">&amp;</span>get_contract_hash().<span class="kw">await</span>).unwrap();
-        <span class="kw">let </span>entity_hash: AddressableEntityHash = contract_hash.into();
+        <span class="kw">let </span>entity_addr = EntityAddr::from_formatted_str(<span class="kw-2">&amp;</span>get_entity_key().<span class="kw">await</span>).unwrap();
 
         <span class="kw">let </span>builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
-            .call_entrypoint(builder_params, transaction_params, <span class="prelude-val">Some</span>(node_address))
+            .call_entrypoint(builder_params, transaction_params, <span class="prelude-val">Some</span>(rpc_address))
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
@@ -415,47 +416,44 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_call_entrypoint_with_invalid_input() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
 
-        <span class="kw">let </span>error_message =
-            <span class="string">"Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty"</span>;
+        <span class="kw">let </span>error_message = <span class="string">"the transaction was invalid: no such contract at hash"</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
         transaction_params.set_chain_name(<span class="kw-2">&amp;</span>chain_name);
-        transaction_params.set_payment_amount(<span class="string">""</span>); <span class="comment">// This is not valid payment amount
-        </span>transaction_params.set_session_args_simple(ARGS.to_vec());
+        transaction_params.set_session_args_simple(ARGS.to_vec());
 
-        <span class="kw">let </span>entity_hash = AddressableEntityHash::from_formatted_str(
-            <span class="string">"addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d"</span>,
+        <span class="kw">let </span>entity_addr = EntityAddr::from_formatted_str(
+            <span class="string">"entity-contract-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d"</span>,
         )
         .unwrap();
 
         <span class="kw">let </span>builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
-            .call_entrypoint(builder_params, transaction_params, <span class="prelude-val">Some</span>(node_address))
+            .call_entrypoint(builder_params, transaction_params, <span class="prelude-val">Some</span>(rpc_address))
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
         </span><span class="macro">assert!</span>(result.is_err());
         <span class="kw">let </span>err_string = result.err().unwrap().to_string();
-
         <span class="macro">assert!</span>(err_string.contains(error_message));
     }
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_call_entrypoint_without_secret_key() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>initiator_addr = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
-        <span class="kw">let </span>error_message = <span class="string">"the transaction was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason"</span>;
+        <span class="kw">let </span>error_message = <span class="string">"the transaction was invalid: invalid associated keys"</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(<span class="kw-2">&amp;</span>chain_name);
@@ -463,17 +461,17 @@
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
-        <span class="kw">let </span>entity_hash = AddressableEntityHash::from_formatted_str(
-            <span class="string">"addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d"</span>,
+        <span class="kw">let </span>entity_addr = EntityAddr::from_formatted_str(
+            <span class="string">"entity-contract-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d"</span>,
         )
         .unwrap();
 
         <span class="kw">let </span>builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
-            .call_entrypoint(builder_params, transaction_params, <span class="prelude-val">Some</span>(node_address))
+            .call_entrypoint(builder_params, transaction_params, <span class="prelude-val">Some</span>(rpc_address))
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
@@ -485,8 +483,8 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_call_entrypoint_with_error() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
 
         <span class="kw">let </span>error_message = <span class="string">"error sending request for url (http://localhost/rpc)"</span>;
@@ -497,13 +495,13 @@
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
-        <span class="kw">let </span>entity_hash = AddressableEntityHash::from_formatted_str(
-            <span class="string">"addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d"</span>,
+        <span class="kw">let </span>entity_addr = EntityAddr::from_formatted_str(
+            <span class="string">"entity-contract-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d"</span>,
         )
         .unwrap();
 
         <span class="kw">let </span>builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk

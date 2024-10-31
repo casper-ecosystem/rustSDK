@@ -2386,6 +2386,10 @@ You can download an alpha version of the app illustrating the SDK here:
 
 - [Rust helpers](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/helpers/index.html)
 
+## Binary Port
+
+- [Binary methods](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/binary_port/index.html)
+
 ## Typescript API
 
 - [Full item list](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/index.html)
@@ -2428,6 +2432,10 @@ You can download an alpha version of the app illustrating the SDK here:
 ### Helpers functions
 
 - [TS helpers](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/modules.html#Functions)
+
+## Binary Port
+
+- [Binary methods](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/)
 
 ## Casper Wallet
 

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/helpers/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/helpers/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-590a400c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (759e07f06 2024-10-30)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/helpers/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -701,10 +702,23 @@
 <a href="#701" id="701">701</a>
 <a href="#702" id="702">702</a>
 <a href="#703" id="703">703</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::account_hash::AccountHash;
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::hash::account_hash::AccountHash;
 <span class="kw">use </span><span class="kw">crate</span>::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
 <span class="kw">use </span>base64::engine::general_purpose;
 <span class="kw">use </span>base64::Engine;
+<span class="kw">use </span>bigdecimal::BigDecimal;
 <span class="kw">use </span>blake2::{
     digest::{Update, VariableOutput},
     VarBlake2b,
@@ -718,9 +732,9 @@
 <span class="kw">use </span>chrono::{DateTime, SecondsFormat, Utc};
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
-<span class="kw">use </span>rust_decimal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>serde_json::Value;
+<span class="kw">use </span>std::str::FromStr;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>wasm_bindgen::{JsCast, JsValue};
 
@@ -765,7 +779,6 @@
 /// # Returns
 ///
 /// A hexadecimal string representing the Blake2b hash of the input metadata.
-
 </span><span class="kw">pub fn </span>get_blake2b_hash(meta_data: <span class="kw-2">&amp;</span>str) -&gt; String {
     <span class="kw">let </span><span class="kw-2">mut </span>result = [<span class="number">0</span>; BLAKE2B_DIGEST_LENGTH];
     <span class="kw">let </span><span class="kw-2">mut </span>hasher = VarBlake2b::new(BLAKE2B_DIGEST_LENGTH).expect(<span class="string">"should create hasher"</span>);
@@ -833,6 +846,7 @@
 /// # Arguments
 ///
 /// * `formatted_account_hash` - A hex-formatted string representing the account hash.
+///
 /// Example: "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
 ///
 /// # Returns
@@ -1040,20 +1054,22 @@
 ///
 /// A string representing the CSPR amount.
 </span><span class="kw">pub fn </span>motes_to_cspr(motes: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, SdkError&gt; {
-    <span class="kw">match </span>Decimal::from_str(motes) {
+    <span class="kw">match </span>BigDecimal::from_str(motes) {
         <span class="prelude-val">Ok</span>(motes_decimal) =&gt; {
-            <span class="kw">let </span>cspr_decimal = motes_decimal / Decimal::new(<span class="number">1_000_000_000</span>, <span class="number">0</span>);
-            <span class="kw">let </span>formatted_cspr = cspr_decimal.to_string();
+            <span class="kw">let </span>divisor = BigDecimal::from(<span class="number">1_000_000_000</span>);
+            <span class="kw">let </span>cspr_decimal = <span class="kw-2">&amp;</span>motes_decimal / divisor;
+            <span class="kw">let </span>formatted_cspr = <span class="macro">format!</span>(<span class="string">"{:.2}"</span>, cspr_decimal);
+
             <span class="kw">if </span>formatted_cspr.ends_with(<span class="string">".00"</span>) {
                 <span class="prelude-val">Ok</span>(formatted_cspr.replace(<span class="string">".00"</span>, <span class="string">""</span>))
             } <span class="kw">else </span>{
                 <span class="prelude-val">Ok</span>(formatted_cspr)
             }
         }
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(SdkError::CustomError(<span class="macro">format!</span>(
-            <span class="string">"Failed to parse input as Decimal: {:?}"</span>,
-            err
-        ))),
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(SdkError::CustomError {
+            context: <span class="string">"Failed to parse input as BigDecimal"</span>,
+            error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
+        }),
     }
 }
 
@@ -1075,8 +1091,12 @@
 
     <span class="kw">match </span>verbosity {
         <span class="prelude-val">Some</span>(Verbosity::Low) | <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(deserialized.to_string()),
-        <span class="prelude-val">Some</span>(Verbosity::Medium) =&gt; casper_types::json_pretty_print(<span class="kw-2">&amp;</span>deserialized)
-            .map_err(|err| SdkError::CustomError(<span class="macro">format!</span>(<span class="string">"Error in json_pretty_print: {}"</span>, err))),
+        <span class="prelude-val">Some</span>(Verbosity::Medium) =&gt; {
+            casper_types::json_pretty_print(<span class="kw-2">&amp;</span>deserialized).map_err(|err| SdkError::CustomError {
+                context: <span class="string">"Error in json_pretty_print"</span>,
+                error: <span class="macro">format!</span>(<span class="string">"{}"</span>, err),
+            })
+        }
         <span class="prelude-val">Some</span>(Verbosity::High) =&gt; {
             serde_json::to_string_pretty(<span class="kw-2">&amp;</span>deserialized).map_err(SdkError::from)
         }
@@ -1099,24 +1119,30 @@
     js_value_arg: JsValue,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>RuntimeArgs, SdkError&gt; {
     <span class="kw">if </span>js_sys::Object::instanceof(<span class="kw-2">&amp;</span>js_value_arg) {
-        <span class="kw">let </span>json_arg: JsonArg = js_value_arg.into_serde().map_err(|err| {
-            SdkError::CustomError(<span class="macro">format!</span>(<span class="string">"Error converting to JsonArg: {:?}"</span>, err))
-        })<span class="question-mark">?</span>;
+        <span class="kw">let </span>json_arg: JsonArg = js_value_arg
+            .into_serde()
+            .map_err(|err| SdkError::CustomError {
+                context: <span class="string">"Error converting to JsonArg"</span>,
+                error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
+            })<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>named_arg = NamedArg::try_from(json_arg).map_err(|err| {
-            SdkError::CustomError(<span class="macro">format!</span>(<span class="string">"Error converting to NamedArg: {:?}"</span>, err))
+        <span class="kw">let </span>named_arg = NamedArg::try_from(json_arg).map_err(|err| SdkError::CustomError {
+            context: <span class="string">"Error converting to NamedArg"</span>,
+            error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
         })<span class="question-mark">?</span>;
 
         args.insert_cl_value(named_arg.name(), named_arg.cl_value().clone());
     } <span class="kw">else if let </span><span class="prelude-val">Some</span>(string_arg) = js_value_arg.as_string() {
         <span class="kw">let </span>simple_arg = string_arg;
-        casper_client::cli::insert_arg(<span class="kw-2">&amp;</span>simple_arg, args).map_err(|err| {
-            SdkError::CustomError(<span class="macro">format!</span>(<span class="string">"Error inserting simple arg: {:?}"</span>, err))
+        casper_client::cli::insert_arg(<span class="kw-2">&amp;</span>simple_arg, args).map_err(|err| SdkError::CustomError {
+            context: <span class="string">"Error inserting simple arg"</span>,
+            error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
         })<span class="question-mark">?</span>;
     } <span class="kw">else </span>{
-        <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::CustomError(String::from(
-            <span class="string">"Error converting to JsonArg or Simple Arg"</span>,
-        )));
+        <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::CustomError {
+            context: <span class="string">"Error converting to JsonArg or Simple Arg"</span>,
+            error: String::from(<span class="string">"Conversion failed"</span>),
+        });
     }
 
     <span class="prelude-val">Ok</span>(args)

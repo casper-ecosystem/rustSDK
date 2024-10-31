@@ -438,8 +438,26 @@ export class ClientService {
       return;
     }
 
-    const builder_params = this.get_builder_params(wasm);
-    let transaction_params = new TransactionStrParams(
+    let builder_params: TransactionBuilderParams;
+    let transaction_params: TransactionStrParams;
+
+    try {
+      const params = this.get_builder_params(wasm);
+      if (params) {
+        builder_params = params;
+      }
+      else {
+        const err = "builder params are missing";
+        err && (this.errorService.setError(err.toString()));
+        throw err;
+      }
+    }
+    catch (err) {
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+
+    transaction_params = new TransactionStrParams(
       this.chain_name,
       this.public_key,
       this.secret_key,
@@ -466,7 +484,7 @@ export class ClientService {
 
     try {
       let result;
-      if (speculative) {
+      if (speculative && deploy_result) {
         result = await this.sdk.speculative_transaction(
           builder_params,
           transaction_params,
@@ -1050,7 +1068,7 @@ export class ClientService {
     const builder_params = this.get_builder_params();
 
     try {
-      const call_entrypoint = await this.sdk.call_entrypoint(
+      const call_entrypoint = builder_params && await this.sdk.call_entrypoint(
         builder_params,
         transaction_params,
       );
@@ -1288,7 +1306,7 @@ export class ClientService {
     return session_params;
   }
 
-  private get_builder_params(wasm?: Uint8Array): TransactionBuilderParams {
+  private get_builder_params(wasm?: Uint8Array): TransactionBuilderParams | undefined {
     let builder_params: TransactionBuilderParams = new TransactionBuilderParams();
 
     const entity_hash_input: string = this.getIdentifier('entityHash')?.value?.trim();
@@ -1311,7 +1329,7 @@ export class ClientService {
           } catch (innerError) {
             const err = "entity_hash could not be parsed";
             this.errorService.setError(err.toString());
-            return builder_params;
+            throw (err);
           }
         }
         if (entity_hash) {
@@ -1333,7 +1351,7 @@ export class ClientService {
           } catch (innerError) {
             const err = "package_hash could not be parsed";
             this.errorService.setError(err.toString());
-            return builder_params;
+            throw (err);
           }
         }
         if (package_hash) {

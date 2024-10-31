@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_balance.rs`."><title>get_balance.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_balance.rs`."><title>get_balance.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-590a400c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (759e07f06 2024-10-30)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../../static.files/storage-59e33391.js"></script><script defer src="../../../../static.files/src-script-56102188.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/rpcs/</div>get_balance.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -395,7 +396,9 @@
 <a href="#395" id="395">395</a>
 <a href="#396" id="396">396</a>
 <a href="#397" id="397">397</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a></pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     types::{
         digest::{Digest, ToDigest},
         sdk_error::SdkError,
@@ -473,7 +476,7 @@
     <span class="kw">pub </span>state_root_hash: <span class="prelude-ty">Option</span>&lt;Digest&gt;,
     <span class="kw">pub </span>purse_uref_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>purse_uref: <span class="prelude-ty">Option</span>&lt;URef&gt;,
-    <span class="kw">pub </span>node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 }
 
@@ -519,7 +522,7 @@
             purse_uref_as_string,
             purse_uref,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         <span class="kw">let </span>purse_uref = <span class="kw">if let </span><span class="prelude-val">Some</span>(purse_uref) = purse_uref {
@@ -532,7 +535,7 @@
         };
 
         <span class="kw">let </span>result = <span class="kw">if let </span><span class="prelude-val">Some</span>(hash) = state_root_hash {
-            <span class="self">self</span>.get_balance(hash, purse_uref, verbosity, node_address)
+            <span class="self">self</span>.get_balance(hash, purse_uref, verbosity, rpc_address)
                 .<span class="kw">await
         </span>} <span class="kw">else if let </span><span class="prelude-val">Some</span>(hash) = state_root_hash_as_string.clone() {
             <span class="kw">let </span>hash = <span class="kw">if </span>!hash.is_empty() {
@@ -543,10 +546,10 @@
             } <span class="kw">else </span>{
                 <span class="string">""</span>.to_string()
             };
-            <span class="self">self</span>.get_balance(<span class="kw-2">&amp;*</span>hash, purse_uref, verbosity, node_address)
+            <span class="self">self</span>.get_balance(<span class="kw-2">&amp;*</span>hash, purse_uref, verbosity, rpc_address)
                 .<span class="kw">await
         </span>} <span class="kw">else </span>{
-            <span class="self">self</span>.get_balance(<span class="string">""</span>, purse_uref, verbosity, node_address)
+            <span class="self">self</span>.get_balance(<span class="string">""</span>, purse_uref, verbosity, rpc_address)
                 .<span class="kw">await
         </span>};
 
@@ -594,7 +597,7 @@
     /// * `state_root_hash` - The state root hash to query for balance information.
     /// * `purse_uref` - The purse uref specifying the purse for which to retrieve the balance.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -608,16 +611,12 @@
         state_root_hash: <span class="kw">impl </span>ToDigest,
         purse_uref: GetBalanceInput,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetBalanceResult&gt;, SdkError&gt; {
         <span class="comment">//log("get_balance!");
         </span><span class="kw">let </span>state_root_hash = <span class="kw">if </span>state_root_hash.is_empty() {
             <span class="kw">let </span>state_root_hash = <span class="self">self
-                </span>.get_state_root_hash(
-                    <span class="prelude-val">None</span>,
-                    <span class="prelude-val">None</span>,
-                    <span class="prelude-val">Some</span>(<span class="self">self</span>.get_node_address(node_address.clone())),
-                )
+                </span>.get_state_root_hash(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>.get_rpc_address(rpc_address.clone())))
                 .<span class="kw">await</span>;
 
             <span class="kw">match </span>state_root_hash {
@@ -634,7 +633,7 @@
         <span class="kw">match </span>purse_uref {
             GetBalanceInput::PurseUref(purse_uref) =&gt; get_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::&lt;i64&gt;().to_string()),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 state_root_hash.into(),
                 purse_uref.into(),
@@ -643,7 +642,7 @@
             </span>.map_err(SdkError::from),
             GetBalanceInput::PurseUrefAsString(purse_uref) =&gt; get_balance_cli(
                 <span class="kw-2">&amp;</span>rand::thread_rng().gen::&lt;i64&gt;().to_string(),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 <span class="kw-2">&amp;</span>state_root_hash.to_string(),
                 <span class="kw-2">&amp;</span>purse_uref,
@@ -658,36 +657,43 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::helpers::public_key_from_secret_key;
-    <span class="kw">use </span>sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
+    <span class="kw">use </span>sdk_tests::tests::helpers::{
+        get_enable_addressable_entity, get_network_constants, get_user_secret_key,
+    };
 
     <span class="kw">async fn </span>get_main_purse() -&gt; URef {
-        <span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
-        <span class="kw">let </span>entity_result = sdk
-            .get_entity(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(account), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(node_address))
-            .<span class="kw">await
-            </span>.unwrap()
-            .result
-            .entity_result;
+        <span class="kw">let </span>main_purse = <span class="kw">if </span>get_enable_addressable_entity() {
+            sdk.get_entity(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(account), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(rpc_address))
+                .<span class="kw">await
+                </span>.unwrap()
+                .result
+                .entity_result
+                .addressable_entity()
+                .unwrap()
+                .entity
+                .main_purse()
+        } <span class="kw">else </span>{
+            <span class="attr">#[allow(deprecated)]
+            </span>sdk.get_account(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(account), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(rpc_address))
+                .<span class="kw">await
+                </span>.unwrap()
+                .result
+                .account
+                .main_purse()
+        };
 
-        <span class="kw">let </span>purse_uref = entity_result
-            .addressable_entity()
-            .unwrap()
-            .entity
-            .main_purse();
-
-        <span class="kw">let </span>purse_uref_value: URef = purse_uref.into();
-
-        purse_uref_value
+        main_purse.into()
     }
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_balance_with_none_values() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>purse_uref = GetBalanceInput::PurseUref(get_main_purse().<span class="kw">await</span>);
         <span class="kw">let </span>error_message = <span class="string">"builder error"</span>;
 
@@ -710,13 +716,13 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_balance_with_purse_uref() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
         <span class="kw">let </span>purse_uref = GetBalanceInput::PurseUref(get_main_purse().<span class="kw">await</span>);
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
-            .get_balance(<span class="string">""</span>, purse_uref, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(node_address))
+            .get_balance(<span class="string">""</span>, purse_uref, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(rpc_address))
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
@@ -726,14 +732,14 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_balance_with_purse_uref_as_string() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
         <span class="kw">let </span>purse_uref =
             GetBalanceInput::PurseUrefAsString(get_main_purse().<span class="kw">await</span>.to_formatted_string());
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
-            .get_balance(<span class="string">""</span>, purse_uref, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(node_address))
+            .get_balance(<span class="string">""</span>, purse_uref, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(rpc_address))
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
@@ -743,11 +749,11 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_balance_with_state_root_hash() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="kw">let </span>state_root_hash: Digest = sdk
-            .get_state_root_hash(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(Verbosity::High), <span class="prelude-val">Some</span>(node_address.clone()))
+            .get_state_root_hash(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(Verbosity::High), <span class="prelude-val">Some</span>(rpc_address.clone()))
             .<span class="kw">await
             </span>.unwrap()
             .result
@@ -762,7 +768,7 @@
                 state_root_hash.to_digest(),
                 purse_uref,
                 <span class="prelude-val">None</span>,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -773,7 +779,7 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_balance_with_error() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>error_message = <span class="string">"error sending request for url (http://localhost/rpc)"</span>;
         <span class="kw">let </span>purse_uref = GetBalanceInput::PurseUref(get_main_purse().<span class="kw">await</span>);
         <span class="comment">// Act

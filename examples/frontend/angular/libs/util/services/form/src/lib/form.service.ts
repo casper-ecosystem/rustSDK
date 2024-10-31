@@ -161,7 +161,6 @@ export class FormService {
           else if (input.disabled_when) {
             const fieldName: string = control.value && input.disabled_when?.find(field => field.includes('value'));
             const targetControlName = fieldName && fieldName.split('.')[0];
-            console.log(targetControlName);
             const targetControl = targetControlName && this.form?.get(targetControlName);
             if (targetControl) {
               targetControl.disable();

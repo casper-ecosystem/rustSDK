@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/transaction/transaction.rs`."><title>transaction.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/transaction/transaction.rs`."><title>transaction.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-590a400c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (759e07f06 2024-10-30)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../../static.files/storage-59e33391.js"></script><script defer src="../../../../static.files/src-script-56102188.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/transaction/</div>transaction.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -269,8 +270,13 @@
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::types::transaction_hash::TransactionHash;
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a></pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::types::hash::transaction_hash::TransactionHash;
 <span class="kw">use crate</span>::{
     types::{
         sdk_error::SdkError,
@@ -351,7 +357,7 @@
     /// * `transaction_params` - Transaction parameters.
     /// * `builder_params` - Session parameters.
     /// * `verbosity` - An optional verbosity level.
-    /// * `node_address` - An optional node address.
+    /// * `rpc_address` - An optional rpc address.
     ///
     /// # Returns
     ///
@@ -362,10 +368,10 @@
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PutTransactionResult, JsError&gt; {
         <span class="kw">let </span>result = <span class="self">self
-            </span>.transaction(builder_params, transaction_params, verbosity, node_address)
+            </span>.transaction(builder_params, transaction_params, verbosity, rpc_address)
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
@@ -385,7 +391,7 @@
     /// * `builder_params` - Transaction Builder parameters.
     /// * `transaction_params` - Transaction parameters.
     /// * `verbosity` - An optional verbosity level.
-    /// * `node_address` - An optional node address.
+    /// * `rpc_address` - An optional rpc address.
     ///
     /// # Returns
     ///
@@ -395,7 +401,7 @@
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_PutTransactionResult&gt;, SdkError&gt; {
         <span class="comment">//log("transaction!");
         </span><span class="kw">let </span>transaction = <span class="kw">match </span>make_transaction(
@@ -409,7 +415,7 @@
             }
         };
 
-        <span class="self">self</span>.put_transaction(transaction.into(), verbosity, node_address)
+        <span class="self">self</span>.put_transaction(transaction.into(), verbosity, rpc_address)
             .<span class="kw">await
             </span>.map_err(SdkError::from)
     }
@@ -417,6 +423,8 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::sync::Mutex;
+
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::helpers::public_key_from_secret_key;
     <span class="kw">use </span>once_cell::sync::Lazy;
@@ -428,33 +436,38 @@
     <span class="kw">static </span>ARGS: Lazy&lt;Vec&lt;String&gt;&gt; =
         Lazy::new(|| ARGS_SIMPLE.iter().map(|s| s.to_string()).collect());
 
-    <span class="kw">fn </span>get_builder_params() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>TransactionBuilderParams {
-        <span class="kw">static </span><span class="kw-2">mut </span>BUILDER_PARAMS: <span class="prelude-ty">Option</span>&lt;TransactionBuilderParams&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">static </span>BUILDER_PARAMS: Lazy&lt;Mutex&lt;<span class="prelude-ty">Option</span>&lt;TransactionBuilderParams&gt;&gt;&gt; =
+        Lazy::new(|| Mutex::new(<span class="prelude-val">None</span>));
 
-        <span class="kw">unsafe </span>{
-            <span class="kw">if </span>BUILDER_PARAMS.is_none() {
-                <span class="kw">let </span>file_path = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{WASM_PATH}{HELLO_CONTRACT}"</span>);
-                <span class="kw">let </span>transaction_bytes = <span class="kw">match </span>read_wasm_file(file_path) {
-                    <span class="prelude-val">Ok</span>(transaction_bytes) =&gt; transaction_bytes,
-                    <span class="prelude-val">Err</span>(err) =&gt; {
-                        <span class="macro">eprintln!</span>(<span class="string">"Error reading file: {:?}"</span>, err);
-                        <span class="macro">unimplemented!</span>()
-                    }
-                };
-                <span class="kw">let </span>builder_params =
-                    TransactionBuilderParams::new_session(<span class="prelude-val">Some</span>(transaction_bytes.into()));
-                BUILDER_PARAMS = <span class="prelude-val">Some</span>(builder_params);
-            }
-            BUILDER_PARAMS.as_ref().unwrap()
+    <span class="kw">fn </span>get_builder_params() -&gt; TransactionBuilderParams {
+        <span class="kw">let </span><span class="kw-2">mut </span>builder_params = BUILDER_PARAMS.lock().unwrap();
+
+        <span class="kw">if </span>builder_params.is_none() {
+            <span class="kw">let </span>file_path = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{WASM_PATH}{HELLO_CONTRACT}"</span>);
+            <span class="kw">let </span>transaction_bytes = <span class="kw">match </span>read_wasm_file(file_path) {
+                <span class="prelude-val">Ok</span>(transaction_bytes) =&gt; transaction_bytes,
+                <span class="prelude-val">Err</span>(err) =&gt; {
+                    <span class="macro">eprintln!</span>(<span class="string">"Error reading file: {:?}"</span>, err);
+                    <span class="macro">unimplemented!</span>()
+                }
+            };
+            <span class="kw">let </span>is_install_upgrade = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
+            <span class="kw">let </span>new_builder_params = TransactionBuilderParams::new_session(
+                <span class="prelude-val">Some</span>(transaction_bytes.into()),
+                is_install_upgrade,
+            );
+            <span class="kw-2">*</span>builder_params = <span class="prelude-val">Some</span>(new_builder_params);
         }
+
+        builder_params.clone().unwrap()
     }
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_transaction_with_valid_transaction_params() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
 
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_params = TransactionStrParams::default();
@@ -469,7 +482,7 @@
                 get_builder_params().clone(),
                 transaction_params,
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -480,12 +493,12 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_transaction_with_valid_transaction_params_without_secret_key() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>initiator_addr = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
-        <span class="kw">let </span>error_message = <span class="string">"Invalid transaction"</span>;
+        <span class="kw">let </span>error_message = <span class="string">"the transaction was invalid: invalid associated keys"</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(<span class="kw-2">&amp;</span>chain_name);
@@ -499,7 +512,7 @@
                 get_builder_params().clone(),
                 transaction_params,
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -512,25 +525,24 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_transaction_with_invalid_transaction_params() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
-        <span class="kw">let </span>error_message = <span class="string">"Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty"</span>;
+        <span class="kw">let </span>error_message = <span class="string">"The transaction sent to the network had an invalid chain name"</span>;
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
 
         <span class="kw">let </span>transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
-        transaction_params.set_chain_name(<span class="kw-2">&amp;</span>chain_name);
-        transaction_params.set_payment_amount(<span class="string">""</span>); <span class="comment">// This is not valid payment amount
+        transaction_params.set_chain_name(<span class="string">""</span>);
 
-        // Act
+        <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
             .transaction(
                 get_builder_params().clone(),
                 transaction_params,
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
         <span class="comment">// Assert

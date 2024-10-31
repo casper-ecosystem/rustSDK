@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "strict": false, // Turn off strict type checking
+    "noImplicitAny": false, // Allow implicit "any" type
+    "skipLibCheck": true // Skip type checking on libraries (like `.d.ts` files)
+  },
+  "exclude": ["tests", "node_modules"],
+  "include": ["pkg/**/*.ts"]
+}

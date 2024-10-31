@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/transaction.rs`."><title>transaction.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/transaction.rs`."><title>transaction.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-590a400c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (759e07f06 2024-10-30)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/types/</div>transaction.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -801,11 +802,296 @@
 <a href="#801" id="801">801</a>
 <a href="#802" id="802">802</a>
 <a href="#803" id="803">803</a>
-</pre></div><pre class="rust"><code><span class="kw">use super</span>::{
-    account_hash::AccountHash,
-    addressable_entity_hash::AddressableEntityHash,
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+<a href="#1069" id="1069">1069</a>
+<a href="#1070" id="1070">1070</a>
+<a href="#1071" id="1071">1071</a>
+<a href="#1072" id="1072">1072</a>
+<a href="#1073" id="1073">1073</a>
+<a href="#1074" id="1074">1074</a>
+<a href="#1075" id="1075">1075</a>
+<a href="#1076" id="1076">1076</a>
+<a href="#1077" id="1077">1077</a>
+<a href="#1078" id="1078">1078</a>
+<a href="#1079" id="1079">1079</a>
+<a href="#1080" id="1080">1080</a>
+<a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
+<a href="#1083" id="1083">1083</a>
+<a href="#1084" id="1084">1084</a>
+<a href="#1085" id="1085">1085</a>
+<a href="#1086" id="1086">1086</a></pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::helpers::insert_js_value_arg;
+<span class="kw">use </span><span class="kw">crate</span>::types::{
     cl::bytes::Bytes,
-    package_hash::PackageHash,
+    hash::{
+        account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
+        package_hash::PackageHash,
+    },
     public_key::PublicKey,
     sdk_error::SdkError,
     transaction_params::{
@@ -814,8 +1100,6 @@
     },
     uref::URef,
 };
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::helpers::insert_js_value_arg;
 <span class="kw">use crate</span>::{
     debug::{error, log},
     helpers::{
@@ -824,14 +1108,20 @@
     },
     make_transaction,
     make_transfer_transaction::make_transfer_transaction,
-    types::transaction_hash::TransactionHash,
+    types::{
+        digest::Digest,
+        hash::transaction_hash::TransactionHash,
+        pricing_mode::PricingMode,
+        transaction_params::transaction_builder_params::{TransferTarget, TransferTargetKind},
+    },
 };
 <span class="kw">use </span>casper_types::{
-    bytesrepr::{<span class="self">self</span>, Bytes <span class="kw">as </span>_Bytes},
-    transaction::Transaction <span class="kw">as </span>_Transaction,
-    Approval, ApprovalsHash, AsymmetricType, Deploy, InitiatorAddr, PricingMode, RuntimeArgs,
-    SecretKey, TimeDiff, Timestamp, TransactionHeader, TransactionV1, TransactionV1Body,
-    TransactionV1Builder,
+    account::AccountHash <span class="kw">as </span>_AccountHash,
+    bytesrepr::{<span class="self">self</span>, Bytes <span class="kw">as </span>_Bytes, ToBytes},
+    Approval, ApprovalsHash, AsymmetricType, Deploy, GasLimited, InitiatorAddr,
+    PublicKey <span class="kw">as </span>_PublicKey, RuntimeArgs, Timestamp, Transaction <span class="kw">as </span>_Transaction,
+    TransactionEntryPoint, TransactionInvocationTarget, TransactionTarget, TransactionV1,
+    URef <span class="kw">as </span>_URef, U512,
 };
 <span class="kw">use </span>chrono::{DateTime, Utc};
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -844,16 +1134,10 @@
 #[wasm_bindgen]
 </span><span class="kw">pub struct </span>Transaction(_Transaction);
 
-<span class="attr">#[derive(Default)]
-</span><span class="kw">struct </span>BuildParams {
-    chain_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-    ttl: <span class="prelude-ty">Option</span>&lt;TimeDiff&gt;,
-    body: <span class="prelude-ty">Option</span>&lt;TransactionV1Body&gt;,
-    pricing_mode: <span class="prelude-ty">Option</span>&lt;PricingMode&gt;,
-    initiator_addr: <span class="prelude-ty">Option</span>&lt;InitiatorAddr&gt;,
-    secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
-}
+<span class="kw">const </span>ARGS_MAP_KEY: u16 = <span class="number">0</span>;
+<span class="kw">const </span>TARGET_MAP_KEY: u16 = <span class="number">1</span>;
+<span class="kw">const </span>ENTRY_POINT_MAP_KEY: u16 = <span class="number">2</span>;
+<span class="kw">const </span>DEFAULT_GAS_PRICE_TOLERANCE: u8 = <span class="number">1</span>;
 
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">impl </span>Transaction {
@@ -920,11 +1204,14 @@
             error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing TTL: {}"</span>, err));
             ttl = parse_ttl(<span class="kw-2">&amp;</span>get_ttl_or_default(<span class="prelude-val">None</span>));
         }
-        <span class="self">self</span>.build(BuildParams {
-            secret_key,
-            ttl: <span class="prelude-val">Some</span>(ttl.unwrap()),
-            ..Default::default()
-        })
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(ttl) = ttl {
+            transaction_params.set_ttl(<span class="prelude-val">Some</span>(ttl.to_string()));
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
+            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        }
+        <span class="self">self</span>.rebuild(transaction_params, NewBuilderParams::default())
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withTimestamp"</span>)]
@@ -934,20 +1221,24 @@
             error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing Timestamp: {}"</span>, err));
             timestamp = parse_timestamp(<span class="kw-2">&amp;</span>get_current_timestamp(<span class="prelude-val">None</span>));
         }
-        <span class="self">self</span>.build(BuildParams {
-            secret_key,
-            timestamp: <span class="prelude-val">Some</span>(timestamp.unwrap()),
-            ..Default::default()
-        })
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(timestamp) = timestamp {
+            transaction_params.set_timestamp(<span class="prelude-val">Some</span>(timestamp.to_string()));
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
+            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        }
+        <span class="self">self</span>.rebuild(transaction_params, NewBuilderParams::default())
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withChainName"</span>)]
     </span><span class="kw">pub fn </span>with_chain_name(<span class="kw-2">&amp;</span><span class="self">self</span>, chain_name: <span class="kw-2">&amp;</span>str, secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; Transaction {
-        <span class="self">self</span>.build(BuildParams {
-            secret_key,
-            chain_name: <span class="prelude-val">Some</span>(chain_name.to_string()),
-            ..Default::default()
-        })
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        transaction_params.set_chain_name(chain_name);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
+            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        }
+        <span class="self">self</span>.rebuild(transaction_params, NewBuilderParams::default())
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withPublicKey"</span>)]
@@ -956,11 +1247,13 @@
         public_key: PublicKey,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; Transaction {
-        <span class="self">self</span>.build(BuildParams {
-            secret_key,
-            initiator_addr: <span class="prelude-val">Some</span>(InitiatorAddr::PublicKey(public_key.into())),
-            ..Default::default()
-        })
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        transaction_params
+            .set_initiator_addr(<span class="kw-2">&amp;</span>InitiatorAddr::PublicKey(public_key.into()).to_string());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
+            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        }
+        <span class="self">self</span>.rebuild(transaction_params, NewBuilderParams::default())
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withAccountHash"</span>)]
@@ -969,26 +1262,26 @@
         account_hash: AccountHash,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; Transaction {
-        <span class="self">self</span>.build(BuildParams {
-            secret_key,
-            initiator_addr: <span class="prelude-val">Some</span>(InitiatorAddr::AccountHash(account_hash.into())),
-            ..Default::default()
-        })
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        transaction_params
+            .set_initiator_addr(<span class="kw-2">&amp;</span>InitiatorAddr::AccountHash(account_hash.into()).to_string());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
+            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        }
+        <span class="self">self</span>.rebuild(transaction_params, NewBuilderParams::default())
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withEntryPoint"</span>)]
     </span><span class="kw">pub fn </span>with_entry_point(<span class="kw-2">&amp;</span><span class="self">self</span>, entry_point: <span class="kw-2">&amp;</span>str, secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; Transaction {
-        <span class="self">self</span>.build(BuildParams {
-            secret_key,
-            body: <span class="prelude-val">Some</span>(modify_body(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.body(),
-                NewBodyParams {
-                    new_entry_point: <span class="prelude-val">Some</span>(entry_point.to_string()),
-                    ..Default::default()
-                },
-            )),
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
+            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        }
+        <span class="kw">let </span>new_builder_params = NewBuilderParams::&lt;<span class="lifetime">'_</span>&gt; {
+            new_entry_point: <span class="prelude-val">Some</span>(entry_point.to_string()),
             ..Default::default()
-        })
+        };
+        <span class="self">self</span>.rebuild(transaction_params, new_builder_params)
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withEntityHash"</span>)]
@@ -997,17 +1290,15 @@
         hash: AddressableEntityHash,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; Transaction {
-        <span class="self">self</span>.build(BuildParams {
-            secret_key,
-            body: <span class="prelude-val">Some</span>(modify_body(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.body(),
-                NewBodyParams {
-                    new_hash: <span class="prelude-val">Some</span>(hash),
-                    ..Default::default()
-                },
-            )),
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
+            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        }
+        <span class="kw">let </span>new_builder_params = NewBuilderParams::&lt;<span class="lifetime">'_</span>&gt; {
+            new_hash: <span class="prelude-val">Some</span>(hash),
             ..Default::default()
-        })
+        };
+        <span class="self">self</span>.rebuild(transaction_params, new_builder_params)
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withPackageHash"</span>)]
@@ -1016,68 +1307,48 @@
         package_hash: PackageHash,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; Transaction {
-        <span class="self">self</span>.build(BuildParams {
-            secret_key,
-            body: <span class="prelude-val">Some</span>(modify_body(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.body(),
-                NewBodyParams {
-                    new_package_hash: <span class="prelude-val">Some</span>(package_hash),
-                    ..Default::default()
-                },
-            )),
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
+            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        }
+        <span class="kw">let </span>new_builder_params = NewBuilderParams::&lt;<span class="lifetime">'_</span>&gt; {
+            new_package_hash: <span class="prelude-val">Some</span>(package_hash),
             ..Default::default()
-        })
+        };
+        <span class="self">self</span>.rebuild(transaction_params, new_builder_params)
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withTransactionBytes"</span>)]
     </span><span class="kw">pub fn </span>with_transaction_bytes(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         transaction_bytes: Bytes,
+        is_install_upgrade: <span class="prelude-ty">Option</span>&lt;bool&gt;,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; Transaction {
-        <span class="self">self</span>.build(BuildParams {
-            secret_key,
-            body: <span class="prelude-val">Some</span>(modify_body(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.body(),
-                NewBodyParams {
-                    new_transaction_bytes: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>transaction_bytes),
-                    ..Default::default()
-                },
-            )),
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
+            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        }
+        <span class="kw">let </span>new_builder_params = NewBuilderParams::&lt;<span class="lifetime">'_</span>&gt; {
+            new_transaction_bytes: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>transaction_bytes),
+            new_is_install_upgrade: is_install_upgrade,
             ..Default::default()
-        })
+        };
+        <span class="self">self</span>.rebuild(transaction_params, new_builder_params)
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withSecretKey"</span>)]
     </span><span class="kw">pub fn </span>with_secret_key(<span class="kw-2">&amp;</span><span class="self">self</span>, secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; Transaction {
-        <span class="self">self</span>.build(BuildParams {
-            secret_key,
-            ..Default::default()
-        })
-    }
-
-    <span class="comment">// Load body from json
-    </span><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-    #[wasm_bindgen(js_name = <span class="string">"withBody"</span>)]
-    </span><span class="kw">pub fn </span>with_body(<span class="kw-2">&amp;</span><span class="self">self</span>, body: JsValue, secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; Transaction {
-        <span class="kw">let </span>body_item_result = body.into_serde();
-
-        <span class="kw">match </span>body_item_result {
-            <span class="prelude-val">Ok</span>(body_item) =&gt; <span class="self">self</span>.build(BuildParams {
-                secret_key,
-                body: <span class="prelude-val">Some</span>(body_item),
-                ..Default::default()
-            }),
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing body: {}"</span>, err));
-                <span class="self">self</span>.<span class="number">0</span>.clone().into()
-            }
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
+            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
         }
+        <span class="self">self</span>.rebuild(transaction_params, NewBuilderParams::default())
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"verify"</span>)]
     </span><span class="kw">pub fn </span>verify(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.clone().verify() {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.verify() {
             <span class="prelude-val">Ok</span>(()) =&gt; <span class="bool-val">true</span>,
             <span class="prelude-val">Err</span>(err) =&gt; {
                 log(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Warning Transaction is not valid: {:?}"</span>, err));
@@ -1088,7 +1359,7 @@
 
     <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TransactionHash {
-        <span class="self">self</span>.<span class="number">0</span>.clone().hash().into()
+        <span class="self">self</span>.<span class="number">0</span>.hash().into()
     }
 
     <span class="attr">#[wasm_bindgen(getter)]
@@ -1096,7 +1367,7 @@
         <span class="kw">let </span>now: DateTime&lt;Utc&gt; = Utc::now();
         <span class="kw">let </span>now_millis = now.timestamp_millis() <span class="kw">as </span>u64;
         <span class="kw">let </span>timestamp = Timestamp::from(now_millis);
-        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.clone().expired(timestamp) {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.expired(timestamp) {
             <span class="bool-val">false </span>=&gt; <span class="bool-val">false</span>,
             <span class="bool-val">true </span>=&gt; {
                 error(<span class="string">"Transaction has expired"</span>);
@@ -1154,7 +1425,7 @@
         }
         transaction.sign(<span class="kw-2">&amp;</span>secret_key_from_pem.unwrap());
         <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = transaction.verify() {
-            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Transaction has not a valid: {:?}"</span>, err));
+            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Transaction is not a valid: {:?}"</span>, err));
         }
         transaction.into()
     }
@@ -1186,26 +1457,40 @@
         }
     }
 
+    <span class="attr">#[wasm_bindgen(getter)]
+    </span><span class="kw">pub fn </span>is_native(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+            _Transaction::Deploy(deploy) =&gt; deploy.is_transfer(),
+            _Transaction::V1(_transaction_v1) =&gt; {
+                <span class="kw">match </span><span class="self">self</span>.target() {
+                    <span class="prelude-val">Ok</span>(target) =&gt; target == TransactionTarget::Native,
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>, <span class="comment">// Return false on error
+                </span>}
+            }
+        }
+    }
+
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-    #[wasm_bindgen(getter, js_name = <span class="string">"header"</span>)]
-    </span><span class="kw">pub fn </span>header_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
-        <span class="kw">match </span>JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.header()) {
-            <span class="prelude-val">Ok</span>(json) =&gt; json,
+    #[wasm_bindgen(getter, js_name = <span class="string">"target"</span>)]
+    </span><span class="kw">pub fn </span>target_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
+        <span class="kw">match </span><span class="self">self</span>.target() {
+            <span class="prelude-val">Ok</span>(target_value) =&gt; <span class="kw">match </span>JsValue::from_serde(<span class="kw-2">&amp;</span>target_value) {
+                <span class="prelude-val">Ok</span>(json) =&gt; json,
+                <span class="prelude-val">Err</span>(err) =&gt; {
+                    error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error serializing target to JSON: {:?}"</span>, err));
+                    JsValue::null()
+                }
+            },
             <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error serializing header to JSON: {:?}"</span>, err));
+                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error retrieving target: {:?}"</span>, err));
                 JsValue::null()
             }
         }
     }
 
     <span class="attr">#[wasm_bindgen(getter)]
-    </span><span class="kw">pub fn </span>is_native(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.<span class="number">0</span>.clone().is_native()
-    }
-
-    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>is_standard_payment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.<span class="number">0</span>.clone().is_standard_payment()
+        <span class="self">self</span>.<span class="number">0</span>.is_standard_payment()
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -1267,35 +1552,41 @@
 
     <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>entry_point(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="self">self</span>.<span class="number">0</span>.clone().entry_point().to_string()
-    }
-
-    <span class="attr">#[wasm_bindgen(getter)]
-    </span><span class="kw">pub fn </span>ttl(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="self">self</span>.<span class="number">0</span>.clone().ttl().to_string()
-    }
-
-    <span class="attr">#[wasm_bindgen(getter)]
-    </span><span class="kw">pub fn </span>timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="self">self</span>.<span class="number">0</span>.clone().timestamp().to_string()
-    }
-
-    <span class="attr">#[wasm_bindgen(getter)]
-    </span><span class="kw">pub fn </span>size_estimate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="self">self</span>.<span class="number">0</span>.clone().size_estimate()
-    }
-
-    <span class="attr">#[wasm_bindgen(getter)]
-    </span><span class="kw">pub fn </span>chain_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.header() {
-            TransactionHeader::Deploy(header) =&gt; header.chain_name().to_string(),
-            TransactionHeader::V1(header) =&gt; header.chain_name().to_string(),
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+            _Transaction::Deploy(deploy) =&gt; deploy.session().entry_point_name().into(),
+            _Transaction::V1(transaction_v1) =&gt; {
+                <span class="kw">match </span>transaction_v1.deserialize_field::&lt;TransactionEntryPoint&gt;(ENTRY_POINT_MAP_KEY)
+                {
+                    <span class="prelude-val">Ok</span>(entry_point) =&gt; entry_point.to_string(),
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; String::new(), <span class="comment">// Return an empty string on error
+                </span>}
+            }
         }
     }
 
     <span class="attr">#[wasm_bindgen(getter)]
+    </span><span class="kw">pub fn </span>ttl(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.<span class="number">0</span>.ttl().to_string()
+    }
+
+    <span class="attr">#[wasm_bindgen(getter)]
+    </span><span class="kw">pub fn </span>timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.<span class="number">0</span>.timestamp().to_string()
+    }
+
+    <span class="attr">#[wasm_bindgen(getter)]
+    </span><span class="kw">pub fn </span>size_estimate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.<span class="number">0</span>.size_estimate()
+    }
+
+    <span class="attr">#[wasm_bindgen(getter)]
+    </span><span class="kw">pub fn </span>chain_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.<span class="number">0</span>.chain_name()
+    }
+
+    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>initiator_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="kw">let </span>initiator_addr: InitiatorAddr = <span class="self">self</span>.<span class="number">0</span>.clone().initiator_addr().clone();
+        <span class="kw">let </span>initiator_addr: InitiatorAddr = <span class="self">self</span>.<span class="number">0</span>.initiator_addr().clone();
         <span class="kw">match </span>initiator_addr {
             InitiatorAddr::PublicKey(public_key) =&gt; public_key.to_hex(),
             InitiatorAddr::AccountHash(hash) =&gt; hash.to_formatted_string(),
@@ -1303,8 +1594,51 @@
     }
 
     <span class="attr">#[wasm_bindgen(getter)]
+    </span><span class="kw">pub fn </span>pricing_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PricingMode {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+            _Transaction::Deploy(_deploy) =&gt; {
+                <span class="macro">unimplemented!</span>(<span class="string">"pricing_mode not implemented in deploy!"</span>)
+            }
+            _Transaction::V1(transaction_v1) =&gt; transaction_v1.pricing_mode().clone().into(),
+        }
+    }
+
+    <span class="attr">#[wasm_bindgen(getter)]
+    </span><span class="kw">pub fn </span>additional_computation_factor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+            _Transaction::Deploy(_deploy) =&gt; {
+                <span class="macro">unimplemented!</span>(<span class="string">"additional_computation_factor not implemented in deploy!"</span>)
+            }
+            _Transaction::V1(transaction_v1) =&gt; transaction_v1
+                .pricing_mode()
+                .additional_computation_factor(),
+        }
+    }
+
+    <span class="attr">#[wasm_bindgen(getter)]
+    </span><span class="kw">pub fn </span>receipt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Digest {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+            _Transaction::Deploy(_deploy) =&gt; {
+                <span class="macro">unimplemented!</span>(<span class="string">"receipt not implemented in deploy!"</span>)
+            } <span class="comment">// TODO
+            // _Transaction::V1(transaction_v1) =&gt; transaction_v1.pricing_mode().receipt().into(),
+            </span>_Transaction::V1(_transaction_v1) =&gt; Digest::new(<span class="string">"0"</span>).unwrap(),
+        }
+    }
+
+    <span class="attr">#[wasm_bindgen(getter)]
+    </span><span class="kw">pub fn </span>gas_price_tolerance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+            _Transaction::Deploy(deploy) =&gt; deploy
+                .gas_price_tolerance()
+                .unwrap_or(DEFAULT_GAS_PRICE_TOLERANCE),
+            _Transaction::V1(transaction_v1) =&gt; transaction_v1.gas_price_tolerance(),
+        }
+    }
+
+    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>account_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AccountHash {
-        <span class="kw">let </span>initiator_addr: InitiatorAddr = <span class="self">self</span>.<span class="number">0</span>.clone().initiator_addr().clone();
+        <span class="kw">let </span>initiator_addr: InitiatorAddr = <span class="self">self</span>.<span class="number">0</span>.initiator_addr().clone();
         initiator_addr.account_hash().into()
     }
 
@@ -1315,76 +1649,79 @@
         js_value_arg: JsValue,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Transaction, JsError&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>args = <span class="self">self</span>.<span class="number">0</span>.clone().session_args().clone();
+        <span class="kw">let </span><span class="kw-2">mut </span>args = <span class="self">self</span>.session_args().clone();
         <span class="kw">let </span>new_args = <span class="kw">match </span>insert_js_value_arg(<span class="kw-2">&amp;mut </span>args, js_value_arg) {
             <span class="prelude-val">Ok</span>(new_args) =&gt; new_args,
             <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error adding argument: {}"</span>, err))),
         };
-        <span class="kw">let </span>new_body = modify_body(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.body(),
-            NewBodyParams {
-                new_args: <span class="prelude-val">Some</span>(new_args),
-                ..Default::default()
-            },
-        );
-
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.build(BuildParams {
-            secret_key,
-            body: <span class="prelude-val">Some</span>(new_body),
-            ..Default::default()
-        }))
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.add_arg_common(new_args, secret_key))
     }
 }
 
 <span class="kw">impl </span>Transaction {
     <span class="kw">pub fn </span>session_args(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RuntimeArgs {
-        <span class="self">self</span>.<span class="number">0</span>.clone().session_args().clone()
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+            _Transaction::Deploy(deploy) =&gt; deploy.session().args().clone(),
+            _Transaction::V1(transaction_v1) =&gt; transaction_v1
+                .deserialize_field::&lt;RuntimeArgs&gt;(ARGS_MAP_KEY)
+                .unwrap_or_default(),
+        }
     }
 
-    <span class="kw">fn </span>body(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TransactionV1Body {
-        <span class="kw">let </span>body = <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.clone() {
-            _Transaction::Deploy(_deploy) =&gt; <span class="macro">todo!</span>(<span class="string">"deploy body in transaction"</span>),
-            _Transaction::V1(<span class="kw-2">ref </span>transaction_v1) =&gt; transaction_v1.body().clone(),
-        };
-        body
+    <span class="kw">pub fn </span>target(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionTarget, SdkError&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+            _Transaction::Deploy(_deploy) =&gt; <span class="macro">unimplemented!</span>(<span class="string">"target not implemented for deploy!"</span>),
+            _Transaction::V1(transaction_v1) =&gt; transaction_v1
+                .deserialize_field::&lt;TransactionTarget&gt;(TARGET_MAP_KEY)
+                .map_err(|err| SdkError::FieldDeserialization {
+                    index: TARGET_MAP_KEY,
+                    error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
+                }),
+        }
     }
 
     <span class="kw">pub fn </span>add_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_value_arg: String, secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; Transaction {
-        <span class="kw">let </span><span class="kw-2">mut </span>args = <span class="self">self</span>.<span class="number">0</span>.clone().session_args().clone();
-        <span class="kw">let </span>new_args = insert_arg(<span class="kw-2">&amp;mut </span>args, new_value_arg);
-        <span class="kw">let </span>new_body = modify_body(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.body(),
-            NewBodyParams {
-                new_args: <span class="prelude-val">Some</span>(new_args),
-                ..Default::default()
-            },
-        );
+        <span class="kw">let </span><span class="kw-2">mut </span>session_args = <span class="self">self</span>.session_args().clone();
+        <span class="kw">let </span>new_args = insert_arg(<span class="kw-2">&amp;mut </span>session_args, new_value_arg);
+        <span class="self">self</span>.add_arg_common(new_args, secret_key)
+    }
 
-        <span class="self">self</span>.build(BuildParams {
-            secret_key,
-            body: <span class="prelude-val">Some</span>(new_body),
-            ..Default::default()
-        })
+    <span class="kw">fn </span>add_arg_common(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        new_args: <span class="kw-2">&amp;</span>RuntimeArgs,
+        secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; Transaction {
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
+            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        }
+        <span class="kw">let </span>json_array = <span class="self">self</span>.args_to_json_array(new_args);
+
+        <span class="comment">// Convert the json_array to a JSON string and set it in the transaction params
+        </span>transaction_params.set_session_args_json(<span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>json_array).unwrap());
+
+        <span class="self">self</span>.rebuild(transaction_params, NewBuilderParams::default())
     }
 
     <span class="kw">pub fn </span>to_json_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, SdkError&gt; {
         serde_json::to_string(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).map_err(SdkError::from)
     }
 
+    <span class="kw">pub fn </span>from_json_string(json_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Deploy, SdkError&gt; {
+        serde_json::from_str(json_str).map_err(Into::into)
+    }
+
     <span class="kw">pub fn </span>compute_approvals_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ApprovalsHash, bytesrepr::Error&gt; {
-        <span class="self">self</span>.<span class="number">0</span>.clone().compute_approvals_hash()
+        <span class="self">self</span>.<span class="number">0</span>.compute_approvals_hash()
     }
 
     <span class="kw">pub fn </span>approvals(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Approval&gt; {
-        <span class="self">self</span>.<span class="number">0</span>.clone().approvals().iter().cloned().collect()
-    }
-
-    <span class="kw">pub fn </span>header(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TransactionHeader {
-        <span class="self">self</span>.<span class="number">0</span>.clone().header()
+        <span class="self">self</span>.<span class="number">0</span>.approvals().iter().cloned().collect()
     }
 
     <span class="kw">pub fn </span>expires(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Timestamp {
-        <span class="self">self</span>.<span class="number">0</span>.clone().expires()
+        <span class="self">self</span>.<span class="number">0</span>.expires()
     }
 
     <span class="kw">pub fn </span>signers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;AccountHash&gt; {
@@ -1397,188 +1734,321 @@
     }
 
     <span class="kw">pub fn </span>authorization_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;AccountHash&gt; {
-        <span class="self">self</span>.<span class="number">0
-            </span>.clone()
-            .authorization_keys()
-            .into_iter()
+        <span class="self">self</span>.approvals()
+            .iter()
+            .map(|approval| approval.signer().to_account_hash())
             .map(Into::into)
             .collect()
     }
 
-    <span class="kw">fn </span>build(<span class="kw-2">&amp;</span><span class="self">self</span>, transaction_params: BuildParams) -&gt; Transaction {
-        <span class="kw">let </span>BuildParams {
-            chain_name,
-            ttl,
-            timestamp,
-            initiator_addr,
-            body,
-            pricing_mode,
-            secret_key,
-        } = transaction_params;
-        <span class="kw">let </span>transaction = <span class="self">self</span>.<span class="number">0</span>.clone();
-        <span class="kw">let </span>chain_name = <span class="kw">if let </span><span class="prelude-val">Some</span>(chain_name) = chain_name {
+    <span class="kw">fn </span>args_to_json_array(<span class="kw-2">&amp;</span><span class="self">self</span>, new_args: <span class="kw-2">&amp;</span>RuntimeArgs) -&gt; Vec&lt;serde_json::Value&gt; {
+        new_args
+            .named_args()
+            .map(|named_arg| {
+                <span class="kw">let </span>name = named_arg.name().to_string();
+                <span class="kw">let </span>cl_value = named_arg.cl_value();
+                <span class="comment">// let cl_type = cl_value.cl_type().to_string();
+                // let capitalized_type = cl_type
+                //     .chars()
+                //     .next()
+                //     .map(|c| c.to_uppercase().collect::&lt;String&gt;() + &amp;cl_type[1..])
+                //     .unwrap_or_default();
+
+                // let value_json: serde_json::Value =
+                //     serde_json::to_value(cl_value).unwrap_or(serde_json::Value::Null);
+
+                // let value = value_json
+                //     .get("parsed")
+                //     .cloned()
+                //     .unwrap_or(serde_json::Value::Null);
+
+                </span><span class="kw">let </span>bytes = cl_value.to_bytes().unwrap_or_default();
+                <span class="kw">let </span>size = bytes.len();
+
+                <span class="kw">let </span>json_value = <span class="macro">json!</span>({
+                    <span class="string">"name"</span>: name,
+                    <span class="string">"type"</span>: <span class="macro">json!</span>({ <span class="string">"ByteArray"</span>: size }),
+                    <span class="string">"value"</span>: bytes,
+                });
+                json_value
+            })
+            .collect()
+    }
+
+    <span class="kw">fn </span>rebuild(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        transaction_params: TransactionStrParams,
+        new_builder_params: NewBuilderParams,
+    ) -&gt; Transaction {
+        <span class="kw">let </span>chain_name = <span class="kw">if let </span><span class="prelude-val">Some</span>(chain_name) = transaction_params.chain_name() {
             chain_name
         } <span class="kw">else </span>{
             <span class="self">self</span>.chain_name()
         };
-        <span class="kw">let </span>ttl = <span class="kw">if let </span><span class="prelude-val">Some</span>(ttl) = ttl {
+        <span class="kw">let </span>ttl = <span class="kw">if let </span><span class="prelude-val">Some</span>(ttl) = transaction_params.ttl() {
             ttl
         } <span class="kw">else </span>{
-            transaction.ttl()
+            <span class="self">self</span>.ttl().to_string()
         };
-        <span class="kw">let </span>timestamp = <span class="kw">if let </span><span class="prelude-val">Some</span>(timestamp) = timestamp {
+        <span class="kw">let </span>timestamp = <span class="kw">if let </span><span class="prelude-val">Some</span>(timestamp) = transaction_params.timestamp() {
             timestamp
         } <span class="kw">else </span>{
-            transaction.timestamp()
+            <span class="self">self</span>.timestamp().to_string()
         };
 
-        <span class="kw">let </span>initiator_addr = <span class="kw">if let </span><span class="prelude-val">Some</span>(initiator_addr) = initiator_addr {
+        <span class="kw">let </span>initiator_addr = <span class="kw">if let </span><span class="prelude-val">Some</span>(initiator_addr) = transaction_params.initiator_addr() {
             initiator_addr
         } <span class="kw">else </span>{
-            transaction.initiator_addr().clone()
+            <span class="self">self</span>.initiator_addr().to_string()
         };
 
-        <span class="kw">let </span>body = <span class="kw">if let </span><span class="prelude-val">Some</span>(body) = body {
-            body
-        } <span class="kw">else </span>{
-            <span class="kw">match </span>transaction {
-                _Transaction::Deploy(_deploy) =&gt; <span class="macro">todo!</span>(<span class="string">"deploy body in transaction"</span>),
-                _Transaction::V1(<span class="kw-2">ref </span>transaction_v1) =&gt; transaction_v1.body().clone(),
-            }
-        };
+        <span class="kw">let </span>new_transaction_params = TransactionStrParams::new_with_defaults(
+            <span class="kw-2">&amp;</span>chain_name,
+            <span class="prelude-val">Some</span>(initiator_addr),
+            transaction_params.secret_key(),
+            <span class="prelude-val">Some</span>(ttl),
+        );
 
-        <span class="kw">let </span>pricing_mode = <span class="kw">if let </span><span class="prelude-val">Some</span>(pricing_mode) = pricing_mode {
+        new_transaction_params.set_timestamp(<span class="prelude-val">Some</span>(timestamp));
+
+        <span class="kw">let </span>pricing_mode = <span class="kw">if let </span><span class="prelude-val">Some</span>(pricing_mode) = transaction_params.pricing_mode() {
             pricing_mode
         } <span class="kw">else </span>{
-            <span class="kw">match </span>transaction {
-                _Transaction::Deploy(_deploy) =&gt; <span class="macro">todo!</span>(<span class="string">"deploy pricing_mode in transaction"</span>),
-                _Transaction::V1(transaction_v1) =&gt; transaction_v1.pricing_mode().clone(),
-            }
+            <span class="self">self</span>.pricing_mode()
         };
 
-        <span class="kw">let </span><span class="kw-2">mut </span>transaction_builder = TransactionV1Builder::new(body)
-            .with_chain_name(chain_name)
-            .with_pricing_mode(pricing_mode)
-            .with_initiator_addr(initiator_addr)
-            .with_ttl(ttl)
-            .with_timestamp(timestamp);
+        <span class="kw">let </span>receipt = <span class="kw">if </span>pricing_mode == PricingMode::Reserved {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(receipt) = transaction_params.receipt() {
+                receipt
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.receipt().to_string()
+            }
+        } <span class="kw">else </span>{
+            String::new()
+        };
 
-        <span class="kw">let </span>secret_key_result = secret_key
-            .clone()
-            .map(|key| secret_key_from_pem(<span class="kw-2">&amp;</span>key).unwrap())
-            .unwrap_or_else(|| {
-                <span class="kw">if </span>secret_key.is_some() {
-                    error(<span class="string">"Error loading secret key"</span>);
-                }
-                <span class="comment">// Default will never be used in next if secret_key.is_some()
-                </span>SecretKey::generate_ed25519().unwrap()
-            });
-        <span class="kw">if </span>secret_key.is_some() {
-            transaction_builder = transaction_builder.with_secret_key(<span class="kw-2">&amp;</span>secret_key_result);
+        <span class="kw">let </span>additional_computation_factor = <span class="kw">if let </span><span class="prelude-val">Some</span>(additional_computation_factor) =
+            transaction_params.additional_computation_factor()
+        {
+            additional_computation_factor
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.additional_computation_factor().to_string()
+        };
+
+        <span class="kw">let </span>gas_price_tolerance =
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(gas_price_tolerance) = transaction_params.gas_price_tolerance() {
+                gas_price_tolerance
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.gas_price_tolerance().to_string()
+            };
+
+        new_transaction_params.set_pricing_mode(pricing_mode);
+
+        <span class="kw">if </span>!receipt.is_empty() {
+            new_transaction_params.set_receipt(<span class="kw-2">&amp;</span>receipt);
         }
-        <span class="kw">let </span>transaction = transaction_builder
-            .build()
-            .map_err(|err| error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Failed to build transaction: {:?}"</span>, err)))
-            .unwrap();
+        <span class="kw">if </span>!additional_computation_factor.is_empty() {
+            new_transaction_params
+                .set_additional_computation_factor(<span class="kw-2">&amp;</span>additional_computation_factor);
+        }
+        <span class="kw">if </span>!gas_price_tolerance.is_empty() {
+            new_transaction_params.set_gas_price_tolerance(<span class="kw-2">&amp;</span>gas_price_tolerance);
+        }
 
-        <span class="kw">let </span>transaction: Transaction = transaction.into();
-        <span class="comment">// let _ = transaction.validate_transaction_size();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(session_args_json) = transaction_params.session_args_json() {
+            new_transaction_params.set_session_args_json(<span class="kw-2">&amp;</span>session_args_json);
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>json_array = <span class="self">self</span>.args_to_json_array(<span class="kw-2">&amp;</span><span class="self">self</span>.session_args());
+            new_transaction_params.set_session_args_json(
+                <span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>json_array)
+                    .map_err(|err| error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Failed to deserialize args: {:?}"</span>, err)))
+                    .unwrap(),
+            );
+        }
+
+        <span class="kw">let </span>builder_params = <span class="self">self</span>.make_transaction_builder_params(new_builder_params);
+
+        <span class="kw">let </span>transaction: Transaction = make_transaction(builder_params, new_transaction_params)
+            .map(Into::into)
+            .map_err(|err| {
+                <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error building transaction: {}"</span>, err);
+                log(<span class="kw-2">&amp;</span>err_msg);
+                err_msg
+            })
+            .unwrap();
+        <span class="comment">// let _ = transaction.verify();
         </span>transaction
+    }
+
+    <span class="kw">fn </span>make_transaction_builder_params(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        NewBuilderParams {
+            new_hash,
+            new_package_hash,
+            new_entry_point,
+            new_alias,
+            new_version,
+            new_transaction_bytes,
+            new_is_install_upgrade,
+        }: NewBuilderParams,
+    ) -&gt; TransactionBuilderParams {
+        <span class="kw">let </span>target = <span class="self">self
+            </span>.target()
+            .map_err(|err| error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Failed to get transaction target: {:?}"</span>, err)))
+            .unwrap();
+        <span class="kw">let </span>entry_point = new_entry_point.unwrap_or_else(|| <span class="self">self</span>.entry_point().clone());
+
+        <span class="kw">match </span>target {
+            TransactionTarget::Native =&gt; <span class="kw">match </span>entry_point.as_str() {
+                <span class="comment">// "add_bid" =&gt; TransactionBuilderParams::new_add_bid(
+                //     self.public_key().clone(),
+                //     self.delegation_rate(),
+                //     &amp;self.amount(),
+                //     self.min_delegation_amount(),
+                //     self.max_delegation_amount(),
+                // ),
+                // "delegate" =&gt; TransactionBuilderParams::new_delegate(
+                //     self.delegator_key().clone(),
+                //     self.validator_key().clone(),
+                //     &amp;self.amount(),
+                // ),
+                // "undelegate" =&gt; TransactionBuilderParams::new_undelegate(
+                //     self.delegator_key().clone(),
+                //     self.validator_key().clone(),
+                //     &amp;self.amount(),
+                // ),
+                // "redelegate" =&gt; TransactionBuilderParams::new_redelegate(
+                //     self.delegator_key().clone(),
+                //     self.validator_key().clone(),
+                //     self.new_validator_key().clone(),
+                //     &amp;self.amount(),
+                // ),
+                // "withdraw_bid" =&gt; TransactionBuilderParams::new_withdraw_bid(
+                //     self.public_key().clone(),
+                //     &amp;self.amount(),
+                // ),
+                </span><span class="string">"transfer" </span>=&gt; {
+                    <span class="kw">let </span>args = <span class="self">self</span>.session_args();
+
+                    <span class="kw">let </span>target = args.get(<span class="string">"target"</span>).expect(<span class="string">"Expected 'target' argument"</span>);
+
+                    <span class="kw">let </span>target = <span class="kw">if let </span><span class="prelude-val">Ok</span>(public_key) = target.clone().into_t::&lt;_PublicKey&gt;() {
+                        TransferTarget::new(
+                            TransferTargetKind::PublicKey,
+                            <span class="prelude-val">Some</span>(public_key.into()),
+                            <span class="prelude-val">None</span>,
+                            <span class="prelude-val">None</span>,
+                        )
+                    }
+                    <span class="comment">// Try to interpret the target as an AccountHash
+                    </span><span class="kw">else if let </span><span class="prelude-val">Ok</span>(account_hash) = target.clone().into_t::&lt;_AccountHash&gt;() {
+                        TransferTarget::new(
+                            TransferTargetKind::AccountHash,
+                            <span class="prelude-val">None</span>,
+                            <span class="prelude-val">Some</span>(account_hash.into()),
+                            <span class="prelude-val">None</span>,
+                        )
+                    }
+                    <span class="comment">// Try to interpret the target as a URef
+                    </span><span class="kw">else if let </span><span class="prelude-val">Ok</span>(uref) = target.clone().into_t::&lt;_URef&gt;() {
+                        TransferTarget::new(TransferTargetKind::URef, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(uref.into()))
+                    } <span class="kw">else </span>{
+                        <span class="macro">unimplemented!</span>(<span class="string">"unimplemented target: {:?}"</span>, target);
+                    };
+
+                    <span class="comment">// Extract the "amount" argument as a U512 and convert it to a string
+                    </span><span class="kw">let </span>amount = args
+                        .get(<span class="string">"amount"</span>)
+                        .and_then(|cl_value| cl_value.clone().into_t::&lt;U512&gt;().ok())
+                        .expect(<span class="string">"Expected 'amount' to be of type U512"</span>);
+
+                    <span class="comment">// Extract the "id" argument as an Option&lt;u64&gt; if it exists
+                    </span><span class="kw">let </span>maybe_id = args
+                        .get(<span class="string">"id"</span>)
+                        .and_then(|cl_value| cl_value.clone().into_t::&lt;<span class="prelude-ty">Option</span>&lt;u64&gt;&gt;().ok())
+                        .flatten();
+
+                    <span class="comment">// Extract the "source" argument as a URef, if available
+                    </span><span class="kw">let </span>maybe_source: <span class="prelude-ty">Option</span>&lt;_URef&gt; = args
+                        .get(<span class="string">"source"</span>)
+                        .and_then(|cl_value| cl_value.clone().into_t::&lt;<span class="prelude-ty">Option</span>&lt;_URef&gt;&gt;().ok())
+                        .flatten();
+
+                    TransactionBuilderParams::new_transfer(
+                        maybe_source.map(Into::into),
+                        target,
+                        <span class="kw-2">&amp;</span>amount.to_string(),
+                        maybe_id,
+                    )
+                }
+                <span class="kw">_ </span>=&gt; {
+                    <span class="macro">unimplemented!</span>(<span class="string">"unimplemented native entry point: {}"</span>, entry_point);
+                }
+            },
+            TransactionTarget::Stored { id, runtime: <span class="kw">_ </span>} =&gt; <span class="kw">match </span>id {
+                casper_types::TransactionInvocationTarget::ByHash(hash) =&gt; {
+                    TransactionBuilderParams::new_invocable_entity(
+                        new_hash.unwrap_or(AddressableEntityHash::from_bytes(hash.into())),
+                        <span class="kw-2">&amp;</span>entry_point,
+                    )
+                }
+                TransactionInvocationTarget::ByName(alias) =&gt; {
+                    TransactionBuilderParams::new_invocable_entity_alias(
+                        <span class="kw-2">&amp;</span>new_alias.unwrap_or(alias.clone()),
+                        <span class="kw-2">&amp;</span>entry_point,
+                    )
+                }
+                TransactionInvocationTarget::ByPackageHash { addr, version } =&gt; {
+                    TransactionBuilderParams::new_package(
+                        new_package_hash.unwrap_or(PackageHash::from_bytes(addr.into())),
+                        <span class="kw-2">&amp;</span>entry_point,
+                        <span class="prelude-val">Some</span>(new_version.unwrap_or(version.unwrap_or(<span class="number">1</span>)).to_string()),
+                    )
+                }
+                TransactionInvocationTarget::ByPackageName { name, version } =&gt; {
+                    TransactionBuilderParams::new_package_alias(
+                        <span class="kw-2">&amp;</span>new_alias.unwrap_or(name.clone()),
+                        <span class="kw-2">&amp;</span>entry_point,
+                        <span class="prelude-val">Some</span>(new_version.unwrap_or(version.unwrap_or(<span class="number">1</span>)).to_string()),
+                    )
+                }
+            },
+            casper_types::TransactionTarget::Session {
+                is_install_upgrade,
+                module_bytes: transaction_bytes,
+                runtime: <span class="kw">_</span>,
+            } =&gt; {
+                <span class="kw">let </span>default: _Bytes = transaction_bytes.clone();
+                <span class="kw">let </span>bytes_default = Bytes::default();
+                <span class="kw">let </span>new_bytes = new_transaction_bytes.unwrap_or(<span class="kw-2">&amp;</span>bytes_default);
+                <span class="kw">let </span>new: <span class="kw-2">&amp;</span>Bytes = new_bytes;
+                <span class="kw">let </span>new_transaction_bytes: _Bytes = {
+                    <span class="kw">let </span>new_bytes: _Bytes = _Bytes::from((<span class="kw-2">*</span>new).to_vec());
+                    <span class="kw">if </span>new_bytes.len() &gt; <span class="number">0 </span>{
+                        new_bytes
+                    } <span class="kw">else </span>{
+                        default
+                    }
+                };
+
+                TransactionBuilderParams::new_session(
+                    <span class="prelude-val">Some</span>(new_transaction_bytes.into()),
+                    <span class="prelude-val">Some</span>(new_is_install_upgrade.unwrap_or(is_install_upgrade)),
+                )
+            }
+        }
     }
 }
 
 <span class="attr">#[derive(Default)]
-</span><span class="kw">struct </span>NewBodyParams&lt;<span class="lifetime">'a</span>&gt; {
-    new_args: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>RuntimeArgs&gt;,
+</span><span class="kw">struct </span>NewBuilderParams&lt;<span class="lifetime">'a</span>&gt; {
     new_hash: <span class="prelude-ty">Option</span>&lt;AddressableEntityHash&gt;,
     new_package_hash: <span class="prelude-ty">Option</span>&lt;PackageHash&gt;,
     new_entry_point: <span class="prelude-ty">Option</span>&lt;String&gt;,
     new_alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
     new_version: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     new_transaction_bytes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Bytes&gt;,
-}
-
-<span class="kw">fn </span>modify_body(
-    body: <span class="kw-2">&amp;</span>TransactionV1Body,
-    NewBodyParams {
-        new_args,
-        new_hash,
-        new_package_hash,
-        new_entry_point,
-        new_alias,
-        new_version,
-        new_transaction_bytes,
-    }: NewBodyParams,
-) -&gt; TransactionV1Body {
-    <span class="kw">let </span>runtime_args = new_args.cloned().unwrap_or_else(|| body.args().clone());
-    <span class="kw">let </span>entry_point = body.entry_point().to_string();
-    <span class="kw">match </span>body.target() {
-        casper_types::TransactionTarget::Native =&gt; {
-            <span class="macro">unimplemented!</span>(<span class="string">"native transfer not implemented!"</span>)
-        }
-        casper_types::TransactionTarget::Stored { id, runtime: <span class="kw">_ </span>} =&gt; <span class="kw">match </span>id {
-            casper_types::TransactionInvocationTarget::ByHash(hash) =&gt; {
-                (<span class="kw-2">*</span>TransactionV1Builder::new_targeting_invocable_entity(
-                    new_hash.unwrap_or((<span class="kw-2">*</span>hash).into()).into(),
-                    new_entry_point.unwrap_or_else(|| entry_point.clone()),
-                )
-                .with_runtime_args(runtime_args)
-                .body())
-                .clone()
-            }
-            casper_types::TransactionInvocationTarget::ByName(alias) =&gt; {
-                (<span class="kw-2">*</span>TransactionV1Builder::new_targeting_invocable_entity_via_alias(
-                    new_alias.unwrap_or_else(|| alias.clone()),
-                    new_entry_point.unwrap_or_else(|| entry_point.clone()),
-                )
-                .with_runtime_args(runtime_args)
-                .body())
-                .clone()
-            }
-            casper_types::TransactionInvocationTarget::ByPackageHash { addr, version } =&gt; {
-                (<span class="kw-2">*</span>TransactionV1Builder::new_targeting_package(
-                    new_package_hash.unwrap_or((<span class="kw-2">*</span>addr).into()).into(),
-                    <span class="prelude-val">Some</span>(new_version.unwrap_or(version.unwrap_or(<span class="number">1</span>))),
-                    new_entry_point.unwrap_or_else(|| entry_point.clone()),
-                )
-                .with_runtime_args(runtime_args)
-                .body())
-                .clone()
-            }
-            casper_types::TransactionInvocationTarget::ByPackageName { name, version } =&gt; {
-                (<span class="kw-2">*</span>TransactionV1Builder::new_targeting_package_via_alias(
-                    new_alias.unwrap_or_else(|| name.clone()),
-                    <span class="prelude-val">Some</span>(new_version.unwrap_or(version.unwrap_or(<span class="number">1</span>))),
-                    new_entry_point.unwrap_or_else(|| entry_point.clone()),
-                )
-                .with_runtime_args(runtime_args)
-                .body())
-                .clone()
-            }
-        },
-        casper_types::TransactionTarget::Session {
-            kind: transaction_session_kind,
-            module_bytes: transaction_bytes,
-            runtime: <span class="kw">_</span>,
-        } =&gt; {
-            <span class="kw">let </span>default: _Bytes = transaction_bytes.clone();
-            <span class="kw">let </span>new_bytes = new_transaction_bytes.unwrap();
-            <span class="kw">let </span>new: <span class="kw-2">&amp;</span>Bytes = new_bytes;
-            <span class="kw">let </span>new_transaction_bytes: _Bytes = {
-                <span class="kw">let </span>new_bytes: _Bytes = _Bytes::from((<span class="kw-2">*</span>new).to_vec());
-                <span class="kw">if </span>new_bytes.len() &gt; <span class="number">0 </span>{
-                    new_bytes
-                } <span class="kw">else </span>{
-                    default
-                }
-            };
-
-            (<span class="kw-2">*</span>TransactionV1Builder::new_session(<span class="kw-2">*</span>transaction_session_kind, new_transaction_bytes)
-                .with_runtime_args(runtime_args)
-                .body())
-            .clone()
-        }
-    }
+    new_is_install_upgrade: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
 <span class="kw">impl </span>From&lt;Transaction&gt; <span class="kw">for </span>_Transaction {
@@ -1602,6 +2072,102 @@
 <span class="kw">impl </span>From&lt;TransactionV1&gt; <span class="kw">for </span>Transaction {
     <span class="kw">fn </span>from(transaction: TransactionV1) -&gt; <span class="self">Self </span>{
         _Transaction::V1(transaction).into()
+    }
+}
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::helpers::public_key_from_secret_key;
+    <span class="kw">use </span>sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_args_to_json_array() {
+        <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        <span class="comment">// Create a RuntimeArgs instance and populate it directly with CLValues
+        </span><span class="kw">let </span><span class="kw-2">mut </span>runtime_args = RuntimeArgs::new();
+        runtime_args
+            .insert(<span class="string">"collection_name"</span>, <span class="string">"enhanced-nft-1"</span>)
+            .unwrap();
+        runtime_args.insert(<span class="string">"collection_symbol"</span>, <span class="string">"ENFT-1"</span>).unwrap();
+        runtime_args.insert(<span class="string">"total_token_supply"</span>, <span class="number">10u64</span>).unwrap();
+        runtime_args.insert(<span class="string">"ownership_mode"</span>, <span class="number">0u8</span>).unwrap();
+        runtime_args.insert(<span class="string">"nft_kind"</span>, <span class="number">1u8</span>).unwrap();
+        runtime_args.insert(<span class="string">"allow_minting"</span>, <span class="bool-val">true</span>).unwrap();
+        runtime_args
+            .insert(<span class="string">"owner_reverse_lookup_mode"</span>, <span class="number">0u8</span>)
+            .unwrap();
+        runtime_args.insert(<span class="string">"nft_metadata_kind"</span>, <span class="number">2u8</span>).unwrap();
+        runtime_args.insert(<span class="string">"identifier_mode"</span>, <span class="number">0u8</span>).unwrap();
+        runtime_args.insert(<span class="string">"metadata_mutability"</span>, <span class="number">0u8</span>).unwrap();
+        runtime_args.insert(<span class="string">"events_mode"</span>, <span class="number">1u8</span>).unwrap();
+
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        transaction_params.set_chain_name(<span class="kw-2">&amp;</span>chain_name);
+
+        <span class="kw">let </span>builder_params = TransactionBuilderParams::default();
+        <span class="kw">let </span>transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
+        <span class="kw">let </span>json_array = transaction.args_to_json_array(<span class="kw-2">&amp;</span>runtime_args);
+
+        <span class="comment">// Convert the generated json_array to a serde_json Value
+        </span><span class="kw">let </span>generated_json: serde_json::Value = serde_json::to_value(<span class="kw-2">&amp;</span>json_array).unwrap();
+
+        <span class="comment">// Deserialize ARGS_JSON into a serde_json Value
+        // let expected_json: serde_json::Value = serde_json::from_str(ARGS_JSON).unwrap();
+
+        </span><span class="kw">let </span>expected_json = <span class="string">r#"[{"name":"collection_name","type":{"ByteArray":23},"value":[18,0,0,0,14,0,0,0,101,110,104,97,110,99,101,100,45,110,102,116,45,49,10]},{"name":"collection_symbol","type":{"ByteArray":15},"value":[10,0,0,0,6,0,0,0,69,78,70,84,45,49,10]},{"name":"total_token_supply","type":{"ByteArray":13},"value":[8,0,0,0,10,0,0,0,0,0,0,0,5]},{"name":"ownership_mode","type":{"ByteArray":6},"value":[1,0,0,0,0,3]},{"name":"nft_kind","type":{"ByteArray":6},"value":[1,0,0,0,1,3]},{"name":"allow_minting","type":{"ByteArray":6},"value":[1,0,0,0,1,0]},{"name":"owner_reverse_lookup_mode","type":{"ByteArray":6},"value":[1,0,0,0,0,3]},{"name":"nft_metadata_kind","type":{"ByteArray":6},"value":[1,0,0,0,2,3]},{"name":"identifier_mode","type":{"ByteArray":6},"value":[1,0,0,0,0,3]},{"name":"metadata_mutability","type":{"ByteArray":6},"value":[1,0,0,0,0,3]},{"name":"events_mode","type":{"ByteArray":6},"value":[1,0,0,0,1,3]}]"#</span>;
+
+        <span class="macro">assert_eq!</span>(
+            <span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>generated_json).unwrap(),
+            expected_json
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_add_arg_without_secret_key() {
+        <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        transaction_params.set_chain_name(<span class="kw-2">&amp;</span>chain_name);
+
+        <span class="kw">let </span>builder_params = TransactionBuilderParams::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
+        <span class="kw">let </span>transaction = transaction.add_arg(<span class="string">"foo:bool='false"</span>.to_string(), <span class="prelude-val">None</span>);
+
+        <span class="macro">assert_eq!</span>(transaction.session_args().len(), <span class="number">1</span>);
+        <span class="kw">let </span>expected_inner_bytes = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
+
+        <span class="macro">assert_eq!</span>(
+            <span class="kw-2">*</span>transaction.session_args().get(<span class="string">"foo"</span>).unwrap().inner_bytes(),
+            expected_inner_bytes
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_add_arg_with_secret_key() {
+        <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>initiator_addr = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
+
+        <span class="kw">let </span>transaction_params = TransactionStrParams::default();
+        transaction_params.set_chain_name(<span class="kw-2">&amp;</span>chain_name);
+        transaction_params.set_initiator_addr(<span class="kw-2">&amp;</span>initiator_addr);
+
+        <span class="kw">let </span>builder_params = TransactionBuilderParams::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
+        <span class="kw">let </span>transaction = transaction.add_arg(<span class="string">"foo:bool='false"</span>.to_string(), <span class="prelude-val">None</span>);
+
+        <span class="kw">let </span>expected_inner_bytes = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
+
+        <span class="macro">assert_eq!</span>(
+            <span class="kw-2">*</span>transaction.session_args().get(<span class="string">"foo"</span>).unwrap().inner_bytes(),
+            expected_inner_bytes
+        );
     }
 }
 </code></pre></div></section></main></body></html>

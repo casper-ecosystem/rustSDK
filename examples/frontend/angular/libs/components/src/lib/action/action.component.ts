@@ -66,7 +66,8 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
         if (name.endsWith('_hash') || name.endsWith('_height') || name.endsWith('_era') || name.endsWith('_state_root_hash')) {
           rejectedMethodsSet.add(name);
           const baseMethod = name.slice(0, name.lastIndexOf('_'));
-          baseMethodsSet.add(baseMethod.replace('_by', '').replace('_block', ''));
+          const final_name = baseMethod.replace(/(_by_block|_by_state_root|_by)$/, '');
+          baseMethodsSet.add(final_name);
           return false;
         }
         return true;

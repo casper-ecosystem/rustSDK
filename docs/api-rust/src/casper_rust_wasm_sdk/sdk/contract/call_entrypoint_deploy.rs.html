@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/contract/call_entrypoint_deploy.rs`."><title>call_entrypoint_deploy.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/contract/call_entrypoint_deploy.rs`."><title>call_entrypoint_deploy.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-590a400c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (759e07f06 2024-10-30)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../../static.files/storage-59e33391.js"></script><script defer src="../../../../static.files/src-script-56102188.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/contract/</div>call_entrypoint_deploy.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -307,8 +308,7 @@
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+<a href="#310" id="310">310</a></pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::deploy::deploy::PutDeployResult;
 <span class="kw">use </span><span class="kw">crate</span>::types::deploy_params::{
     deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -333,7 +333,7 @@
     /// * `deploy_params` - The deploy parameters.
     /// * `session_params` - The session parameters.
     /// * `payment_amount` - The payment amount as a string.
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -350,13 +350,13 @@
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_amount: <span class="kw-2">&amp;</span>str,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PutDeployResult, JsError&gt; {
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(payment_amount);
 
         <span class="kw">let </span>result = <span class="self">self
-            </span>.call_entrypoint_deploy(deploy_params, session_params, payment_params, node_address)
+            </span>.call_entrypoint_deploy(deploy_params, session_params, payment_params, rpc_address)
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
@@ -378,7 +378,7 @@
     /// * `deploy_params` - The deploy parameters.
     /// * `session_params` - The session parameters.
     /// * `payment_params` - The payment parameters.
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -394,7 +394,7 @@
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_PutDeployResult&gt;, SdkError&gt; {
         <span class="comment">//log("call_entrypoint_deploy!");
         </span><span class="kw">let </span>deploy = make_deploy(
@@ -405,7 +405,7 @@
             <span class="bool-val">false</span>,
         )<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.put_deploy(deploy.into(), <span class="prelude-val">None</span>, node_address)
+        <span class="self">self</span>.put_deploy(deploy.into(), <span class="prelude-val">None</span>, rpc_address)
             .<span class="kw">await
             </span>.map_err(SdkError::from)
     }
@@ -429,7 +429,7 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_call_entrypoint_deploy_with_none_values() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>deploy_params = DeployStrParams::new(<span class="string">""</span>, <span class="string">""</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>session_params = SessionStrParams::default();
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
@@ -451,8 +451,8 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_call_entrypoint_deploy_with_valid_input() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
@@ -463,7 +463,8 @@
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
 
         <span class="kw">let </span><span class="kw-2">mut </span>session_params = SessionStrParams::default();
-        session_params.set_session_hash(<span class="kw-2">&amp;</span>get_contract_hash().<span class="kw">await</span>);
+        session_params
+            .set_session_hash(<span class="kw-2">&amp;</span>get_contract_hash().<span class="kw">await</span>.replace(<span class="string">"entity-contract"</span>, <span class="string">"hash"</span>));
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         <span class="kw">let </span>args_simple: Vec&lt;String&gt; = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
         session_params.set_session_args(args_simple);
@@ -474,12 +475,11 @@
                 deploy_params,
                 session_params,
                 payment_params,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
-        // dbg!(result);
         </span><span class="macro">assert!</span>(result.is_ok());
         <span class="kw">let </span>deploy_hash = result.unwrap().result.deploy_hash;
         <span class="macro">assert!</span>(!deploy_hash.to_string().is_empty());
@@ -488,8 +488,8 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_call_entrypoint_deploy_with_invalid_input() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
@@ -522,7 +522,7 @@
                 deploy_params,
                 session_params,
                 payment_params,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -535,12 +535,12 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_call_entrypoint_deploy_without_secret_key() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
-        <span class="kw">let </span>error_message = <span class="string">"the deploy was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason"</span>;
+        <span class="kw">let </span>error_message = <span class="string">"the deploy was invalid: invalid associated keys"</span>;
 
         <span class="kw">let </span>deploy_params = DeployStrParams::new(
             <span class="kw-2">&amp;</span>chain_name,
@@ -567,7 +567,7 @@
                 deploy_params,
                 session_params,
                 payment_params,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -580,8 +580,8 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_call_entrypoint_deploy_with_error() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 

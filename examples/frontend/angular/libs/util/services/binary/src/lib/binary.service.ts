@@ -4,20 +4,34 @@ import { CONFIG, EnvironmentConfig } from '@util/config';
 import { ErrorService } from '@util/error';
 import { FormService } from '@util/form';
 import { ResultService } from '@util/result';
+import { State, StateService } from '@util/state';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockHash, EraId, hexToUint8Array, PeerEntry, PublicKey, RecordId, SDK, TransactionHash } from 'casper-sdk';
+import { BlockHash, Digest, EraId, hexToUint8Array, Key, PeerEntry, PublicKey, RecordId, SDK, Transaction, TransactionHash } from 'casper-sdk';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BinaryService {
+
+  private public_key!: string;
+  private secret_key!: string | undefined;
+
   constructor(
     @Inject(CONFIG) public readonly config: EnvironmentConfig,
     @Inject(SDK_TOKEN) private readonly sdk: SDK,
     private readonly resultService: ResultService,
     private readonly formService: FormService,
     private readonly errorService: ErrorService,
+    private readonly stateService: StateService,
   ) {
+    this.setStateSubscription();
+  }
+
+  private setStateSubscription() {
+    this.stateService.getState().subscribe((state: State) => {
+      state.public_key && (this.public_key = state.public_key);
+      state.secret_key && (this.secret_key = state.secret_key);
+    });
   }
 
   async get_binary_latest_switch_block_header() {
@@ -79,7 +93,6 @@ export class BinaryService {
   }
 
   async get_binary_peers() {
-    console.log(this.sdk.getNodeAddress());
     let peers: PeerEntry[] = [];
     try {
       const get_binary_peers = await this.sdk.get_binary_peers();
@@ -212,48 +225,82 @@ export class BinaryService {
   }
 
   async get_binary_read_record() {
-    const record_id_string: number = this.getIdentifier('eraId')?.value?.trim() as number;
-    const key: string = this.getIdentifier('key')?.value?.trim();
-    const get_binary_read_record = await this.sdk.get_binary_read_record(new RecordId(record_id_string), hexToUint8Array(key));
+    const record_id_string: number = this.getIdentifier('recordId')?.value?.trim() as number;
+    const key_string: string = this.getIdentifier('key')?.value?.trim();
+    const get_binary_read_record = await this.sdk.get_binary_read_record(new RecordId(record_id_string), hexToUint8Array(key_string));
     get_binary_read_record && this.resultService.setResult(get_binary_read_record);
     return get_binary_read_record;
   }
 
-  // async get_binary_global_state_item() {
-  //   const get_binary_nget_binary_global_state_itemode_status = await this.sdk.get_binary_global_state_item();
-  //   get_binary_global_state_item && this.resultService.setResult(get_binary_global_state_item);
-  //   return get_binary_global_state_item;
-  // }
+  async get_binary_global_state_item() {
+    const key_string: string = this.getIdentifier('key')?.value?.trim();
+    const path: string[] = this.getIdentifier('queryPath')?.value?.toString().trim().replace(/^\/+|\/+$/g, '').split('/') || [];
+    const block_identifier_height: string = this.getIdentifier('blockIdentifierHeight')?.value?.trim();
+    const block_identifier_hash: string = this.getIdentifier('blockIdentifierHash')?.value?.trim();
+    const state_root_hash: string = this.getIdentifier('stateRootHash')?.value?.trim();
+    if (block_identifier_hash) {
+      const get_binary_global_state_item_by_block_hash = await this.sdk.get_binary_global_state_item_by_block_hash(new BlockHash(block_identifier_hash), Key.fromFormattedString(key_string), path);
+      get_binary_global_state_item_by_block_hash && this.resultService.setResult(get_binary_global_state_item_by_block_hash);
+      return get_binary_global_state_item_by_block_hash;
+    } else if (block_identifier_height) {
+      const get_binary_global_state_item_by_block_height = await this.sdk.get_binary_global_state_item_by_block_height(BigInt(block_identifier_height), Key.fromFormattedString(key_string), path);
+      get_binary_global_state_item_by_block_height && this.resultService.setResult(get_binary_global_state_item_by_block_height);
+      return get_binary_global_state_item_by_block_height;
 
-  // async get_binary_global_state_item_by_state_root_hash() {
-  //   const get_binary_global_state_item_by_state_root_hash = await this.sdk.get_binary_global_state_item_by_state_root_hash();
-  //   get_binary_global_state_item_by_state_root_hash && this.resultService.setResult(get_binary_global_state_item_by_state_root_hash);
-  //   return get_binary_global_state_item_by_state_root_hash;
-  // }
+    } else if (state_root_hash) {
+      const get_binary_global_state_item_by_state_root_hash = await this.sdk.get_binary_global_state_item_by_state_root_hash(Digest.fromString(state_root_hash), Key.fromFormattedString(key_string), path);
+      get_binary_global_state_item_by_state_root_hash && this.resultService.setResult(get_binary_global_state_item_by_state_root_hash);
+      return get_binary_global_state_item_by_state_root_hash;
+    }
+    else {
+      const get_binary_global_state_item = await this.sdk.get_binary_global_state_item(Key.fromFormattedString(key_string), path);
+      get_binary_global_state_item && this.resultService.setResult(get_binary_global_state_item);
+      return get_binary_global_state_item;
 
-  // async get_binary_global_state_item_by_block_hash() {
-  //   const get_binary_global_state_item_by_block_hash = await this.sdk.get_binary_global_state_item_by_block_hash();
-  //   get_binary_global_state_item_by_block_hash && this.resultService.setResult(get_binary_global_state_item_by_block_hash);
-  //   return get_binary_global_state_item_by_block_hash;
-  // }
+    }
+  }
 
-  // async get_binary_global_state_item_by_block_height() {
-  //   const get_binary_global_state_item_by_block_height = await this.sdk.get_binary_global_state_item_by_block_height();
-  //   get_binary_global_state_item_by_block_height && this.resultService.setResult(get_binary_global_state_item_by_block_height);
-  //   return get_binary_global_state_item_by_block_height;
-  // }
+  async get_binary_try_accept_transaction(transaction: Transaction) {
+    if (!this.public_key) {
+      const err = "public_key is missing";
+      this.errorService.setError(err.toString());
+      return;
+    }
+    else if (!this.secret_key) {
+      const err = "secret_key is missing";
+      this.errorService.setError(err.toString());
+      return;
+    }
+    else if (!transaction) {
+      const err = "transaction is missing";
+      this.errorService.setError(err.toString());
+      return;
+    }
+    const get_binary_try_accept_transaction = await this.sdk.get_binary_try_accept_transaction(transaction);
+    get_binary_try_accept_transaction && this.resultService.setResult(get_binary_try_accept_transaction);
+    return get_binary_try_accept_transaction;
+  }
 
-  // async get_binary_try_accept_transaction() {
-  //   const get_binary_try_accept_transaction = await this.sdk.get_binary_try_accept_transaction();
-  //   get_binary_try_accept_transaction && this.resultService.setResult(get_binary_try_accept_transaction);
-  //   return get_binary_try_accept_transaction;
-  // }
-
-  // async get_binary_try_speculative_execution() {
-  //   const get_binary_try_speculative_execution = await this.sdk.get_binary_try_speculative_execution();
-  //   get_binary_try_speculative_execution && this.resultService.setResult(get_binary_try_speculative_execution);
-  //   return get_binary_try_speculative_execution;
-  // }
+  async get_binary_try_speculative_execution(transaction: Transaction) {
+    if (!this.public_key) {
+      const err = "public_key is missing";
+      this.errorService.setError(err.toString());
+      return;
+    }
+    else if (!this.secret_key) {
+      const err = "secret_key is missing";
+      this.errorService.setError(err.toString());
+      return;
+    }
+    else if (!transaction) {
+      const err = "transaction is missing";
+      this.errorService.setError(err.toString());
+      return;
+    }
+    const get_binary_try_speculative_execution = await this.sdk.get_binary_try_speculative_execution(transaction);
+    get_binary_try_speculative_execution && this.resultService.setResult(get_binary_try_speculative_execution);
+    return get_binary_try_speculative_execution;
+  }
 
   async get_binary_protocol_version() {
     const get_binary_protocol_version = await this.sdk.get_binary_protocol_version();

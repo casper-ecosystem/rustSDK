@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_entity.rs`."><title>get_entity.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_entity.rs`."><title>get_entity.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-590a400c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (759e07f06 2024-10-30)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../../static.files/storage-59e33391.js"></script><script defer src="../../../../static.files/src-script-56102188.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/rpcs/</div>get_entity.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -374,20 +375,32 @@
 <a href="#374" id="374">374</a>
 <a href="#375" id="375">375</a>
 <a href="#376" id="376">376</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a></pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::types::identifier::block_identifier::BlockIdentifier;
 <span class="kw">use crate</span>::{
     types::{
-        block_identifier::BlockIdentifierInput, entity_identifier::EntityIdentifier,
-        sdk_error::SdkError, verbosity::Verbosity,
+        identifier::{block_identifier::BlockIdentifierInput, entity_identifier::EntityIdentifier},
+        sdk_error::SdkError,
+        verbosity::Verbosity,
     },
     SDK,
 };
-<span class="kw">use </span>casper_client::cli::parse::entity_identifier <span class="kw">as </span>parse_entity_identifier;
 <span class="kw">use </span>casper_client::{
-    cli::get_entity <span class="kw">as </span>get_entity_cli, get_entity <span class="kw">as </span>get_entity_lib,
-    rpcs::results::GetAddressableEntityResult <span class="kw">as </span>_GetAddressableEntityResult, JsonRpcId,
-    SuccessResponse,
+    cli::{get_entity <span class="kw">as </span>get_entity_cli, parse::entity_identifier <span class="kw">as </span>parse_entity_identifier},
+    get_entity <span class="kw">as </span>get_entity_lib,
+    rpcs::results::GetAddressableEntityResult <span class="kw">as </span>_GetAddressableEntityResult,
+    JsonRpcId, SuccessResponse,
 };
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
@@ -452,7 +465,7 @@
     <span class="kw">pub </span>entity_identifier_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>maybe_block_id_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>maybe_block_identifier: <span class="prelude-ty">Option</span>&lt;BlockIdentifier&gt;,
-    <span class="kw">pub </span>node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 }
 
@@ -478,7 +491,7 @@
     ///   - `maybe_block_id_as_string`: Optional string representation of the block ID.
     ///   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
     ///   - `verbosity`: Verbosity level for the output.
-    ///   - `node_address`: Address of the node to query.
+    ///   - `rpc_address`: Address of the node to query.
     ///
     /// # Returns
     ///
@@ -499,7 +512,7 @@
             maybe_block_id_as_string,
             maybe_block_identifier,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         <span class="kw">let </span>maybe_block_identifier = <span class="kw">if let </span><span class="prelude-val">Some</span>(maybe_block_identifier) = maybe_block_identifier {
@@ -516,7 +529,7 @@
                 entity_identifier_as_string,
                 maybe_block_identifier,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
@@ -547,7 +560,7 @@
     /// * `entity_identifier_as_string` - An optional string representing the entity identifier.
     /// * `maybe_block_identifier` - An optional `BlockIdentifierInput` for specifying a block identifier.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -562,7 +575,7 @@
         entity_identifier_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
         maybe_block_identifier: <span class="prelude-ty">Option</span>&lt;BlockIdentifierInput&gt;,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetAddressableEntityResult&gt;, SdkError&gt; {
         <span class="kw">let </span>entity_identifier = <span class="kw">if let </span><span class="prelude-val">Some</span>(entity_identifier) = entity_identifier {
             entity_identifier
@@ -583,7 +596,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_entity_cli(
                 <span class="kw-2">&amp;</span>rand::thread_rng().gen::&lt;i64&gt;().to_string(),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 <span class="kw-2">&amp;</span>maybe_block_id,
                 <span class="kw-2">&amp;</span>entity_identifier.to_string(),
@@ -601,7 +614,7 @@
                 </span>};
             get_entity_lib(
                 JsonRpcId::from(rand::thread_rng().gen::&lt;i64&gt;().to_string()),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
                 entity_identifier.into(),
@@ -617,9 +630,11 @@
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use crate</span>::{
         helpers::public_key_from_secret_key,
-        types::{block_identifier::BlockIdentifier, public_key::PublicKey},
+        types::{identifier::block_identifier::BlockIdentifier, public_key::PublicKey},
     };
-    <span class="kw">use </span>sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
+    <span class="kw">use </span>sdk_tests::tests::helpers::{
+        get_enable_addressable_entity, get_network_constants, get_user_secret_key,
+    };
 
     <span class="kw">fn </span>get_entity_identifier() -&gt; EntityIdentifier {
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
@@ -632,7 +647,7 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_entity_with_none_values() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>error_message = <span class="string">"builder error"</span>;
         <span class="kw">let </span>entity_identifier = get_entity_identifier();
 
@@ -650,7 +665,7 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_entity_with_missing_entity() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>error_message = <span class="string">"Error: Missing entity identifier"</span>;
 
         <span class="comment">// Act
@@ -664,11 +679,14 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_entity_with_entity_identifier() {
+        <span class="kw">if </span>!get_enable_addressable_entity() {
+            <span class="kw">return</span>;
+        }
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>entity_identifier = get_entity_identifier();
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -677,7 +695,7 @@
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">None</span>,
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
         <span class="comment">// Assert
@@ -686,11 +704,14 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_entity_with_entity_identifier_as_string() {
+        <span class="kw">if </span>!get_enable_addressable_entity() {
+            <span class="kw">return</span>;
+        }
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>entity_identifier_as_string = get_entity_identifier().to_string();
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -699,7 +720,7 @@
                 <span class="prelude-val">Some</span>(entity_identifier_as_string),
                 <span class="prelude-val">None</span>,
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -709,13 +730,16 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_entity_with_block_identifier() {
+        <span class="kw">if </span>!get_enable_addressable_entity() {
+            <span class="kw">return</span>;
+        }
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(<span class="number">1</span>));
         <span class="kw">let </span>entity_identifier = get_entity_identifier();
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -724,7 +748,7 @@
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">Some</span>(block_identifier),
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -735,7 +759,7 @@
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_get_entity_with_error() {
         <span class="comment">// Arrange
-        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>);
+        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>entity_identifier = get_entity_identifier();
         <span class="kw">let </span>error_message = <span class="string">"error sending request for url (http://localhost/rpc)"</span>;
 

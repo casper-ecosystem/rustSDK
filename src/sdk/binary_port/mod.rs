@@ -461,7 +461,16 @@ impl SDK {
         record_id: RecordId,
         key: &[u8],
     ) -> Result<Vec<u8>, SdkError> {
+        // Check if the key is empty and return an error if it is
+        if key.is_empty() {
+            return Err(SdkError::CustomError {
+                context: "Failed to read record",
+                error: "Key cannot be an empty array".to_string(),
+            });
+        }
+
         let node_address = self.get_node_address(node_address);
+
         match read_record(&node_address, record_id, key).await {
             Ok(record) => Ok(record),
             Err(err) => Err(SdkError::CustomError {

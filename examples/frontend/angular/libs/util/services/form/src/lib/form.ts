@@ -104,7 +104,7 @@ const validatorKey: InputField = {
 const delegatorKey: InputField = {
   id: 'delegatorKey',
   type: 'search',
-  wrap_class: 'col-lg-9',
+  wrap_class: 'col-lg-9 mb-2',
   class: 'form-control',
   label: 'Delegator Key',
   name: 'delegator_key',
@@ -116,7 +116,7 @@ const delegatorKey: InputField = {
 const key: InputField = {
   id: 'key',
   type: 'search',
-  wrap_class: 'col-lg-9',
+  wrap_class: 'col-lg-9 mb-2',
   class: 'form-control',
   label: 'Key',
   name: 'key',
@@ -797,8 +797,14 @@ const getBinaryDelegatorRewardByEraFields: InputContainer[][] = [
 ];
 
 const getBinaryReadRecordFields: InputContainer[][] = [
-  [{ input: recordId }],
-  [{ input: key }],
+  [{ input: recordId, required: true }],
+  [{ input: key, required: true }],
+];
+const getBinaryGlobalStateItem = [
+  ...getBlockFields,
+  [{ input: stateRootHash }],
+  [{ input: key, required: true }],
+  [{ input: queryPath }],
 ];
 
 const formFields = new Map<string, InputContainer[][]>([
@@ -846,6 +852,9 @@ const formFields = new Map<string, InputContainer[][]>([
   ['get_binary_validator_reward', getBinaryValidatorRewardByEraFields],
   ['get_binary_delegator_reward', getBinaryDelegatorRewardByEraFields],
   ['get_binary_read_record', getBinaryReadRecordFields],
+  ['get_binary_global_state_item', getBinaryGlobalStateItem],
+  ['get_binary_try_accept_transaction', makeTransactionFields],
+  ['get_binary_try_speculative_execution', makeTransactionFields],
 ]);
 
 export default formFields;

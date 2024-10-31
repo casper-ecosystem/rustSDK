@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { SDK, PeerEntry } from "casper-sdk";
+import { SDK, PeerEntry, Transaction } from "casper-sdk";
 import { ResultComponent, HeaderComponent, ErrorComponent, StatusComponent, ActionComponent, SubmitActionComponent, PublicKeyComponent, SecretKeyComponent, FormComponent } from '@components';
 import { Subscription } from 'rxjs';
 import { State, StateService } from '@util/state';
@@ -57,7 +57,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly formService: FormService,
     private readonly errorService: ErrorService,
     private readonly storageService: StorageService,
-  ) { }
+  ) {
+    this.setStateSubscription();
+  }
 
   public async ngOnInit(): Promise<void> {
     console.info(this.sdk);
@@ -175,5 +177,15 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async transfer_transaction(transaction_result = true, speculative?: boolean) {
     return await this.clientService.transfer_transaction(transaction_result, speculative);
+  }
+
+  private async get_binary_try_accept_transaction() {
+    let transaction = await this.clientService.transaction(false, false, this.wasm) as Transaction;
+    return await this.binaryService.get_binary_try_accept_transaction(transaction);
+  }
+
+  private async get_binary_try_speculative_execution() {
+    let transaction = await this.clientService.transaction(false, true, this.wasm) as Transaction;
+    return await this.binaryService.get_binary_try_speculative_execution(transaction);
   }
 }
