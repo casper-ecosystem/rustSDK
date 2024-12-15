@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_balance.rs`."><title>get_balance.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_balance.rs`."><title>get_balance.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/rpcs/</div>get_balance.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -387,7 +388,22 @@
 <a href="#387" id="387">387</a>
 <a href="#388" id="388">388</a>
 <a href="#389" id="389">389</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a></pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     types::{
         digest::{Digest, ToDigest},
         sdk_error::SdkError,
@@ -524,7 +540,7 @@
         };
 
         <span class="kw">let </span>result = <span class="kw">if let </span><span class="prelude-val">Some</span>(hash) = state_root_hash {
-            <span class="self">self</span>.get_balance(hash, purse_uref, verbosity, node_address)
+            <span class="self">self</span>.get_balance(purse_uref, <span class="prelude-val">Some</span>(hash.to_digest()), verbosity, node_address)
                 .<span class="kw">await
         </span>} <span class="kw">else if let </span><span class="prelude-val">Some</span>(hash) = state_root_hash_as_string.clone() {
             <span class="kw">let </span>hash = <span class="kw">if </span>!hash.is_empty() {
@@ -535,10 +551,10 @@
             } <span class="kw">else </span>{
                 <span class="string">""</span>.to_string()
             };
-            <span class="self">self</span>.get_balance(<span class="kw-2">&amp;*</span>hash, purse_uref, verbosity, node_address)
+            <span class="self">self</span>.get_balance(purse_uref, <span class="prelude-val">Some</span>(hash.as_str()), verbosity, node_address)
                 .<span class="kw">await
         </span>} <span class="kw">else </span>{
-            <span class="self">self</span>.get_balance(<span class="string">""</span>, purse_uref, verbosity, node_address)
+            <span class="self">self</span>.get_balance(purse_uref, <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>str&gt;, verbosity, node_address)
                 .<span class="kw">await
         </span>};
 
@@ -595,13 +611,35 @@
     /// Returns a `SdkError` if there is an error during the retrieval process.
     </span><span class="kw">pub async fn </span>get_balance(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        state_root_hash: <span class="kw">impl </span>ToDigest,
         purse_uref: GetBalanceInput,
+        state_root_hash: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ToDigest&gt;,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
         node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetBalanceResult&gt;, Box&lt;SdkError&gt;&gt; {
         <span class="comment">//log("get_balance!");
-        </span><span class="kw">let </span>state_root_hash = <span class="kw">if </span>state_root_hash.is_empty() {
+
+        </span><span class="kw">let </span>state_root_hash = <span class="kw">if let </span><span class="prelude-val">Some</span>(state_root_hash) = state_root_hash {
+            <span class="kw">if </span>state_root_hash.is_empty() {
+                <span class="kw">let </span>state_root_hash = <span class="self">self
+                    </span>.get_state_root_hash(
+                        <span class="prelude-val">None</span>,
+                        <span class="prelude-val">None</span>,
+                        <span class="prelude-val">Some</span>(<span class="self">self</span>.get_node_address(node_address.clone())),
+                    )
+                    .<span class="kw">await</span>;
+
+                <span class="kw">match </span>state_root_hash {
+                    <span class="prelude-val">Ok</span>(state_root_hash) =&gt; {
+                        <span class="kw">let </span>state_root_hash: Digest =
+                            state_root_hash.result.state_root_hash.unwrap().into();
+                        state_root_hash
+                    }
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="string">""</span>.to_digest(),
+                }
+            } <span class="kw">else </span>{
+                state_root_hash.to_digest()
+            }
+        } <span class="kw">else </span>{
             <span class="kw">let </span>state_root_hash = <span class="self">self
                 </span>.get_state_root_hash(
                     <span class="prelude-val">None</span>,
@@ -618,9 +656,8 @@
                 }
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="string">""</span>.to_digest(),
             }
-        } <span class="kw">else </span>{
-            state_root_hash.to_digest()
         };
+
         <span class="kw">match </span>purse_uref {
             GetBalanceInput::PurseUref(purse_uref) =&gt; get_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::&lt;i64&gt;().to_string()),
@@ -677,9 +714,9 @@
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
             .get_balance(
-                <span class="string">"7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed"</span>, <span class="comment">// get_balance does not support empty string as state_root_hash
-                </span>purse_uref,
-                <span class="prelude-val">None</span>,
+                purse_uref,
+                <span class="prelude-val">Some</span>(<span class="string">"7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed"</span>), <span class="comment">// get_balance does not support empty string as state_root_hash
+                </span><span class="prelude-val">None</span>,
                 <span class="prelude-val">None</span>,
             )
             .<span class="kw">await</span>;
@@ -699,7 +736,7 @@
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
-            .get_balance(<span class="string">""</span>, purse_uref, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(node_address))
+            .get_balance(purse_uref, <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>str&gt;, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(node_address))
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
@@ -716,7 +753,7 @@
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
-            .get_balance(<span class="string">""</span>, purse_uref, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(node_address))
+            .get_balance(purse_uref, <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>str&gt;, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(node_address))
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
@@ -741,12 +778,7 @@
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
-            .get_balance(
-                state_root_hash.to_digest(),
-                purse_uref,
-                <span class="prelude-val">None</span>,
-                <span class="prelude-val">Some</span>(node_address),
-            )
+            .get_balance(purse_uref, <span class="prelude-val">Some</span>(state_root_hash), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(node_address))
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
@@ -763,9 +795,9 @@
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
             .get_balance(
-                <span class="string">"7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed"</span>, <span class="comment">// get_balance does not support empty string as state_root_hash
-                </span>purse_uref,
-                <span class="prelude-val">None</span>,
+                purse_uref,
+                <span class="prelude-val">Some</span>(<span class="string">"7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed"</span>), <span class="comment">// get_balance does not support empty string as state_root_hash
+                </span><span class="prelude-val">None</span>,
                 <span class="prelude-val">None</span>,
             )
             .<span class="kw">await</span>;
