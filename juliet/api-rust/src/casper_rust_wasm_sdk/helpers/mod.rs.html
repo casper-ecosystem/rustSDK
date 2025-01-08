@@ -733,7 +733,45 @@
 <a href="#732" id="732">732</a>
 <a href="#733" id="733">733</a>
 <a href="#734" id="734">734</a>
-<a href="#735" id="735">735</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::{
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::{
     account_hash::AccountHash, key::Key, public_key::PublicKey, sdk_error::SdkError,
     verbosity::Verbosity,
 };
@@ -876,9 +914,34 @@
 ///
 /// Returns a `Result` with the base64-encoded string on success, or a `FromStrError` on failure.
 /// Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
-</span><span class="kw">pub fn </span>get_base64_key_from_account_hash(account_hash: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, Box&lt;SdkError&gt;&gt; {
-    <span class="kw">let </span>account_hash = AccountHash::from_formatted_str(account_hash)<span class="question-mark">?</span>;
+</span><span class="kw">pub fn </span>get_base64_key_from_account_hash(
+    formatted_account_hash: <span class="kw-2">&amp;</span>str,
+) -&gt; <span class="prelude-ty">Result</span>&lt;String, Box&lt;SdkError&gt;&gt; {
+    <span class="kw">let </span>account_hash = AccountHash::from_formatted_str(formatted_account_hash)<span class="question-mark">?</span>;
     <span class="kw">let </span>key = Key::from_account(account_hash).to_bytes().unwrap();
+    <span class="prelude-val">Ok</span>(general_purpose::STANDARD.encode(key)) <span class="comment">// base64.encode
+</span>}
+
+<span class="doccomment">/// Converts a formatted key hash to a base64-encoded string (CEP-18 key encoding).
+///
+/// # Arguments
+///
+/// * `formatted_hash` - A hex-formatted string representing the key hash.
+///   Example: "hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+///
+/// # Returns
+///
+/// Returns a `Result` containing the base64-encoded string on success.
+/// Example: "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+///
+/// # Errors
+///
+/// This function returns an error if:
+/// - The input string is not a valid formatted key hash.
+/// - The conversion to bytes or base64 encoding fails.
+</span><span class="kw">pub fn </span>get_base64_key_from_key_hash(formatted_hash: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, Box&lt;SdkError&gt;&gt; {
+    <span class="kw">let </span>key = Key::from_formatted_str(formatted_hash)<span class="question-mark">?</span>;
+    <span class="kw">let </span>key = key.to_bytes().unwrap();
     <span class="prelude-val">Ok</span>(general_purpose::STANDARD.encode(key)) <span class="comment">// base64.encode
 </span>}
 
@@ -1463,6 +1526,19 @@
 
         <span class="comment">// Call the function under test
         </span><span class="kw">let </span>result = get_base64_key_from_account_hash(input_hash).unwrap();
+
+        <span class="comment">// Check the result against the expected output
+        </span><span class="macro">assert_eq!</span>(result, expected_output.to_string());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_get_base64_key_from_key_hash() {
+        <span class="comment">// Test with a known input and expected output
+        </span><span class="kw">let </span>input_hash = <span class="string">"hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"</span>;
+        <span class="kw">let </span>expected_output = <span class="string">"AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"</span>;
+
+        <span class="comment">// Call the function under test
+        </span><span class="kw">let </span>result = get_base64_key_from_key_hash(input_hash).unwrap();
 
         <span class="comment">// Check the result against the expected output
         </span><span class="macro">assert_eq!</span>(result, expected_output.to_string());
