@@ -1,5 +1,6 @@
 use crate::helpers::{
-    get_base64_key_from_account_hash, get_blake2b_hash, get_current_timestamp, hex_to_uint8_vec,
+    get_base64_key_from_account_hash, get_base64_key_from_key_hash, get_blake2b_hash,
+    get_current_timestamp, hex_to_uint8_vec,
     make_dictionary_item_key as make_dictionary_item_key_helper, public_key_from_secret_key,
     secret_key_generate, secret_key_secp256k1_generate,
 };
@@ -217,6 +218,35 @@ pub fn get_base64_key_from_account_hash_js_alias(
 ) -> Result<String, JsError> {
     get_base64_key_from_account_hash(formatted_account_hash).map_err(|err| {
         let error_text = format!("Error serializing account hash: {:?}", err);
+        JsError::new(&error_text)
+    })
+}
+
+/// Converts a formatted key hash to a base64-encoded string (CEP-18 key encoding) for use in JavaScript.
+///
+/// This function acts as a wrapper around `get_base64_key_from_key_hash` and maps errors to JavaScript-compatible errors.
+///
+/// # Arguments
+///
+/// * `formatted_key_hash` - A hex-formatted string representing the key hash.
+/// Example: "hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+///
+/// # Returns
+///
+/// Returns a `Result` containing the base64-encoded string on success.
+/// Example: "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+///
+/// # Errors
+///
+/// This function returns a `JsError` if:
+/// - The input string is not a valid formatted key hash.
+/// - The conversion to bytes or base64 encoding fails.
+///
+/// The error message is formatted as a JavaScript-compatible string.
+#[wasm_bindgen(js_name = "keyHashToBase64Key")]
+pub fn get_base64_key_from_key_hash_js_alias(formatted_key_hash: &str) -> Result<String, JsError> {
+    get_base64_key_from_key_hash(formatted_key_hash).map_err(|err| {
+        let error_text = format!("Error serializing package hash: {:?}", err);
         JsError::new(&error_text)
     })
 }
