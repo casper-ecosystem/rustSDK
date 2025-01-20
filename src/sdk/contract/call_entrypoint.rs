@@ -111,6 +111,7 @@ mod tests {
         let sdk = SDK::new(None, None, None);
         let builder_params = TransactionBuilderParams::default();
         let transaction_params = TransactionStrParams::default();
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let error_message =
             "transaction requires account - use `with_account` or `with_secret_key`";
@@ -167,6 +168,7 @@ mod tests {
         transaction_params.set_secret_key(&secret_key);
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_session_args_simple(ARGS.to_vec());
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let entity_addr = EntityAddr::from_formatted_str(
             "entity-contract-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
