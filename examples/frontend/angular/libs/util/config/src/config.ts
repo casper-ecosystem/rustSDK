@@ -4,8 +4,8 @@ export type EnvironmentConfig = {
   [key: string]: string | object | Verbosity | boolean | PricingMode;
 };
 
-const action_needs_secret_key = ['deploy', 'transfer', 'put_deploy', 'speculative_deploy', 'speculative_transfer', 'speculative_exec_deploy', 'sign_deploy', 'call_entrypoint_deploy', 'install'];
-const action_needs_public_key = ['make_deploy', 'make_transfer', ...action_needs_secret_key];
+const action_needs_secret_key = ['deploy', 'transfer', 'put_deploy', 'speculative_deploy', 'speculative_transfer', 'speculative_exec_deploy', 'sign_deploy', 'call_entrypoint_deploy', 'install_deploy', 'transaction', 'transfer_transaction', 'put_transaction', 'speculative_transaction', 'speculative_transfer_transaction', 'speculative_exec', 'sign_transaction', 'call_entrypoint', 'install'];
+const action_needs_public_key = ['make_deploy', 'make_transfer', 'make_transaction', 'make_transfer_transaction', ...action_needs_secret_key];
 
 export const config: EnvironmentConfig = {
   wasm_asset_path: 'assets/casper_rust_wasm_sdk_bg.wasm',
