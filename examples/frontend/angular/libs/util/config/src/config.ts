@@ -33,22 +33,16 @@ export const config: EnvironmentConfig = {
       stream_address: 'http://localhost:18101/events/main',
       chain_name: 'casper-net-1'
     },
-    'integration': {
-      rpc_address: 'https://rpc.integration.casperlabs.io',
-      node_address: 'localhost:7779',
-      stream_address: 'https://events.integration.casperlabs.io/events/main',
-      chain_name: 'integration-test'
-    },
     'testnet': {
-      rpc_address: 'https://rpc.testnet.casperlabs.io',
-      node_address: 'localhost:7779',
-      stream_address: 'https://events.testnet.casperlabs.io/events/main',
+      rpc_address: 'https://node.testnet.casper.network',
+      node_address: 'node.mainnet.casper.network:7779',
+      stream_address: 'https://node.testnet.casper.network/events/main',
       chain_name: 'casper-test'
     },
     'mainnet': {
-      rpc_address: 'https://rpc.mainnet.casperlabs.io',
-      node_address: 'localhost:7779',
-      stream_address: 'https://events.mainnet.casperlabs.io/events/main',
+      rpc_address: 'https://node.mainnet.casper.network',
+      node_address: 'node.mainnet.casper.network:7779',
+      stream_address: 'https://node.mainnet.casper.network/events/main',
       chain_name: 'casper'
     },
     'custom': {

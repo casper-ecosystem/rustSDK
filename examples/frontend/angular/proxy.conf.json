@@ -1,6 +1,6 @@
 {
   "/custom/rpc": {
-    "target": "http://3.136.227.9:7777",
+    "target": "http://65.21.231.40:7777",
     "secure": false,
     "changeOrigin": false,
     "pathRewrite": {
@@ -8,36 +8,19 @@
     }
   },
   "/mainnet/rpc": {
-    "target": "https://rpc.mainnet.casperlabs.io",
+    "target": "https://node.mainnet.casper.network",
     "secure": false,
-    "changeOrigin": false,
+    "changeOrigin": true,
     "pathRewrite": {
       "^/mainnet/rpc": "/rpc"
     }
   },
   "/testnet/rpc": {
-    "target": "https://rpc.testnet.casperlabs.io",
+    "target": "https://node.testnet.casper.network",
     "secure": false,
-    "changeOrigin": false,
+    "changeOrigin": true,
     "pathRewrite": {
       "^/testnet/rpc": "/rpc"
-    }
-  },
-  "/localws": {
-    "target": "ws://127.0.0.1:8181",
-    "secure": false,
-    "changeOrigin": false,
-    "ws": true,
-    "pathRewrite": {
-      "^/localws": ""
-    }
-  },
-  "/integration/rpc": {
-    "target": "https://rpc.integration.casperlabs.io",
-    "secure": false,
-    "changeOrigin": false,
-    "pathRewrite": {
-      "^/integration/rpc": "/rpc"
     }
   },
   "/ntcl/rpc": {

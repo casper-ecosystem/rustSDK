@@ -32,7 +32,7 @@ casper-rust-wasm-sdk = { version = "2.0.0", git = "https://github.com/casper-eco
 use casper_rust_wasm_sdk::{types::verbosity::Verbosity, SDK};
 
 let sdk = SDK::new(
-  Some("https://rpc.testnet.casperlabs.io".to_string()),
+  Some("https://node.testnet.casper.network".to_string()),
   Some(Verbosity::High)
 );
 ```
@@ -106,7 +106,7 @@ import init, {
   Verbosity,
 } from 'casper-sdk';
 
-const node_address = 'https://rpc.testnet.casperlabs.io';
+const rpc_address = 'https://node.testnet.casper.networko';
 const verbosity = Verbosity.High;
 
 function App() {
@@ -125,7 +125,7 @@ function App() {
     await fetchWasm();
   };
 
-  const sdk = new SDK(node_address, verbosity);
+  const sdk = new SDK(rpc_address, verbosity);
   console.log(sdk);
   ...
 }
@@ -169,18 +169,18 @@ import init, { SDK, Verbosity } from 'casper-sdk';
 export const SDK_TOKEN = new InjectionToken() < SDK > 'SDK';
 export const WASM_ASSET_PATH =
   new InjectionToken() < string > 'wasm_asset_path';
-export const NODE_ADDRESS = new InjectionToken() < string > 'node_address';
+export const RPC_ADDRESS = new InjectionToken() < string > 'rpc_address';
 export const VERBOSITY = new InjectionToken() < Verbosity > 'verbosity';
 
 type Params = {
   wasm_asset_path: string,
-  node_address: string,
+  rpc_address: string,
   verbosity: Verbosity,
 };
 
 export const fetchWasmFactory = async (params: Params): Promise<SDK> => {
   const wasm = await init(params.wasm_asset_path);
-  return new SDK(params.node_address, params.verbosity);
+  return new SDK(params.rpc_address, params.verbosity);
 };
 ```
 
@@ -260,8 +260,8 @@ const { SDK } = casper_sdk;
 // or with import
 import { SDK } from 'casper-sdk';
 
-const node_address = 'https://rpc.integration.casperlabs.io';
-const sdk = new SDK(node_address);
+const rpc_address = 'https://node.testnet.casper.network';
+const sdk = new SDK(rpc_address);
 console.log(sdk);
 ```
 
@@ -2501,7 +2501,7 @@ Example of .env
 SECRET_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
 # SECRET_KEY_USER_1 = MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 # SECRET_KEY_USER_2 = MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
-# NODE_ADDRESS=http://localhost:7777
+# RPC_ADDRESS=http://localhost:7777
 # EVENT_ADDRESS=http://localhost:9999/events/main
 # SPECULATIVE_ADDRESS=http://localhost:7778
 # CHAIN_NAME=casper-net-1

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/transaction_params/transaction_builder_params.rs`."><title>transaction_builder_params.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-590a400c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (759e07f06 2024-10-30)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../../static.files/storage-59e33391.js"></script><script defer src="../../../../static.files/src-script-56102188.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/types/transaction_params/</div>transaction_builder_params.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/transaction_params/transaction_builder_params.rs`."><title>transaction_builder_params.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-590a400c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (bc5cf994d 2024-11-05)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../../static.files/storage-59e33391.js"></script><script defer src="../../../../static.files/src-script-56102188.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/types/transaction_params/</div>transaction_builder_params.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -744,7 +744,22 @@
 <a href="#743" id="743">743</a>
 <a href="#744" id="744">744</a>
 <a href="#745" id="745">745</a>
-<a href="#746" id="746">746</a></pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a></pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     debug::error,
     types::{
         cl::bytes::Bytes,
@@ -758,7 +773,7 @@
 };
 
 <span class="kw">use </span>casper_client::cli::TransactionBuilderParams <span class="kw">as </span>_TransactionBuilderParams;
-<span class="kw">use </span>casper_types::{TransferTarget <span class="kw">as </span>_TransferTarget, U512};
+<span class="kw">use </span>casper_types::{TransactionRuntimeParams, TransferTarget <span class="kw">as </span>_TransferTarget, U512};
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[wasm_bindgen]
@@ -817,8 +832,9 @@
     delegator: <span class="prelude-ty">Option</span>&lt;PublicKey&gt;,
     validator: <span class="prelude-ty">Option</span>&lt;PublicKey&gt;,
     new_validator: <span class="prelude-ty">Option</span>&lt;PublicKey&gt;,
-    minimum_delegation_amount: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-    maximum_delegation_amount: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    minimum_delegation_amount: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;u64&gt;&gt;,
+    maximum_delegation_amount: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;u64&gt;&gt;,
+    reserved_slots: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;,
 }
 
 <span class="attr">#[wasm_bindgen]
@@ -866,6 +882,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -898,6 +915,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -927,6 +945,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -956,6 +975,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -988,6 +1008,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1019,6 +1040,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1027,8 +1049,9 @@
         public_key: PublicKey,
         delegation_rate: u8,
         amount: <span class="kw-2">&amp;</span>str,
-        minimum_delegation_amount: u64,
-        maximum_delegation_amount: u64,
+        minimum_delegation_amount: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+        maximum_delegation_amount: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+        reserved_slots: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     ) -&gt; TransactionBuilderParams {
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
@@ -1052,6 +1075,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">Some</span>(minimum_delegation_amount),
             maximum_delegation_amount: <span class="prelude-val">Some</span>(maximum_delegation_amount),
+            reserved_slots: <span class="prelude-val">Some</span>(reserved_slots),
         }
     }
 
@@ -1083,6 +1107,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1114,6 +1139,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1146,6 +1172,7 @@
             new_validator: <span class="prelude-val">Some</span>(new_validator),
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1173,6 +1200,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1339,21 +1367,21 @@
 
     <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>minimum_delegation_amount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
-        <span class="self">self</span>.minimum_delegation_amount
+        <span class="self">self</span>.minimum_delegation_amount.unwrap_or(<span class="prelude-val">None</span>)
     }
 
     <span class="attr">#[wasm_bindgen(setter)]
-    </span><span class="kw">pub fn </span>set_minimum_delegation_amount(<span class="kw-2">&amp;mut </span><span class="self">self</span>, minimum_delegation_amount: u64) {
+    </span><span class="kw">pub fn </span>set_minimum_delegation_amount(<span class="kw-2">&amp;mut </span><span class="self">self</span>, minimum_delegation_amount: <span class="prelude-ty">Option</span>&lt;u64&gt;) {
         <span class="self">self</span>.minimum_delegation_amount = <span class="prelude-val">Some</span>(minimum_delegation_amount);
     }
 
     <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>maximum_delegation_amount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
-        <span class="self">self</span>.maximum_delegation_amount
+        <span class="self">self</span>.maximum_delegation_amount.unwrap_or(<span class="prelude-val">None</span>)
     }
 
     <span class="attr">#[wasm_bindgen(setter)]
-    </span><span class="kw">pub fn </span>set_maximum_delegation_amount(<span class="kw-2">&amp;mut </span><span class="self">self</span>, maximum_delegation_amount: u64) {
+    </span><span class="kw">pub fn </span>set_maximum_delegation_amount(<span class="kw-2">&amp;mut </span><span class="self">self</span>, maximum_delegation_amount: <span class="prelude-ty">Option</span>&lt;u64&gt;) {
         <span class="self">self</span>.maximum_delegation_amount = <span class="prelude-val">Some</span>(maximum_delegation_amount);
     }
 
@@ -1380,7 +1408,8 @@
                 .clone()
                 .unwrap_or_default()
                 .into(),
-        },
+            runtime: TransactionRuntimeParams::VmCasperV1, <span class="comment">// TODo FIX Runtime
+        </span>},
         TransactionKind::Transfer =&gt; _TransactionBuilderParams::Transfer {
             maybe_source: transaction_params.maybe_source.clone().map(Into::into),
             target: transaction_params
@@ -1407,7 +1436,8 @@
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-        },
+            runtime: TransactionRuntimeParams::VmCasperV1, <span class="comment">// TODO FIX Runtime
+        </span>},
         TransactionKind::InvocableEntityAlias =&gt; _TransactionBuilderParams::InvocableEntityAlias {
             entity_alias: transaction_params
                 .entity_alias
@@ -1417,7 +1447,8 @@
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-        },
+            runtime: TransactionRuntimeParams::VmCasperV1, <span class="comment">// TODO FIX Runtime
+        </span>},
         TransactionKind::Package =&gt; _TransactionBuilderParams::Package {
             package_hash: transaction_params.package_hash.unwrap().into(),
             maybe_entity_version: transaction_params.maybe_entity_version,
@@ -1425,7 +1456,8 @@
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-        },
+            runtime: TransactionRuntimeParams::VmCasperV1, <span class="comment">// TODO FIX Runtime
+        </span>},
         TransactionKind::PackageAlias =&gt; _TransactionBuilderParams::PackageAlias {
             package_alias: transaction_params
                 .package_alias
@@ -1436,17 +1468,15 @@
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-        },
+            runtime: TransactionRuntimeParams::VmCasperV1, <span class="comment">// TODO FIX Runtime
+        </span>},
         TransactionKind::AddBid =&gt; _TransactionBuilderParams::AddBid {
             public_key: transaction_params.public_key.clone().unwrap().into(),
             delegation_rate: transaction_params.delegation_rate.unwrap(),
             amount: transaction_params.amount.unwrap_or_default(),
-            minimum_delegation_amount: transaction_params
-                .minimum_delegation_amount
-                .unwrap_or_default(),
-            maximum_delegation_amount: transaction_params
-                .maximum_delegation_amount
-                .unwrap_or_default(),
+            minimum_delegation_amount: transaction_params.minimum_delegation_amount.unwrap(),
+            maximum_delegation_amount: transaction_params.maximum_delegation_amount.unwrap(),
+            reserved_slots: transaction_params.reserved_slots.unwrap(),
         },
         TransactionKind::Delegate =&gt; _TransactionBuilderParams::Delegate {
             delegator: transaction_params.delegator.clone().unwrap().into(),
