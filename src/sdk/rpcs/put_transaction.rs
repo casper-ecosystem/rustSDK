@@ -88,7 +88,7 @@ impl SDK {
     ) -> Result<SuccessResponse<_PutTransactionResult>, Error> {
         //log("account_put_transaction!");
         put_transaction(
-            JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+            JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
             &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
             transaction.into(),

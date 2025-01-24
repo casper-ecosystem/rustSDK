@@ -252,7 +252,7 @@ impl SDK {
 
         match purse_uref {
             GetBalanceInput::PurseUref(purse_uref) => get_balance_lib(
-                JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+                JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 state_root_hash.into(),
@@ -261,7 +261,7 @@ impl SDK {
             .await
             .map_err(SdkError::from),
             GetBalanceInput::PurseUrefAsString(purse_uref) => get_balance_cli(
-                &rand::thread_rng().gen::<i64>().to_string(),
+                &rand::thread_rng().gen::<u64>().to_string(),
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &state_root_hash.to_string(),

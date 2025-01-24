@@ -253,7 +253,7 @@ impl SDK {
 
         if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
             query_balance_details_lib(
-                JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+                JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 Some(maybe_global_state_identifier.into()),
@@ -263,7 +263,7 @@ impl SDK {
             .map_err(SdkError::from)
         } else if maybe_global_state_identifier.is_none() {
             query_balance_details_lib(
-                JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+                JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 None,
@@ -273,7 +273,7 @@ impl SDK {
             .map_err(SdkError::from)
         } else if let Some(state_root_hash) = state_root_hash {
             query_balance_details_cli(
-                &rand::thread_rng().gen::<i64>().to_string(),
+                &rand::thread_rng().gen::<u64>().to_string(),
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 "",
@@ -284,7 +284,7 @@ impl SDK {
             .map_err(SdkError::from)
         } else {
             query_balance_details_cli(
-                &rand::thread_rng().gen::<i64>().to_string(),
+                &rand::thread_rng().gen::<u64>().to_string(),
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &maybe_block_id.unwrap_or_default(),

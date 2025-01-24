@@ -110,7 +110,7 @@ impl SDK {
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetPeersResult>, Error> {
         get_peers(
-            JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+            JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
             &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
         )

@@ -180,7 +180,7 @@ impl SDK {
     ) -> Result<SuccessResponse<_GetDeployResult>, Error> {
         //log("get_deploy!");
         get_deploy(
-            JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+            JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
             &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
             deploy_hash.into(),
