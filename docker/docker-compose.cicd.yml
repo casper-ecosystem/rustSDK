@@ -6,8 +6,36 @@ services:
       dockerfile: ./docker/Dockerfile.cicd
       context: ../
     ports:
-      - "8080:8080"
+      - '8080:8080'
+    networks:
+      - casper-network
 
-# Build and run image with Dockerfile
-# docker build -t casper-webclient . --force-rm
-# docker container run -t -i --rm -h casper-webclient -p 4200:4200 casper-webclient
+  # Build and run image with Dockerfile
+  # docker build -t casper-webclient . --force-rm
+  # docker container run -t -i --rm -h casper-webclient -p 4200:4200 casper-webclient
+
+  cors-anywhere:
+    image: cors-anywhere:latest
+    container_name: cors-anywhere
+    build:
+      context: ../
+      dockerfile: ./docker/cors-anywhere.Dockerfile
+    tty: true
+    environment:
+      PORT: 11100
+
+      # Set allowed origins here with casper-webclient url
+      ORIGIN_WHITELIST: |
+        http://localhost:8080,
+        http://localhost:4200,
+        http://127.0.0.1:8080,
+        http://127.0.0.1:4200
+
+    ports:
+      - 11100:11100
+    networks:
+      - casper-network
+
+networks:
+  casper-network:
+    external: false

@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   default_network: 'dev',
-  localhost_to_gateway: true
+  is_docker: false
 };
 
 /*

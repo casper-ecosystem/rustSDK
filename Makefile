@@ -84,9 +84,6 @@ docker-start-prod:
 	$(CICD_DC) build --build-arg BUILD_CONFIGURATION=docker
 	$(CICD_DC) up --remove-orphans -d
 
-docker-stop-prod:
-	$(CICD_DC) stop
-
 docker-deploy-prod:
 	rm webclient.tar
 	$(CICD_DC) build --build-arg BUILD_CONFIGURATION=production

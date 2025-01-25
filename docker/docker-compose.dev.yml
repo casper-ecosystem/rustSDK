@@ -6,8 +6,8 @@ services:
       dockerfile: ./docker/Dockerfile.dev
       context: ../
     ports:
-      - "4200:4200"
+      - '4200:4200'
 
-# Build and run image with Dockerfile
-# docker build -t casper-webclient . --force-rm
-# docker container run -t -i --rm -h casper-webclient -p 4200:4200 casper-webclient
+  # Build and run image with Dockerfile
+  # docker build -t casper-webclient . --force-rm
+  # docker container run -t -i --rm -h casper-webclient -p 4200:4200 casper-webclient

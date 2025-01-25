@@ -62,4 +62,6 @@ export const config: EnvironmentConfig = {
   app_port: '4200',
   default_port: '7777',
   default_protocol: 'http://',
+  docker_gateway: '172.17.0.1',
+  cors_anywhere_port: '11100',
 };

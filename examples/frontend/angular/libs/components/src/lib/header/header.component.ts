@@ -32,7 +32,7 @@ export class HeaderComponent implements AfterViewInit {
   private window!: (Window & typeof globalThis) | null;
   private is_electron!: boolean;
   private is_production: boolean = this.env['production'] as unknown as boolean;
-  private localhost_to_gateway: boolean = this.env['localhost_to_gateway'] as unknown as boolean;
+  private is_docker: boolean = this.env['is_docker'] as unknown as boolean;
 
   constructor(
     @Inject(SDK_TOKEN) private readonly sdk: SDK,
@@ -145,20 +145,35 @@ export class HeaderComponent implements AfterViewInit {
     return typeof this.window !== 'undefined' && window.location?.origin?.startsWith('file://');
   }
 
-  // TODO Refacto with proxy-everywhere
   private setRPCAddress() {
     try {
       if ((this.is_electron)) {
         this.sdk.setRPCAddress(this.rpc_address);
         this.sdk.setNodeAddress(this.node_address);
-      } else {
-        const network = this.networks.find(x => x.rpc_address == this.rpc_address);
-        if (this.is_production && !this.localhost_to_gateway && network && ['ntcl', 'node-launcher'].includes(network?.name)) {
-          this.sdk.setRPCAddress(this.rpc_address);
-          this.sdk.setNodeAddress(this.node_address);
-        } else {
-          network && this.sdk.setRPCAddress([this.window?.location?.href, network?.name].join(''));
-        }
+      } else if (!this.is_production && this.is_docker) {
+        this.sdk.setRPCAddress(this.rpc_address);
+        this.sdk.setNodeAddress(this.node_address);
+      }
+      else if (this.is_production && this.is_docker) {
+        this.sdk.setRPCAddress([
+          this.config['default_protocol'],
+          this.config['docker_gateway'],
+          ':',
+          this.config['cors_anywhere_port'],
+          '/',
+          this.rpc_address.replace(this.config['localhost'] as string, this.config['docker_gateway'] as string)].join(''));
+
+        this.sdk.setNodeAddress([
+          this.config['docker_gateway'],
+          ':',
+          this.config['cors_anywhere_port'],
+          '/',
+          this.node_address.replace(this.config['localhost'] as string, this.config['docker_gateway'] as string)].join(''));
+      }
+      else {
+        const network = this.networks.find(x => x.node_address == this.node_address);
+        network && this.sdk.setRPCAddress([this.window?.location?.href, network?.name].join(''));
+        network && this.sdk.setNodeAddress([this.window?.location?.href, network?.name].join(''));
       }
     }
     catch (e) {
