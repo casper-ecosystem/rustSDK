@@ -2,6 +2,7 @@
 use crate::deploy::deploy::PutDeployResult;
 use crate::types::deploy::Deploy;
 use crate::{types::verbosity::Verbosity, SDK};
+#[allow(deprecated)]
 use casper_client::{
     put_deploy, rpcs::results::PutDeployResult as _PutDeployResult, Error, JsonRpcId,
     SuccessResponse,
@@ -30,6 +31,7 @@ impl SDK {
     ///
     /// Returns a `JsError` if there is an error during the deploy process.
     #[wasm_bindgen(js_name = "put_deploy")]
+    #[allow(deprecated)]
     pub async fn put_deploy_js_alias(
         &self,
         deploy: Deploy,
@@ -76,6 +78,7 @@ impl SDK {
     /// # Errors
     ///
     /// Returns an `Error` if there is an error during the deploy process.
+    #[allow(deprecated)]
     pub async fn put_deploy(
         &self,
         deploy: Deploy,

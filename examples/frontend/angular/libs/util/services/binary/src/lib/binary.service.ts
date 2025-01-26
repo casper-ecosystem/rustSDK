@@ -94,13 +94,10 @@ export class BinaryService {
 
   async get_binary_peers() {
     let peers: PeerEntry[] = [];
-    try {
-      const get_binary_peers = await this.sdk.get_binary_peers();
-      get_binary_peers && this.resultService.setResult(get_binary_peers);
-      get_binary_peers && (peers = get_binary_peers.peers);
-    } catch (err) {
-      err && this.errorService.setError(err.toString());
-    }
+
+    const get_binary_peers = await this.sdk.get_binary_peers();
+    get_binary_peers && this.resultService.setResult(get_binary_peers);
+    get_binary_peers && (peers = get_binary_peers.peers);
     return peers;
   }
 

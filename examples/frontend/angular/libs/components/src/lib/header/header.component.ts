@@ -171,15 +171,14 @@ export class HeaderComponent implements AfterViewInit {
           this.node_address.replace(this.config['localhost'] as string, this.config['docker_gateway'] as string)].join(''));
       }
       else {
-        const network = this.networks.find(x => x.node_address == this.node_address);
+        const network = this.networks.find(x => x.rpc_address == this.rpc_address);
         network && this.sdk.setRPCAddress([this.window?.location?.href, network?.name].join(''));
-        network && this.sdk.setNodeAddress([this.window?.location?.href, network?.name].join(''));
+        //network && this.sdk.setNodeAddress([this.window?.location?.href, network?.name].join(''));
+        this.sdk.setNodeAddress(this.node_address);
       }
     }
     catch (e) {
       console.error(e);
-      // TODO Fix bug https://github.com/rustwasm/wasm-bindgen/issues/1578
-      // recursive use of an object detected which would lead to unsafe aliasing in rust
     }
   }
 
@@ -188,8 +187,6 @@ export class HeaderComponent implements AfterViewInit {
       this.sdk.setNodeAddress(this.node_address);
     } catch (e) {
       console.error(e);
-      // TODO Fix bug https://github.com/rustwasm/wasm-bindgen/issues/1578
-      // recursive use of an object detected which would lead to unsafe aliasing in rust
     }
   }
 

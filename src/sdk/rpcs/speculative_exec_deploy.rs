@@ -5,6 +5,7 @@ use crate::{
     types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
+#[allow(deprecated)]
 use casper_client::{
     rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
     speculative_exec as speculative_exec_deploy_lib, JsonRpcId, SuccessResponse,
