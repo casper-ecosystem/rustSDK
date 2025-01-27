@@ -20,4 +20,11 @@ files:
 extraFiles:
   - from: ./../../frontend/angular/dist/casper
     to: frontend/angular/dist/casper
-electronVersion: 33.2.0
+  - from: ./../../frontend/angular/ws-proxy.js
+    to: resources/ws-proxy.js
+extraResources:
+  - from: node_modules/ws
+    to: node_modules/ws
+    filter:
+      - '**/*'
+electronVersion: 34.0.1
