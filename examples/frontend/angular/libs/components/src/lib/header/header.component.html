@@ -100,26 +100,23 @@
         class="input-group mt-2 justify-content-between"
         *ngIf="is_network_tab_open"
       >
-        <div class="col-7">
-          <label
-            class="input-group-text"
-            for="nodeAddressElt"
-            (click)="is_network_tab_open = !is_network_tab_open"
-          >
-            WS</label
-          >
-          <input
-            type="search"
-            class="form-control form-control-xs"
-            name="nodeAddress"
-            [value]="node_address || ''"
-            (change)="onNodeAddressChange($event)"
-            id="nodeAddressElt"
-            #nodeAddressElt
-            e2e-id="nodeAddressElt"
-            [ngClass]="[isNodeAddressInvalid() ? 'is-invalid' : '']"
-          />
-        </div>
+        <label
+          class="input-group-text text-center"
+          for="nodeAddressElt"
+          (click)="is_network_tab_open = !is_network_tab_open"
+          >WS&nbsp;</label
+        >
+        <input
+          type="search"
+          class="form-control form-control-xs"
+          name="nodeAddress"
+          [value]="node_address || ''"
+          (change)="onNodeAddressChange($event)"
+          id="nodeAddressElt"
+          #nodeAddressElt
+          e2e-id="nodeAddressElt"
+          [ngClass]="[isNodeAddressInvalid() ? 'is-invalid' : '']"
+        />
       </div>
     </form>
   </div>

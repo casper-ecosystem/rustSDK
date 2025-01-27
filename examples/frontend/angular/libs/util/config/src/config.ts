@@ -21,39 +21,39 @@ export const config: EnvironmentConfig = {
   action_needs_secret_key,
   action_needs_public_key,
   networks: {
-    'js-node-launcher': {
+    'node-launcher': {
       rpc_address: 'http://localhost:7777',
-      node_address: 'localhost:7779',
+      node_address: 'localhost:4300?targetPort=7779&targetHost=localhost',
       stream_address: 'http://localhost:9999/events/main',
       chain_name: 'casper-net-1'
     },
     'ntcl': {
       rpc_address: 'http://localhost:11101',
-      node_address: 'localhost:4300', // ws proxy to 28101
+      node_address: 'localhost:4300/?targetPort=28101&targetHost=localhost',
       stream_address: 'http://localhost:18101/events/main',
       chain_name: 'casper-net-1'
     },
     'testnet': {
       rpc_address: 'https://node.testnet.casper.network',
-      node_address: 'node.mainnet.casper.network:7779',
+      node_address: 'localhost:4300/?targetPort=7779&targetHost=node.testnet.casper.network',
       stream_address: 'https://node.testnet.casper.network/events/main',
       chain_name: 'casper-test'
     },
     'mainnet': {
       rpc_address: 'https://node.mainnet.casper.network',
-      node_address: 'node.mainnet.casper.network:7779',
+      node_address: 'localhost:4300/?targetPort=7779&targetHost=node.mainnet.casper.network',
       stream_address: 'https://node.mainnet.casper.network/events/main',
       chain_name: 'casper'
     },
     'custom': {
       rpc_address: 'http://3.136.227.9:7777',
-      node_address: 'localhost:4300', // ws proxy to 28101
+      node_address: 'localhost:4300/?targetPort=7779&targetHost=3.136.227.9',
       stream_address: 'http://3.136.227.9:9999/events/main',
       chain_name: 'casper-test'
     },
     'dev': {
       rpc_address: 'http://localhost:4200',
-      node_address: 'localhost:4300', // ws proxy to 28101
+      node_address: 'localhost:4400/?targetPort=28101&targetHost=localhost',
       stream_address: 'http://localhost:4200/events/main',
       chain_name: 'casper-net-1'
     },

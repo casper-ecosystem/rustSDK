@@ -1,6 +1,8 @@
 FROM --platform=linux/amd64 node:22.13-alpine as build
 
 ENV NODE_ENV "development"
+ARG BUILD_CONFIGURATION=docker-dev
+ENV BUILD_CONFIGURATION=$BUILD_CONFIGURATION
 
 WORKDIR /app
 
@@ -22,6 +24,6 @@ RUN npm run build-proxy-conf
 # Proxy localhost to gateway
 RUN sed -i 's|http://localhost|http://172.17.0.1|g' proxy.conf.json
 
-CMD npm run serve -- --configuration=docker
+CMD npm run serve -- --configuration=$BUILD_CONFIGURATION
 
 EXPOSE 4200

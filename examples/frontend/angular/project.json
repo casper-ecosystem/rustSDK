@@ -88,6 +88,27 @@
             }
           ],
           "outputHashing": "all"
+        },
+        "docker-dev": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "fileReplacements": [
+            {
+              "replace": "/src/environments/environment.ts",
+              "with": "/src/environments/environment.dev.docker.ts"
+            }
+          ],
+          "outputHashing": "all"
         }
       },
       "defaultConfiguration": "production"
@@ -100,6 +121,12 @@
         },
         "development": {
           "buildTarget": "casper:build:development"
+        },
+        "docker": {
+          "buildTarget": "casper:build:docker"
+        },
+        "docker-dev": {
+          "buildTarget": "casper:build:docker-dev"
         }
       },
       "defaultConfiguration": "development",

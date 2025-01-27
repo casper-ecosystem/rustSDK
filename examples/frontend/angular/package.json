@@ -4,10 +4,14 @@
   "license": "MIT",
   "scripts": {
     "build-proxy-conf": "node build-proxy-conf.js",
-    "start": "nx serve --host 0.0.0.0",
+    "start-ws-proxy": "node ws-proxy.js",
+    "start": "concurrently \"nx serve --host 0.0.0.0\" \"node ws-proxy.js\"",
     "build": "nx build",
     "test": "nx test",
-    "serve": "nx serve --host 0.0.0.0 --prod=true"
+    "serve": "nx serve --host 0.0.0.0",
+    "serve:prod": "nx serve --configuration=production --host 0.0.0.0",
+    "serve:docker": "nx serve --configuration=docker --host 0.0.0.0",
+    "serve:docker-dev": "nx serve --configuration=docker-dev --host 0.0.0.0"
   },
   "private": true,
   "dependencies": {
@@ -51,6 +55,7 @@
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
     "@typescript-eslint/utils": "^8.15.0",
+    "concurrently": "^9.1.2",
     "eslint": "~9.19.0",
     "eslint-config-prettier": "9.1.0",
     "jest": "^29.7.0",

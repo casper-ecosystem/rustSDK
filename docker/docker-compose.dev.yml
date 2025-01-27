@@ -7,7 +7,38 @@ services:
       context: ../
     ports:
       - '4200:4200'
+    networks:
+      - casper-network
 
   # Build and run image with Dockerfile
   # docker build -t casper-webclient . --force-rm
   # docker container run -t -i --rm -h casper-webclient -p 4200:4200 casper-webclient
+
+  ws-proxy:
+    container_name: ws-proxy
+    build:
+      context: ../
+      dockerfile: ./docker/ws-proxy.Dockerfile
+    tty: true
+    environment:
+      PORT: 4300
+
+      # Set allowed origins here with target url
+      ALLOWED_HOSTS: |
+        localhost,
+        127.0.0.1,
+        172.17.0.1
+
+      # Set allowed origins here with target port
+      ALLOWED_PORTS: |
+        28101,
+        7779
+
+    ports:
+      - 4300:4300
+    networks:
+      - casper-network
+
+networks:
+  casper-network:
+    external: false

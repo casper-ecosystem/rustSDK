@@ -60,7 +60,7 @@ export class HeaderComponent implements AfterViewInit {
       rpc_address: this.rpc_address,
       node_address: this.node_address,
     });
-    this.setRPCAddress();
+    this.setRPCAndNodeAddress();
     this.changeDetectorRef.markForCheck();
   }
 
@@ -71,8 +71,7 @@ export class HeaderComponent implements AfterViewInit {
     this.chain_name = network.chain_name;
     this.rpc_address = network.rpc_address;
     this.node_address = network.node_address;
-    this.setRPCAddress();
-    this.setNodeAddress();
+    this.setRPCAndNodeAddress();
     this.stateService.setState({
       chain_name: network.chain_name
     });
@@ -130,7 +129,7 @@ export class HeaderComponent implements AfterViewInit {
 
   onNodeAddressChange($event: Event) {
     this.node_address = ($event.target as HTMLInputElement)?.value || '';
-    this.setNodeAddress();
+    this.setRPCAndNodeAddress();
   }
 
   iscustomChainInvalid() {
@@ -145,47 +144,35 @@ export class HeaderComponent implements AfterViewInit {
     return typeof this.window !== 'undefined' && window.location?.origin?.startsWith('file://');
   }
 
-  private setRPCAddress() {
+  private setRPCAndNodeAddress() {
     try {
       if ((this.is_electron)) {
         this.sdk.setRPCAddress(this.rpc_address);
-        this.sdk.setNodeAddress(this.node_address);
-      } else if (!this.is_production && this.is_docker) {
-        this.sdk.setRPCAddress(this.rpc_address);
-        this.sdk.setNodeAddress(this.node_address);
       }
-      else if (this.is_production && this.is_docker) {
+      else if (this.is_docker && this.is_production) {
         this.sdk.setRPCAddress([
           this.config['default_protocol'],
           this.config['docker_gateway'],
           ':',
           this.config['cors_anywhere_port'],
           '/',
-          this.rpc_address.replace(this.config['localhost'] as string, this.config['docker_gateway'] as string)].join(''));
+          this.rpc_address.replace(/localhost/g, this.config['docker_gateway'] as string)].join(''));
 
-        this.sdk.setNodeAddress([
-          this.config['docker_gateway'],
-          ':',
-          this.config['cors_anywhere_port'],
-          '/',
-          this.node_address.replace(this.config['localhost'] as string, this.config['docker_gateway'] as string)].join(''));
       }
       else {
         const network = this.networks.find(x => x.rpc_address == this.rpc_address);
         network && this.sdk.setRPCAddress([this.window?.location?.href, network?.name].join(''));
-        //network && this.sdk.setNodeAddress([this.window?.location?.href, network?.name].join(''));
+      }
+
+      if (this.is_docker) {
+        this.sdk.setNodeAddress(
+          this.node_address.replace(/localhost/g, this.config['docker_gateway'] as string)
+        );
+      } else {
         this.sdk.setNodeAddress(this.node_address);
       }
     }
     catch (e) {
-      console.error(e);
-    }
-  }
-
-  private setNodeAddress() {
-    try {
-      this.sdk.setNodeAddress(this.node_address);
-    } catch (e) {
       console.error(e);
     }
   }

@@ -12,8 +12,8 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^34.0.1",
-    "electron-builder": "^25.1.8",
-    "electron-updater": "^6.3.9"
+    "electron-builder": "^26.0.0",
+    "electron-updater": "^6.4.0"
   },
   "build": {
     "appId": "com.example.myapp",
@@ -42,7 +42,23 @@
       {
         "from": "./../../frontend/angular/dist/casper",
         "to": "frontend/angular/dist/casper"
+      },
+      {
+        "from": "./../../frontend/angular/ws-proxy.js",
+        "to": "resources/ws-proxy.js"
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "node_modules/ws",
+        "to": "node_modules/ws",
+        "filter": [
+          "**/*"
+        ]
       }
     ]
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
   }
 }

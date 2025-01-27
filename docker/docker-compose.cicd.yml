@@ -36,6 +36,31 @@ services:
     networks:
       - casper-network
 
+  ws-proxy:
+    container_name: ws-proxy
+    build:
+      context: ../
+      dockerfile: ./docker/ws-proxy.Dockerfile
+    tty: true
+    environment:
+      PORT: 4300
+
+      # Set allowed origins here with casper-webclient url
+      ALLOWED_HOSTS: |
+        localhost,
+        127.0.0.1,
+        172.17.0.1
+
+      # Set allowed origins here with casper-webclient url
+      ALLOWED_PORTS: |
+        28101,
+        7779
+
+    ports:
+      - 4300:4300
+    networks:
+      - casper-network
+
 networks:
   casper-network:
     external: false
