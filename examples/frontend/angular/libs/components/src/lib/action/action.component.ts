@@ -4,6 +4,7 @@ import { SDK } from 'casper-sdk';
 import { SDK_TOKEN } from '@util/wasm';
 import { Subscription } from 'rxjs';
 import { State, StateService } from '@util/state';
+import { CONFIG, EnvironmentConfig } from '@util/config';
 
 @Component({
   selector: 'comp-action',
@@ -30,6 +31,7 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
   private stateSubscription!: Subscription;
 
   constructor(
+    @Inject(CONFIG) public readonly config: EnvironmentConfig,
     @Inject(SDK_TOKEN) private readonly sdk: SDK,
     private readonly stateService: StateService,
     private readonly changeDetectorRef: ChangeDetectorRef
@@ -55,7 +57,13 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
     this.sdk_transaction_methods = this.sdk_methods.filter(name => ['transaction', 'speculative_transaction', 'speculative_transfer_transaction', 'transfer_transaction'].includes(name));
     this.sdk_transaction_utils_methods = this.sdk_methods.filter(name => ['make_transaction', 'make_transfer_transaction', 'sign_transaction', 'put_transaction', 'call_entrypoint', 'install', 'query_contract_dict', 'query_contract_key'].includes(name));
 
-    this.sdk_deprecated = this.sdk_methods.filter(name => ['get_account', 'get_deploy', 'get_era_info', 'put_deploy', 'speculative_exec_deploy', 'sign_deploy', 'make_deploy', 'make_transfer', 'speculative_deploy', 'speculative_transfer', 'deploy', 'transfer', 'call_entrypoint_deploy', 'install_deploy', 'get_balance'].includes(name));
+    this.sdk_deprecated = this.sdk_methods.filter(name => ['get_deploy', 'get_era_info', 'put_deploy', 'speculative_exec_deploy', 'sign_deploy', 'make_deploy', 'make_transfer', 'speculative_deploy', 'speculative_transfer', 'deploy', 'transfer', 'call_entrypoint_deploy', 'install_deploy', 'get_balance'].includes(name));
+
+    if (this.config['ENABLE_ADDRESSABLE_ENTITY']) {
+      this.sdk_deprecated.push('get_account');
+    } else {
+      this.sdk_deprecated.push('get_entity');
+    }
 
     this.sdk_binary_methods = this.sdk_methods.filter(name => name.startsWith('get_binary'));
 

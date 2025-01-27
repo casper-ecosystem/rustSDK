@@ -64,4 +64,5 @@ export const config: EnvironmentConfig = {
   default_protocol: 'http://',
   docker_gateway: '172.17.0.1',
   cors_anywhere_port: '11100',
+  ENABLE_ADDRESSABLE_ENTITY: false
 };

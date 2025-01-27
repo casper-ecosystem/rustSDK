@@ -85,24 +85,39 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
   }
 
   private async updateAccount() {
-    const get_entity = await this.clientService.get_entity(this.public_key);
-    if (!get_entity.entity_result) {
-      return;
-    }
-    // TODO Fix this camelcase syntax with helpers
-    // const account_hash = get_account?.account?.account_hash;
-    // const main_purse = get_account?.account?.main_purse;
-    const account_hash = get_entity?.entity_result?.AddressableEntity?.entity.entity_kind.Account;
-    const main_purse = get_entity?.entity_result?.AddressableEntity?.entity.main_purse;
+    let account_hash: string | undefined;
+    let main_purse: string | undefined;
 
-    this.stateService.setState({
-      account_hash,
-      main_purse
-    });
-    this.storageService.setState({
-      account_hash,
-      main_purse
-    });
-    account_hash && this.formService.updateForm();
+    if (this.config['ENABLE_ADDRESSABLE_ENTITY']) {
+      const get_entity = await this.clientService.get_entity(this.public_key);
+      if (!get_entity.entity_result) {
+        return;
+      }
+      // TODO Fix this camelcase syntax with helpers
+      // const account_hash = get_account?.account?.account_hash;
+      // const main_purse = get_account?.account?.main_purse;
+      account_hash = get_entity?.entity_result?.AddressableEntity?.entity.entity_kind.Account;
+      main_purse = get_entity?.entity_result?.AddressableEntity?.entity.main_purse;
+    } else {
+      const get_account = await this.clientService.get_account(this.public_key);
+      if (get_account && !get_account.account) {
+        return;
+      }
+      account_hash = get_account?.account?.account_hash;
+      main_purse = get_account?.account?.main_purse;
+    }
+
+    if (account_hash && main_purse) {
+      this.stateService.setState({
+        account_hash,
+        main_purse
+      });
+      this.storageService.setState({
+        account_hash,
+        main_purse
+      });
+      account_hash && this.formService.updateForm();
+    }
   }
+
 }
