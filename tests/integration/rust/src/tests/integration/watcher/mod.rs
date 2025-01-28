@@ -17,7 +17,7 @@ pub mod test_module {
         assert!(!transaction_hash.is_empty());
 
         let event_parse_result = sdk
-            .wait_transaction(&config.event_address, &transaction_hash, None)
+            .wait_transaction(&config.events_address, &transaction_hash, None)
             .await
             .unwrap();
         let transaction_processed = event_parse_result
@@ -38,7 +38,7 @@ pub mod test_module {
         assert!(!deploy_hash.is_empty());
 
         let event_parse_result = sdk
-            .wait_deploy(&config.event_address, &deploy_hash, None)
+            .wait_deploy(&config.events_address, &deploy_hash, None)
             .await
             .unwrap();
         let deploy_processed = event_parse_result
@@ -57,7 +57,7 @@ pub mod test_module {
         let transaction_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
         let event_parse_result = sdk
-            .wait_transaction(&config.event_address, transaction_hash, timeout_duration)
+            .wait_transaction(&config.events_address, transaction_hash, timeout_duration)
             .await
             .unwrap();
         assert_eq!(event_parse_result.err.unwrap(), "Timeout expired");
@@ -72,7 +72,7 @@ pub mod test_module {
         let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
         let event_parse_result = sdk
-            .wait_deploy(&config.event_address, deploy_hash, timeout_duration)
+            .wait_deploy(&config.events_address, deploy_hash, timeout_duration)
             .await
             .unwrap();
         assert_eq!(event_parse_result.err.unwrap(), "Timeout expired");
@@ -86,7 +86,7 @@ pub mod test_module {
 
         assert!(!transaction_hash.is_empty());
 
-        let mut watcher = sdk.watch_transaction(&config.event_address, None);
+        let mut watcher = sdk.watch_transaction(&config.events_address, None);
 
         let mut subscriptions: Vec<Subscription> = vec![];
         let transaction_hash_results = vec![transaction_hash.clone()];
@@ -124,7 +124,7 @@ pub mod test_module {
 
         assert!(!deploy_hash.is_empty());
 
-        let mut watcher = sdk.watch_deploy(&config.event_address, None);
+        let mut watcher = sdk.watch_deploy(&config.events_address, None);
 
         let mut subscriptions: Vec<Subscription> = vec![];
         let deploy_hash_results = vec![deploy_hash.clone()];
@@ -157,7 +157,7 @@ pub mod test_module {
         let config: TestConfig = get_config(true).await;
         let sdk = create_test_sdk(Some(config.clone()));
 
-        let mut watcher = sdk.watch_transaction(&config.event_address, timeout_duration);
+        let mut watcher = sdk.watch_transaction(&config.events_address, timeout_duration);
 
         let mut subscriptions: Vec<Subscription> = vec![];
 
@@ -188,7 +188,7 @@ pub mod test_module {
         let config: TestConfig = get_config(true).await;
         let sdk = create_test_sdk(Some(config.clone()));
 
-        let mut watcher = sdk.watch_deploy(&config.event_address, timeout_duration);
+        let mut watcher = sdk.watch_deploy(&config.events_address, timeout_duration);
 
         let mut subscriptions: Vec<Subscription> = vec![];
 

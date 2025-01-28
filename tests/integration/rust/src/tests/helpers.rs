@@ -1,7 +1,7 @@
 use self::intern::{create_test_sdk, install_cep78};
 use crate::config::{
     CONTRACT_CEP78_KEY, DEFAULT_CHAIN_NAME, DEFAULT_ENABLE_ADDRESSABLE_ENTITY,
-    DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_RPC_ADDRESS, DEFAULT_SECRET_KEY_NAME,
+    DEFAULT_EVENTS_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_RPC_ADDRESS, DEFAULT_SECRET_KEY_NAME,
     DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PACKAGE_CEP78_KEY, PAYMENT_AMOUNT,
     SPECULATIVE_ADDRESS,
 };
@@ -213,7 +213,7 @@ pub(crate) mod intern {
         }
         *cep78_reinstall_guard = true;
 
-        let (rpc_address, event_address, chain_name) = network_constants;
+        let (rpc_address, events_address, chain_name) = network_constants;
 
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(chain_name);
@@ -256,7 +256,7 @@ pub(crate) mod intern {
         assert!(!transaction_hash_as_string.is_empty());
 
         let event_parse_result = sdk
-            .wait_transaction(event_address, &transaction_hash_as_string, None)
+            .wait_transaction(events_address, &transaction_hash_as_string, None)
             .await
             .unwrap();
 
@@ -290,8 +290,8 @@ pub(crate) mod intern {
 pub fn get_network_constants() -> (String, String, String, String, String) {
     let default_rpc_address =
         env::var("RPC_ADDRESS").unwrap_or_else(|_| DEFAULT_RPC_ADDRESS.to_string());
-    let default_event_address =
-        env::var("EVENT_ADDRESS").unwrap_or_else(|_| DEFAULT_EVENT_ADDRESS.to_string());
+    let default_events_address =
+        env::var("EVENTS_ADDRESS").unwrap_or_else(|_| DEFAULT_EVENTS_ADDRESS.to_string());
     let default_speculative_address =
         env::var("SPECULATIVE_ADDRESS").unwrap_or_else(|_| SPECULATIVE_ADDRESS.to_string());
     let default_node_address =
@@ -300,7 +300,7 @@ pub fn get_network_constants() -> (String, String, String, String, String) {
 
     (
         default_rpc_address,
-        default_event_address,
+        default_events_address,
         default_speculative_address,
         default_node_address,
         chain_name,
@@ -456,7 +456,7 @@ pub async fn mint_nft(
     secret_key: &str,
     network_constants: (&str, &str, &str),
 ) {
-    let (rpc_address, event_address, chain_name) = network_constants;
+    let (rpc_address, events_address, chain_name) = network_constants;
 
     let mut transaction_params = TransactionStrParams::default();
     transaction_params.set_chain_name(chain_name);
@@ -496,7 +496,7 @@ pub async fn mint_nft(
     assert!(!transaction_hash_as_string.is_empty());
 
     let event_parse_result = sdk
-        .wait_transaction(event_address, &transaction_hash_as_string, None)
+        .wait_transaction(events_address, &transaction_hash_as_string, None)
         .await
         .unwrap();
     let transaction_processed = event_parse_result

@@ -496,7 +496,7 @@ pub mod test_module {
         let transaction_hash_as_string = test_install_deploy().await;
 
         let event_parse_result = sdk
-            .wait_transaction(&config.event_address, &transaction_hash_as_string, None)
+            .wait_transaction(&config.events_address, &transaction_hash_as_string, None)
             .await
             .unwrap();
         let transaction_processed = event_parse_result

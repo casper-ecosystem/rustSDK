@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       RPC_ADDRESS: http://127.0.0.1:7777/rpc
-      EVENT_ADDRESS: http://127.0.0.1:9999/events/main
+      EVENTS_ADDRESS: http://127.0.0.1:9999/events/main
       # WARNING: These accounts, and their private keys, are publicly known.
       # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
       SECRET_KEY_USER_1: MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI

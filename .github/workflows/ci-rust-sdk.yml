@@ -23,7 +23,7 @@ jobs:
 
     env:
       RPC_ADDRESS: http://127.0.0.1:11101
-      EVENT_ADDRESS: http://127.0.0.1:18101/events
+      EVENTS_ADDRESS: http://127.0.0.1:18101/events
       SPECULTATIVE_ADDRESS: http://127.0.0.1:25101
 
     # services:

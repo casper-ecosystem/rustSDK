@@ -1,4 +1,94 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/contract/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-590a400c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (bc5cf994d 2024-11-05)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../../static.files/storage-59e33391.js"></script><script defer src="../../../../static.files/src-script-56102188.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/contract/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content="rustdoc" />
+    <meta
+      name="description"
+      content="Source of the Rust file `src/sdk/contract/mod.rs`."
+    />
+    <title>mod.rs - source</title>
+    <script>
+      if (window.location.protocol !== 'file:')
+        document.head.insertAdjacentHTML(
+          'beforeend',
+          'SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2'
+            .split(',')
+            .map(
+              (f) =>
+                `<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`
+            )
+            .join('')
+        );
+    </script>
+    <link
+      rel="stylesheet"
+      href="../../../../static.files/normalize-9960930a.css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../../../static.files/rustdoc-590a400c.css"
+    />
+    <meta
+      name="rustdoc-vars"
+      data-root-path="../../../../"
+      data-static-root-path="../../../../static.files/"
+      data-current-crate="casper_rust_wasm_sdk"
+      data-themes=""
+      data-resource-suffix=""
+      data-rustdoc-version="1.84.0-nightly (bc5cf994d 2024-11-05)"
+      data-channel="nightly"
+      data-search-js="search-c5a66128.js"
+      data-settings-js="settings-0f613d39.js"
+    />
+    <script src="../../../../static.files/storage-59e33391.js"></script>
+    <script
+      defer
+      src="../../../../static.files/src-script-56102188.js"
+    ></script>
+    <script defer src="../../../../src-files.js"></script>
+    <script defer src="../../../../static.files/main-5f194d8c.js"></script>
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="../../../../static.files/noscript-893ab5e7.css"
+    /></noscript>
+    <link
+      rel="alternate icon"
+      type="image/png"
+      href="../../../../static.files/favicon-32x32-6580c154.png"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../../../../static.files/favicon-044be391.svg"
+    />
+  </head>
+  <body class="rustdoc src">
+    <!--[if lte IE 11
+      ]><div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+      </div><!
+    [endif]-->
+    <nav class="sidebar">
+      <div class="src-sidebar-title"><h2>Files</h2></div>
+    </nav>
+    <div class="sidebar-resizer"></div>
+    <main>
+      <rustdoc-search></rustdoc-search>
+      <section id="main-content" class="content">
+        <div class="main-heading">
+          <h1>
+            <div class="sub-heading">casper_rust_wasm_sdk/sdk/contract/</div>
+            mod.rs
+          </h1>
+          <rustdoc-toolbar></rustdoc-toolbar>
+        </div>
+        <div class="example-wrap">
+          <div data-nosnippet>
+            <pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -108,7 +198,11 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a></pre></div><pre class="rust"><code><span class="kw">pub mod </span>call_entrypoint;
+<a href="#110" id="110">110</a></pre>
+          </div>
+          <pre
+            class="rust"
+          ><code><span class="kw">pub mod </span>call_entrypoint;
 <span class="kw">pub mod </span>call_entrypoint_deploy;
 <span class="kw">pub mod </span>install;
 <span class="kw">pub mod </span>install_deploy;
@@ -142,12 +236,12 @@
     <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
     <span class="kw">let </span>public_key = PublicKey::new(<span class="kw-2">&amp;</span>account).unwrap();
     <span class="kw">let </span>account_hash = public_key.to_account_hash().to_formatted_string();
-    <span class="kw">let </span>(rpc_address, event_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+    <span class="kw">let </span>(rpc_address, events_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
     install_cep78_if_needed(
         <span class="kw-2">&amp;</span>account,
         <span class="kw-2">&amp;</span>secret_key,
         <span class="prelude-val">Some</span>(WASM_PATH),
-        (<span class="kw-2">&amp;</span>rpc_address, <span class="kw-2">&amp;</span>event_address, <span class="kw-2">&amp;</span>chain_name),
+        (<span class="kw-2">&amp;</span>rpc_address, <span class="kw-2">&amp;</span>events_address, <span class="kw-2">&amp;</span>chain_name),
     )
     .<span class="kw">await</span>;
     <span class="kw">let </span>(contract_cep78_key, _contract_cep78_package_hash) =
@@ -162,7 +256,7 @@
 </span><span class="kw">pub async fn </span>get_dictionary_item(as_params: bool) -&gt; DictionaryItemInput {
     <span class="kw">use </span>sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
-    <span class="kw">let </span>(rpc_address, event_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+    <span class="kw">let </span>(rpc_address, events_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
     <span class="kw">let </span><span class="kw-2">mut </span>contract_key = CONTRACT_CEP78_KEY.lock().<span class="kw">await</span>; <span class="comment">// Use the async lock
 
     </span><span class="kw">if </span>contract_key.is_none() {
@@ -180,7 +274,7 @@
             <span class="kw-2">&amp;</span>account,
             <span class="kw-2">&amp;</span>account_hash,
             <span class="kw-2">&amp;</span>secret_key,
-            (<span class="kw-2">&amp;</span>rpc_address, <span class="kw-2">&amp;</span>event_address, <span class="kw-2">&amp;</span>chain_name),
+            (<span class="kw-2">&amp;</span>rpc_address, <span class="kw-2">&amp;</span>events_address, <span class="kw-2">&amp;</span>chain_name),
         )
         .<span class="kw">await</span>;
 
@@ -218,4 +312,9 @@
     params.set_entity_named_key(key, DICTIONARY_NAME, DICTIONARY_ITEM_KEY);
     DictionaryItemInput::Params(params)
 }
-</code></pre></div></section></main></body></html>
+</code></pre>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -32,12 +32,12 @@ pub async fn install_cep78() -> String {
     let account = public_key_from_secret_key(&secret_key).unwrap();
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
-    let (rpc_address, event_address, _, _, chain_name) = get_network_constants();
+    let (rpc_address, events_address, _, _, chain_name) = get_network_constants();
     install_cep78_if_needed(
         &account,
         &secret_key,
         Some(WASM_PATH),
-        (&rpc_address, &event_address, &chain_name),
+        (&rpc_address, &events_address, &chain_name),
     )
     .await;
     let (contract_cep78_key, _contract_cep78_package_hash) =
@@ -52,7 +52,7 @@ static CONTRACT_CEP78_KEY: Lazy<TokioMutex<Option<String>>> = Lazy::new(|| Tokio
 pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
     use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
-    let (rpc_address, event_address, _, _, chain_name) = get_network_constants();
+    let (rpc_address, events_address, _, _, chain_name) = get_network_constants();
     let mut contract_key = CONTRACT_CEP78_KEY.lock().await; // Use the async lock
 
     if contract_key.is_none() {
@@ -70,7 +70,7 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
             &account,
             &account_hash,
             &secret_key,
-            (&rpc_address, &event_address, &chain_name),
+            (&rpc_address, &events_address, &chain_name),
         )
         .await;
 

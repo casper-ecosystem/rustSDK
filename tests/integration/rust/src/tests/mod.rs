@@ -2,7 +2,7 @@ pub mod helpers;
 pub mod integration;
 #[cfg(test)]
 pub mod integration_tests;
-use crate::{config::DEFAULT_EVENT_ADDRESS, tests::helpers::get_event_handler_fn};
+use crate::{config::DEFAULT_EVENTS_ADDRESS, tests::helpers::get_event_handler_fn};
 use casper_rust_wasm_sdk::{
     helpers::public_key_from_secret_key,
     types::verbosity::Verbosity,
@@ -423,7 +423,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
     pub const WASM_PATH: &str = "../../wasm/";
     pub const CEP78_CONTRACT: &str = "cep78.wasm";
-    pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
+    pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
     let transaction_params = TransactionStrParams::default();
     transaction_params.set_chain_name(CHAIN_NAME);
@@ -449,7 +449,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let transaction_hash_as_string = transaction_hash.to_hex_string();
     println!("wait transaction_hash {transaction_hash_as_string}");
     let event_parse_result: EventParseResult = sdk
-        .wait_transaction(DEFAULT_EVENT_ADDRESS, &transaction_hash_as_string, None)
+        .wait_transaction(DEFAULT_EVENTS_ADDRESS, &transaction_hash_as_string, None)
         .await
         .unwrap();
     println!("{:?}", event_parse_result);
@@ -531,7 +531,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         .transaction_hash;
     let transaction_hash = transaction_hash_result.to_hex_string();
     println!("watch transaction_hash {transaction_hash}");
-    let mut watcher = sdk.watch_transaction(DEFAULT_EVENT_ADDRESS, None);
+    let mut watcher = sdk.watch_transaction(DEFAULT_EVENTS_ADDRESS, None);
 
     let mut subscriptions: Vec<Subscription> = vec![];
     let transaction_hash_results = vec![transaction_hash.clone()];
@@ -1008,7 +1008,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
     pub const WASM_PATH: &str = "../../wasm/";
     pub const CEP78_CONTRACT: &str = "cep78.wasm";
-    pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
+    pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
@@ -1044,7 +1044,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let deploy_hash_as_string = deploy_hash.to_hex_string();
     println!("wait deploy_hash {deploy_hash_as_string}");
     let event_parse_result: EventParseResult = sdk
-        .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_as_string, None)
+        .wait_deploy(DEFAULT_EVENTS_ADDRESS, &deploy_hash_as_string, None)
         .await
         .unwrap();
     println!("{:?}", event_parse_result);
@@ -1115,7 +1115,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let deploy_hash = call_entrypoint_deploy.as_ref().unwrap().result.deploy_hash;
     let deploy_hash_string = deploy_hash.to_hex_string();
     println!("watch deploy_hash {deploy_hash_string}");
-    let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, None);
+    let mut watcher = sdk.watch_deploy(DEFAULT_EVENTS_ADDRESS, None);
 
     let mut subscriptions: Vec<Subscription> = vec![];
     let deploy_hash_results = vec![deploy_hash_string.clone()];
