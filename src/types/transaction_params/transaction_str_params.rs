@@ -33,7 +33,7 @@ const DEFAULT_PRICING_MODE: PricingMode = PricingMode::Classic;
 pub const DEFAULT_TTL: &str = "30m";
 pub const DEFAULT_GAS_PRICE: u64 = 1;
 const DEFAULT_ADDITIONAL_COMPUTATION_FACTOR: u8 = 0;
-const DEFAULT_STANDARD_PAYMENT: bool = false;
+const DEFAULT_STANDARD_PAYMENT: bool = true;
 
 #[allow(clippy::too_many_arguments)]
 #[wasm_bindgen]

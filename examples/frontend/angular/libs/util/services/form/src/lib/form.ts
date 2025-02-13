@@ -272,14 +272,14 @@ const entityHash: InputField = {
 const callPackage: InputField = {
   id: 'callPackageElt',
   type: 'checkbox',
-  wrap_class: 'col-xl-1 col-lg-2 mb-2',
+  wrap_class: 'col-lg-2 mb-2',
   class: 'form-check-input mt-0',
   label: 'Call Package',
   name: 'call_package',
   controlName: 'callPackage',
   placeholder: '',
   e2e: 'callPackageElt',
-  label_class: 'form-label',
+  label_class: 'form-label text-nowrap',
   disabled_when: ['has_wasm']
 };
 
@@ -422,7 +422,7 @@ const finalizedApprovals: InputField = {
   controlName: 'finalizedApprovals',
   placeholder: '',
   e2e: 'finalizedApprovalsElt',
-  label_class: 'form-label',
+  label_class: 'form-label text-nowrap',
 };
 
 const seedUref: InputField = {
@@ -625,6 +625,19 @@ const selectTransactionCategory: InputField = {
   enabled_when: ['has_wasm']
 };
 
+const selectStandardParyment: InputField = {
+  id: 'standardPayment',
+  type: 'checkbox',
+  wrap_class: 'mt-3 col-xl-3 mb-3 d-flex flex-row',
+  class: 'form-check-input ms-3',
+  label: 'Standard Payment',
+  label_class: 'form-label text-nowrap',
+  name: 'standard_payment',
+  controlName: 'standardPayment',
+  e2e: 'standardPaymentElt',
+  placeholder_config_value: 'true'
+};
+
 const getBlockFields: InputContainer[][] = [
   [{ input: blockIdentifierHeight }, { input: blockIdentifierHash }]
 ];
@@ -702,14 +715,21 @@ const getSpeculativeTransferFields: InputContainer[][] = [
 
 const installFields: InputContainer[][] = [
   [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor },],
-  [{ wasm_button: true }, { select: selectTransactionCategory }],
+  [{ wasm_button: true }, { select: selectTransactionCategory }, { input: selectStandardParyment }],
+  [{ input: argsSimpleInput }],
+  [{ textarea: argsJson }],
+];
+
+const installDeployFields: InputContainer[][] = [
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor },],
+  [{ wasm_button: true }],
   [{ input: argsSimpleInput }],
   [{ textarea: argsJson }],
 ];
 
 const makeDeployFields: InputContainer[][] = [
   [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }],
-  [{ wasm_button: true }, { select: selectTransactionCategory }],
+  [{ wasm_button: true }],
   [{ input: sessionHash, required: true }, { input: callPackage }, { input: versionInput }],
   [{ input: sessionNameInput, required: true }],
   [{ input: entryPointInput, required: true }],
@@ -719,7 +739,7 @@ const makeDeployFields: InputContainer[][] = [
 
 const makeTransactionFields: InputContainer[][] = [
   [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor }],
-  [{ wasm_button: true }, { select: selectTransactionCategory }],
+  [{ wasm_button: true }, { select: selectTransactionCategory }, { input: selectStandardParyment }],
   [{ input: entityHash, required: true }, { input: callPackage }, { input: versionInput }],
   [{ input: entityAlias, required: true }],
   [{ input: entryPointInput, required: true }],
@@ -823,7 +843,7 @@ const formFields = new Map<string, InputContainer[][]>([
   ['get_state_root_hash', getBlockFields],
   ['get_transaction', getTransactionFields],
   ['install', installFields],
-  ['install_deploy', installFields],
+  ['install_deploy', installDeployFields],
   ['make_deploy', makeDeployFields],
   ['make_transaction', makeTransactionFields],
   ['make_transfer', getTransferFields],

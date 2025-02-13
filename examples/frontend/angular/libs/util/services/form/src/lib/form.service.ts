@@ -95,6 +95,9 @@ export class FormService {
             textarea && (textarea.required = true);
             control.setValidators([Validators.required]);
           }
+          if (input?.type === 'checkbox' && input.placeholder_config_value) {
+            control.setValue(true);
+          }
         });
       });
     }

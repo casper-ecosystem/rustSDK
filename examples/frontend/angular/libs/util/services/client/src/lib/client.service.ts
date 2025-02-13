@@ -480,6 +480,9 @@ export class ClientService {
       return;
     }
 
+    const standard_payment = this.getIdentifier('standardPayment').value as boolean;
+    transaction_params.standard_payment = standard_payment;
+
     transaction_params.payment_amount = payment_amount;
     transaction_params = this.addTransactionArgs(transaction_params);
 

@@ -982,7 +982,7 @@ const signed_transaction = unsigned_transaction.sign(secret_key);
 Developers using Rust can utilize the wait_transaction function to wait for a specific transaction event. This is achieved by providing the desired event URL, transaction hash, and an optional timeout duration. Once the transaction is processed, the resulting data, such as the transaction's cost, can be easily accessed and utilized in subsequent logic.
 
 ```rust
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
 let transaction_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
@@ -990,7 +990,7 @@ let timeout_duration = None; // Some(30000) for 30s instead of default timeout d
 
 // Wait for transaction
 let event_parse_result = sdk
-    .wait_transaction(DEFAULT_EVENT_ADDRESS, &transaction_hash, timeout_duration)
+    .wait_transaction(DEFAULT_EVENTS_ADDRESS, &transaction_hash, timeout_duration)
     .await
     .unwrap();
 let transaction_processed = event_parse_result.body.unwrap().get_transaction_processed();
@@ -1035,14 +1035,14 @@ use casper_rust_wasm_sdk::watcher::{
     Subscription, EventHandlerFn,
 };
 
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
 let transaction_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 let timeout_duration = None; // Some(30000) for 30s instead of default timeout duration of 60s
 
 // Creates a watcher instance
-let mut watcher = sdk.watch_transaction(DEFAULT_EVENT_ADDRESS, timeout_duration);
+let mut watcher = sdk.watch_transaction(DEFAULT_EVENTS_ADDRESS, timeout_duration);
 
 // Create a callback function handler of your design
 let event_handler_fn = get_event_handler_fn(transaction_hash.to_string());
@@ -1156,7 +1156,7 @@ pub const ARGS_JSON: &str = r#"[
 pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
 pub const CEP78_CONTRACT: &str = "cep78.wasm";
 pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
 let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
@@ -1184,7 +1184,7 @@ println!("{:?}", transaction_hash);
 let transaction_hash_as_string = transaction_hash.to_hex_string();
 println!("wait transaction_hash {}", transaction_hash_as_string);
 let event_parse_result: EventParseResult = sdk
-    .wait_transaction(DEFAULT_EVENT_ADDRESS, &transaction_hash_as_string, None)
+    .wait_transaction(DEFAULT_EVENTS_ADDRESS, &transaction_hash_as_string, None)
     .await
     .unwrap();
 println!("{:?}", event_parse_result);
@@ -1915,7 +1915,7 @@ const signed_deploy = unsigned_deploy.sign(secret_key);
 Developers using Rust can utilize the wait_deploy function to wait for a specific deploy event. This is achieved by providing the desired event URL, deploy hash, and an optional timeout duration. Once the deploy is processed, the resulting data, such as the deploy's cost, can be easily accessed and utilized in subsequent logic.
 
 ```rust
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 
 let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
@@ -1923,7 +1923,7 @@ let timeout_duration = None; // Some(30000) for 30s instead of default timeout d
 
 // Wait for deploy
 let event_parse_result = sdk
-    .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash, timeout_duration)
+    .wait_deploy(DEFAULT_EVENTS_ADDRESS, &deploy_hash, timeout_duration)
     .await
     .unwrap();
 let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
@@ -1968,14 +1968,14 @@ use casper_rust_wasm_sdk::deploy_watcher::watcher::{
     Subscription, EventHandlerFn,
 };
 
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 
 let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 let timeout_duration = None; // Some(30000) for 30s instead of default timeout duration of 60s
 
 // Creates a watcher instance
-let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, timeout_duration);
+let mut watcher = sdk.watch_deploy(DEFAULT_EVENTS_ADDRESS, timeout_duration);
 
 // Create a callback function handler of your design
 let event_handler_fn = get_event_handler_fn(deploy_hash.to_string());
@@ -2123,7 +2123,7 @@ let deploy_hash_string = deploy_hash.to_hex_string();
 println!("{:?}", deploy_hash_string);
 
 let event_parse_result = sdk
-    .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_string)
+    .wait_deploy(DEFAULT_EVENTS_ADDRESS, &deploy_hash_string)
     .await
     .unwrap();
 let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
@@ -2502,7 +2502,7 @@ SECRET_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
 # SECRET_KEY_USER_1 = MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 # SECRET_KEY_USER_2 = MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
 # RPC_ADDRESS=http://localhost:7777
-# EVENT_ADDRESS=http://localhost:9999/events/main
+# EVENTS_ADDRESS=http://localhost:9999/events/main
 # SPECULATIVE_ADDRESS=http://localhost:7778
 # CHAIN_NAME=casper-net-1
 # SECRET_KEY_NAME=secret_key.pem

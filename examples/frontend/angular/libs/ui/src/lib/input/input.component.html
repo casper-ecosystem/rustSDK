@@ -11,7 +11,7 @@
       [for]="inputField.id"
       [ngClass]="[
         inputField.label_class || '',
-        parentForm.get(inputField.controlName)?.disabled ? 'disabled' : ''
+        parentForm.get(inputField.controlName)?.disabled ? 'disabled' : '',
       ]"
       >{{ inputField.label }}{{ inputField.required ? ' *' : '' }}
       <span
@@ -26,7 +26,7 @@
         CSPR)</span
       >
     </label>
-    <div class="form-floating">
+    <div [ngClass]="{ 'form-floating': inputField?.type !== 'checkbox' }">
       <ng-container
         [formGroup]="parentForm"
         *ngIf="inputField.type !== 'checkbox'; else checkboxContent"
@@ -47,17 +47,17 @@
           [ngClass]="[
             inputField.class || 'form-control',
             isInvalid(inputField.controlName) ? 'is-invalid' : '',
-            isRequired(inputField) ? 'is-required' : ''
+            isRequired(inputField) ? 'is-required' : '',
           ]"
           (change)="onChange(inputField)"
         />
+        <label *ngIf="inputField.placeholder" [for]="inputField.id"
+          >e.g. {{ inputField.placeholder }}</label
+        >
+        <label *ngIf="inputField.placeholder_config_value" [for]="inputField.id"
+          >e.g. {{ inputField.placeholder_config_value }}</label
+        >
       </ng-container>
-      <label *ngIf="inputField.placeholder" [for]="inputField.id"
-        >e.g. {{ inputField.placeholder }}</label
-      >
-      <label *ngIf="inputField.placeholder_config_value" [for]="inputField.id"
-        >e.g. {{ inputField.placeholder_config_value }}</label
-      >
     </div>
   </div>
 
@@ -68,6 +68,8 @@
       [name]="inputField.name"
       [formControlName]="inputField.controlName"
       [attr.e2e-id]="inputField.e2e"
+      [ngClass]="[inputField.class || 'form-control']"
+      [value]="true"
     />
   </ng-template>
 </ng-template>

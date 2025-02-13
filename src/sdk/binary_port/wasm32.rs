@@ -73,39 +73,41 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_latest_signed_block")]
-    pub async fn get_binary_latest_signed_block_js_alias(
+    #[wasm_bindgen(js_name = "get_binary_latest_block_with_signatures")]
+    pub async fn get_binary_latest_block_with_signatures_js_alias(
         &self,
-        node_address: Option<String>,
-    ) -> Result<JsValue, JsError> {
-        let result = self.get_binary_latest_signed_block(node_address).await;
-        result
-            .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
-    }
-
-    #[wasm_bindgen(js_name = "get_binary_signed_block_by_height")]
-    pub async fn get_binary_signed_block_by_height_js_alias(
-        &self,
-        height: u64,
         node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
-            .get_binary_signed_block_by_height(node_address, height)
+            .get_binary_latest_block_with_signatures(node_address)
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
             .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_signed_block_by_hash")]
-    pub async fn get_binary_signed_block_by_hash_js_alias(
+    #[wasm_bindgen(js_name = "get_binary_block_with_signatures_by_height")]
+    pub async fn get_binary_block_with_signatures_by_height_js_alias(
+        &self,
+        height: u64,
+        node_address: Option<String>,
+    ) -> Result<JsValue, JsError> {
+        let result = self
+            .get_binary_block_with_signatures_by_height(node_address, height)
+            .await;
+        result
+            .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
+            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+    }
+
+    #[wasm_bindgen(js_name = "get_binary_block_with_signatures_by_hash")]
+    pub async fn get_binary_block_with_signatures_by_hash_js_alias(
         &self,
         block_hash: BlockHash,
         node_address: Option<String>,
     ) -> Result<JsValue, JsError> {
         let result = self
-            .get_binary_signed_block_by_hash(node_address, block_hash.into())
+            .get_binary_block_with_signatures_by_hash(node_address, block_hash.into())
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))

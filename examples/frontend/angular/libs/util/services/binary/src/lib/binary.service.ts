@@ -63,7 +63,7 @@ export class BinaryService {
   }
 
   async get_binary_latest_signed_block() {
-    const get_binary_latest_signed_block = await this.sdk.get_binary_latest_signed_block();
+    const get_binary_latest_signed_block = await this.sdk.get_binary_latest_block_with_signatures();
     get_binary_latest_signed_block && this.resultService.setResult(get_binary_latest_signed_block);
     return get_binary_latest_signed_block;
   }
@@ -72,11 +72,11 @@ export class BinaryService {
     const block_identifier_height: string = this.getIdentifier('blockIdentifierHeight')?.value?.trim();
     const block_identifier_hash: string = this.getIdentifier('blockIdentifierHash')?.value?.trim();
     if (block_identifier_hash) {
-      const get_binary_signed_block_by_hash = await this.sdk.get_binary_signed_block_by_hash(new BlockHash(block_identifier_hash));
+      const get_binary_signed_block_by_hash = await this.sdk.get_binary_block_with_signatures_by_hash(new BlockHash(block_identifier_hash));
       get_binary_signed_block_by_hash && this.resultService.setResult(get_binary_signed_block_by_hash);
       return get_binary_signed_block_by_hash;
     } else if (block_identifier_height) {
-      const get_binary_signed_block_by_height = await this.sdk.get_binary_signed_block_by_height(BigInt(block_identifier_height));
+      const get_binary_signed_block_by_height = await this.sdk.get_binary_block_with_signatures_by_height(BigInt(block_identifier_height));
       get_binary_signed_block_by_height && this.resultService.setResult(get_binary_signed_block_by_height);
       return get_binary_signed_block_by_height;
     } else {

@@ -6,19 +6,20 @@ use casper_binary_port::{
 };
 use casper_binary_port_access::{
     available_block_range, block_header_by_hash, block_header_by_height, block_synchronizer_status,
-    chainspec_raw_bytes, consensus_status, consensus_validator_changes,
-    delegator_reward_by_block_hash, delegator_reward_by_block_height, delegator_reward_by_era,
-    global_state_item, global_state_item_by_block_hash, global_state_item_by_block_height,
-    global_state_item_by_state_root_hash, last_progress, latest_block_header, latest_signed_block,
-    latest_switch_block_header, network_name, next_upgrade, node_status, peers, protocol_version,
-    reactor_state, read_record, signed_block_by_hash, signed_block_by_height, transaction_by_hash,
+    block_with_signatures_by_hash, block_with_signatures_by_height, chainspec_raw_bytes,
+    consensus_status, consensus_validator_changes, delegator_reward_by_block_hash,
+    delegator_reward_by_block_height, delegator_reward_by_era, global_state_item,
+    global_state_item_by_block_hash, global_state_item_by_block_height,
+    global_state_item_by_state_root_hash, last_progress, latest_block_header,
+    latest_block_with_signatures, latest_switch_block_header, network_name, next_upgrade,
+    node_status, peers, protocol_version, reactor_state, read_record, transaction_by_hash,
     try_accept_transaction, try_speculative_execution, uptime, validator_reward_by_block_hash,
     validator_reward_by_block_height, validator_reward_by_era,
 };
 use casper_types::{
-    AvailableBlockRange, BlockHash, BlockHeader, BlockSynchronizerStatus, ChainspecRawBytes,
-    Digest, EraId, Key, NextUpgrade, Peers, ProtocolVersion, PublicKey, SignedBlock, Transaction,
-    TransactionHash,
+    AvailableBlockRange, BlockHash, BlockHeader, BlockSynchronizerStatus, BlockWithSignatures,
+    ChainspecRawBytes, Digest, EraId, Key, NextUpgrade, Peers, ProtocolVersion, PublicKey,
+    Transaction, TransactionHash,
 };
 
 pub mod wasm32;
@@ -87,12 +88,12 @@ impl SDK {
     }
 
     /// Returns the latest signed block along with signatures.
-    pub async fn get_binary_latest_signed_block(
+    pub async fn get_binary_latest_block_with_signatures(
         &self,
         node_address: Option<String>,
-    ) -> Result<Option<SignedBlock>, SdkError> {
+    ) -> Result<Option<BlockWithSignatures>, SdkError> {
         let node_address = self.get_node_address(node_address);
-        match latest_signed_block(&node_address).await {
+        match latest_block_with_signatures(&node_address).await {
             Ok(signed_block) => Ok(signed_block),
             Err(err) => Err(SdkError::CustomError {
                 context: "Failed to retrieve latest signed block",
@@ -102,13 +103,13 @@ impl SDK {
     }
 
     /// Returns the signed block at the given height.
-    pub async fn get_binary_signed_block_by_height(
+    pub async fn get_binary_block_with_signatures_by_height(
         &self,
         node_address: Option<String>,
         height: u64,
-    ) -> Result<Option<SignedBlock>, SdkError> {
+    ) -> Result<Option<BlockWithSignatures>, SdkError> {
         let node_address = self.get_node_address(node_address);
-        match signed_block_by_height(&node_address, height).await {
+        match block_with_signatures_by_height(&node_address, height).await {
             Ok(signed_block) => Ok(signed_block),
             Err(err) => Err(SdkError::CustomError {
                 context: "Failed to retrieve signed block by height",
@@ -118,13 +119,13 @@ impl SDK {
     }
 
     /// Returns the signed block with the given hash.
-    pub async fn get_binary_signed_block_by_hash(
+    pub async fn get_binary_block_with_signatures_by_hash(
         &self,
         node_address: Option<String>,
         block_hash: BlockHash,
-    ) -> Result<Option<SignedBlock>, SdkError> {
+    ) -> Result<Option<BlockWithSignatures>, SdkError> {
         let node_address = self.get_node_address(node_address);
-        match signed_block_by_hash(&node_address, block_hash).await {
+        match block_with_signatures_by_hash(&node_address, block_hash).await {
             Ok(signed_block) => Ok(signed_block),
             Err(err) => Err(SdkError::CustomError {
                 context: "Failed to retrieve signed block by block_hash",
