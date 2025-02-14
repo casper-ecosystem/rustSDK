@@ -275,9 +275,12 @@ pub mod test_module_transaction {
             Some(config.secret_key.clone()),
             Some(TTL.to_string()),
         );
-
-        let package_hash =
-            PackageHash::from_formatted_str(&config.contract_cep78_package_hash).unwrap();
+        let package_hash = PackageHash::from_formatted_str(
+            &config
+                .contract_cep78_package_hash
+                .replace("hash", "package"),
+        )
+        .unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_package(package_hash, ENTRYPOINT_MINT, None);
@@ -294,6 +297,7 @@ pub mod test_module_transaction {
             .with_package_hash(new_session_package_hash, Some(config.secret_key.clone()));
         assert!(transaction.verify());
         // assert!(transaction.is_stored_contract_package());
+
         assert!(!transaction
             .to_json_string()
             .unwrap()

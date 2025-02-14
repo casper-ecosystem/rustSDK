@@ -330,18 +330,20 @@ impl SDK {
             Some(p) => p.to_string(),
             None => String::new(),
         };
+
         if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
+            let path = match path {
+                Some(path) if path.is_empty() => Vec::new(),
+                Some(path) => path.into(),
+                None => Vec::new(),
+            };
             query_global_state_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 maybe_global_state_identifier.into(),
                 key.unwrap().into(),
-                match path {
-                    Some(path) if path.is_empty() => Vec::new(),
-                    Some(path) => path.into(),
-                    None => Vec::new(),
-                },
+                path,
             )
             .await
             .map_err(SdkError::from)

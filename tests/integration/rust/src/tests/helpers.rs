@@ -108,7 +108,15 @@ pub(crate) mod intern {
         rpc_address: Option<String>,
     ) -> String {
         let mut params = DictionaryItemStrParams::new();
-        params.set_entity_named_key(contract_entity, dictionary_name, dictionary_item_key);
+        if get_enable_addressable_entity() {
+            params.set_entity_named_key(contract_entity, dictionary_name, dictionary_item_key);
+        } else {
+            params.set_contract_named_key(
+                &contract_entity.replace("entity-contract", "hash"),
+                dictionary_name,
+                dictionary_item_key,
+            );
+        }
         let dictionary_item = DictionaryItemInput::Params(params);
 
         let get_dictionary_item = create_test_sdk(None)
@@ -171,7 +179,7 @@ pub(crate) mod intern {
         } else {
             // Prepare the query parameters
             let query_params = QueryGlobalStateParams {
-                key: KeyIdentifierInput::String(contract_entity.to_string()),
+                key: KeyIdentifierInput::String(contract_entity.replace("entity-contract", "hash")),
                 path: None,
                 maybe_global_state_identifier: None,
                 state_root_hash: None,
@@ -199,7 +207,7 @@ pub(crate) mod intern {
                 .find(|(key, _)| key == &dictionary_name)
                 .unwrap();
 
-            dictionary_uref.to_string()
+            dictionary_uref.to_formatted_string()
         }
     }
 
@@ -547,7 +555,6 @@ pub async fn mint_nft(
         transaction_processed.hash.to_string(),
         transaction_hash_as_string
     );
-    dbg!(transaction_hash_as_string);
 }
 
 pub async fn get_block(rpc_address: &str) -> (String, u64) {

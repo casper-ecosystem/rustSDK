@@ -1,9 +1,10 @@
 #[allow(dead_code)]
 pub mod test_module {
     use crate::config::{
-        get_config, TestConfig, COLLECTION_NAME, CONTRACT_CEP78_KEY, DICTIONARY_ITEM_KEY,
-        DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE,
+        get_config, TestConfig, COLLECTION_NAME, DICTIONARY_ITEM_KEY, DICTIONARY_NAME,
+        TEST_HELLO_KEY, TEST_HELLO_MESSAGE,
     };
+    use crate::tests::helpers::get_enable_addressable_entity;
     use crate::tests::helpers::intern::create_test_sdk;
     use crate::tests::integration::{
         contract::test_module::test_install_deploy, deploy::test_module::test_deploy,
@@ -287,11 +288,19 @@ pub mod test_module {
             .into();
 
         let mut params = DictionaryItemStrParams::new();
-        params.set_entity_named_key(
-            &config.contract_cep78_key,
-            DICTIONARY_NAME,
-            DICTIONARY_ITEM_KEY,
-        );
+        if get_enable_addressable_entity() {
+            params.set_entity_named_key(
+                &config.contract_cep78_key,
+                DICTIONARY_NAME,
+                DICTIONARY_ITEM_KEY,
+            );
+        } else {
+            params.set_contract_named_key(
+                &config.contract_cep78_key.replace("entity-contract", "hash"),
+                DICTIONARY_NAME,
+                DICTIONARY_ITEM_KEY,
+            );
+        };
         let dictionary_item = DictionaryItemInput::Params(params);
         let get_dictionary_item = create_test_sdk(Some(config))
             .get_dictionary_item(dictionary_item, Some(state_root_hash), None, None)
@@ -315,11 +324,20 @@ pub mod test_module {
     pub async fn test_get_dictionary_item_without_state_root_hash() {
         let config: TestConfig = get_config(false).await;
         let mut params = DictionaryItemStrParams::new();
-        params.set_entity_named_key(
-            &config.contract_cep78_key,
-            DICTIONARY_NAME,
-            DICTIONARY_ITEM_KEY,
-        );
+
+        if get_enable_addressable_entity() {
+            params.set_entity_named_key(
+                &config.contract_cep78_key,
+                DICTIONARY_NAME,
+                DICTIONARY_ITEM_KEY,
+            );
+        } else {
+            params.set_contract_named_key(
+                &config.contract_cep78_key.replace("entity-contract", "hash"),
+                DICTIONARY_NAME,
+                DICTIONARY_ITEM_KEY,
+            );
+        };
         let dictionary_item = DictionaryItemInput::Params(params);
         let get_dictionary_item = create_test_sdk(Some(config))
             .get_dictionary_item(dictionary_item, None::<&str>, None, None)
@@ -453,10 +471,18 @@ pub mod test_module {
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,
     ) {
         let config: TestConfig = get_config(false).await;
-        let path = format!("{CONTRACT_CEP78_KEY}/collection_name");
+        let path = "collection_name".to_string();
+        let key = if get_enable_addressable_entity() {
+            config.to_owned().contract_cep78_key
+        } else {
+            config
+                .to_owned()
+                .contract_cep78_key
+                .replace("entity-contract", "hash")
+        };
 
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-            key: KeyIdentifierInput::String(config.to_owned().account_hash),
+            key: KeyIdentifierInput::String(key),
             path: Some(PathIdentifierInput::String(path)),
             maybe_global_state_identifier,
             state_root_hash: None,
@@ -464,6 +490,7 @@ pub mod test_module {
             rpc_address: None,
             verbosity: None,
         };
+
         let query_global_state = create_test_sdk(Some(config.clone()))
             .query_global_state(query_params)
             .await;

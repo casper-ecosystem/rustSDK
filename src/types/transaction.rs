@@ -163,8 +163,7 @@ impl Transaction {
         secret_key: Option<String>,
     ) -> Transaction {
         let transaction_params = TransactionStrParams::default();
-        transaction_params
-            .set_initiator_addr(&InitiatorAddr::PublicKey(public_key.into()).to_string());
+        transaction_params.set_initiator_addr(&public_key.to_string());
         if let Some(secret_key) = secret_key {
             transaction_params.set_secret_key(&secret_key);
         }
@@ -178,8 +177,7 @@ impl Transaction {
         secret_key: Option<String>,
     ) -> Transaction {
         let transaction_params = TransactionStrParams::default();
-        transaction_params
-            .set_initiator_addr(&InitiatorAddr::AccountHash(account_hash.into()).to_string());
+        transaction_params.set_initiator_addr(&account_hash.to_formatted_string());
         if let Some(secret_key) = secret_key {
             transaction_params.set_secret_key(&secret_key);
         }
@@ -832,7 +830,6 @@ impl Transaction {
         }
 
         let builder_params = self.make_transaction_builder_params(new_builder_params);
-
         let transaction: Transaction = make_transaction(builder_params, new_transaction_params)
             .map(Into::into)
             .map_err(|err| {
