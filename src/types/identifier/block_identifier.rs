@@ -1,3 +1,5 @@
+use core::fmt;
+
 use crate::types::hash::block_hash::BlockHash;
 use casper_client::rpcs::common::BlockIdentifier as _BlockIdentifier;
 #[cfg(target_arch = "wasm32")]
@@ -44,14 +46,14 @@ impl From<_BlockIdentifier> for BlockIdentifier {
     }
 }
 
-impl ToString for BlockIdentifierInput {
-    fn to_string(&self) -> String {
+impl fmt::Display for BlockIdentifierInput {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             BlockIdentifierInput::BlockIdentifier(identifier) => match identifier.0 {
-                _BlockIdentifier::Hash(ref hash) => hash.to_string(),
-                _BlockIdentifier::Height(height) => height.to_string(),
+                _BlockIdentifier::Hash(ref hash) => write!(f, "{}", hash),
+                _BlockIdentifier::Height(height) => write!(f, "{}", height),
             },
-            BlockIdentifierInput::String(ref value) => value.clone(),
+            BlockIdentifierInput::String(ref value) => write!(f, "{}", value),
         }
     }
 }
