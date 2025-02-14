@@ -99,13 +99,13 @@ pub fn get_blake2b_hash(meta_data: &str) -> String {
 /// // Key / Value as U256
 /// let key = Key::from_formatted_str( "account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538").unwrap();
 /// let value = U256::from(1);
-/// let dictionary_item_key = make_dictionary_item_key(key, &value);
+/// let dictionary_item_key = make_dictionary_item_key(&key, &value);
 /// println!("Dictionary Item Key (Key/Value as U256): {}", dictionary_item_key);
 /// assert_eq!(dictionary_item_key,"145f6211a24c0a8af16b47e7aa58431ea25172eb402903b3c25ac92b9784c7a9".to_string());
 /// // Key / Value as Key
 /// let key = Key::from_formatted_str( "account-hash-813428ce1a9805f1087db07e6017c6c4f5af0ee78a05591bb6577763e89b4f1f").unwrap();
 /// let value = Key::from_formatted_str("account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538").unwrap();
-/// let dictionary_item_key = make_dictionary_item_key(key, &value);
+/// let dictionary_item_key = make_dictionary_item_key(&key, &value);
 /// println!("Dictionary Item Key (Key/Value as Key): {}", dictionary_item_key);
 /// assert_eq!(dictionary_item_key,"1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca".to_string());
 /// ```

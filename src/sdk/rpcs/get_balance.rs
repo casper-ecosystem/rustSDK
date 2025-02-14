@@ -315,7 +315,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None, None);
         let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
-        let error_message = "builder error";
+        let error_message = "failed to parse node address as valid URL";
 
         // Act
         let result = sdk

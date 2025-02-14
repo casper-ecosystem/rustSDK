@@ -111,7 +111,7 @@ mod tests {
     async fn test_query_contract_dict_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None, None);
-        let error_message = "builder error";
+        let error_message = "failed to parse node address as valid URL";
 
         // Act
         let result = sdk

@@ -6,6 +6,7 @@ use crate::config::{
     SPECULATIVE_ADDRESS,
 };
 use casper_rust_wasm_sdk::{
+    rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams},
     types::{
         addr::entity_addr::EntityAddr,
         hash::{block_hash::BlockHash, transaction_hash::TransactionHash},
@@ -18,6 +19,7 @@ use casper_rust_wasm_sdk::{
     watcher::EventParseResult,
 };
 use lazy_static::lazy_static;
+use serde_json::{to_string, Value};
 use std::{
     env,
     fs::File,
@@ -283,6 +285,7 @@ pub(crate) mod intern {
             .hash()
             .to_string()
             .is_empty());
+
         Ok(transaction_hash_as_string)
     }
 }
@@ -412,41 +415,77 @@ pub async fn get_contract_cep78_hash_keys(
     account_hash: &str,
     rpc_address: &str,
 ) -> (String, String) {
-    let entity_identifier = EntityIdentifier::from_formatted_str(account_hash).ok();
-    let get_entity = create_test_sdk(None)
-        .get_entity(
-            entity_identifier,
-            None,
-            None,
-            None,
-            Some(rpc_address.to_string()),
+    if get_enable_addressable_entity() {
+        let entity_identifier = EntityIdentifier::from_formatted_str(account_hash).ok();
+        let get_entity = create_test_sdk(None)
+            .get_entity(
+                entity_identifier,
+                None,
+                None,
+                None,
+                Some(rpc_address.to_string()),
+            )
+            .await
+            .unwrap();
+
+        let account = get_entity
+            .result
+            .entity_result
+            .addressable_entity()
+            .unwrap();
+
+        let named_keys = account.named_keys.clone();
+        let (_, contract_cep78_key) = named_keys
+            .iter()
+            .find(|(key, _)| key == &CONTRACT_CEP78_KEY)
+            .unwrap();
+        let (_, contract_cep78_package_hash) = named_keys
+            .iter()
+            .find(|(key, _)| key == &PACKAGE_CEP78_KEY)
+            .unwrap();
+        (
+            contract_cep78_key.to_formatted_string(),
+            contract_cep78_package_hash.to_formatted_string(),
         )
-        .await
-        .unwrap();
+    } else {
+        let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
+            key: KeyIdentifierInput::String(account_hash.to_string()),
+            path: None,
+            maybe_global_state_identifier: None,
+            state_root_hash: None,
+            maybe_block_id: None,
+            rpc_address: Some(rpc_address.to_string()),
+            verbosity: None,
+        };
+        let query_global_state = create_test_sdk(None).query_global_state(query_params).await;
+        let query_global_state_result = query_global_state.unwrap();
 
-    let account = get_entity
-        .result
-        .entity_result
-        .addressable_entity()
-        .unwrap();
+        let json_string = to_string(&query_global_state_result.result.stored_value).unwrap();
 
-    let named_keys = account.named_keys.clone();
+        // Parse the JSON string in 1.6
+        let parsed_json: Value = serde_json::from_str(&json_string).unwrap();
+        let named_keys = &parsed_json["Account"]["named_keys"];
 
-    dbg!(&named_keys);
+        let named_keys_array = named_keys
+            .as_array()
+            .unwrap_or_else(|| panic!("named_keys is not an array"));
+        let contract_cep78_hash = named_keys_array
+            .iter()
+            .find(|obj| obj["name"] == Value::String(CONTRACT_CEP78_KEY.to_string()))
+            .and_then(|obj| obj["key"].as_str())
+            .unwrap_or_else(|| panic!("Contract CEP78 key not found in named_keys"));
 
-    let (_, contract_cep78_key) = named_keys
-        .iter()
-        .find(|(key, _)| key == &CONTRACT_CEP78_KEY)
-        .unwrap();
-    let (_, contract_cep78_package_hash) = named_keys
-        .iter()
-        .find(|(key, _)| key == &PACKAGE_CEP78_KEY)
-        .unwrap();
+        let contract_cep78_package_hash = named_keys_array
+            .iter()
+            .find(|obj| obj["name"] == Value::String(PACKAGE_CEP78_KEY.to_string()))
+            .and_then(|obj| obj["key"].as_str())
+            .unwrap_or_else(|| panic!("Package CEP78 key not found in named_keys"));
 
-    (
-        contract_cep78_key.to_formatted_string(),
-        contract_cep78_package_hash.to_formatted_string(),
-    )
+        (
+            contract_cep78_hash.to_string(),
+            contract_cep78_package_hash.to_string(),
+        )
+    }
 }
 
 pub async fn mint_nft(
@@ -508,6 +547,7 @@ pub async fn mint_nft(
         transaction_processed.hash.to_string(),
         transaction_hash_as_string
     );
+    dbg!(transaction_hash_as_string);
 }
 
 pub async fn get_block(rpc_address: &str) -> (String, u64) {

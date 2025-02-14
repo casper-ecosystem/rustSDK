@@ -210,7 +210,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None, None);
         let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
-        let error_message = "builder error";
+        let error_message = "failed to parse node address as valid URL";
 
         // Act
         let result = sdk.get_deploy(deploy_hash, None, None, None).await;

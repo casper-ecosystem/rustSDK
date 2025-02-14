@@ -217,7 +217,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None, None);
         let transaction_hash = TransactionHash::from_raw(&[1u8; 32]).unwrap();
-        let error_message = "builder error";
+        let error_message = "failed to parse node address as valid URL";
 
         // Act
         let result = sdk

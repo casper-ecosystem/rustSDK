@@ -217,7 +217,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None, None);
         let deploy = get_deploy();
-        let error_message = "builder error";
+        let error_message = "failed to parse node address as valid URL";
 
         // Act
         let result = sdk.speculative_exec_deploy(deploy, None, None).await;

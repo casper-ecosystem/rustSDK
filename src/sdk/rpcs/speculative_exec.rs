@@ -208,7 +208,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None, None);
         let transaction = get_transaction();
-        let error_message = "builder error";
+        let error_message = "failed to parse node address as valid URL";
 
         // Act
         let result = sdk.speculative_exec(transaction, None, None).await;

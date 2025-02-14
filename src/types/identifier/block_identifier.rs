@@ -44,6 +44,18 @@ impl From<_BlockIdentifier> for BlockIdentifier {
     }
 }
 
+impl ToString for BlockIdentifierInput {
+    fn to_string(&self) -> String {
+        match self {
+            BlockIdentifierInput::BlockIdentifier(identifier) => match identifier.0 {
+                _BlockIdentifier::Hash(ref hash) => hash.to_string(),
+                _BlockIdentifier::Height(height) => height.to_string(),
+            },
+            BlockIdentifierInput::String(ref value) => value.clone(),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum BlockIdentifierInput {
     BlockIdentifier(BlockIdentifier),

@@ -127,7 +127,7 @@ mod tests {
     async fn test_get_peers_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None, None);
-        let error_message = "builder error";
+        let error_message = "failed to parse node address as valid URL";
 
         // Act
         let result = sdk.get_peers(None, None).await;

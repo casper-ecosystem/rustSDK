@@ -1120,7 +1120,12 @@ export class ClientService {
       //     dictionary_item_key
       //   );
       dictionary_item_params = new DictionaryItemStrParams();
-      dictionary_item_params.setEntityNamedKey(entity_named_key, dictionary_name, dictionary_item_key);
+      if (this.config['ENABLE_ADDRESSABLE_ENTITY']) {
+        dictionary_item_params.setEntityNamedKey(entity_named_key, dictionary_name, dictionary_item_key);
+      } else {
+        console.log(entity_named_key);
+        dictionary_item_params.setContractNamedKey(entity_named_key, dictionary_name, dictionary_item_key);
+      }
     }
     if (!dictionary_item_params) {
       const err = "dictionary_item_params is missing";

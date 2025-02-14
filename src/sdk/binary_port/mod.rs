@@ -697,11 +697,13 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_binary_latest_signed_block_success() {
+    async fn test_get_binary_latest_block_with_signatures_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
 
-        let result = sdk.get_binary_latest_signed_block(Some(node_address)).await;
+        let result = sdk
+            .get_binary_latest_block_with_signatures(Some(node_address))
+            .await;
         let signed_block = result.unwrap();
         assert!(signed_block.is_some());
         let signed_block = signed_block.unwrap();
@@ -710,13 +712,13 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_binary_signed_block_by_height_success() {
+    async fn test_get_binary_block_with_signatures_by_height_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
         let block_height = 1;
 
         let result = sdk
-            .get_binary_signed_block_by_height(Some(node_address), block_height)
+            .get_binary_block_with_signatures_by_height(Some(node_address), block_height)
             .await;
         let signed_block = result.unwrap();
         assert!(signed_block.is_some());
@@ -726,13 +728,13 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_binary_signed_block_by_hash_success() {
+    async fn test_get_binary_block_with_signatures_by_hash_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
         let block_height = 1;
 
         let result = sdk
-            .get_binary_signed_block_by_height(Some(node_address.clone()), block_height)
+            .get_binary_block_with_signatures_by_height(Some(node_address.clone()), block_height)
             .await;
         let signed_block = result.unwrap();
         assert!(signed_block.is_some());
@@ -742,7 +744,7 @@ mod tests {
         assert!(!block_hash.to_string().is_empty());
 
         let result = sdk
-            .get_binary_signed_block_by_hash(Some(node_address), *block_hash)
+            .get_binary_block_with_signatures_by_hash(Some(node_address), *block_hash)
             .await;
 
         let signed_block = result.unwrap();
@@ -983,7 +985,7 @@ mod tests {
         let block_height = 1;
 
         let result = sdk
-            .get_binary_signed_block_by_height(Some(node_address.clone()), block_height)
+            .get_binary_block_with_signatures_by_height(Some(node_address.clone()), block_height)
             .await;
         let signed_block = result.unwrap();
         assert!(signed_block.is_some());
@@ -1081,7 +1083,7 @@ mod tests {
         let block_height = 1;
 
         let result = sdk
-            .get_binary_signed_block_by_height(Some(node_address.clone()), block_height)
+            .get_binary_block_with_signatures_by_height(Some(node_address.clone()), block_height)
             .await;
         let signed_block = result.unwrap();
         assert!(signed_block.is_some());

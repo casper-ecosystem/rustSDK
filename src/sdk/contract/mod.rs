@@ -89,22 +89,45 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
 #[cfg(test)]
 async fn get_dictionary_item_input(entity_addr: &str) -> DictionaryItemInput {
     use crate::types::identifier::dictionary_item_identifier::DictionaryItemIdentifier;
+    use sdk_tests::tests::helpers::get_enable_addressable_entity;
 
-    DictionaryItemInput::Identifier(
-        DictionaryItemIdentifier::new_from_entity_info(
-            entity_addr,
-            DICTIONARY_NAME,
-            DICTIONARY_ITEM_KEY,
+    if get_enable_addressable_entity() {
+        DictionaryItemInput::Identifier(
+            DictionaryItemIdentifier::new_from_entity_info(
+                entity_addr,
+                DICTIONARY_NAME,
+                DICTIONARY_ITEM_KEY,
+            )
+            .unwrap(),
         )
-        .unwrap(),
-    )
+    } else {
+        DictionaryItemInput::Identifier(
+            DictionaryItemIdentifier::new_from_contract_info(
+                &entity_addr.replace("entity-contract", "hash"),
+                DICTIONARY_NAME,
+                DICTIONARY_ITEM_KEY,
+            )
+            .unwrap(),
+        )
+    }
 }
 
 #[cfg(test)]
 async fn get_dictionary_item_params_input(key: &str) -> DictionaryItemInput {
     use crate::types::deploy_params::dictionary_item_str_params::DictionaryItemStrParams;
+    use sdk_tests::tests::helpers::get_enable_addressable_entity;
 
     let mut params = DictionaryItemStrParams::new();
-    params.set_entity_named_key(key, DICTIONARY_NAME, DICTIONARY_ITEM_KEY);
+
+    if get_enable_addressable_entity() {
+        params.set_entity_named_key(key, DICTIONARY_NAME, DICTIONARY_ITEM_KEY);
+    } else {
+        params.set_contract_named_key(
+            &key.replace("entity-contract", "hash"),
+            DICTIONARY_NAME,
+            DICTIONARY_ITEM_KEY,
+        );
+    }
+
     DictionaryItemInput::Params(params)
 }

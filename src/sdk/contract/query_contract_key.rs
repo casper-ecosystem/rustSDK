@@ -122,7 +122,7 @@ impl SDK {
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_QueryGlobalStateResult>, SdkError> {
-        let path_string = match path {
+        match path {
             PathIdentifierInput::Path(ref path_struct) => {
                 if path_struct.is_empty() {
                     return Err(SdkError::InvalidArgument {
@@ -146,50 +146,64 @@ impl SDK {
         //log("query_contract_key!");
         let entity = self
             .get_entity(
-                entity_identifier,
-                entity_identifier_as_string,
-                maybe_block_identifier,
+                entity_identifier.clone(),
+                entity_identifier_as_string.clone(),
+                maybe_block_identifier.clone(),
                 verbosity,
                 rpc_address.clone(),
             )
             .await
             .map_err(SdkError::from);
 
-        let addressable_entity = entity
-            .as_ref()
-            .map_err(|err| SdkError::InvalidArgument {
-                context: "Addressable entity",
-                error: format!("Failed to get entity: {}", err),
-            })?
-            .result
-            .entity_result
-            .addressable_entity()
-            .ok_or_else(|| SdkError::InvalidArgument {
-                context: "Addressable entity",
-                error: "Addressable entity is missing".to_string(),
-            })?;
+        let key_as_string = entity_identifier_as_string
+            .or_else(|| entity_identifier.as_ref().map(ToString::to_string))
+            .unwrap_or_default();
 
-        let named_key = *addressable_entity
-            .named_keys
-            .get(&path_string)
-            .ok_or_else(|| SdkError::InvalidArgument {
-                context: "Named key",
-                error: format!("No key found for path string '{}'", path_string),
-            })?;
+        let maybe_block_id: Option<String> = match maybe_block_identifier.clone() {
+            Some(block_identifier) => match block_identifier {
+                BlockIdentifierInput::BlockIdentifier(_) => {
+                    maybe_block_identifier.map(|b| b.to_string())
+                }
+                BlockIdentifierInput::String(block_identifier_as_string) => {
+                    Some(block_identifier_as_string.clone())
+                }
+            },
+            None => None,
+        };
 
-        let key = KeyIdentifierInput::Key(named_key.into());
-
-        self.query_global_state(QueryGlobalStateParams {
-            key,
-            path: None,
-            maybe_global_state_identifier: None,
-            state_root_hash: None,
-            maybe_block_id: None,
-            verbosity,
-            rpc_address,
-        })
-        .await
-        .map_err(SdkError::from)
+        match entity {
+            // Entities enabled
+            Ok(_) => {
+                let key = KeyIdentifierInput::String(key_as_string);
+                self.query_global_state(QueryGlobalStateParams {
+                    key,
+                    path: Some(path),
+                    maybe_global_state_identifier: None,
+                    state_root_hash: None,
+                    maybe_block_id,
+                    verbosity,
+                    rpc_address,
+                })
+                .await
+                .map_err(SdkError::from)
+            }
+            Err(_) => {
+                // Entities not enabled
+                let key_as_string = key_as_string.replace("entity-contract", "hash");
+                let key = KeyIdentifierInput::String(key_as_string);
+                self.query_global_state(QueryGlobalStateParams {
+                    key,
+                    path: Some(path),
+                    maybe_global_state_identifier: None,
+                    state_root_hash: None,
+                    maybe_block_id,
+                    verbosity,
+                    rpc_address,
+                })
+                .await
+                .map_err(SdkError::from)
+            }
+        }
     }
 }
 
@@ -203,7 +217,9 @@ mod tests {
             verbosity::Verbosity,
         },
     };
-    use sdk_tests::tests::helpers::{get_block, get_network_constants};
+    use sdk_tests::tests::helpers::{
+        get_block, get_enable_addressable_entity, get_network_constants,
+    };
     use tokio;
 
     async fn get_entity_input() -> EntityIdentifier {
@@ -214,9 +230,9 @@ mod tests {
     async fn test_query_contract_key_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None, None);
-        let error_message = "builder error";
+        let error_message = "Invalid argument 'Path string': Path string is empty";
 
-        let path = PathIdentifierInput::String("installer".to_string());
+        let path = PathIdentifierInput::String("".to_string());
 
         // Act
         let result = sdk
@@ -233,7 +249,11 @@ mod tests {
     async fn test_query_contract_key_with_missing_key() {
         // Arrange
         let sdk = SDK::new(None, None, None);
-        let error_message = "Invalid argument 'get_entity': Error: Missing entity identifier";
+        let error_message = if get_enable_addressable_entity() {
+            "Invalid argument 'get_entity': Error: Missing entity identifier"
+        } else {
+            "Invalid argument 'query_global_state': Error: Missing key from formatted string"
+        };
 
         let path = PathIdentifierInput::String("installer".to_string());
 
@@ -256,6 +276,8 @@ mod tests {
         let (rpc_address, _, _, _, _) = get_network_constants();
 
         let entity = get_entity_input().await;
+
+        dbg!(&entity);
 
         let path = PathIdentifierInput::String("installer".to_string());
 
@@ -380,7 +402,8 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_key_with_error() {
         let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
-
+        let block_identifier =
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let error_message = "error sending request for url (http://localhost/rpc)";
         let entity = get_entity_input().await;
 
@@ -388,7 +411,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .query_contract_key(Some(entity), None, path, None, None, None)
+            .query_contract_key(Some(entity), None, path, Some(block_identifier), None, None)
             .await;
         // Assert
         assert!(result.is_err());
