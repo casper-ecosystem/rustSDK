@@ -152,12 +152,7 @@ pub fn generate_ed25519_js_alias() -> Result<JsValue, JsError> {
             secret_key
                 .to_pem()
                 .map_err(|err| JsError::new(&format!("Error in secret_key.to_pem: {:?}", err)))
-        });
-
-    let secret_key = match secret_key {
-        Ok(secret_key) => secret_key,
-        Err(err) => return Err(err),
-    };
+        })?;
 
     JsValue::from_serde(&secret_key).map_err(|err| {
         let error_text = format!("Error serializing secret key: {:?}", err);
@@ -187,12 +182,7 @@ pub fn generate_secp256k1_js_alias() -> Result<JsValue, JsError> {
             secret_key
                 .to_pem()
                 .map_err(|err| JsError::new(&format!("Error in secret_key.to_pem: {:?}", err)))
-        });
-
-    let secret_key = match secret_key {
-        Ok(secret_key) => secret_key,
-        Err(err) => return Err(err),
-    };
+        })?;
 
     JsValue::from_serde(&secret_key).map_err(|err| {
         let error_text = format!("Error serializing secret key: {:?}", err);

@@ -516,9 +516,8 @@ impl Watcher {
                                 .and_then(|transaction_hash| transaction_hash.as_str())
                         })
                     {
-                        let mut transaction_hash_found = target_hash.map_or(false, |target_hash| {
-                            target_hash == transaction_hash_processed
-                        });
+                        let mut transaction_hash_found =
+                            target_hash == Some(transaction_hash_processed);
 
                         let transaction_processed: Option<TransactionProcessed> =
                             serde_json::from_value(transaction.unwrap().clone()).ok();

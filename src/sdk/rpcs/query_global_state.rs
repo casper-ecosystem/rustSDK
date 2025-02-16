@@ -302,10 +302,7 @@ impl SDK {
 
         let key = match key {
             KeyIdentifierInput::Key(key) => Some(key),
-            KeyIdentifierInput::String(key_string) => match Key::from_formatted_str(&key_string) {
-                Ok(key) => Some(key),
-                Err(_) => None,
-            },
+            KeyIdentifierInput::String(key_string) => Key::from_formatted_str(&key_string).ok(),
         };
 
         if key.is_none() {

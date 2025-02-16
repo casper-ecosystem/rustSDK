@@ -91,7 +91,6 @@ impl SDK {
         // log("query_contract_dict!");
         self.get_dictionary_item(dictionary_item, state_root_hash, verbosity, rpc_address)
             .await
-            .map_err(SdkError::from)
     }
 }
 

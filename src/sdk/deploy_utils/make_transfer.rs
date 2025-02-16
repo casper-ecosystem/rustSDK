@@ -92,7 +92,6 @@ impl SDK {
             deploy_params,
             payment_params,
         )
-        .map_err(SdkError::from)
     }
 }
 

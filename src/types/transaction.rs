@@ -84,12 +84,10 @@ impl Transaction {
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
     ) -> Result<Transaction, String> {
-        make_transaction(builder_params, transaction_params)
-            .map(Into::into)
-            .map_err(|err| {
-                let err_msg = format!("Error creating body transaction: {}", err);
-                err_msg
-            })
+        make_transaction(builder_params, transaction_params).map_err(|err| {
+            let err_msg = format!("Error creating body transaction: {}", err);
+            err_msg
+        })
     }
 
     // static context
@@ -108,7 +106,6 @@ impl Transaction {
             transaction_params,
             maybe_id,
         )
-        .map(Into::into)
         .map_err(|err| format!("Error creating transfer transaction: {}", err))
     }
 
@@ -831,7 +828,6 @@ impl Transaction {
 
         let builder_params = self.make_transaction_builder_params(new_builder_params);
         let transaction: Transaction = make_transaction(builder_params, new_transaction_params)
-            .map(Into::into)
             .map_err(|err| {
                 let err_msg = format!("Error building transaction: {}", err);
                 log(&err_msg);
@@ -987,7 +983,7 @@ impl Transaction {
                 let new: &Bytes = new_bytes;
                 let new_transaction_bytes: _Bytes = {
                     let new_bytes: _Bytes = _Bytes::from((*new).to_vec());
-                    if new_bytes.len() > 0 {
+                    if !new_bytes.is_empty() {
                         new_bytes
                     } else {
                         default

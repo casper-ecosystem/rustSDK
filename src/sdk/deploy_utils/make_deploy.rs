@@ -69,7 +69,7 @@ impl SDK {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
     ) -> Result<Deploy, SdkError> {
-        make_deploy(deploy_params, session_params, payment_params).map_err(SdkError::from)
+        make_deploy(deploy_params, session_params, payment_params)
     }
 }
 

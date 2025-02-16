@@ -91,12 +91,10 @@ impl Deploy {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
     ) -> Result<Deploy, String> {
-        make_deploy(deploy_params, session_params, payment_params)
-            .map(Into::into)
-            .map_err(|err| {
-                let err_msg = format!("Error creating session deploy: {}", err);
-                err_msg
-            })
+        make_deploy(deploy_params, session_params, payment_params).map_err(|err| {
+            let err_msg = format!("Error creating session deploy: {}", err);
+            err_msg
+        })
     }
 
     // static context
@@ -115,7 +113,6 @@ impl Deploy {
             deploy_params,
             payment_params,
         )
-        .map(Into::into)
         .map_err(|err| format!("Error creating transfer deploy: {}", err))
     }
 
@@ -713,7 +710,7 @@ fn modify_session(
             let new: &Bytes = new_bytes;
             let new_module_bytes: _Bytes = {
                 let new_bytes: _Bytes = _Bytes::from((*new).to_vec());
-                if new_bytes.len() > 0 {
+                if !new_bytes.is_empty() {
                     new_bytes
                 } else {
                     default

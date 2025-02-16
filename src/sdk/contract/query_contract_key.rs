@@ -152,8 +152,7 @@ impl SDK {
                 verbosity,
                 rpc_address.clone(),
             )
-            .await
-            .map_err(SdkError::from);
+            .await;
 
         let key_as_string = entity_identifier_as_string
             .or_else(|| entity_identifier.as_ref().map(ToString::to_string))
@@ -185,7 +184,6 @@ impl SDK {
                     rpc_address,
                 })
                 .await
-                .map_err(SdkError::from)
             }
             Err(_) => {
                 // Entities not enabled
@@ -201,7 +199,6 @@ impl SDK {
                     rpc_address,
                 })
                 .await
-                .map_err(SdkError::from)
             }
         }
     }

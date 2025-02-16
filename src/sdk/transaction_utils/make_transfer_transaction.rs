@@ -86,7 +86,6 @@ impl SDK {
     ) -> Result<Transaction, SdkError> {
         // log("make_transfer_transaction");
         make_transfer_transaction(maybe_source, target, amount, transaction_params, maybe_id)
-            .map_err(SdkError::from)
     }
 }
 

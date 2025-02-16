@@ -64,7 +64,7 @@ impl SDK {
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
     ) -> Result<Transaction, SdkError> {
-        make_transaction(builder_params, transaction_params).map_err(SdkError::from)
+        make_transaction(builder_params, transaction_params)
     }
 }
 

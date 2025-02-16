@@ -92,7 +92,6 @@ impl SDK {
 
         self.speculative_exec(transaction.unwrap().into(), verbosity, rpc_address)
             .await
-            .map_err(SdkError::from)
     }
 }
 
