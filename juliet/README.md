@@ -32,7 +32,7 @@ casper-rust-wasm-sdk = { version = "1.0.0", git = "https://github.com/casper-eco
 use casper_rust_wasm_sdk::{types::verbosity::Verbosity, SDK};
 
 let sdk = SDK::new(
-  Some("https://rpc.testnet.casperlabs.io".to_string()),
+  Some("https://node.testnet.casper.network".to_string()),
   Some(Verbosity::High)
 );
 ```
@@ -106,7 +106,7 @@ import init, {
   Verbosity,
 } from 'casper-sdk';
 
-const node_address = 'https://rpc.testnet.casperlabs.io';
+const node_address = 'https://node.testnet.casper.network';
 const verbosity = Verbosity.High;
 
 function App() {
@@ -260,7 +260,7 @@ const { SDK } = casper_sdk;
 // or with import
 import { SDK } from 'casper-sdk';
 
-const node_address = 'https://rpc.integration.casperlabs.io';
+const node_address = 'https://node.testnet.casper.network';
 const sdk = new SDK(node_address);
 console.log(sdk);
 ```
@@ -952,7 +952,7 @@ const signed_deploy = unsigned_deploy.sign(secret_key);
 Developers using Rust can utilize the wait_deploy function to wait for a specific deploy event. This is achieved by providing the desired event URL, deploy hash, and an optional timeout duration. Once the deploy is processed, the resulting data, such as the deploy's cost, can be easily accessed and utilized in subsequent logic.
 
 ```rust
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 
 let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
@@ -960,7 +960,7 @@ let timeout_duration = None; // Some(30000) for 30s instead of default timeout d
 
 // Wait for deploy
 let event_parse_result = sdk
-    .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash, timeout_duration)
+    .wait_deploy(DEFAULT_EVENTS_ADDRESS, &deploy_hash, timeout_duration)
     .await
     .unwrap();
 let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
@@ -1005,14 +1005,14 @@ use casper_rust_wasm_sdk::deploy_watcher::watcher::{
     DeploySubscription, EventHandlerFn,
 };
 
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 
 let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 let timeout_duration = None; // Some(30000) for 30s instead of default timeout duration of 60s
 
 // Creates a watcher instance
-let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, timeout_duration);
+let mut watcher = sdk.watch_deploy(DEFAULT_EVENTS_ADDRESS, timeout_duration);
 
 // Create a callback function handler of your design
 let event_handler_fn = get_event_handler_fn(deploy_hash.to_string());
@@ -1494,7 +1494,7 @@ SECRET_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
 # SECRET_KEY_USER_1 = MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 # SECRET_KEY_USER_2 = MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
 # NODE_ADDRESS=http://localhost:7777
-# EVENT_ADDRESS=http://localhost:9999/events/main
+# EVENTS_ADDRESS=http://localhost:9999/events/main
 # SPECULATIVE_ADDRESS=http://localhost:7778
 # CHAIN_NAME=casper-net-1
 # SECRET_KEY_NAME=secret_key.pem
