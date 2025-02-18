@@ -67,6 +67,25 @@ jobs:
             exit 1
           fi
 
+          echo "Waiting for the service to be ready on http://127.0.0.1:18101/events..."
+
+          for i in {1..30}; do  # Wait for up to 30 seconds
+            if curl --silent --include --fail http://127.0.0.1:18101/events; then
+              echo "Service is up!"
+              echo "Wait 45s for nctl sidecar to boot"
+              sleep 45  # - name: wait for up to 45 seconds for an era like
+              break
+            fi
+            echo "Waiting..."
+            sleep 1
+          done
+
+          # Check if the service is still not ready after 30 seconds
+          if ! curl --silent --include --fail http://127.0.0.1:18101/events; then
+            echo "Service did not start in time!"
+            exit 1
+          fi
+
       # - name: List files in the users directory
       #   run: |
       #     echo "Listing files in the users directory of the service container..."

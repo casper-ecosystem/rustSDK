@@ -264,7 +264,7 @@ pub(crate) mod intern {
             TransactionHash::from(install.as_ref().unwrap().result.transaction_hash);
         let transaction_hash_as_string = transaction_hash.to_string();
         assert!(!transaction_hash_as_string.is_empty());
-
+        dbg!(&events_address);
         let event_parse_result = sdk
             .wait_transaction(events_address, &transaction_hash_as_string, None)
             .await
