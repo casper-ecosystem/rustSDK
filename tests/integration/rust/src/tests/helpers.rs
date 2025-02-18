@@ -269,7 +269,7 @@ pub(crate) mod intern {
             .wait_transaction(events_address, &transaction_hash_as_string, None)
             .await
             .unwrap();
-        dbg!(event_parse_result);
+        dbg!(&event_parse_result);
         let transaction = event_parse_result
             .body
             .unwrap()
