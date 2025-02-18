@@ -24,7 +24,7 @@ describe('Angular App Tests', () => {
   describe('Loading', () => {
     it('should have a title', async () => {
       const title = await test.page.title();
-      expect(title).toBe('Casper Client');
+      expect(title).toBe('Casper WebClient');
     });
 
     it('should have a state_root_hash', async () => {
@@ -106,7 +106,6 @@ describe('Angular App Tests', () => {
       expect(account_hash).toMatch(pattern);
     });
   });
-
 
   describe('Contract install deploy', () => {
     beforeEach(async () => {
