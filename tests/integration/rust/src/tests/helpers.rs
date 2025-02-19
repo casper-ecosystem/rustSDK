@@ -297,13 +297,7 @@ pub(crate) mod intern {
             .hash()
             .to_string()
             .is_empty());
-        dbg!(
-            get_transaction
-                .result
-                .execution_info
-                .unwrap()
-                .execution_result
-        );
+        dbg!(get_transaction.result.execution_info);
         dbg!(get_transaction.result.transaction.approvals());
         Ok(transaction_hash_as_string)
     }
