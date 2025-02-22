@@ -72,6 +72,7 @@ jobs:
           for i in {1..30}; do  # Wait for up to 30 seconds
             if curl --silent --max-time 2 http://127.0.0.1:18101/events | grep -q "ApiVersion"; then
               echo "Service is up!"
+              sleep 45
               break
             fi
             echo "Waiting..."
@@ -100,6 +101,7 @@ jobs:
         run: |
           echo "SECRET_KEY_USER_1=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
           echo "SECRET_KEY_USER_2=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
+          echo "ENABLE_ADDRESSABLE_ENTITY=false" >> $GITHUB_ENV
 
       - name: Delete user-1 directory
         run: |

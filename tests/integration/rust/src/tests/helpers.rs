@@ -281,6 +281,12 @@ pub(crate) mod intern {
         //     .unwrap();
         // assert_eq!(transaction.hash.to_string(), transaction_hash_as_string);
         thread::sleep(DEPLOY_TIME);
+
+        let get_transaction = sdk
+            .get_era_summary(None, None, Some(rpc_address.to_string()))
+            .await;
+        dbg!(get_transaction.unwrap().result.era_summary);
+
         let get_transaction = sdk
             .get_transaction(
                 transaction_hash,
