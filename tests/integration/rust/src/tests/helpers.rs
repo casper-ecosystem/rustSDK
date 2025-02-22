@@ -290,7 +290,7 @@ pub(crate) mod intern {
         let get_transaction = sdk
             .get_transaction(
                 transaction_hash,
-                Some(true),
+                Some(false),
                 None,
                 Some(rpc_address.to_string()),
             )
@@ -305,6 +305,44 @@ pub(crate) mod intern {
             .is_empty());
         dbg!(get_transaction.result.execution_info);
         dbg!(get_transaction.result.transaction.approvals());
+        thread::sleep(DEPLOY_TIME);
+
+        let get_transaction = sdk
+            .get_transaction(
+                transaction_hash,
+                Some(false),
+                None,
+                Some(rpc_address.to_string()),
+            )
+            .await;
+        let get_transaction = get_transaction.unwrap();
+        assert!(!get_transaction.result.api_version.to_string().is_empty());
+        assert!(!get_transaction
+            .result
+            .transaction
+            .hash()
+            .to_string()
+            .is_empty());
+        dbg!(get_transaction.result.execution_info);
+        thread::sleep(DEPLOY_TIME);
+        let get_transaction = sdk
+            .get_transaction(
+                transaction_hash,
+                Some(false),
+                None,
+                Some(rpc_address.to_string()),
+            )
+            .await;
+        let get_transaction = get_transaction.unwrap();
+        assert!(!get_transaction.result.api_version.to_string().is_empty());
+        assert!(!get_transaction
+            .result
+            .transaction
+            .hash()
+            .to_string()
+            .is_empty());
+        dbg!(get_transaction.result.execution_info);
+
         Ok(transaction_hash_as_string)
     }
 }
