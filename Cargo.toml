@@ -24,7 +24,7 @@ exclude = [
 casper-types = { version = "5.0.0", default-features = false, features = [
   "datasize",
 ] }
-casper-client = { version = "2.0.0", default-features = false }
+casper-client = { version = "3.0.1", default-features = false }
 casper-binary-port = { version = "1.0.0" }
 casper-binary-port-access = { version = "0.1.0" }
 rand = { version = "0.8.5", default-features = false }
@@ -38,7 +38,7 @@ once_cell = { version = "1.18.0", default-features = false }
 chrono = "0.4.31"
 num-traits = "0.2"
 humantime = "2"
-thiserror = "1"
+thiserror = "2"
 base16 = "0.2.1"
 base64 = { version = "0.22.1", default-features = false, features = ["alloc"] }
 hex = { version = "0.4.3", default-features = false }
@@ -72,6 +72,6 @@ dotenvy = "0.15.7"
 
 [patch.crates-io]
 casper-types = { version = "5.0.0", git = "https://github.com/casper-network/casper-node", branch = "dev" }
-casper-client = { version = "2.0.0", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "feat-track-node-2.0" }
+casper-client = { version = "3.0.1", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "feat-track-node-2.0" }
 casper-binary-port = { version = "1.0.0", git = "https://github.com/casper-network/casper-node", branch = "dev" }
 casper-binary-port-access = { version = "0.1.0", git = "https://github.com/gRoussac/casper-binary-port-client", branch = "binary_response_changes" }
