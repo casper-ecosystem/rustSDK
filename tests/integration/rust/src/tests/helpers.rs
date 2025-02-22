@@ -289,7 +289,7 @@ pub(crate) mod intern {
 
         let get_transaction = sdk
             .get_transaction(
-                transaction_hash,
+                transaction_hash.clone(),
                 Some(false),
                 None,
                 Some(rpc_address.to_string()),
@@ -309,7 +309,7 @@ pub(crate) mod intern {
 
         let get_transaction = sdk
             .get_transaction(
-                transaction_hash,
+                transaction_hash.clone(),
                 Some(false),
                 None,
                 Some(rpc_address.to_string()),
@@ -327,7 +327,7 @@ pub(crate) mod intern {
         thread::sleep(DEPLOY_TIME);
         let get_transaction = sdk
             .get_transaction(
-                transaction_hash,
+                transaction_hash.clone(),
                 Some(false),
                 None,
                 Some(rpc_address.to_string()),
