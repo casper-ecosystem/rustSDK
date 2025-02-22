@@ -343,6 +343,11 @@ pub(crate) mod intern {
             .is_empty());
         dbg!(get_transaction.result.execution_info);
 
+        let get_transaction = sdk
+            .get_era_summary(None, None, Some(rpc_address.to_string()))
+            .await;
+        dbg!(get_transaction.unwrap().result.era_summary);
+
         Ok(transaction_hash_as_string)
     }
 }
