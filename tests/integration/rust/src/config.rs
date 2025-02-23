@@ -17,7 +17,7 @@ pub const DEFAULT_SECRET_KEY_NAME: &str = "secret_key.pem";
 // TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static erroring with runtime dropped the dispatch task
 // https://github.com/seanmonstar/reqwest/issues/1148#issuecomment-910868788
 pub const TIMESTAMP_WAIT_TIME: Duration = time::Duration::from_millis(1000);
-pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
+pub const DEPLOY_TIME: Duration = time::Duration::from_millis(60000);
 // read_pem_file will look SECRET_KEY_NAME to root directory if relative path is not found (relative to root)
 pub const DEFAULT_SECRET_KEY_NCTL_PATH: &str =
     "../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/";

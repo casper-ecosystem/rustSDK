@@ -248,7 +248,17 @@ pub(crate) mod intern {
             }
         };
 
+        dbg!(secret_key);
+
         let sdk = create_test_sdk(None);
+
+        let get_transaction = sdk
+            .get_era_summary(None, None, Some(rpc_address.to_string()))
+            .await;
+        dbg!(get_transaction.unwrap().result.era_summary.era_id);
+
+        thread::sleep(DEPLOY_TIME);
+
         let install = sdk
             .install(
                 transaction_params,
@@ -281,11 +291,12 @@ pub(crate) mod intern {
         //     .unwrap();
         // assert_eq!(transaction.hash.to_string(), transaction_hash_as_string);
         thread::sleep(DEPLOY_TIME);
+        thread::sleep(DEPLOY_TIME);
 
         let get_transaction = sdk
             .get_era_summary(None, None, Some(rpc_address.to_string()))
             .await;
-        dbg!(get_transaction.unwrap().result.era_summary);
+        dbg!(get_transaction.unwrap().result.era_summary.era_id);
 
         let get_transaction = sdk
             .get_transaction(
@@ -303,7 +314,13 @@ pub(crate) mod intern {
             .hash()
             .to_string()
             .is_empty());
-        dbg!(get_transaction.result.execution_info);
+        dbg!(get_transaction
+            .result
+            .execution_info
+            .unwrap()
+            .execution_result
+            .unwrap()
+            .error_message());
         dbg!(get_transaction.result.transaction.approvals());
         thread::sleep(DEPLOY_TIME);
 
@@ -323,7 +340,13 @@ pub(crate) mod intern {
             .hash()
             .to_string()
             .is_empty());
-        dbg!(get_transaction.result.execution_info);
+        dbg!(get_transaction
+            .result
+            .execution_info
+            .unwrap()
+            .execution_result
+            .unwrap()
+            .error_message());
         thread::sleep(DEPLOY_TIME);
         let get_transaction = sdk
             .get_transaction(
@@ -341,12 +364,42 @@ pub(crate) mod intern {
             .hash()
             .to_string()
             .is_empty());
-        dbg!(get_transaction.result.execution_info);
+        dbg!(get_transaction
+            .result
+            .execution_info
+            .unwrap()
+            .execution_result
+            .unwrap()
+            .error_message());
 
         let get_transaction = sdk
             .get_era_summary(None, None, Some(rpc_address.to_string()))
             .await;
-        dbg!(get_transaction.unwrap().result.era_summary);
+        dbg!(get_transaction.unwrap().result.era_summary.era_id);
+
+        let get_transaction = sdk
+            .get_transaction(
+                transaction_hash.clone(),
+                Some(false),
+                None,
+                Some(rpc_address.to_string()),
+            )
+            .await;
+        let get_transaction = get_transaction.unwrap();
+        assert!(!get_transaction.result.api_version.to_string().is_empty());
+        assert!(!get_transaction
+            .result
+            .transaction
+            .hash()
+            .to_string()
+            .is_empty());
+        dbg!(get_transaction
+            .result
+            .execution_info
+            .unwrap()
+            .execution_result
+            .unwrap()
+            .error_message());
 
         Ok(transaction_hash_as_string)
     }
