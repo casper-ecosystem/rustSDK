@@ -88,7 +88,8 @@ jobs:
       - name: tail
         run: |
           cd casper-nctl-2-docker/assets/logs
-          tail -f stderr.log
+          cat stderr.log
+          cat sidecar-stderr.log
 
       # - name: List files in the users directory
       #   run: |
