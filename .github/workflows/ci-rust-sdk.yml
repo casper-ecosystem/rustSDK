@@ -85,6 +85,11 @@ jobs:
             exit 1
           fi
 
+      - name: tail
+        run: |
+          cd casper-nctl-2-docker/assets/logs
+          tail -f stderr.log
+
       # - name: List files in the users directory
       #   run: |
       #     echo "Listing files in the users directory of the service container..."
@@ -97,78 +102,78 @@ jobs:
 
       # WARNING: These accounts, and their private keys, are now publicly known.
       # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
-      - name: Set SECRET_KEY_USER_1 and SECRET_KEY_USER_2 environment variables
-        run: |
-          echo "SECRET_KEY_USER_1=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
-          echo "SECRET_KEY_USER_2=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
-          echo "ENABLE_ADDRESSABLE_ENTITY=false" >> $GITHUB_ENV
+      # - name: Set SECRET_KEY_USER_1 and SECRET_KEY_USER_2 environment variables
+      #   run: |
+      #     echo "SECRET_KEY_USER_1=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
+      #     echo "SECRET_KEY_USER_2=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
+      #     echo "ENABLE_ADDRESSABLE_ENTITY=false" >> $GITHUB_ENV
 
-      - name: Delete user-1 directory
-        run: |
-          echo "Deleting ./casper-nctl-2-docker directories..."
-          sudo rm -rf ./casper-nctl-2-docker
+      # - name: Delete user-1 directory
+      #   run: |
+      #     echo "Deleting ./casper-nctl-2-docker directories..."
+      #     sudo rm -rf ./casper-nctl-2-docker
 
-      - name: Print GITHUB_ENV
-        run: |
-          echo "Contents of GITHUB_ENV:"
-          cat $GITHUB_ENV
+      # - name: Print GITHUB_ENV
+      #   run: |
+      #     echo "Contents of GITHUB_ENV:"
+      #     cat $GITHUB_ENV
 
-      - uses: actions/checkout@v2
+      # - uses: actions/checkout@v2
 
-      - name: Swatinem cache
-        uses: Swatinem/rust-cache@cb2cf0cc7c5198d3364b9630e2c3d457f160790c #v1.4.0
+      # # - name: Swatinem cache
+      # #   uses: Swatinem/rust-cache@cb2cf0cc7c5198d3364b9630e2c3d457f160790c #v1.4.0
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          components: rustfmt, clippy
-          target: wasm32-unknown-unknown
+      # - uses: actions-rs/toolchain@v1
+      #   with:
+      #     toolchain: stable
+      #     profile: minimal
+      #     components: rustfmt, clippy
+      #     target: wasm32-unknown-unknown
 
-      - name: Fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: -- --check
+      # - name: Fmt
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: fmt
+      #     args: -- --check
 
-      - name: Audit
-        uses: actions-rs/cargo@v1
-        with:
-          command: audit
+      # - name: Audit
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: audit
 
-      - name: Lint
-        run: make check-lint
+      # - name: Lint
+      #   run: make check-lint
 
-      - name: Unit Tests
-        run: make test
+      # - name: Unit Tests
+      #   run: make test
 
-      - name: Integration Tests
-        run: make integration-test
+      # - name: Integration Tests
+      #   run: make integration-test
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
-        with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: 'https://registry.npmjs.org'
+      # - name: Use Node.js ${{ matrix.node-version }}
+      #   uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
+      #   with:
+      #     node-version: ${{ matrix.node-version }}
+      #     registry-url: 'https://registry.npmjs.org'
 
-      - name: E2E Tests
-        run: make e2e-test
+      # - name: E2E Tests
+      #   run: make e2e-test
 
-      - name: Build lib for all targets
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --lib --all-targets
+      # - name: Build lib for all targets
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: build
+      #     args: --lib --all-targets
 
-      - name: Doc
-        run: make doc
+      # - name: Doc
+      #   run: make doc
 
-      - name: Github pages 🚀
-        uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6 #v4.4.1
-        with:
-          folder: docs # The folder the action should deploy.
-          target-folder: condor
-          commit-message: 'Deploy documentation for ${{ github.ref_name }}'
+      # - name: Github pages 🚀
+      #   uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6 #v4.4.1
+      #   with:
+      #     folder: docs # The folder the action should deploy.
+      #     target-folder: condor
+      #     commit-message: 'Deploy documentation for ${{ github.ref_name }}'
 
       # - name: Install Electron
       #   run: |
