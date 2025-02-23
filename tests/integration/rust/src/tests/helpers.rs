@@ -314,13 +314,7 @@ pub(crate) mod intern {
             .hash()
             .to_string()
             .is_empty());
-        dbg!(get_transaction
-            .result
-            .execution_info
-            .unwrap()
-            .execution_result
-            .unwrap()
-            .error_message());
+        dbg!(get_transaction.result.execution_info);
         dbg!(get_transaction.result.transaction.approvals());
         thread::sleep(DEPLOY_TIME);
 
@@ -340,13 +334,7 @@ pub(crate) mod intern {
             .hash()
             .to_string()
             .is_empty());
-        dbg!(get_transaction
-            .result
-            .execution_info
-            .unwrap()
-            .execution_result
-            .unwrap()
-            .error_message());
+        dbg!(get_transaction.result.execution_info);
         thread::sleep(DEPLOY_TIME);
         let get_transaction = sdk
             .get_transaction(
@@ -364,13 +352,7 @@ pub(crate) mod intern {
             .hash()
             .to_string()
             .is_empty());
-        dbg!(get_transaction
-            .result
-            .execution_info
-            .unwrap()
-            .execution_result
-            .unwrap()
-            .error_message());
+        dbg!(get_transaction.result.execution_info);
 
         let get_transaction = sdk
             .get_era_summary(None, None, Some(rpc_address.to_string()))
@@ -393,13 +375,7 @@ pub(crate) mod intern {
             .hash()
             .to_string()
             .is_empty());
-        dbg!(get_transaction
-            .result
-            .execution_info
-            .unwrap()
-            .execution_result
-            .unwrap()
-            .error_message());
+        dbg!(get_transaction.result.execution_info);
 
         Ok(transaction_hash_as_string)
     }
