@@ -248,8 +248,6 @@ pub(crate) mod intern {
             }
         };
 
-        dbg!(secret_key);
-
         let sdk = create_test_sdk(None);
 
         let get_transaction = sdk
@@ -278,20 +276,16 @@ pub(crate) mod intern {
             TransactionHash::from(install.as_ref().unwrap().result.transaction_hash);
         let transaction_hash_as_string = transaction_hash.to_string();
         assert!(!transaction_hash_as_string.is_empty());
-        // dbg!(&events_address);
-        // let event_parse_result = sdk
-        //     .wait_transaction(events_address, &transaction_hash_as_string, None)
-        //     .await
-        //     .unwrap();
-        // dbg!(&event_parse_result);
-        // let transaction = event_parse_result
-        //     .body
-        //     .unwrap()
-        //     .get_transaction_processed()
-        //     .unwrap();
-        // assert_eq!(transaction.hash.to_string(), transaction_hash_as_string);
-        thread::sleep(DEPLOY_TIME);
-        thread::sleep(DEPLOY_TIME);
+        let event_parse_result = sdk
+            .wait_transaction(events_address, &transaction_hash_as_string, None)
+            .await
+            .unwrap();
+        let transaction = event_parse_result
+            .body
+            .unwrap()
+            .get_transaction_processed()
+            .unwrap();
+        assert_eq!(transaction.hash.to_string(), transaction_hash_as_string);
 
         let get_transaction = sdk
             .get_era_summary(None, None, Some(rpc_address.to_string()))
@@ -314,69 +308,6 @@ pub(crate) mod intern {
             .hash()
             .to_string()
             .is_empty());
-        dbg!(get_transaction.result.execution_info);
-        dbg!(get_transaction.result.transaction.approvals());
-        thread::sleep(DEPLOY_TIME);
-
-        let get_transaction = sdk
-            .get_transaction(
-                transaction_hash.clone(),
-                Some(false),
-                None,
-                Some(rpc_address.to_string()),
-            )
-            .await;
-        let get_transaction = get_transaction.unwrap();
-        assert!(!get_transaction.result.api_version.to_string().is_empty());
-        assert!(!get_transaction
-            .result
-            .transaction
-            .hash()
-            .to_string()
-            .is_empty());
-        dbg!(get_transaction.result.execution_info);
-        thread::sleep(DEPLOY_TIME);
-        let get_transaction = sdk
-            .get_transaction(
-                transaction_hash.clone(),
-                Some(false),
-                None,
-                Some(rpc_address.to_string()),
-            )
-            .await;
-        let get_transaction = get_transaction.unwrap();
-        assert!(!get_transaction.result.api_version.to_string().is_empty());
-        assert!(!get_transaction
-            .result
-            .transaction
-            .hash()
-            .to_string()
-            .is_empty());
-        dbg!(get_transaction.result.execution_info);
-
-        let get_transaction = sdk
-            .get_era_summary(None, None, Some(rpc_address.to_string()))
-            .await;
-        dbg!(get_transaction.unwrap().result.era_summary.era_id);
-
-        let get_transaction = sdk
-            .get_transaction(
-                transaction_hash.clone(),
-                Some(false),
-                None,
-                Some(rpc_address.to_string()),
-            )
-            .await;
-        let get_transaction = get_transaction.unwrap();
-        assert!(!get_transaction.result.api_version.to_string().is_empty());
-        assert!(!get_transaction
-            .result
-            .transaction
-            .hash()
-            .to_string()
-            .is_empty());
-        dbg!(get_transaction.result.execution_info);
-
         Ok(transaction_hash_as_string)
     }
 }
