@@ -85,64 +85,45 @@ jobs:
             exit 1
           fi
 
-      - name: tail
-        run: |
-          ls -la casper-nctl-2-docker/assets/logs || echo "Logs directory not found"
-          chmod +r casper-nctl-2-docker/assets/logs/*.log
-          cd casper-nctl-2-docker/assets/logs
-          cat stderr.log
-          cat sidecar-stderr.log
-          docker ps -a
-
-      - name: Print Docker Logs
-        run: |
-          CONTAINER_ID=$(docker ps --format "{{.ID}} {{.Image}}" | grep "casper-nctl" | awk '{print $1}')
-          if [ -z "$CONTAINER_ID" ]; then
-            echo "No running container found!"
-            exit 1
-          fi
-          echo "Found container: $CONTAINER_ID"
-          docker logs "$CONTAINER_ID"
-
       # - name: List files in the users directory
       #   run: |
       #     echo "Listing files in the users directory of the service container..."
       #     docker exec ${{ job.services.casper-nctl.id }} ls /app/casper-nctl/assets/net-1/users/
 
-      # - name: List files in user-1 directory
-      #   run: |
-      #     echo "Listing files in ./assets/users/user-1/:"
-      #     ls -la ./casper-nctl-2-docker/assets/users/user-1/
+      - name: List files in user-1 directory
+        run: |
+          echo "Listing files in ./assets/users/user-1/:"
+          ls -la ./casper-nctl-2-docker/assets/users/user-1/
 
       # WARNING: These accounts, and their private keys, are now publicly known.
       # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
-      # - name: Set SECRET_KEY_USER_1 and SECRET_KEY_USER_2 environment variables
-      #   run: |
-      #     echo "SECRET_KEY_USER_1=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
-      #     echo "SECRET_KEY_USER_2=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
-      #     echo "ENABLE_ADDRESSABLE_ENTITY=false" >> $GITHUB_ENV
+      - name: Set SECRET_KEY_USER_1 and SECRET_KEY_USER_2 environment variables
+        run: |
+          echo "SECRET_KEY_USER_1=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
+          echo "SECRET_KEY_USER_2=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
+          echo "ENABLE_ADDRESSABLE_ENTITY=false" >> $GITHUB_ENV
 
       # - name: Delete user-1 directory
       #   run: |
       #     echo "Deleting ./casper-nctl-2-docker directories..."
       #     sudo rm -rf ./casper-nctl-2-docker
 
-      # - name: Print GITHUB_ENV
-      #   run: |
-      #     echo "Contents of GITHUB_ENV:"
-      #     cat $GITHUB_ENV
+      - name: Print GITHUB_ENV
+        run: |
+          echo "Contents of GITHUB_ENV:"
+          cat $GITHUB_ENV
 
-      # - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       # # - name: Swatinem cache
       # #   uses: Swatinem/rust-cache@cb2cf0cc7c5198d3364b9630e2c3d457f160790c #v1.4.0
 
-      # - uses: actions-rs/toolchain@v1
-      #   with:
-      #     toolchain: stable
-      #     profile: minimal
-      #     components: rustfmt, clippy
-      #     target: wasm32-unknown-unknown
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          components: rustfmt, clippy
+          target: wasm32-unknown-unknown
 
       # - name: Fmt
       #   uses: actions-rs/cargo@v1
@@ -158,8 +139,26 @@ jobs:
       # - name: Lint
       #   run: make check-lint
 
-      # - name: Unit Tests
-      #   run: make test
+      - name: Unit Tests
+        run: make test
+
+      - name: tail
+        run: |
+          ls -la casper-nctl-2-docker/assets/logs || echo "Logs directory not found".log
+          cd casper-nctl-2-docker/assets/logs
+          cat stderr.log
+          cat sidecar-stderr.log
+          docker ps -a
+
+      - name: Print Docker Logs
+        run: |
+          CONTAINER_ID=$(docker ps --format "{{.ID}} {{.Image}}" | grep "casper-nctl" | awk '{print $1}')
+          if [ -z "$CONTAINER_ID" ]; then
+            echo "No running container found!"
+            exit 1
+          fi
+          echo "Found container: $CONTAINER_ID"
+          docker logs "$CONTAINER_ID"
 
       # - name: Integration Tests
       #   run: make integration-test
