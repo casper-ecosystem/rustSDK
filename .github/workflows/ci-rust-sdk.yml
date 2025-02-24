@@ -36,6 +36,15 @@ jobs:
     #       - ./assets/users:/app/casper-nctl/assets/net-1/users/
 
     steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          components: rustfmt, clippy
+          target: wasm32-unknown-unknown
+
       # Replace by above service with docker image of stable 2.0
       - name: Clone casper-nctl-2-docker repository
         run: |
@@ -113,17 +122,8 @@ jobs:
           echo "Contents of GITHUB_ENV:"
           cat $GITHUB_ENV
 
-      - uses: actions/checkout@v2
-
       # # - name: Swatinem cache
       # #   uses: Swatinem/rust-cache@cb2cf0cc7c5198d3364b9630e2c3d457f160790c #v1.4.0
-
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          components: rustfmt, clippy
-          target: wasm32-unknown-unknown
 
       # - name: Fmt
       #   uses: actions-rs/cargo@v1
