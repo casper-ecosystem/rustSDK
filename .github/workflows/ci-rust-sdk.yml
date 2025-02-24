@@ -144,9 +144,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Disable AppArmor
+        run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
+
       - name: E2E Tests
         run: |
-          export PUPPETEER_ARGS="--no-sandbox --disable-setuid-sandbox"
           make e2e-test
 
       - name: Build lib for all targets

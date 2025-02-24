@@ -6,7 +6,10 @@ const puppeteer = require('puppeteer');
 describe('Angular App Tests', () => {
   beforeAll(async () => {
     setupFixtures();
-    test.browser = await puppeteer.launch({ headless: 'new' });
+    test.browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     test.page = await test.browser.newPage();
     await test.page.goto(config.app_address);
     await test.page.setViewport({
