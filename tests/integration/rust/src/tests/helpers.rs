@@ -35,12 +35,9 @@ lazy_static! {
 }
 
 pub(crate) mod intern {
-    use std::{thread, time::Duration};
-
     use super::{get_enable_addressable_entity, read_wasm_file, CEP78_REINSTALL_GUARD};
     use crate::config::{
-        TestConfig, ARGS_JSON, CEP78_CONTRACT, DEPLOY_TIME, PAYMENT_AMOUNT_CONTRACT_CEP78,
-        WASM_PATH,
+        TestConfig, ARGS_JSON, CEP78_CONTRACT, PAYMENT_AMOUNT_CONTRACT_CEP78, WASM_PATH,
     };
     use casper_rust_wasm_sdk::{
         rpcs::{
@@ -55,7 +52,6 @@ pub(crate) mod intern {
         },
         SDK,
     };
-    use tokio::time::sleep;
     pub fn create_test_sdk(config: Option<TestConfig>) -> SDK {
         match config {
             Some(config) => SDK::new(config.rpc_address, config.node_address, config.verbosity),

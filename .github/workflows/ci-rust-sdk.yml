@@ -16,8 +16,7 @@ jobs:
   build_and_test:
     strategy:
       matrix:
-        #https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
-        os: [ubuntu-20.04]
+        os: [ubuntu-latest] # Uses the newest available runner
         node-version: [22.x]
     runs-on: ${{ matrix.os }}
 
@@ -36,6 +35,11 @@ jobs:
     #       - ./assets/users:/app/casper-nctl/assets/net-1/users/
 
     steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev
+
       - uses: actions/checkout@v4
 
       - name: Swatinem cache
