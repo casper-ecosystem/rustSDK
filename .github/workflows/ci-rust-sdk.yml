@@ -16,7 +16,7 @@ jobs:
   build_and_test:
     strategy:
       matrix:
-        os: [ubuntu-latest] # Uses the newest available runner
+        os: [ubuntu-latest]
         node-version: [22.x]
     runs-on: ${{ matrix.os }}
 
@@ -145,7 +145,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: E2E Tests
-        run: make e2e-test
+        run: |
+          export PUPPETEER_ARGS="--no-sandbox --disable-setuid-sandbox"
+          make e2e-test
 
       - name: Build lib for all targets
         uses: actions-rs/cargo@v1
