@@ -250,13 +250,6 @@ pub(crate) mod intern {
 
         let sdk = create_test_sdk(None);
 
-        let get_transaction = sdk
-            .get_era_summary(None, None, Some(rpc_address.to_string()))
-            .await;
-        dbg!(get_transaction.unwrap().result.era_summary.era_id);
-
-        thread::sleep(DEPLOY_TIME);
-
         let install = sdk
             .install(
                 transaction_params,
@@ -286,11 +279,6 @@ pub(crate) mod intern {
             .get_transaction_processed()
             .unwrap();
         assert_eq!(transaction.hash.to_string(), transaction_hash_as_string);
-
-        let get_transaction = sdk
-            .get_era_summary(None, None, Some(rpc_address.to_string()))
-            .await;
-        dbg!(get_transaction.unwrap().result.era_summary.era_id);
 
         let get_transaction = sdk
             .get_transaction(

@@ -17,8 +17,8 @@ jobs:
     strategy:
       matrix:
         #https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
-        os: [ubuntu-22.04]
-        node-version: [20.x]
+        os: [ubuntu-24.04]
+        node-version: [22.x]
     runs-on: ${{ matrix.os }}
 
     # services:
@@ -38,15 +38,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Swatinem cache
+        uses: Swatinem/rust-cache@v2
+
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           profile: minimal
           components: rustfmt, clippy
           target: wasm32-unknown-unknown
-
-      # - name: Swatinem cache
-      #   uses: Swatinem/rust-cache@v2
 
       # Replace by above service with docker image of stable 2.0
       - name: Clone casper-nctl-2-docker repository
@@ -84,7 +84,6 @@ jobs:
           for i in {1..30}; do  # Wait for up to 30 seconds
             if curl --silent --max-time 2 http://127.0.0.1:18101/events | grep -q "ApiVersion"; then
               echo "Service is up!"
-              sleep 45
               break
             fi
             echo "Waiting..."

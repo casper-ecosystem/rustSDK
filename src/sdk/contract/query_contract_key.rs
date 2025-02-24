@@ -274,8 +274,6 @@ mod tests {
 
         let entity = get_entity_input().await;
 
-        dbg!(&entity);
-
         let path = PathIdentifierInput::String("installer".to_string());
 
         let (_, block_height) = get_block(&rpc_address.clone()).await;
