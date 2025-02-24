@@ -87,9 +87,22 @@ jobs:
 
       - name: tail
         run: |
+          ls -la casper-nctl-2-docker/assets/logs || echo "Logs directory not found"
+          chmod +r casper-nctl-2-docker/assets/logs/*.log
           cd casper-nctl-2-docker/assets/logs
           cat stderr.log
           cat sidecar-stderr.log
+          docker ps -a
+
+      - name: Print Docker Logs
+        run: |
+          CONTAINER_ID=$(docker ps --format "{{.ID}} {{.Image}}" | grep "casper-nctl" | awk '{print $1}')
+          if [ -z "$CONTAINER_ID" ]; then
+            echo "No running container found!"
+            exit 1
+          fi
+          echo "Found container: $CONTAINER_ID"
+          docker logs "$CONTAINER_ID"
 
       # - name: List files in the users directory
       #   run: |
