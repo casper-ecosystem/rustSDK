@@ -128,7 +128,7 @@ jobs:
       - name: Audit
         uses: actions-rs/cargo@v1
         with:
-          command: audit
+          command: cargo install cargo-audit || cargo audit
 
       - name: Lint
         run: make check-lint
