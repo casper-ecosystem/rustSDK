@@ -36,6 +36,11 @@ jobs:
     #       - ./assets/users:/app/casper-nctl/assets/net-1/users/
 
     steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev
+
       - uses: actions/checkout@v4
 
       - name: Swatinem cache
@@ -123,7 +128,9 @@ jobs:
           cat $GITHUB_ENV
 
       - name: Run cargo audit
-        run: cargo audit
+        uses: actions-rs/cargo@v1
+        with:
+          command: audit
 
       - name: Lint
         run: make check-lint
