@@ -123,9 +123,7 @@ jobs:
           cat $GITHUB_ENV
 
       - name: Run cargo audit
-        uses: actions-rs/cargo@v1
-        with:
-          command: audit
+        run: cargo audit
 
       - name: Lint
         run: make check-lint
