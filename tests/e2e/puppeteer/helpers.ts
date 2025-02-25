@@ -92,7 +92,7 @@ export async function setSecretKey() {
   if (fs.existsSync(resolvedPath)) {
     await elementHandle.uploadFile(resolvedPath);
   } else {
-    console.error(`File [resolvedPath} does not exist.`);
+    console.error(`File ${resolvedPath} does not exist.`);
   }
   await variables.page.waitForSelector('[e2e-id="publicKeyElt"]');
   await variables.page.waitForSelector('[e2e-id="main_purse"]');
@@ -106,7 +106,7 @@ export async function setWasm(file_name: string) {
   if (fs.existsSync(resolvedPath)) {
     await elementHandle.uploadFile(resolvedPath);
   } else {
-    console.error(`File [resolvedPath} does not exist.`);
+    console.error(`File ${resolvedPath} does not exist.`);
   }
   await variables.page.waitForSelector('[e2e-id="wasmName"]');
   const name = await variables.page.evaluate(() => {
