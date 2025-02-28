@@ -213,6 +213,7 @@ mod tests {
         assert!(result.is_err());
 
         let err_string = result.err().unwrap().to_string();
+        dbg!(err_string);
         assert!(err_string.contains(error_message));
     }
 }
