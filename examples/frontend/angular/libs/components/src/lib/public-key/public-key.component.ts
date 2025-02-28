@@ -1,4 +1,13 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnDestroy, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Inject,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { State, StateService } from '@util/state';
 import { Subscription } from 'rxjs';
@@ -16,7 +25,6 @@ import { FormService } from '@util/form';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublicKeyComponent implements AfterViewInit, OnDestroy {
-
   public_key!: string;
   secret_key!: string;
   action!: string;
@@ -32,7 +40,7 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
     private readonly storageService: StorageService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly formService: FormService,
-  ) { }
+  ) {}
 
   async ngAfterViewInit() {
     this.setStateSubscription();
@@ -40,7 +48,7 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
     if (this.public_key) {
       await this.updateAccount();
       this.stateService.setState({
-        public_key: this.public_key
+        public_key: this.public_key,
       });
     }
   }
@@ -50,35 +58,43 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
   }
 
   private setStateSubscription() {
-    this.stateSubscription = this.stateService.getState().subscribe(async (state: State) => {
-      state.action && (this.action = state.action);
-      if (state.public_key && this.public_key != state.public_key) {
-        state.public_key && (this.public_key = state.public_key);
-        state.secret_key && (this.secret_key = state.secret_key);
-        await this.updateAccount();
-      } else if (state.public_key) {
-        state.public_key && (this.public_key = state.public_key);
-      }
-      this.changeDetectorRef.markForCheck();
-    });
+    this.stateSubscription = this.stateService
+      .getState()
+      .subscribe(async (state: State) => {
+        state.action && (this.action = state.action);
+        if (state.public_key && this.public_key != state.public_key) {
+          state.public_key && (this.public_key = state.public_key);
+          state.secret_key && (this.secret_key = state.secret_key);
+          await this.updateAccount();
+        } else if (state.public_key) {
+          state.public_key && (this.public_key = state.public_key);
+        }
+        this.changeDetectorRef.markForCheck();
+      });
   }
 
   async onPublicKeyChange() {
-    const public_key: string = this.publicKeyElt && this.publicKeyElt.nativeElement.value.toString().trim();
+    const public_key: string =
+      this.publicKeyElt &&
+      this.publicKeyElt.nativeElement.value.toString().trim();
     this.public_key = '';
     const secret_key = '';
     this.stateService.setState({
       public_key,
-      secret_key
+      secret_key,
     });
     this.storageService.setState({
-      public_key
+      public_key,
     });
-
   }
 
   isInvalid(): boolean {
-    if (this.config['action_needs_public_key'] && !(this.config['action_needs_public_key'] as Array<string>)?.includes(this.action)) {
+    if (
+      this.config['action_needs_public_key'] &&
+      !(this.config['action_needs_public_key'] as Array<string>)?.includes(
+        this.action,
+      )
+    ) {
       return false;
     }
     return !(this.publicKeyElt?.nativeElement.value?.trim() ?? '');
@@ -88,7 +104,7 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
     let account_hash: string | undefined;
     let main_purse: string | undefined;
 
-    if (this.config['ENABLE_ADDRESSABLE_ENTITY']) {
+    if (this.config['enable_addressable_entity']) {
       const get_entity = await this.clientService.get_entity(this.public_key);
       if (!get_entity.entity_result) {
         return;
@@ -96,8 +112,11 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
       // TODO Fix this camelcase syntax with helpers
       // const account_hash = get_account?.account?.account_hash;
       // const main_purse = get_account?.account?.main_purse;
-      account_hash = get_entity?.entity_result?.AddressableEntity?.entity.entity_kind.Account;
-      main_purse = get_entity?.entity_result?.AddressableEntity?.entity.main_purse;
+      account_hash =
+        get_entity?.entity_result?.AddressableEntity?.entity.entity_kind
+          .Account;
+      main_purse =
+        get_entity?.entity_result?.AddressableEntity?.entity.main_purse;
     } else {
       const get_account = await this.clientService.get_account(this.public_key);
       if (get_account && !get_account.account) {
@@ -110,14 +129,13 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
     if (account_hash && main_purse) {
       this.stateService.setState({
         account_hash,
-        main_purse
+        main_purse,
       });
       this.storageService.setState({
         account_hash,
-        main_purse
+        main_purse,
       });
       account_hash && this.formService.updateForm();
     }
   }
-
 }

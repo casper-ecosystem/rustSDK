@@ -33,7 +33,9 @@ export const variables = {
 export async function clear() {
   await variables.page.waitForSelector('[e2e-id="clear result"]');
   await variables.page.click('[e2e-id="clear result"]');
-  await variables.page.waitForFunction(() => !document.querySelector('[e2e-id="clear result"]'));
+  await variables.page.waitForFunction(
+    () => !document.querySelector('[e2e-id="clear result"]')
+  );
   // wait for document to refresh
   await delay(150);
   let result = await variables.page.evaluate(() => {
@@ -78,7 +80,9 @@ export async function seletAction(action: string) {
   await variables.page.select('[e2e-id="selectActionElt"]', action);
   await variables.page.waitForSelector('[e2e-id="selectActionElt"]');
   const action_selected = await variables.page.evaluate(() => {
-    return (document.querySelector('[e2e-id="selectActionElt"]') as HTMLSelectElement).value;
+    return (
+      document.querySelector('[e2e-id="selectActionElt"]') as HTMLSelectElement
+    ).value;
   });
   expect(action_selected).toBe(action);
   // wait for document to refresh
@@ -116,7 +120,7 @@ export async function setWasm(file_name: string) {
 }
 
 export async function screenshot() {
-  await variables.page.screenshot({ path: "test.png" });
+  await variables.page.screenshot({ path: 'test.png' });
 }
 
 export function delay(time: number | undefined) {
@@ -137,7 +141,10 @@ export async function setupFixtures() {
     writeFile(variables.secret_key, copyFilePath);
     variables.delete_key_at_root_after_test = copy_key_to_root_folder;
   } else {
-    variables.secret_key = readPEMFile(`${config.key_path}${config.key_name}`, copy_key_to_root_folder);
+    variables.secret_key = readPEMFile(
+      `${config.key_path}${config.key_name}`,
+      copy_key_to_root_folder
+    );
     variables.account = publicKeyFromSecretKey(variables.secret_key);
   }
 
@@ -147,7 +154,9 @@ export async function setupFixtures() {
     variables.target = publicKeyFromSecretKey(secret_key_target);
   } else {
     const key_path_target = config.key_path.replace('user-1', 'user-2');
-    const secret_key_target = readPEMFile(`${key_path_target}${config.key_name}`);
+    const secret_key_target = readPEMFile(
+      `${key_path_target}${config.key_name}`
+    );
     variables.target = publicKeyFromSecretKey(secret_key_target);
   }
 
@@ -180,11 +189,16 @@ export function deleteFile(filePathToDelete: string) {
 }
 
 export async function get_state_root_hash() {
-  const get_state_root_hash_options = variables.sdk.get_state_root_hash_options({
-    rpc_address: config.rpc_address
-  });
-  const get_state_root_hash_result = await variables.sdk.get_state_root_hash(get_state_root_hash_options);
-  variables.state_root_hash_default = get_state_root_hash_result?.state_root_hash.toString();
+  const get_state_root_hash_options = variables.sdk.get_state_root_hash_options(
+    {
+      rpc_address: config.rpc_address,
+    }
+  );
+  const get_state_root_hash_result = await variables.sdk.get_state_root_hash(
+    get_state_root_hash_options
+  );
+  variables.state_root_hash_default =
+    get_state_root_hash_result?.state_root_hash.toString();
 }
 
 function readPEMFile(key_path?: string, copy?: boolean): string {
@@ -227,7 +241,7 @@ function writeFile(content: string, dest: string) {
 
 export async function get_block() {
   const chain_get_block_options = variables.sdk.get_block_options({
-    rpc_address: config.rpc_address
+    rpc_address: config.rpc_address,
   });
   const block_result = await variables.sdk.get_block(chain_get_block_options);
   variables.block_hash = block_result?.block?.hash?.toString();

@@ -1,8 +1,8 @@
-import { config } from "@util/config";
-import { PricingMode } from "casper-sdk";
+import { config } from '@util/config';
+import { PricingMode } from 'casper-sdk';
 
 export type option = {
-  value: string,
+  value: string;
   label: string;
   default?: boolean;
 };
@@ -21,8 +21,8 @@ export type InputField = {
   state_name?: string[];
   storage_name?: string;
   config_name?: string;
-  maxlength?: string,
-  pattern?: string,
+  maxlength?: string;
+  pattern?: string;
   placeholder_config_value?: string;
   change?: string;
   disabled_when?: string[];
@@ -199,9 +199,9 @@ const transferAmount: InputField = {
   controlName: 'transferAmount',
   e2e: 'transferAmountElt',
   config_name: 'minimum_transfer',
-  maxlength: "28",
-  pattern: "\\d*",
-  change: "motesToCSPR"
+  maxlength: '28',
+  pattern: '\\d*',
+  change: 'motesToCSPR',
 };
 
 const paymentAmount: InputField = {
@@ -214,7 +214,7 @@ const paymentAmount: InputField = {
   controlName: 'paymentAmount',
   placeholder: '',
   e2e: 'paymentAmountElt',
-  change: "motesToCSPR"
+  change: 'motesToCSPR',
 };
 
 const ttlInput: InputField = {
@@ -251,7 +251,7 @@ const sessionHash: InputField = {
   controlName: 'sessionHash',
   placeholder: 'Contract Hash or Package Hash',
   e2e: 'sessionHashElt',
-  disabled_when: ['has_wasm', 'sessionName.value']
+  disabled_when: ['has_wasm', 'sessionName.value'],
 };
 
 const entityHash: InputField = {
@@ -264,10 +264,8 @@ const entityHash: InputField = {
   controlName: 'entityHash',
   placeholder: 'Entity Hash (entity-contract-0x) or Package Hash (package-0x)',
   e2e: 'entityHashElt',
-  disabled_when: ['has_wasm', 'entityAlias.value']
+  disabled_when: ['has_wasm', 'entityAlias.value'],
 };
-
-
 
 const callPackage: InputField = {
   id: 'callPackageElt',
@@ -280,7 +278,7 @@ const callPackage: InputField = {
   placeholder: '',
   e2e: 'callPackageElt',
   label_class: 'form-label text-nowrap',
-  disabled_when: ['has_wasm']
+  disabled_when: ['has_wasm'],
 };
 
 const versionInput: InputField = {
@@ -293,7 +291,7 @@ const versionInput: InputField = {
   controlName: 'version',
   placeholder: '1, empty last',
   e2e: 'versionElt',
-  disabled_when: ['has_wasm']
+  disabled_when: ['has_wasm'],
 };
 
 const gasPriceTolerance: InputField = {
@@ -305,7 +303,7 @@ const gasPriceTolerance: InputField = {
   name: 'gas_price_tolerance',
   controlName: 'gasPriceTolerance',
   placeholder: '1, empty default',
-  e2e: 'gasPriceToleranceElt'
+  e2e: 'gasPriceToleranceElt',
 };
 
 const additionalComputationFactor: InputField = {
@@ -318,7 +316,7 @@ const additionalComputationFactor: InputField = {
   controlName: 'additionalComputationFactor',
   placeholder: '0, empty default',
   e2e: 'additionalComputationFactorElt',
-  disabled_when: ['fixedPricingMode']
+  disabled_when: ['fixedPricingMode'],
 };
 
 const sessionNameInput: InputField = {
@@ -331,7 +329,7 @@ const sessionNameInput: InputField = {
   controlName: 'sessionName',
   placeholder: 'Counter',
   e2e: 'sessionNameElt',
-  disabled_when: ['has_wasm', 'sessionHash.value']
+  disabled_when: ['has_wasm', 'sessionHash.value'],
 };
 
 const entityAlias: InputField = {
@@ -344,7 +342,7 @@ const entityAlias: InputField = {
   controlName: 'entityAlias',
   placeholder: 'Counter',
   e2e: 'entityAliasElt',
-  disabled_when: ['has_wasm', 'entityHash.value']
+  disabled_when: ['has_wasm', 'entityHash.value'],
 };
 
 const entryPointInput: InputField = {
@@ -357,7 +355,7 @@ const entryPointInput: InputField = {
   controlName: 'entryPoint',
   placeholder: 'counter_inc',
   e2e: 'entryPointElt',
-  disabled_when: ['has_wasm']
+  disabled_when: ['has_wasm'],
 };
 
 const argsSimpleInput: InputField = {
@@ -368,7 +366,7 @@ const argsSimpleInput: InputField = {
   label: 'Args',
   name: 'args_simple',
   controlName: 'argsSimple',
-  placeholder: 'foo:Bool=\'true\', bar:String=\'value\'',
+  placeholder: "foo:Bool='true', bar:String='value'",
   e2e: 'argsSimpleElt',
   disabled_when: ['argsJson.value'],
   storage_name: 'args_simple',
@@ -435,7 +433,7 @@ const seedUref: InputField = {
   controlName: 'seedUref',
   placeholder: 'uref-0x',
   e2e: 'seedUrefElt',
-  enabled_when: ['newFromSeedUref']
+  enabled_when: ['newFromSeedUref'],
 };
 
 const seedAccountHash: InputField = {
@@ -448,7 +446,7 @@ const seedAccountHash: InputField = {
   controlName: 'seedAccountHash',
   placeholder: 'account-hash-0x',
   e2e: 'seedAccountHashElt',
-  enabled_when: ['newFromAccountInfo']
+  enabled_when: ['newFromAccountInfo'],
 };
 
 const seedContractHash: InputField = {
@@ -461,7 +459,7 @@ const seedContractHash: InputField = {
   controlName: 'seedContractHash',
   placeholder: 'hash-0x',
   e2e: 'seedContractHashElt',
-  enabled_when: ['newFromContractInfo']
+  enabled_when: ['newFromContractInfo'],
 };
 
 const seedEntityHash: InputField = {
@@ -474,7 +472,7 @@ const seedEntityHash: InputField = {
   controlName: 'seedEntityHash',
   placeholder: 'entity-contract-0x',
   e2e: 'seedEntityHashElt',
-  enabled_when: ['newFromEntityInfo']
+  enabled_when: ['newFromEntityInfo'],
 };
 
 const seedKey: InputField = {
@@ -487,7 +485,7 @@ const seedKey: InputField = {
   controlName: 'seedKey',
   placeholder: 'dictionary-0x',
   e2e: 'seedKeyElt',
-  enabled_when: ['newFromDictionaryKey']
+  enabled_when: ['newFromDictionaryKey'],
 };
 
 const seedName: InputField = {
@@ -500,7 +498,11 @@ const seedName: InputField = {
   controlName: 'seedName',
   placeholder: 'events',
   e2e: 'seedNameElt',
-  enabled_when: ['newFromContractInfo', 'newFromAccountInfo', 'newFromEntityInfo']
+  enabled_when: [
+    'newFromContractInfo',
+    'newFromAccountInfo',
+    'newFromEntityInfo',
+  ],
 };
 
 const itemKey: InputField = {
@@ -513,7 +515,12 @@ const itemKey: InputField = {
   controlName: 'itemKey',
   placeholder: 'Item key string',
   e2e: 'itemKeyElt',
-  enabled_when: ['newFromContractInfo', 'newFromAccountInfo', 'newFromSeedUref', 'newFromEntityInfo']
+  enabled_when: [
+    'newFromContractInfo',
+    'newFromAccountInfo',
+    'newFromSeedUref',
+    'newFromEntityInfo',
+  ],
 };
 
 const queryKey: InputField = {
@@ -530,8 +537,8 @@ const queryKey: InputField = {
 
 const queryContractKey: InputField = {
   ...queryKey,
-  label: 'Contract Hash',
-  placeholder: 'hash-0x',
+  label: 'Contract Hash or Entity Hash',
+  placeholder: 'hash-0x || entity-contract-0x',
 };
 
 const queryPath: InputField = {
@@ -585,11 +592,21 @@ const selectDictIdentifier: InputField = {
   state_name: ['select_dict_identifier'],
   options: [
     { value: 'newFromSeedUref', label: 'From Dictionary Uref' },
-    { value: 'newFromContractInfo', label: 'From Contract Info (depr.)' },
-    { value: 'newFromEntityInfo', label: 'From Entity Info', default: true },
+    {
+      value: 'newFromContractInfo',
+      label: config['enable_addressable_entity']
+        ? 'From Contract Info (depr.)'
+        : 'From Contract Info',
+      default: !config['enable_addressable_entity'],
+    },
+    {
+      value: 'newFromEntityInfo',
+      label: 'From Entity Info',
+      default: !!config['enable_addressable_entity'],
+    },
     { value: 'newFromAccountInfo', label: 'From Account Info' },
     { value: 'newFromDictionaryKey', label: 'From Dictionary Key' },
-  ]
+  ],
 };
 
 const selectPricingMode: InputField = {
@@ -603,9 +620,17 @@ const selectPricingMode: InputField = {
   controlName: 'selectPricingMode',
   e2e: 'selectPricingModeElt',
   options: [
-    { value: PricingMode.Classic.toString(), label: 'Classic', default: config['default_pricing_mode'] === PricingMode.Classic },
-    { value: PricingMode.Fixed.toString(), label: 'Fixed', default: config['default_pricing_mode'] === PricingMode.Fixed },
-  ]
+    {
+      value: PricingMode.Classic.toString(),
+      label: 'Classic',
+      default: config['default_pricing_mode'] === PricingMode.Classic,
+    },
+    {
+      value: PricingMode.Fixed.toString(),
+      label: 'Fixed',
+      default: config['default_pricing_mode'] === PricingMode.Fixed,
+    },
+  ],
 };
 
 const selectTransactionCategory: InputField = {
@@ -619,10 +644,18 @@ const selectTransactionCategory: InputField = {
   controlName: 'selectTransactionCategory',
   e2e: 'selectTransactionCategoryElt',
   options: [
-    { value: "true", label: "Install & Upgrade", default: config['default_is_install_upgrade'] === true },
-    { value: "false", label: "Session", default: config['default_is_install_upgrade'] === false },
+    {
+      value: 'true',
+      label: 'Install & Upgrade',
+      default: config['default_is_install_upgrade'] === true,
+    },
+    {
+      value: 'false',
+      label: 'Session',
+      default: config['default_is_install_upgrade'] === false,
+    },
   ],
-  enabled_when: ['has_wasm']
+  enabled_when: ['has_wasm'],
 };
 
 const selectStandardParyment: InputField = {
@@ -635,11 +668,11 @@ const selectStandardParyment: InputField = {
   name: 'standard_payment',
   controlName: 'standardPayment',
   e2e: 'standardPaymentElt',
-  placeholder_config_value: 'true'
+  placeholder_config_value: 'true',
 };
 
 const getBlockFields: InputContainer[][] = [
-  [{ input: blockIdentifierHeight }, { input: blockIdentifierHash }]
+  [{ input: blockIdentifierHeight }, { input: blockIdentifierHash }],
 ];
 
 const getAccountFields: InputContainer[][] = [
@@ -672,7 +705,14 @@ const queryGlobalStateFields: InputContainer[][] = [
 
 const queryContractDictFields: InputContainer[][] = [
   [{ input: stateRootHash }],
-  [{ input: seedEntityHash, required: true }],
+  [
+    {
+      input: config['enable_addressable_entity']
+        ? seedEntityHash
+        : seedContractHash,
+      required: true,
+    },
+  ],
   [{ input: seedName, required: true }],
   [{ input: itemKey, required: true }],
 ];
@@ -710,27 +750,51 @@ const getTransferFields: InputContainer[][] = [
 
 const getSpeculativeTransferFields: InputContainer[][] = [
   ...getBlockFields,
-  ...getTransferFields
+  ...getTransferFields,
 ];
 
 const installFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor },],
-  [{ wasm_button: true }, { select: selectTransactionCategory }, { input: selectStandardParyment }],
+  [
+    { input: paymentAmount, required: true },
+    { input: ttlInput },
+    { input: gasPriceTolerance },
+    { select: selectPricingMode },
+    { input: additionalComputationFactor },
+  ],
+  [
+    { wasm_button: true },
+    { select: selectTransactionCategory },
+    { input: selectStandardParyment },
+  ],
   [{ input: argsSimpleInput }],
   [{ textarea: argsJson }],
 ];
 
 const installDeployFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor },],
+  [
+    { input: paymentAmount, required: true },
+    { input: ttlInput },
+    { input: gasPriceTolerance },
+    { select: selectPricingMode },
+    { input: additionalComputationFactor },
+  ],
   [{ wasm_button: true }],
   [{ input: argsSimpleInput }],
   [{ textarea: argsJson }],
 ];
 
 const makeDeployFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }],
+  [
+    { input: paymentAmount, required: true },
+    { input: ttlInput },
+    { input: gasPriceTolerance },
+  ],
   [{ wasm_button: true }],
-  [{ input: sessionHash, required: true }, { input: callPackage }, { input: versionInput }],
+  [
+    { input: sessionHash, required: true },
+    { input: callPackage },
+    { input: versionInput },
+  ],
   [{ input: sessionNameInput, required: true }],
   [{ input: entryPointInput, required: true }],
   [{ input: argsSimpleInput }],
@@ -738,25 +802,43 @@ const makeDeployFields: InputContainer[][] = [
 ];
 
 const makeTransactionFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor }],
-  [{ wasm_button: true }, { select: selectTransactionCategory }, { input: selectStandardParyment }],
-  [{ input: entityHash, required: true }, { input: callPackage }, { input: versionInput }],
+  [
+    { input: paymentAmount, required: true },
+    { input: ttlInput },
+    { input: gasPriceTolerance },
+    { select: selectPricingMode },
+    { input: additionalComputationFactor },
+  ],
+  [
+    { wasm_button: true },
+    { select: selectTransactionCategory },
+    { input: selectStandardParyment },
+  ],
+  [
+    { input: entityHash, required: true },
+    { input: callPackage },
+    { input: versionInput },
+  ],
   [{ input: entityAlias, required: true }],
   [{ input: entryPointInput, required: true }],
   [{ input: argsSimpleInput }],
   [{ textarea: argsJson }],
 ];
 
-const speculativeDeployFields: InputContainer[][] = [
-  ...makeDeployFields
-];
+const speculativeDeployFields: InputContainer[][] = [...makeDeployFields];
 
 const speculativeTransactionFields: InputContainer[][] = [
-  ...makeTransactionFields
+  ...makeTransactionFields,
 ];
 
 const callEntrypointFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor }],
+  [
+    { input: paymentAmount, required: true },
+    { input: ttlInput },
+    { input: gasPriceTolerance },
+    { select: selectPricingMode },
+    { input: additionalComputationFactor },
+  ],
   [{ input: entityHash }, { input: callPackage }, { input: versionInput }],
   [{ input: entityAlias }],
   [{ input: entryPointInput }],
@@ -765,7 +847,11 @@ const callEntrypointFields: InputContainer[][] = [
 ];
 
 const callEntrypointFieldsDeploy: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }],
+  [
+    { input: paymentAmount, required: true },
+    { input: ttlInput },
+    { input: gasPriceTolerance },
+  ],
   [{ input: sessionHash }, { input: callPackage }, { input: versionInput }],
   [{ input: sessionNameInput }],
   [{ input: entryPointInput }],
