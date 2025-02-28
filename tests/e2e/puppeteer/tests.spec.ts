@@ -2442,7 +2442,6 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="itemKeyElt"]');
       await clearInput('[e2e-id="itemKeyElt"]');
       await test.page.type('[e2e-id="itemKeyElt"]', '0');
-      await screenshot();
       await submit();
       await getResult();
     });
