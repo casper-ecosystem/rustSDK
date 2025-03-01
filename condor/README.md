@@ -32,7 +32,7 @@ casper-rust-wasm-sdk = { version = "2.0.0", git = "https://github.com/casper-eco
 use casper_rust_wasm_sdk::{types::verbosity::Verbosity, SDK};
 
 let sdk = SDK::new(
-  Some("https://rpc.testnet.casperlabs.io".to_string()),
+  Some("https://node.testnet.casper.network".to_string()),
   Some(Verbosity::High)
 );
 ```
@@ -106,7 +106,7 @@ import init, {
   Verbosity,
 } from 'casper-sdk';
 
-const node_address = 'https://rpc.testnet.casperlabs.io';
+const rpc_address = 'https://node.testnet.casper.networko';
 const verbosity = Verbosity.High;
 
 function App() {
@@ -125,7 +125,7 @@ function App() {
     await fetchWasm();
   };
 
-  const sdk = new SDK(node_address, verbosity);
+  const sdk = new SDK(rpc_address, verbosity);
   console.log(sdk);
   ...
 }
@@ -169,18 +169,18 @@ import init, { SDK, Verbosity } from 'casper-sdk';
 export const SDK_TOKEN = new InjectionToken() < SDK > 'SDK';
 export const WASM_ASSET_PATH =
   new InjectionToken() < string > 'wasm_asset_path';
-export const NODE_ADDRESS = new InjectionToken() < string > 'node_address';
+export const RPC_ADDRESS = new InjectionToken() < string > 'rpc_address';
 export const VERBOSITY = new InjectionToken() < Verbosity > 'verbosity';
 
 type Params = {
   wasm_asset_path: string,
-  node_address: string,
+  rpc_address: string,
   verbosity: Verbosity,
 };
 
 export const fetchWasmFactory = async (params: Params): Promise<SDK> => {
   const wasm = await init(params.wasm_asset_path);
-  return new SDK(params.node_address, params.verbosity);
+  return new SDK(params.rpc_address, params.verbosity);
 };
 ```
 
@@ -260,8 +260,8 @@ const { SDK } = casper_sdk;
 // or with import
 import { SDK } from 'casper-sdk';
 
-const node_address = 'https://rpc.integration.casperlabs.io';
-const sdk = new SDK(node_address);
+const rpc_address = 'https://node.testnet.casper.network';
+const sdk = new SDK(rpc_address);
 console.log(sdk);
 ```
 
@@ -293,7 +293,7 @@ You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io
 
 ```rust
 use casper_rust_wasm_sdk::types::{
-    transaction::Transaction, transaction_hash::TransactionHash,
+    transaction::Transaction, hash::transaction_hash::TransactionHash,
 };
 
 let transaction_hash =
@@ -307,15 +307,14 @@ let get_transaction = sdk
 
 let transaction: Transaction = get_transaction.unwrap().result.transaction.into();
 let timestamp = transaction.timestamp();
-let header = transaction.header();
 let hash = transaction.hash();
-println!("{timestamp} {header} {hash}");
+println!("{timestamp} {hash}");
 ```
 
 #### Get deploy by deploy hash (legacy)
 
 ```rust
-use casper_rust_wasm_sdk::types::deploy_hash::DeployHash;
+use casper_rust_wasm_sdk::types::hash::deploy_hash::DeployHash;
 
 let deploy_hash =
     DeployHash::new("a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9")
@@ -401,9 +400,8 @@ const transaction_result = await sdk.get_transaction(get_transaction_options);
 
 const transaction: Transaction = transaction_result.transaction;
 const timestamp = transaction.timestamp;
-const header = transaction.header;
 const hash = transaction.hash.toString();
-console.log(timestamp, header, hash);
+console.log(timestamp, hash);
 ```
 
 #### Get deploy by deploy hash (legacy)
@@ -635,7 +633,7 @@ console.log(transaction_hash);
 ```rust
 use casper_rust_wasm_sdk::types::{
     addr::entity_addr::EntityAddr,
-    addressable_entity_hash::AddressableEntityHash,
+    hash::addressable_entity_hash::AddressableEntityHash,
     transaction_params::{
         transaction_builder_params::TransactionBuilderParams,
         transaction_str_params::TransactionStrParams,
@@ -714,7 +712,7 @@ let sdk = SDK::new(
 );
 
 use casper_rust_wasm_sdk::types::{
-    addressable_entity_hash::AddressableEntityHash,
+    hash::addressable_entity_hash::AddressableEntityHash,
     transaction_params::{
         transaction_builder_params::TransactionBuilderParams,
         transaction_str_params::TransactionStrParams,
@@ -800,7 +798,7 @@ Puts a [`Transaction`] to the network for execution.
 
 ```rust
 use casper_rust_wasm_sdk::types::{
-    addressable_entity_hash::AddressableEntityHash,
+    hash::addressable_entity_hash::AddressableEntityHash,
     transaction_params::{
         transaction_builder_params::TransactionBuilderParams,
         transaction_str_params::TransactionStrParams,
@@ -984,7 +982,7 @@ const signed_transaction = unsigned_transaction.sign(secret_key);
 Developers using Rust can utilize the wait_transaction function to wait for a specific transaction event. This is achieved by providing the desired event URL, transaction hash, and an optional timeout duration. Once the transaction is processed, the resulting data, such as the transaction's cost, can be easily accessed and utilized in subsequent logic.
 
 ```rust
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
 let transaction_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
@@ -992,7 +990,7 @@ let timeout_duration = None; // Some(30000) for 30s instead of default timeout d
 
 // Wait for transaction
 let event_parse_result = sdk
-    .wait_transaction(DEFAULT_EVENT_ADDRESS, &transaction_hash, timeout_duration)
+    .wait_transaction(DEFAULT_EVENTS_ADDRESS, &transaction_hash, timeout_duration)
     .await
     .unwrap();
 let transaction_processed = event_parse_result.body.unwrap().get_transaction_processed();
@@ -1037,14 +1035,14 @@ use casper_rust_wasm_sdk::watcher::{
     Subscription, EventHandlerFn,
 };
 
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
 let transaction_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 let timeout_duration = None; // Some(30000) for 30s instead of default timeout duration of 60s
 
 // Creates a watcher instance
-let mut watcher = sdk.watch_transaction(DEFAULT_EVENT_ADDRESS, timeout_duration);
+let mut watcher = sdk.watch_transaction(DEFAULT_EVENTS_ADDRESS, timeout_duration);
 
 // Create a callback function handler of your design
 let event_handler_fn = get_event_handler_fn(transaction_hash.to_string());
@@ -1130,7 +1128,7 @@ console.log(results);
 use casper_rust_wasm_sdk::{
     helpers::json_pretty_print,
     types::{
-        transaction_hash::TransactionHash,
+        hash::transaction_hash::TransactionHash,
         transaction_params::transaction_str_params::TransactionStrParams,
     },
 };
@@ -1158,7 +1156,7 @@ pub const ARGS_JSON: &str = r#"[
 pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
 pub const CEP78_CONTRACT: &str = "cep78.wasm";
 pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
 let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
@@ -1186,7 +1184,7 @@ println!("{:?}", transaction_hash);
 let transaction_hash_as_string = transaction_hash.to_hex_string();
 println!("wait transaction_hash {}", transaction_hash_as_string);
 let event_parse_result: EventParseResult = sdk
-    .wait_transaction(DEFAULT_EVENT_ADDRESS, &transaction_hash_as_string, None)
+    .wait_transaction(DEFAULT_EVENTS_ADDRESS, &transaction_hash_as_string, None)
     .await
     .unwrap();
 println!("{:?}", event_parse_result);
@@ -1292,7 +1290,7 @@ async function loadFile() {
 
 ```rust
 use casper_rust_wasm_sdk::types::{
-    addressable_entity_hash::AddressableEntityHash,
+    hash::addressable_entity_hash::AddressableEntityHash,
     transaction_params::{
         transaction_builder_params::TransactionBuilderParams,
         transaction_str_params::TransactionStrParams,
@@ -1917,7 +1915,7 @@ const signed_deploy = unsigned_deploy.sign(secret_key);
 Developers using Rust can utilize the wait_deploy function to wait for a specific deploy event. This is achieved by providing the desired event URL, deploy hash, and an optional timeout duration. Once the deploy is processed, the resulting data, such as the deploy's cost, can be easily accessed and utilized in subsequent logic.
 
 ```rust
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 
 let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
@@ -1925,7 +1923,7 @@ let timeout_duration = None; // Some(30000) for 30s instead of default timeout d
 
 // Wait for deploy
 let event_parse_result = sdk
-    .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash, timeout_duration)
+    .wait_deploy(DEFAULT_EVENTS_ADDRESS, &deploy_hash, timeout_duration)
     .await
     .unwrap();
 let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
@@ -1970,14 +1968,14 @@ use casper_rust_wasm_sdk::deploy_watcher::watcher::{
     Subscription, EventHandlerFn,
 };
 
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 
 let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 let timeout_duration = None; // Some(30000) for 30s instead of default timeout duration of 60s
 
 // Creates a watcher instance
-let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, timeout_duration);
+let mut watcher = sdk.watch_deploy(DEFAULT_EVENTS_ADDRESS, timeout_duration);
 
 // Create a callback function handler of your design
 let event_handler_fn = get_event_handler_fn(deploy_hash.to_string());
@@ -2063,7 +2061,7 @@ console.log(results);
 use casper_rust_wasm_sdk::{
     helpers::json_pretty_print,
     types::{
-        deploy_hash::DeployHash,
+        hash::deploy_hash::DeployHash,
         deploy_params::{
             deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
             session_str_params::SessionStrParams,
@@ -2125,7 +2123,7 @@ let deploy_hash_string = deploy_hash.to_hex_string();
 println!("{:?}", deploy_hash_string);
 
 let event_parse_result = sdk
-    .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_string)
+    .wait_deploy(DEFAULT_EVENTS_ADDRESS, &deploy_hash_string)
     .await
     .unwrap();
 let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
@@ -2227,7 +2225,7 @@ async function loadFile() {
 
 ```rust
 use casper_rust_wasm_sdk::types::{
-    deploy_hash::DeployHash,
+    hash::deploy_hash::DeployHash,
     deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,
@@ -2388,6 +2386,10 @@ You can download an alpha version of the app illustrating the SDK here:
 
 - [Rust helpers](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/helpers/index.html)
 
+### Binary Port
+
+- [Binary methods](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/binary_port/index.html)
+
 ## Typescript API
 
 - [Full item list](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/index.html)
@@ -2430,6 +2432,10 @@ You can download an alpha version of the app illustrating the SDK here:
 ### Helpers functions
 
 - [TS helpers](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/modules.html#Functions)
+
+### Binary Port
+
+- [Binary methods](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/SDK.html#Methods)
 
 ## Casper Wallet
 
@@ -2495,8 +2501,8 @@ Example of .env
 SECRET_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
 # SECRET_KEY_USER_1 = MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 # SECRET_KEY_USER_2 = MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
-# NODE_ADDRESS=http://localhost:7777
-# EVENT_ADDRESS=http://localhost:9999/events/main
+# RPC_ADDRESS=http://localhost:7777
+# EVENTS_ADDRESS=http://localhost:9999/events/main
 # SPECULATIVE_ADDRESS=http://localhost:7778
 # CHAIN_NAME=casper-net-1
 # SECRET_KEY_NAME=secret_key.pem

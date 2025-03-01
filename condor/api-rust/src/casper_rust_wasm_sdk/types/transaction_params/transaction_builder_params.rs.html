@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/transaction_params/transaction_builder_params.rs`."><title>transaction_builder_params.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/transaction_params/transaction_builder_params.rs`."><title>transaction_builder_params.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-46132b98.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.85.0 (4d91de4e4 2025-02-17)" data-channel="1.85.0" data-search-js="search-75f5ac3e.js" data-settings-js="settings-0f613d39.js" ><script src="../../../../static.files/storage-59e33391.js"></script><script defer src="../../../../static.files/src-script-56102188.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/types/transaction_params/</div>transaction_builder_params.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -752,16 +753,27 @@
 <a href="#752" id="752">752</a>
 <a href="#753" id="753">753</a>
 <a href="#754" id="754">754</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a></pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     debug::error,
     types::{
-        account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
-        cl::bytes::Bytes, package_hash::PackageHash, public_key::PublicKey,
-        transaction_category::TransactionCategory, uref::URef,
+        cl::bytes::Bytes,
+        hash::{
+            account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
+            package_hash::PackageHash,
+        },
+        public_key::PublicKey,
+        uref::URef,
     },
 };
+
 <span class="kw">use </span>casper_client::cli::TransactionBuilderParams <span class="kw">as </span>_TransactionBuilderParams;
-<span class="kw">use </span>casper_types::{TransferTarget <span class="kw">as </span>_TransferTarget, U512};
+<span class="kw">use </span>casper_types::{TransactionRuntimeParams, TransferTarget <span class="kw">as </span>_TransferTarget, U512};
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[wasm_bindgen]
@@ -803,7 +815,7 @@
 #[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>TransactionBuilderParams {
     kind: TransactionKind,
-    transaction_category: <span class="prelude-ty">Option</span>&lt;TransactionCategory&gt;,
+    is_install_upgrade: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     transaction_bytes: <span class="prelude-ty">Option</span>&lt;Bytes&gt;,
     maybe_source: <span class="prelude-ty">Option</span>&lt;URef&gt;,
     target: <span class="prelude-ty">Option</span>&lt;TransferTarget&gt;,
@@ -820,8 +832,9 @@
     delegator: <span class="prelude-ty">Option</span>&lt;PublicKey&gt;,
     validator: <span class="prelude-ty">Option</span>&lt;PublicKey&gt;,
     new_validator: <span class="prelude-ty">Option</span>&lt;PublicKey&gt;,
-    minimum_delegation_amount: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-    maximum_delegation_amount: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    minimum_delegation_amount: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;u64&gt;&gt;,
+    maximum_delegation_amount: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;u64&gt;&gt;,
+    reserved_slots: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;,
 }
 
 <span class="attr">#[wasm_bindgen]
@@ -846,11 +859,11 @@
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"newSession"</span>)]
     </span><span class="kw">pub fn </span>new_session(
         transaction_bytes: <span class="prelude-ty">Option</span>&lt;Bytes&gt;,
-        transaction_category: <span class="prelude-ty">Option</span>&lt;TransactionCategory&gt;,
+        is_install_upgrade: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     ) -&gt; TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::Session,
-            transaction_category: <span class="prelude-val">Some</span>(transaction_category.unwrap_or_default()),
+            is_install_upgrade,
             transaction_bytes,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source: <span class="prelude-val">None</span>,
@@ -869,6 +882,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -882,7 +896,7 @@
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Transfer,
-            transaction_category: <span class="prelude-val">None</span>,
+            is_install_upgrade: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source,
@@ -901,6 +915,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -911,7 +926,7 @@
     ) -&gt; TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntity,
-            transaction_category: <span class="prelude-val">None</span>,
+            is_install_upgrade: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">Some</span>(entry_point.to_string()),
             maybe_source: <span class="prelude-val">None</span>,
@@ -930,6 +945,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -940,7 +956,7 @@
     ) -&gt; TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntityAlias,
-            transaction_category: <span class="prelude-val">None</span>,
+            is_install_upgrade: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">Some</span>(entry_point.to_string()),
             maybe_source: <span class="prelude-val">None</span>,
@@ -959,6 +975,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -972,7 +989,7 @@
 
         TransactionBuilderParams {
             kind: TransactionKind::Package,
-            transaction_category: <span class="prelude-val">None</span>,
+            is_install_upgrade: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">Some</span>(entry_point.to_string()),
             maybe_source: <span class="prelude-val">None</span>,
@@ -991,6 +1008,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1003,7 +1021,7 @@
         <span class="kw">let </span>maybe_entity_version_as_u32 = parse_maybe_entity_version(maybe_entity_version);
         TransactionBuilderParams {
             kind: TransactionKind::PackageAlias,
-            transaction_category: <span class="prelude-val">None</span>,
+            is_install_upgrade: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">Some</span>(entry_point.to_string()),
             maybe_source: <span class="prelude-val">None</span>,
@@ -1022,6 +1040,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1030,13 +1049,14 @@
         public_key: PublicKey,
         delegation_rate: u8,
         amount: <span class="kw-2">&amp;</span>str,
-        minimum_delegation_amount: u64,
-        maximum_delegation_amount: u64,
+        minimum_delegation_amount: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+        maximum_delegation_amount: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+        reserved_slots: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     ) -&gt; TransactionBuilderParams {
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::AddBid,
-            transaction_category: <span class="prelude-val">None</span>,
+            is_install_upgrade: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source: <span class="prelude-val">None</span>,
@@ -1055,6 +1075,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">Some</span>(minimum_delegation_amount),
             maximum_delegation_amount: <span class="prelude-val">Some</span>(maximum_delegation_amount),
+            reserved_slots: <span class="prelude-val">Some</span>(reserved_slots),
         }
     }
 
@@ -1067,7 +1088,7 @@
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Delegate,
-            transaction_category: <span class="prelude-val">None</span>,
+            is_install_upgrade: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source: <span class="prelude-val">None</span>,
@@ -1086,6 +1107,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1098,7 +1120,7 @@
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Undelegate,
-            transaction_category: <span class="prelude-val">None</span>,
+            is_install_upgrade: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source: <span class="prelude-val">None</span>,
@@ -1117,6 +1139,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1130,7 +1153,7 @@
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Redelegate,
-            transaction_category: <span class="prelude-val">None</span>,
+            is_install_upgrade: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source: <span class="prelude-val">None</span>,
@@ -1149,6 +1172,7 @@
             new_validator: <span class="prelude-val">Some</span>(new_validator),
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1157,7 +1181,7 @@
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::WithdrawBid,
-            transaction_category: <span class="prelude-val">None</span>,
+            is_install_upgrade: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source: <span class="prelude-val">None</span>,
@@ -1176,6 +1200,7 @@
             new_validator: <span class="prelude-val">None</span>,
             minimum_delegation_amount: <span class="prelude-val">None</span>,
             maximum_delegation_amount: <span class="prelude-val">None</span>,
+            reserved_slots: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1291,16 +1316,6 @@
     }
 
     <span class="attr">#[wasm_bindgen(getter)]
-    </span><span class="kw">pub fn </span>maybe_entity_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
-        <span class="self">self</span>.maybe_entity_version
-    }
-
-    <span class="attr">#[wasm_bindgen(setter)]
-    </span><span class="kw">pub fn </span>set_maybe_entity_version(<span class="kw-2">&amp;mut </span><span class="self">self</span>, maybe_entity_version: u32) {
-        <span class="self">self</span>.maybe_entity_version = <span class="prelude-val">Some</span>(maybe_entity_version);
-    }
-
-    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>public_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PublicKey&gt; {
         <span class="self">self</span>.public_key.clone()
     }
@@ -1352,32 +1367,32 @@
 
     <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>minimum_delegation_amount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
-        <span class="self">self</span>.minimum_delegation_amount
+        <span class="self">self</span>.minimum_delegation_amount.unwrap_or(<span class="prelude-val">None</span>)
     }
 
     <span class="attr">#[wasm_bindgen(setter)]
-    </span><span class="kw">pub fn </span>set_minimum_delegation_amount(<span class="kw-2">&amp;mut </span><span class="self">self</span>, minimum_delegation_amount: u64) {
+    </span><span class="kw">pub fn </span>set_minimum_delegation_amount(<span class="kw-2">&amp;mut </span><span class="self">self</span>, minimum_delegation_amount: <span class="prelude-ty">Option</span>&lt;u64&gt;) {
         <span class="self">self</span>.minimum_delegation_amount = <span class="prelude-val">Some</span>(minimum_delegation_amount);
     }
 
     <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>maximum_delegation_amount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
-        <span class="self">self</span>.maximum_delegation_amount
+        <span class="self">self</span>.maximum_delegation_amount.unwrap_or(<span class="prelude-val">None</span>)
     }
 
     <span class="attr">#[wasm_bindgen(setter)]
-    </span><span class="kw">pub fn </span>set_maximum_delegation_amount(<span class="kw-2">&amp;mut </span><span class="self">self</span>, maximum_delegation_amount: u64) {
+    </span><span class="kw">pub fn </span>set_maximum_delegation_amount(<span class="kw-2">&amp;mut </span><span class="self">self</span>, maximum_delegation_amount: <span class="prelude-ty">Option</span>&lt;u64&gt;) {
         <span class="self">self</span>.maximum_delegation_amount = <span class="prelude-val">Some</span>(maximum_delegation_amount);
     }
 
     <span class="attr">#[wasm_bindgen(getter)]
-    </span><span class="kw">pub fn </span>transaction_category(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TransactionCategory&gt; {
-        <span class="self">self</span>.transaction_category
+    </span><span class="kw">pub fn </span>is_install_upgrade(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+        <span class="self">self</span>.is_install_upgrade
     }
 
     <span class="attr">#[wasm_bindgen(setter)]
-    </span><span class="kw">pub fn </span>set_transaction_category(<span class="kw-2">&amp;mut </span><span class="self">self</span>, transaction_category: TransactionCategory) {
-        <span class="self">self</span>.transaction_category = <span class="prelude-val">Some</span>(transaction_category);
+    </span><span class="kw">pub fn </span>set_is_install_upgrade(<span class="kw-2">&amp;mut </span><span class="self">self</span>, is_install_upgrade: bool) {
+        <span class="self">self</span>.is_install_upgrade = <span class="prelude-val">Some</span>(is_install_upgrade);
     }
 }
 
@@ -1387,16 +1402,14 @@
 ) -&gt; _TransactionBuilderParams&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">match </span>transaction_params.kind {
         TransactionKind::Session =&gt; _TransactionBuilderParams::Session {
-            transaction_category: transaction_params
-                .transaction_category
-                .unwrap_or_default()
-                .into(),
+            is_install_upgrade: transaction_params.is_install_upgrade.unwrap_or_default(),
             transaction_bytes: transaction_params
                 .transaction_bytes
                 .clone()
                 .unwrap_or_default()
                 .into(),
-        },
+            runtime: TransactionRuntimeParams::VmCasperV1, <span class="comment">// TODo FIX Runtime
+        </span>},
         TransactionKind::Transfer =&gt; _TransactionBuilderParams::Transfer {
             maybe_source: transaction_params.maybe_source.clone().map(Into::into),
             target: transaction_params
@@ -1423,7 +1436,8 @@
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-        },
+            runtime: TransactionRuntimeParams::VmCasperV1, <span class="comment">// TODO FIX Runtime
+        </span>},
         TransactionKind::InvocableEntityAlias =&gt; _TransactionBuilderParams::InvocableEntityAlias {
             entity_alias: transaction_params
                 .entity_alias
@@ -1433,7 +1447,8 @@
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-        },
+            runtime: TransactionRuntimeParams::VmCasperV1, <span class="comment">// TODO FIX Runtime
+        </span>},
         TransactionKind::Package =&gt; _TransactionBuilderParams::Package {
             package_hash: transaction_params.package_hash.unwrap().into(),
             maybe_entity_version: transaction_params.maybe_entity_version,
@@ -1441,7 +1456,8 @@
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-        },
+            runtime: TransactionRuntimeParams::VmCasperV1, <span class="comment">// TODO FIX Runtime
+        </span>},
         TransactionKind::PackageAlias =&gt; _TransactionBuilderParams::PackageAlias {
             package_alias: transaction_params
                 .package_alias
@@ -1452,17 +1468,15 @@
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-        },
+            runtime: TransactionRuntimeParams::VmCasperV1, <span class="comment">// TODO FIX Runtime
+        </span>},
         TransactionKind::AddBid =&gt; _TransactionBuilderParams::AddBid {
             public_key: transaction_params.public_key.clone().unwrap().into(),
             delegation_rate: transaction_params.delegation_rate.unwrap(),
             amount: transaction_params.amount.unwrap_or_default(),
-            minimum_delegation_amount: transaction_params
-                .minimum_delegation_amount
-                .unwrap_or_default(),
-            maximum_delegation_amount: transaction_params
-                .maximum_delegation_amount
-                .unwrap_or_default(),
+            minimum_delegation_amount: transaction_params.minimum_delegation_amount.unwrap(),
+            maximum_delegation_amount: transaction_params.maximum_delegation_amount.unwrap(),
+            reserved_slots: transaction_params.reserved_slots.unwrap(),
         },
         TransactionKind::Delegate =&gt; _TransactionBuilderParams::Delegate {
             delegator: transaction_params.delegator.clone().unwrap().into(),

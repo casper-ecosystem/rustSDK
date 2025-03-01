@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/helpers/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/helpers/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-46132b98.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.85.0 (4d91de4e4 2025-02-17)" data-channel="1.85.0" data-search-js="search-75f5ac3e.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/helpers/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -715,7 +716,43 @@
 <a href="#715" id="715">715</a>
 <a href="#716" id="716">716</a>
 <a href="#717" id="717">717</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::account_hash::AccountHash;
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::hash::account_hash::AccountHash;
+<span class="kw">use </span><span class="kw">crate</span>::types::transaction_params::transaction_str_params::{DEFAULT_GAS_PRICE, DEFAULT_TTL};
 <span class="kw">use </span><span class="kw">crate</span>::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
 <span class="kw">use </span>base64::engine::general_purpose;
 <span class="kw">use </span>base64::Engine;
@@ -727,8 +764,8 @@
 <span class="kw">use </span>casper_client::cli::JsonArg;
 <span class="kw">use </span>casper_types::{
     bytesrepr::ToBytes, cl_value_to_json <span class="kw">as </span>cl_value_to_json_from_casper_types, CLValue,
-    DeployBuilder, Key <span class="kw">as </span>CasperTypesKey, NamedArg, PublicKey <span class="kw">as </span>CasperTypesPublicKey, RuntimeArgs,
-    SecretKey, TimeDiff, Timestamp,
+    Key <span class="kw">as </span>CasperTypesKey, NamedArg, PublicKey <span class="kw">as </span>CasperTypesPublicKey, RuntimeArgs, SecretKey,
+    TimeDiff, Timestamp,
 };
 <span class="kw">use </span>chrono::{DateTime, SecondsFormat, Utc};
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -780,7 +817,6 @@
 /// # Returns
 ///
 /// A hexadecimal string representing the Blake2b hash of the input metadata.
-
 </span><span class="kw">pub fn </span>get_blake2b_hash(meta_data: <span class="kw-2">&amp;</span>str) -&gt; String {
     <span class="kw">let </span><span class="kw-2">mut </span>result = [<span class="number">0</span>; BLAKE2B_DIGEST_LENGTH];
     <span class="kw">let </span><span class="kw-2">mut </span>hasher = VarBlake2b::new(BLAKE2B_DIGEST_LENGTH).expect(<span class="string">"should create hasher"</span>);
@@ -816,18 +852,18 @@
 /// // Key / Value as U256
 /// let key = Key::from_formatted_str( "account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538").unwrap();
 /// let value = U256::from(1);
-/// let dictionary_item_key = make_dictionary_item_key(key, &amp;value);
+/// let dictionary_item_key = make_dictionary_item_key(&amp;key, &amp;value);
 /// println!("Dictionary Item Key (Key/Value as U256): {}", dictionary_item_key);
 /// assert_eq!(dictionary_item_key,"145f6211a24c0a8af16b47e7aa58431ea25172eb402903b3c25ac92b9784c7a9".to_string());
 /// // Key / Value as Key
 /// let key = Key::from_formatted_str( "account-hash-813428ce1a9805f1087db07e6017c6c4f5af0ee78a05591bb6577763e89b4f1f").unwrap();
 /// let value = Key::from_formatted_str("account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538").unwrap();
-/// let dictionary_item_key = make_dictionary_item_key(key, &amp;value);
+/// let dictionary_item_key = make_dictionary_item_key(&amp;key, &amp;value);
 /// println!("Dictionary Item Key (Key/Value as Key): {}", dictionary_item_key);
 /// assert_eq!(dictionary_item_key,"1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca".to_string());
 /// ```
-</span><span class="kw">pub fn </span>make_dictionary_item_key&lt;V: ToBytes&gt;(key: Key, value: <span class="kw-2">&amp;</span>V) -&gt; String {
-    <span class="kw">let </span>key: CasperTypesKey = CasperTypesKey::from(key);
+</span><span class="kw">pub fn </span>make_dictionary_item_key&lt;V: ToBytes&gt;(key: <span class="kw-2">&amp;</span>Key, value: <span class="kw-2">&amp;</span>V) -&gt; String {
+    <span class="kw">let </span>key: CasperTypesKey = CasperTypesKey::from(key.clone());
     <span class="kw">let </span><span class="kw-2">mut </span>bytes_a = key.to_bytes().unwrap_or_default();
     <span class="kw">let </span><span class="kw-2">mut </span>bytes_b = value.to_bytes().unwrap_or_default();
 
@@ -861,6 +897,29 @@
     <span class="prelude-val">Ok</span>(general_purpose::STANDARD.encode(key)) <span class="comment">// base64.encode
 </span>}
 
+<span class="doccomment">/// Converts a formatted key hash to a base64-encoded string (CEP-18 key encoding).
+///
+/// # Arguments
+///
+/// * `formatted_hash` - A hex-formatted string representing the key hash.
+///   Example: "hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+///
+/// # Returns
+///
+/// Returns a `Result` containing the base64-encoded string on success.
+/// Example: "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+///
+/// # Errors
+///
+/// This function returns an error if:
+/// - The input string is not a valid formatted key hash.
+/// - The conversion to bytes or base64 encoding fails.
+</span><span class="kw">pub fn </span>get_base64_key_from_key_hash(formatted_hash: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, Box&lt;SdkError&gt;&gt; {
+    <span class="kw">let </span>key = Key::from_formatted_str(formatted_hash)<span class="question-mark">?</span>;
+    <span class="kw">let </span>key = key.to_bytes().unwrap();
+    <span class="prelude-val">Ok</span>(general_purpose::STANDARD.encode(key)) <span class="comment">// base64.encode
+</span>}
+
 <span class="doccomment">/// Gets the time to live (TTL) value or returns the default value if not provided.
 ///
 /// # Arguments
@@ -874,7 +933,7 @@
     <span class="kw">if let </span><span class="prelude-val">Some</span>(ttl) = ttl {
         ttl.to_string()
     } <span class="kw">else </span>{
-        DeployBuilder::DEFAULT_TTL.to_string()
+        DEFAULT_TTL.to_string()
     }
 }
 
@@ -920,7 +979,7 @@
 ///
 /// The gas price or the default gas price if not provided.
 </span><span class="kw">pub fn </span>get_gas_price_or_default(gas_price: <span class="prelude-ty">Option</span>&lt;u64&gt;) -&gt; u64 {
-    gas_price.unwrap_or(DeployBuilder::DEFAULT_GAS_PRICE)
+    gas_price.unwrap_or(DEFAULT_GAS_PRICE)
 }
 
 <span class="doccomment">/// Gets the value as a string or returns an empty string if not provided.
@@ -1219,7 +1278,7 @@
         <span class="macro">assert_eq!</span>(ttl_value, <span class="string">"1h"</span>.to_string());
 
         <span class="kw">let </span>default_ttl = get_ttl_or_default(<span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(default_ttl, DeployBuilder::DEFAULT_TTL.to_string());
+        <span class="macro">assert_eq!</span>(default_ttl, DEFAULT_TTL.to_string());
     }
 
     <span class="attr">#[test]
@@ -1251,7 +1310,7 @@
         <span class="macro">assert_eq!</span>(price, <span class="number">100</span>);
 
         <span class="kw">let </span>default_price = get_gas_price_or_default(<span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(default_price, DeployBuilder::DEFAULT_GAS_PRICE);
+        <span class="macro">assert_eq!</span>(default_price, DEFAULT_GAS_PRICE);
     }
 
     <span class="attr">#[test]
@@ -1398,7 +1457,7 @@
         )
         .unwrap();
         <span class="kw">let </span>value = U256::from(<span class="number">1</span>);
-        <span class="kw">let </span>dictionary_item_key = make_dictionary_item_key(key, <span class="kw-2">&amp;</span>value);
+        <span class="kw">let </span>dictionary_item_key = make_dictionary_item_key(<span class="kw-2">&amp;</span>key, <span class="kw-2">&amp;</span>value);
         <span class="macro">assert_eq!</span>(
             dictionary_item_key,
             <span class="string">"145f6211a24c0a8af16b47e7aa58431ea25172eb402903b3c25ac92b9784c7a9"</span>.to_string()
@@ -1411,7 +1470,7 @@
             <span class="string">"account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538"</span>,
         )
         .unwrap();
-        <span class="kw">let </span>dictionary_item_key = make_dictionary_item_key(key, <span class="kw-2">&amp;</span>value);
+        <span class="kw">let </span>dictionary_item_key = make_dictionary_item_key(<span class="kw-2">&amp;</span>key, <span class="kw-2">&amp;</span>value);
         <span class="macro">assert_eq!</span>(
             dictionary_item_key,
             <span class="string">"1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca"</span>.to_string()
@@ -1427,6 +1486,19 @@
 
         <span class="comment">// Call the function under test
         </span><span class="kw">let </span>result = get_base64_key_from_account_hash(input_hash).unwrap();
+
+        <span class="comment">// Check the result against the expected output
+        </span><span class="macro">assert_eq!</span>(result, expected_output.to_string());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_get_base64_key_from_key_hash() {
+        <span class="comment">// Test with a known input and expected output
+        </span><span class="kw">let </span>input_hash = <span class="string">"hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"</span>;
+        <span class="kw">let </span>expected_output = <span class="string">"AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"</span>;
+
+        <span class="comment">// Call the function under test
+        </span><span class="kw">let </span>result = get_base64_key_from_key_hash(input_hash).unwrap();
 
         <span class="comment">// Check the result against the expected output
         </span><span class="macro">assert_eq!</span>(result, expected_output.to_string());
