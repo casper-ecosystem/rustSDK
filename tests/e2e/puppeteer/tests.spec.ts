@@ -649,7 +649,8 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_transaction', async () => {
-      expect(test.deploy_hash).toBeDefined();
+      console.log(test.transaction_hash);
+      expect(test.transaction_hash).toBeDefined();
       await test.page.waitForSelector('[e2e-id="transactionHashElt"]');
       await clearInput('[e2e-id="transactionHashElt"]');
       await test.page.type(
@@ -2409,6 +2410,7 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_dictionary_item with dictionary uref', async () => {
+      console.log(test);
       await seletAction('query_global_state');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="queryKeyElt"]');
