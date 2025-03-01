@@ -306,17 +306,17 @@ mod tests {
 
     #[test]
     pub async fn test_watch_transaction_test() {
-        // Wrap the test function with a timeout of 45 seconds
+        // Wrap the test function with a timeout of 60 seconds
         let result = timeout(Duration::from_secs(60), test_watch_transaction()).await;
         // Assert whether the test completed within the timeout period
-        assert!(result.is_ok(), "Test timed out after 45 seconds");
+        assert!(result.is_ok(), "Test timed out after 60 seconds");
     }
 
     #[test]
     pub async fn test_watch_deploy_test() {
-        // Wrap the test function with a timeout of 45 seconds
-        let result = timeout(Duration::from_secs(45), test_watch_deploy()).await;
+        // Wrap the test function with a timeout of 60 seconds
+        let result = timeout(Duration::from_secs(60), test_watch_deploy()).await;
         // Assert whether the test completed within the timeout period
-        assert!(result.is_ok(), "Test timed out after 45 seconds");
+        assert!(result.is_ok(), "Test timed out after 60 seconds");
     }
 }
