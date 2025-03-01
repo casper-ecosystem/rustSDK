@@ -646,6 +646,7 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await test.page.reload();
       await seletAction('get_transaction');
+      await test.page.waitForSelector('[e2e-id="transactionHashElt"]');
     });
 
     it('should get_transaction', async () => {
@@ -2410,12 +2411,11 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_dictionary_item with dictionary uref', async () => {
-      console.log(test);
+      await test.page.reload();
       await seletAction('query_global_state');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="queryKeyElt"]');
       await test.page.waitForSelector('[e2e-id="queryPathElt"]');
-      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
 
       await test.page.type('[e2e-id="queryKeyElt"]', test.contract_cep78_hash);
       await submit();
@@ -2430,6 +2430,7 @@ describe('Angular App Tests', () => {
         name: string;
         key: string;
       }>;
+
       test.dictionary_uref =
         named_keys.find((key) => key.name === 'events')?.key || '';
 
