@@ -650,7 +650,6 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_transaction', async () => {
-      console.log(test.transaction_hash);
       expect(test.transaction_hash).toBeDefined();
       await test.page.waitForSelector('[e2e-id="transactionHashElt"]');
       await clearInput('[e2e-id="transactionHashElt"]');
