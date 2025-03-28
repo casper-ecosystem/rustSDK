@@ -1,4 +1,19 @@
-import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams, publicKeyFromSecretKey, Bytes, Deploy, EventParseResult, Subscription, Transaction, TransactionStrParams, TransactionBuilderParams, AddressableEntityHash } from 'casper-sdk';
+import {
+  DeployStrParams,
+  PaymentStrParams,
+  getTimestamp,
+  SDK,
+  SessionStrParams,
+  publicKeyFromSecretKey,
+  Bytes,
+  Deploy,
+  EventParseResult,
+  Subscription,
+  Transaction,
+  TransactionStrParams,
+  TransactionBuilderParams,
+  AddressableEntityHash,
+} from 'casper-rust-wasm-sdk';
 const fs = require('fs').promises;
 const http = require('http');
 
@@ -105,7 +120,7 @@ const example5 = async () => {
     undefined, // Optional maybe_source
     target_account,
     transfer_amount,
-    transaction_params,
+    transaction_params
   );
   const make_transfer_transaction_as_json = make_transfer_transaction.toJson();
   console.log(make_transfer_transaction_as_json);
@@ -141,11 +156,13 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     undefined, // Optional maybe_source
     target_account,
     transfer_amount,
-    transaction_params,
+    transaction_params
   );
-  const transfer_transaction_result_as_json = transfer_transaction_result.toJson();
+  const transfer_transaction_result_as_json =
+    transfer_transaction_result.toJson();
   console.log(transfer_transaction_result_as_json);
-  const transaction_hash = transfer_transaction_result.transaction_hash.toString();
+  const transaction_hash =
+    transfer_transaction_result.transaction_hash.toString();
   console.log(transaction_hash);
 };
 
@@ -163,7 +180,10 @@ const example7 = async () => {
   transaction_params.payment_amount = payment_amount;
 
   let entity_hash = new AddressableEntityHash(entity_hash_hex_string);
-  let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
+  let builder_params = TransactionBuilderParams.newInvocableEntity(
+    entity_hash,
+    entry_point
+  );
 
   const transaction = sdk.make_transaction(builder_params, transaction_params);
   const transaction_as_json = transaction.toJson();
@@ -184,13 +204,23 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
   const entry_point = 'set_variables';
 
-  const transaction_params = new TransactionStrParams(chain_name, public_key, secret_key);
+  const transaction_params = new TransactionStrParams(
+    chain_name,
+    public_key,
+    secret_key
+  );
   transaction_params.payment_amount = payment_amount;
 
   let entity_hash = new AddressableEntityHash(entity_hash_hex_string);
-  let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
+  let builder_params = TransactionBuilderParams.newInvocableEntity(
+    entity_hash,
+    entry_point
+  );
 
-  const transaction_result = await sdk.transaction(builder_params, transaction_params);
+  const transaction_result = await sdk.transaction(
+    builder_params,
+    transaction_params
+  );
   const transaction_result_as_json = transaction_result.toJson();
   console.log(transaction_result_as_json);
 };
@@ -209,11 +239,20 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
   const entry_point = 'set_variables';
 
-  const transaction_params = new TransactionStrParams(chain_name, public_key, secret_key);
+  const transaction_params = new TransactionStrParams(
+    chain_name,
+    public_key,
+    secret_key
+  );
   transaction_params.payment_amount = payment_amount;
 
-  let entity_hash = AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
-  let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
+  let entity_hash = AddressableEntityHash.fromFormattedStr(
+    entity_hash_formatted_string
+  );
+  let builder_params = TransactionBuilderParams.newInvocableEntity(
+    entity_hash,
+    entry_point
+  );
 
   const transaction = Transaction.newSession(
     builder_params,
@@ -238,7 +277,11 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   const target_account =
     '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
 
-  const transfer_params = new TransactionStrParams(chain_name, public_key, secret_key);
+  const transfer_params = new TransactionStrParams(
+    chain_name,
+    public_key,
+    secret_key
+  );
 
   transfer_params.payment_amount = payment_amount;
 
@@ -247,10 +290,12 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     target_account,
     transfer_amount,
     transfer_params,
-    undefined, // optional transfer_id
+    undefined // optional transfer_id
   );
 
-  const put_transaction_result = await sdk.put_transaction(transfer_transaction);
+  const put_transaction_result = await sdk.put_transaction(
+    transfer_transaction
+  );
   const put_transaction_result_as_json = put_transaction_result.toJson();
   console.log(put_transaction_result_as_json);
 };
@@ -265,25 +310,31 @@ const example11 = async () => {
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 -----END PRIVATE KEY-----`;
   const initiator_addr = publicKeyFromSecretKey(secret_key);
-  const transaction_params = new TransactionStrParams(chain_name, initiator_addr, secret_key);
+  const transaction_params = new TransactionStrParams(
+    chain_name,
+    initiator_addr,
+    secret_key
+  );
   transaction_params.session_args_json = JSON.stringify([
-    { "name": "collection_name", "type": "String", "value": "enhanced-nft-1" },
-    { "name": "collection_symbol", "type": "String", "value": "ENFT-1" },
-    { "name": "total_token_supply", "type": "U64", "value": 100 },
-    { "name": "ownership_mode", "type": "U8", "value": 0 },
-    { "name": "nft_kind", "type": "U8", "value": 1 },
-    { "name": "allow_minting", "type": "Bool", "value": true },
-    { "name": "owner_reverse_lookup_mode", "type": "U8", "value": 0 },
-    { "name": "nft_metadata_kind", "type": "U8", "value": 2 },
-    { "name": "identifier_mode", "type": "U8", "value": 0 },
-    { "name": "metadata_mutability", "type": "U8", "value": 0 },
-    { "name": "events_mode", "type": "U8", "value": 1 }
+    { name: 'collection_name', type: 'String', value: 'enhanced-nft-1' },
+    { name: 'collection_symbol', type: 'String', value: 'ENFT-1' },
+    { name: 'total_token_supply', type: 'U64', value: 100 },
+    { name: 'ownership_mode', type: 'U8', value: 0 },
+    { name: 'nft_kind', type: 'U8', value: 1 },
+    { name: 'allow_minting', type: 'Bool', value: true },
+    { name: 'owner_reverse_lookup_mode', type: 'U8', value: 0 },
+    { name: 'nft_metadata_kind', type: 'U8', value: 2 },
+    { name: 'identifier_mode', type: 'U8', value: 0 },
+    { name: 'metadata_mutability', type: 'U8', value: 0 },
+    { name: 'events_mode', type: 'U8', value: 1 },
   ]);
   transaction_params.payment_amount = '500000000000';
 
   async function loadFile() {
     try {
-      const fileBuffer = await fs.readFile(__dirname + '/../../../tests/wasm/cep78.wasm');
+      const fileBuffer = await fs.readFile(
+        __dirname + '/../../../tests/wasm/cep78.wasm'
+      );
       return fileBuffer.buffer; // Returns an ArrayBuffer
     } catch (error) {
       throw new Error('Error reading file: ' + error.message);
@@ -304,8 +355,13 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   );
   const install_result_as_json = install_result.toJson();
   console.log(install_result_as_json.transaction_hash);
-  const eventParseResult: EventParseResult = await sdk.waitTransaction(events_address, install_result_as_json.transaction_hash);
-  const cost = eventParseResult.body?.transaction_processed?.execution_result.Success?.cost;
+  const eventParseResult: EventParseResult = await sdk.waitTransaction(
+    events_address,
+    install_result_as_json.transaction_hash
+  );
+  const cost =
+    eventParseResult.body?.transaction_processed?.execution_result.Success
+      ?.cost;
   //  console.log(eventParseResult.body.transaction_processed);
   console.log(`install cost ${cost}`);
 };
@@ -327,12 +383,24 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
   const payment_amount = '5000000000';
 
-  const transaction_params = new TransactionStrParams(chain_name, initiator_addr, secret_key);
-  transaction_params.session_args_simple = ["token_meta_data:String='test_meta_data'", `token_owner:Key='${token_owner}'`];
+  const transaction_params = new TransactionStrParams(
+    chain_name,
+    initiator_addr,
+    secret_key
+  );
+  transaction_params.session_args_simple = [
+    "token_meta_data:String='test_meta_data'",
+    `token_owner:Key='${token_owner}'`,
+  ];
   transaction_params.payment_amount = payment_amount;
 
-  let entity_hash = AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
-  let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
+  let entity_hash = AddressableEntityHash.fromFormattedStr(
+    entity_hash_formatted_string
+  );
+  let builder_params = TransactionBuilderParams.newInvocableEntity(
+    entity_hash,
+    entry_point
+  );
 
   const call_entrypoint_result = await sdk.call_entrypoint(
     builder_params,
@@ -341,7 +409,9 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   const call_entrypoint_result_as_json = call_entrypoint_result.toJson();
 
   // watch transaction_hash to trigger callback
-  const transaction_hash_results = [call_entrypoint_result_as_json.transaction_hash];
+  const transaction_hash_results = [
+    call_entrypoint_result_as_json.transaction_hash,
+  ];
   const watcher = sdk.watchTransaction(events_address);
   const Subscriptions: Subscription[] = [];
   const getEventHandlerFn = (transactionHash: string) => {
@@ -349,15 +419,19 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
       console.log(`callback for ${transactionHash}`);
       if (eventParseResult.err) {
         return false;
-      }
-      else if (eventParseResult.body?.transaction_processed?.execution_result.Success) {
-        console.log(eventParseResult.body?.transaction_processed?.execution_result.Success);
+      } else if (
+        eventParseResult.body?.transaction_processed?.execution_result.Success
+      ) {
+        console.log(
+          eventParseResult.body?.transaction_processed?.execution_result.Success
+        );
         return true;
-      }
-      else {
-        console.error(eventParseResult.body?.transaction_processed?.execution_result.Failure);
+      } else {
+        console.error(
+          eventParseResult.body?.transaction_processed?.execution_result.Failure
+        );
         return false;
-      };
+      }
     };
     return eventHandlerFn;
   };
@@ -365,7 +439,10 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   transaction_hash_results.map(async (transaction_hash) => {
     const eventHandlerFn = getEventHandlerFn(transaction_hash);
     console.log(transaction_hash);
-    const subscription: Subscription = new Subscription(transaction_hash, eventHandlerFn);
+    const subscription: Subscription = new Subscription(
+      transaction_hash,
+      eventHandlerFn
+    );
     Subscriptions.push(subscription);
   });
   watcher.subscribe(Subscriptions);
@@ -384,11 +461,19 @@ const example13 = async () => {
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 -----END PRIVATE KEY-----`;
   const initiator_addr = publicKeyFromSecretKey(secret_key);
-  const transaction_params = new TransactionStrParams(chain_name, initiator_addr);
+  const transaction_params = new TransactionStrParams(
+    chain_name,
+    initiator_addr
+  );
   transaction_params.payment_amount = payment_amount;
 
-  let entity_hash = AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
-  let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, 'set_variables');
+  let entity_hash = AddressableEntityHash.fromFormattedStr(
+    entity_hash_formatted_string
+  );
+  let builder_params = TransactionBuilderParams.newInvocableEntity(
+    entity_hash,
+    'set_variables'
+  );
 
   const transaction = sdk.make_transaction(builder_params, transaction_params);
   const signed_transaction = transaction.sign(secret_key);
@@ -401,21 +486,37 @@ const example14 = async () => {
   const payment_amount = '5000000000';
   const entity_hash_hex_string =
     '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-  let public_key_kms = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
-  const transaction_params = new TransactionStrParams(chain_name, public_key_kms);
+  let public_key_kms =
+    '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
+  const transaction_params = new TransactionStrParams(
+    chain_name,
+    public_key_kms
+  );
   transaction_params.payment_amount = payment_amount;
 
   let entity_hash = new AddressableEntityHash(entity_hash_hex_string);
-  let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, 'set_variables');
+  let builder_params = TransactionBuilderParams.newInvocableEntity(
+    entity_hash,
+    'set_variables'
+  );
 
   const transaction = sdk.make_transaction(builder_params, transaction_params);
 
-  const signature_kms = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980b';
-  let signed_transaction = transaction.addSignature(public_key_kms, signature_kms);
+  const signature_kms =
+    '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980b';
+  let signed_transaction = transaction.addSignature(
+    public_key_kms,
+    signature_kms
+  );
 
-  const public_key_kms_2 = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
-  const signature_kms_2 = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980c';
-  signed_transaction = signed_transaction.addSignature(public_key_kms_2, signature_kms_2);
+  const public_key_kms_2 =
+    '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
+  const signature_kms_2 =
+    '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980c';
+  signed_transaction = signed_transaction.addSignature(
+    public_key_kms_2,
+    signature_kms_2
+  );
   console.log(signed_transaction.approvals);
 };
 
@@ -553,7 +654,11 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
   const payment_params = new PaymentStrParams(payment_amount);
 
-  const deploy_result = await sdk.deploy(deploy_params, session_params, payment_params);
+  const deploy_result = await sdk.deploy(
+    deploy_params,
+    session_params,
+    payment_params
+  );
   const deploy_result_as_json = deploy_result.toJson();
   console.log(deploy_result_as_json);
 };
@@ -636,7 +741,9 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
   async function loadFile() {
     try {
-      const fileBuffer = await fs.readFile(__dirname + '/../../../tests/wasm/cep78.wasm');
+      const fileBuffer = await fs.readFile(
+        __dirname + '/../../../tests/wasm/cep78.wasm'
+      );
       return fileBuffer.buffer; // Returns an ArrayBuffer
     } catch (error) {
       throw new Error('Error reading file: ' + error.message);
@@ -645,17 +752,17 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
   const session_params = new SessionStrParams();
   session_params.session_args_json = JSON.stringify([
-    { "name": "collection_name", "type": "String", "value": "enhanced-nft-1" },
-    { "name": "collection_symbol", "type": "String", "value": "ENFT-1" },
-    { "name": "total_token_supply", "type": "U64", "value": 100 },
-    { "name": "ownership_mode", "type": "U8", "value": 0 },
-    { "name": "nft_kind", "type": "U8", "value": 1 },
-    { "name": "allow_minting", "type": "Bool", "value": true },
-    { "name": "owner_reverse_lookup_mode", "type": "U8", "value": 0 },
-    { "name": "nft_metadata_kind", "type": "U8", "value": 2 },
-    { "name": "identifier_mode", "type": "U8", "value": 0 },
-    { "name": "metadata_mutability", "type": "U8", "value": 0 },
-    { "name": "events_mode", "type": "U8", "value": 1 }
+    { name: 'collection_name', type: 'String', value: 'enhanced-nft-1' },
+    { name: 'collection_symbol', type: 'String', value: 'ENFT-1' },
+    { name: 'total_token_supply', type: 'U64', value: 100 },
+    { name: 'ownership_mode', type: 'U8', value: 0 },
+    { name: 'nft_kind', type: 'U8', value: 1 },
+    { name: 'allow_minting', type: 'Bool', value: true },
+    { name: 'owner_reverse_lookup_mode', type: 'U8', value: 0 },
+    { name: 'nft_metadata_kind', type: 'U8', value: 2 },
+    { name: 'identifier_mode', type: 'U8', value: 0 },
+    { name: 'metadata_mutability', type: 'U8', value: 0 },
+    { name: 'events_mode', type: 'U8', value: 1 },
   ]);
   const payment_amount = '500000000000';
 
@@ -676,8 +783,13 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   );
   const install_result_as_json = install_result.toJson();
   console.log(install_result_as_json.deploy_hash);
-  const eventParseResult: EventParseResult = await sdk.waitDeploy(events_address, install_result_as_json.deploy_hash);
-  const cost = eventParseResult.body?.transaction_processed?.execution_result.Success?.cost;
+  const eventParseResult: EventParseResult = await sdk.waitDeploy(
+    events_address,
+    install_result_as_json.deploy_hash
+  );
+  const cost =
+    eventParseResult.body?.transaction_processed?.execution_result.Success
+      ?.cost;
   //  console.log(eventParseResult.body.transaction_processed);
   console.log(`install cost ${cost}`);
 };
@@ -704,17 +816,23 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   const session_params = new SessionStrParams();
   session_params.session_hash = contract_hash;
   session_params.session_entry_point = entry_point;
-  session_params.session_args_simple = ["token_meta_data:String='test_meta_data'", `token_owner:Key='${token_owner}'`];
+  session_params.session_args_simple = [
+    "token_meta_data:String='test_meta_data'",
+    `token_owner:Key='${token_owner}'`,
+  ];
 
   const call_entrypoint_deploy_result = await sdk.call_entrypoint_deploy(
     deploy_params,
     session_params,
     payment_amount
   );
-  const call_entrypoint_deploy_result_as_json = call_entrypoint_deploy_result.toJson();
+  const call_entrypoint_deploy_result_as_json =
+    call_entrypoint_deploy_result.toJson();
 
   // watch deploy_hash to trigger callback
-  const deploy_hash_results = [call_entrypoint_deploy_result_as_json.deploy_hash];
+  const deploy_hash_results = [
+    call_entrypoint_deploy_result_as_json.deploy_hash,
+  ];
   const watcher = sdk.watchDeploy(events_address);
   const subscriptions: Subscription[] = [];
   const getEventHandlerFn = (deployHash: string) => {
@@ -722,15 +840,19 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
       console.log(`callback for ${deployHash}`);
       if (eventParseResult.err) {
         return false;
-      }
-      else if (eventParseResult.body?.transaction_processed?.execution_result.Success) {
-        console.log(eventParseResult.body?.transaction_processed?.execution_result.Success);
+      } else if (
+        eventParseResult.body?.transaction_processed?.execution_result.Success
+      ) {
+        console.log(
+          eventParseResult.body?.transaction_processed?.execution_result.Success
+        );
         return true;
-      }
-      else {
-        console.error(eventParseResult.body?.transaction_processed?.execution_result.Failure);
+      } else {
+        console.error(
+          eventParseResult.body?.transaction_processed?.execution_result.Failure
+        );
         return false;
-      };
+      }
     };
     return eventHandlerFn;
   };
@@ -738,7 +860,10 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   deploy_hash_results.map(async (deploy_hash) => {
     const eventHandlerFn = getEventHandlerFn(deploy_hash);
     console.log(deploy_hash);
-    const subscription: Subscription = new Subscription(deploy_hash, eventHandlerFn);
+    const subscription: Subscription = new Subscription(
+      deploy_hash,
+      eventHandlerFn
+    );
     subscriptions.push(subscription);
   });
   watcher.subscribe(subscriptions);
@@ -776,7 +901,8 @@ const example14_legacy = async () => {
   const payment_amount = '5000000000';
   const contract_hash =
     'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-  let public_key_kms = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
+  let public_key_kms =
+    '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
   const deploy_params = new DeployStrParams(chain_name, public_key_kms);
 
   const session_params = new SessionStrParams();
@@ -787,11 +913,14 @@ const example14_legacy = async () => {
 
   const deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
 
-  const signature_kms = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980b';
+  const signature_kms =
+    '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980b';
   let deploy_signed = deploy.addSignature(public_key_kms, signature_kms);
 
-  const public_key_kms_2 = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
-  const signature_kms_2 = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980c';
+  const public_key_kms_2 =
+    '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
+  const signature_kms_2 =
+    '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980c';
   deploy_signed = deploy_signed.addSignature(public_key_kms_2, signature_kms_2);
   console.log(deploy_signed.toJson());
 };

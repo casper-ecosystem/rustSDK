@@ -1,7 +1,16 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, Input, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Inject,
+  Input,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { CONFIG, ENV, EnvironmentConfig, Network } from '@util/config';
-import { PeerEntry, SDK } from 'casper-sdk';
+import { PeerEntry, SDK } from 'casper-rust-wasm-sdk';
 import { SDK_TOKEN } from '@util/wasm';
 import { StateService } from '@util/state';
 import { StorageService } from '@util/storage';
@@ -15,7 +24,6 @@ import { StorageService } from '@util/storage';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements AfterViewInit {
-
   @ViewChild('selectNetworkElt') selectNetworkElt!: ElementRef;
   @ViewChild('nodeAddressElt') nodeAddressElt!: ElementRef;
 
@@ -41,18 +49,26 @@ export class HeaderComponent implements AfterViewInit {
     @Inject(DOCUMENT) private document: Document,
     private readonly stateService: StateService,
     private readonly storageService: StorageService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
   ) {
     this.window = this.document.defaultView;
     this.is_electron = this.isElectron();
   }
 
   async ngAfterViewInit() {
-    if (this.storageService.get('chain_name') && this.storageService.get('rpc_address')) {
-      this.chain_name = this.storageService.get('chain_name') || this.chain_name;
-      this.rpc_address = this.storageService.get('rpc_address') || this.rpc_address;
-      this.node_address = this.storageService.get('node_address') || this.node_address;
-      this.network = this.networks.find(x => x.rpc_address == this.rpc_address) || this.network;
+    if (
+      this.storageService.get('chain_name') &&
+      this.storageService.get('rpc_address')
+    ) {
+      this.chain_name =
+        this.storageService.get('chain_name') || this.chain_name;
+      this.rpc_address =
+        this.storageService.get('rpc_address') || this.rpc_address;
+      this.node_address =
+        this.storageService.get('node_address') || this.node_address;
+      this.network =
+        this.networks.find((x) => x.rpc_address == this.rpc_address) ||
+        this.network;
     }
 
     this.stateService.setState({
@@ -65,33 +81,43 @@ export class HeaderComponent implements AfterViewInit {
   }
 
   selectNetwork($event: Event) {
-    let network = ($event.target as HTMLInputElement)?.value || this.selectNetworkElt.nativeElement.value;
-    network = network && this.networks.find(x => x.name == network);
+    let network =
+      ($event.target as HTMLInputElement)?.value ||
+      this.selectNetworkElt.nativeElement.value;
+    network = network && this.networks.find((x) => x.name == network);
     this.network = network;
     this.chain_name = network.chain_name;
     this.rpc_address = network.rpc_address;
     this.node_address = network.node_address;
     this.setRPCAndNodeAddress();
     this.stateService.setState({
-      chain_name: network.chain_name
+      chain_name: network.chain_name,
     });
     this.storageService.setState({
       rpc_address: this.rpc_address,
       node_address: this.node_address,
-      chain_name: this.chain_name
+      chain_name: this.chain_name,
     });
   }
 
   changePort(peer: PeerEntry) {
     const address = peer.address.split(':');
-    const new_address = [this.config['default_protocol'], address.shift(), ':', this.config['default_port']].join('');
+    const new_address = [
+      this.config['default_protocol'],
+      address.shift(),
+      ':',
+      this.config['default_port'],
+    ].join('');
     return new_address;
   }
 
   onCustomNetworkChange($event: Event) {
-    this.rpc_address = ($event.target as HTMLInputElement)?.value || this.network.rpc_address;
+    this.rpc_address =
+      ($event.target as HTMLInputElement)?.value || this.network.rpc_address;
     this.node_address = this.nodeAddressElt.nativeElement.value || '';
-    const customNetwork = this.networks.find(network => network.name === 'custom');
+    const customNetwork = this.networks.find(
+      (network) => network.name === 'custom',
+    );
     // Todo check
     if (customNetwork) {
       customNetwork.rpc_address = this.rpc_address;
@@ -100,11 +126,11 @@ export class HeaderComponent implements AfterViewInit {
       this.sdk.setNodeAddress(this.node_address);
       this.stateService.setState({
         rpc_address: this.rpc_address,
-        node_address: this.node_address
+        node_address: this.node_address,
       });
       this.storageService.setState({
         rpc_address: this.rpc_address,
-        node_address: this.node_address
+        node_address: this.node_address,
       });
     }
   }
@@ -114,15 +140,18 @@ export class HeaderComponent implements AfterViewInit {
   }
 
   onCcustomChainChange($event: Event) {
-    this.chain_name = ($event.target as HTMLInputElement)?.value || this.network.chain_name;
-    const customNetwork = this.networks.find(network => network.name === 'custom');
+    this.chain_name =
+      ($event.target as HTMLInputElement)?.value || this.network.chain_name;
+    const customNetwork = this.networks.find(
+      (network) => network.name === 'custom',
+    );
     if (customNetwork) {
       customNetwork.chain_name = this.chain_name;
       this.stateService.setState({
-        chain_name: this.chain_name
+        chain_name: this.chain_name,
       });
       this.storageService.setState({
-        chain_name: this.chain_name
+        chain_name: this.chain_name,
       });
     }
   }
@@ -141,38 +170,51 @@ export class HeaderComponent implements AfterViewInit {
   }
 
   private isElectron(): boolean {
-    return typeof this.window !== 'undefined' && window.location?.origin?.startsWith('file://');
+    return (
+      typeof this.window !== 'undefined' &&
+      window.location?.origin?.startsWith('file://')
+    );
   }
 
   private setRPCAndNodeAddress() {
     try {
-      if ((this.is_electron)) {
+      if (this.is_electron) {
         this.sdk.setRPCAddress(this.rpc_address);
-      }
-      else if (this.is_docker && this.is_production) {
-        this.sdk.setRPCAddress([
-          this.config['default_protocol'],
-          this.config['docker_gateway'],
-          ':',
-          this.config['cors_anywhere_port'],
-          '/',
-          this.rpc_address.replace(/localhost/g, this.config['docker_gateway'] as string)].join(''));
-
-      }
-      else {
-        const network = this.networks.find(x => x.rpc_address == this.rpc_address);
-        network && this.sdk.setRPCAddress([this.window?.location?.href, network?.name].join(''));
+      } else if (this.is_docker && this.is_production) {
+        this.sdk.setRPCAddress(
+          [
+            this.config['default_protocol'],
+            this.config['docker_gateway'],
+            ':',
+            this.config['cors_anywhere_port'],
+            '/',
+            this.rpc_address.replace(
+              /localhost/g,
+              this.config['docker_gateway'] as string,
+            ),
+          ].join(''),
+        );
+      } else {
+        const network = this.networks.find(
+          (x) => x.rpc_address == this.rpc_address,
+        );
+        network &&
+          this.sdk.setRPCAddress(
+            [this.window?.location?.href, network?.name].join(''),
+          );
       }
 
       if (this.is_docker) {
         this.sdk.setNodeAddress(
-          this.node_address.replace(/localhost/g, this.config['docker_gateway'] as string)
+          this.node_address.replace(
+            /localhost/g,
+            this.config['docker_gateway'] as string,
+          ),
         );
       } else {
         this.sdk.setNodeAddress(this.node_address);
       }
-    }
-    catch (e) {
+    } catch (e) {
       console.error(e);
     }
   }

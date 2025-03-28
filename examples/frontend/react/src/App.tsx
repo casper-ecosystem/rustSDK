@@ -25,7 +25,7 @@ import init, {
   getTimestamp,
   Bytes,
   AccountIdentifier
-} from 'casper-sdk';
+} from 'casper-rust-wasm-sdk';
 
 const public_key_default = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
 const secret_key_default = '-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----';

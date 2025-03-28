@@ -1,4 +1,14 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Inject, Input, OnDestroy, Output } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Inject,
+  Input,
+  OnDestroy,
+  Output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InputComponent, SelectComponent, TextareaComponent } from '@util/ui';
 import { SubmitWasmComponent } from '../submit-wasm/submit-wasm.component';
@@ -7,7 +17,12 @@ import { FormService, InputContainer } from '@util/form';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { State, StateService } from '@util/state';
 import { Subscription } from 'rxjs';
-import { Deploy, Transaction, Verbosity, jsonPrettyPrint } from 'casper-sdk';
+import {
+  Deploy,
+  Transaction,
+  Verbosity,
+  jsonPrettyPrint,
+} from 'casper-rust-wasm-sdk';
 import { CONFIG, EnvironmentConfig } from '@util/config';
 
 const imports = [
@@ -17,7 +32,7 @@ const imports = [
   SubmitWasmComponent,
   SubmitFileComponent,
   TextareaComponent,
-  SelectComponent
+  SelectComponent,
 ];
 
 @Component({
@@ -29,12 +44,12 @@ const imports = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormComponent implements AfterViewInit, OnDestroy {
-
   @Input() form!: FormGroup<any>;
   action!: string;
   formFields: Map<string, InputContainer[][]> = this.formService.formFields;
 
-  @Output() wasm_selected: EventEmitter<Uint8Array> = new EventEmitter<Uint8Array>();
+  @Output() wasm_selected: EventEmitter<Uint8Array> =
+    new EventEmitter<Uint8Array>();
 
   private stateSubscription!: Subscription;
   private verbosity = this.config['verbosity'];
@@ -44,7 +59,7 @@ export class FormComponent implements AfterViewInit, OnDestroy {
     private readonly formService: FormService,
     private readonly stateService: StateService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-  ) { }
+  ) {}
 
   ngOnDestroy() {
     this.stateSubscription && this.stateSubscription.unsubscribe();
@@ -55,38 +70,52 @@ export class FormComponent implements AfterViewInit, OnDestroy {
   }
 
   private setStateSubscription() {
-    this.stateSubscription = this.stateService.getState().subscribe((state: State) => {
-      state.action && (this.action = state.action);
-      this.changeDetectorRef.markForCheck();
-    });
+    this.stateSubscription = this.stateService
+      .getState()
+      .subscribe((state: State) => {
+        state.action && (this.action = state.action);
+        this.changeDetectorRef.markForCheck();
+      });
   }
 
   async onWasmSelected(wasm: Uint8Array | undefined) {
     wasm && this.wasm_selected.emit(wasm);
     this.stateService.setState({
-      has_wasm: !!wasm
+      has_wasm: !!wasm,
     });
   }
 
   async onDeployFileSelected(deploy_json: string) {
-    deploy_json = deploy_json && jsonPrettyPrint(new Deploy(deploy_json).toJson(), this.verbosity as Verbosity);
+    deploy_json =
+      deploy_json &&
+      jsonPrettyPrint(
+        new Deploy(deploy_json).toJson(),
+        this.verbosity as Verbosity,
+      );
     this.updateDeployJson(deploy_json);
   }
 
   async onTransactionFileSelected(transaction_json: string) {
-    transaction_json = transaction_json && jsonPrettyPrint(new Transaction(transaction_json).toJson(), this.verbosity as Verbosity);
+    transaction_json =
+      transaction_json &&
+      jsonPrettyPrint(
+        new Transaction(transaction_json).toJson(),
+        this.verbosity as Verbosity,
+      );
     this.updateTransactionJson(transaction_json);
   }
 
   updateDeployJson(deploy_json: string) {
-    deploy_json && this.stateService.setState({
-      deploy_json
-    });
+    deploy_json &&
+      this.stateService.setState({
+        deploy_json,
+      });
   }
 
   updateTransactionJson(transaction_json: string) {
-    transaction_json && this.stateService.setState({
-      transaction_json
-    });
+    transaction_json &&
+      this.stateService.setState({
+        transaction_json,
+      });
   }
 }

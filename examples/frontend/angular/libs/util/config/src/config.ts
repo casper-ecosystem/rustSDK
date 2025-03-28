@@ -1,4 +1,4 @@
-import { Verbosity, PricingMode } from 'casper-sdk';
+import { Verbosity, PricingMode } from 'casper-rust-wasm-sdk';
 
 export type EnvironmentConfig = {
   [key: string]: string | object | Verbosity | boolean | PricingMode;

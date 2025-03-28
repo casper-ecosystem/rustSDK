@@ -1,9 +1,28 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { SDK, PeerEntry, Transaction } from "casper-sdk";
-import { ResultComponent, HeaderComponent, ErrorComponent, StatusComponent, ActionComponent, SubmitActionComponent, PublicKeyComponent, SecretKeyComponent, FormComponent } from '@components';
+import { SDK, PeerEntry, Transaction } from 'casper-rust-wasm-sdk';
+import {
+  ResultComponent,
+  HeaderComponent,
+  ErrorComponent,
+  StatusComponent,
+  ActionComponent,
+  SubmitActionComponent,
+  PublicKeyComponent,
+  SecretKeyComponent,
+  FormComponent,
+} from '@components';
 import { Subscription } from 'rxjs';
 import { State, StateService } from '@util/state';
 import { ResultService } from '@util/result';
@@ -70,26 +89,29 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private setStateSubscription() {
-    this.stateSubscription = this.stateService.getState().subscribe((state: State) => {
-      state.action && (this.action = state.action);
-    });
+    this.stateSubscription = this.stateService
+      .getState()
+      .subscribe((state: State) => {
+        state.action && (this.action = state.action);
+      });
   }
 
   public async ngAfterViewInit() {
     const no_mark_for_check = true;
-    const action = this.storageService.get('action') || this.config['default_action'].toString();
+    const action =
+      this.storageService.get('action') ||
+      this.config['default_action'].toString();
     try {
       if (action == this.config['default_action'].toString()) {
         await this.handleAction(action, true);
       }
       await this.get_state_root_hash(no_mark_for_check);
-
     } catch (error) {
       console.error(error);
       this.errorService.setError(error as string);
     }
     this.stateService.setState({
-      action
+      action,
     });
     this.setStateSubscription();
   }
@@ -97,11 +119,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   async selectAction(action: string) {
     await this.cleanResult();
     this.stateService.setState({
-      action
+      action,
     });
     await this.handleAction(action);
     this.storageService.setState({
-      action
+      action,
     });
   }
 
@@ -119,9 +141,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async handleAction(action: string, exec = false) {
     const resolveMethod = (obj: unknown) =>
-      (obj as { [key: string]: () => Promise<void>; })[action]?.bind(obj);
+      (obj as { [key: string]: () => Promise<void> })[action]?.bind(obj);
 
-    const fn = resolveMethod(this) || resolveMethod(this.clientService) || resolveMethod(this.binaryService);
+    const fn =
+      resolveMethod(this) ||
+      resolveMethod(this.clientService) ||
+      resolveMethod(this.binaryService);
 
     if (fn && typeof fn === 'function') {
       if (exec) {
@@ -148,11 +173,19 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async deploy(deploy_result = true, speculative?: boolean) {
-    return await this.clientService.deploy(deploy_result, speculative, this.wasm);
+    return await this.clientService.deploy(
+      deploy_result,
+      speculative,
+      this.wasm,
+    );
   }
 
   private async transaction(deploy_result = true, speculative?: boolean) {
-    return await this.clientService.transaction(deploy_result, speculative, this.wasm);
+    return await this.clientService.transaction(
+      deploy_result,
+      speculative,
+      this.wasm,
+    );
   }
 
   private async get_account(account_identifier_param: string) {
@@ -164,9 +197,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public async get_state_root_hash(no_mark_for_check?: boolean) {
-    const state_root_hash = await this.clientService.get_state_root_hash(no_mark_for_check);
+    const state_root_hash =
+      await this.clientService.get_state_root_hash(no_mark_for_check);
     this.stateService.setState({
-      state_root_hash
+      state_root_hash,
     });
     return state_root_hash;
   }
@@ -175,18 +209,36 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return await this.clientService.transfer(deploy_result, speculative);
   }
 
-  private async transfer_transaction(transaction_result = true, speculative?: boolean) {
-    return await this.clientService.transfer_transaction(transaction_result, speculative);
+  private async transfer_transaction(
+    transaction_result = true,
+    speculative?: boolean,
+  ) {
+    return await this.clientService.transfer_transaction(
+      transaction_result,
+      speculative,
+    );
   }
 
   private async get_binary_try_accept_transaction() {
-    let transaction = await this.clientService.transaction(false, false, this.wasm) as Transaction;
-    return await this.binaryService.get_binary_try_accept_transaction(transaction);
+    let transaction = (await this.clientService.transaction(
+      false,
+      false,
+      this.wasm,
+    )) as Transaction;
+    return await this.binaryService.get_binary_try_accept_transaction(
+      transaction,
+    );
   }
 
   private async get_binary_try_speculative_execution() {
-    let transaction = await this.clientService.transaction(false, true, this.wasm) as Transaction;
-    return await this.binaryService.get_binary_try_speculative_execution(transaction);
+    let transaction = (await this.clientService.transaction(
+      false,
+      true,
+      this.wasm,
+    )) as Transaction;
+    return await this.binaryService.get_binary_try_speculative_execution(
+      transaction,
+    );
   }
 
   private async install_deploy() {

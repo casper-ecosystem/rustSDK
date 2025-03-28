@@ -1,5 +1,5 @@
 import { config } from '@util/config';
-import { PricingMode } from 'casper-sdk';
+import { PricingMode } from 'casper-rust-wasm-sdk';
 
 export type option = {
   value: string;

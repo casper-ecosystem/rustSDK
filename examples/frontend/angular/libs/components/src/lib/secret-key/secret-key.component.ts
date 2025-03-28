@@ -1,7 +1,16 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnDestroy, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Inject,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { State, StateService } from '@util/state';
-import { publicKeyFromSecretKey } from 'casper-sdk';
+import { publicKeyFromSecretKey } from 'casper-rust-wasm-sdk';
 import { CONFIG, EnvironmentConfig } from '@util/config';
 import { Subscription } from 'rxjs';
 import { ErrorService } from '@util/error';
@@ -16,7 +25,6 @@ import { StorageService } from '@util/storage';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SecretKeyComponent implements AfterViewInit, OnDestroy {
-
   @ViewChild('secretKeyElt') secretKeyElt!: ElementRef;
 
   private stateSubscription!: Subscription;
@@ -28,9 +36,8 @@ export class SecretKeyComponent implements AfterViewInit, OnDestroy {
     private readonly stateService: StateService,
     private readonly errorService: ErrorService,
     private readonly storageService: StorageService,
-    private readonly changeDetectorRef: ChangeDetectorRef
-  ) {
-  }
+    private readonly changeDetectorRef: ChangeDetectorRef,
+  ) {}
 
   async ngAfterViewInit() {
     this.setStateSubscription();
@@ -41,10 +48,12 @@ export class SecretKeyComponent implements AfterViewInit, OnDestroy {
   }
 
   private setStateSubscription() {
-    this.stateSubscription = this.stateService.getState().subscribe(async (state: State) => {
-      state.action && (this.action = state.action);
-      this.changeDetectorRef.markForCheck();
-    });
+    this.stateSubscription = this.stateService
+      .getState()
+      .subscribe(async (state: State) => {
+        state.action && (this.action = state.action);
+        this.changeDetectorRef.markForCheck();
+      });
   }
 
   onSecretKeyClick() {
@@ -60,7 +69,7 @@ export class SecretKeyComponent implements AfterViewInit, OnDestroy {
         return;
       }
       text = text.trim();
-      this.errorService.setError("");
+      this.errorService.setError('');
       try {
         public_key = publicKeyFromSecretKey(text);
       } catch (err) {
@@ -69,14 +78,13 @@ export class SecretKeyComponent implements AfterViewInit, OnDestroy {
       if (public_key) {
         this.secret_key = text;
       }
-
     } else {
       this.secret_key = '';
     }
 
     this.stateService.setState({
       public_key,
-      secret_key: this.secret_key
+      secret_key: this.secret_key,
     });
 
     this.storageService.setState({
@@ -89,10 +97,14 @@ export class SecretKeyComponent implements AfterViewInit, OnDestroy {
   }
 
   isInvalid(): boolean {
-    if (this.config['action_needs_secret_key'] && !(this.config['action_needs_secret_key'] as Array<string>)?.includes(this.action)) {
+    if (
+      this.config['action_needs_secret_key'] &&
+      !(this.config['action_needs_secret_key'] as Array<string>)?.includes(
+        this.action,
+      )
+    ) {
       return false;
     }
     return !this.secret_key;
   }
-
 }

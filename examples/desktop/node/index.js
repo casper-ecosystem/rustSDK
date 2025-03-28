@@ -36,12 +36,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var casper_sdk_1 = require("casper-sdk");
+var casper_rust_wasm_sdk_1 = require("casper-rust-wasm-sdk");
 var fs = require('fs').promises;
 var http = require('http');
 var rpc_address = 'http://localhost:11101';
 var node_address = 'localhost:28101';
-var sdk = new casper_sdk_1.SDK(rpc_address, node_address);
+var sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address, node_address);
 // const server = http.createServer(async (req, res) => {
 //   res.writeHead(200, { 'Content-Type': 'text/plain' });
 //   let peers_object = await sdk.get_peers();
@@ -147,12 +147,12 @@ var example5 = function () { return __awaiter(void 0, void 0, void 0, function (
         chain_name = 'casper-net-1';
         public_key = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
         secret_key = undefined;
-        timestamp = (0, casper_sdk_1.getTimestamp)();
+        timestamp = (0, casper_rust_wasm_sdk_1.getTimestamp)();
         ttl = '1h';
         payment_amount = '100000000';
         transfer_amount = '2500000000';
         target_account = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
-        transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key, secret_key, timestamp, ttl);
+        transaction_params = new casper_rust_wasm_sdk_1.TransactionStrParams(chain_name, public_key, secret_key, timestamp, ttl);
         transaction_params.payment_amount = payment_amount;
         make_transfer_transaction = sdk.make_transfer_transaction(undefined, // Optional maybe_source
         target_account, transfer_amount, transaction_params);
@@ -168,16 +168,16 @@ var example6 = function () { return __awaiter(void 0, void 0, void 0, function (
         switch (_a.label) {
             case 0:
                 rpc_address = 'http://127.0.0.1:11101';
-                sdk = new casper_sdk_1.SDK(rpc_address);
+                sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address);
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-                public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
-                timestamp = (0, casper_sdk_1.getTimestamp)();
+                public_key = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
+                timestamp = (0, casper_rust_wasm_sdk_1.getTimestamp)();
                 ttl = '1h';
                 payment_amount = '100000000';
                 transfer_amount = '2500000000';
                 target_account = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
-                transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key, secret_key, timestamp, ttl);
+                transaction_params = new casper_rust_wasm_sdk_1.TransactionStrParams(chain_name, public_key, secret_key, timestamp, ttl);
                 transaction_params.payment_amount = payment_amount;
                 return [4 /*yield*/, sdk.transfer_transaction(undefined, // Optional maybe_source
                     target_account, transfer_amount, transaction_params)];
@@ -200,10 +200,10 @@ var example7 = function () { return __awaiter(void 0, void 0, void 0, function (
         payment_amount = '5000000000';
         entity_hash_hex_string = '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
         entry_point = 'set_variables';
-        transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key);
+        transaction_params = new casper_rust_wasm_sdk_1.TransactionStrParams(chain_name, public_key);
         transaction_params.payment_amount = payment_amount;
-        entity_hash = new casper_sdk_1.AddressableEntityHash(entity_hash_hex_string);
-        builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
+        entity_hash = new casper_rust_wasm_sdk_1.AddressableEntityHash(entity_hash_hex_string);
+        builder_params = casper_rust_wasm_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
         transaction = sdk.make_transaction(builder_params, transaction_params);
         transaction_as_json = transaction.toJson();
         console.log(transaction_as_json);
@@ -217,17 +217,17 @@ var example8 = function () { return __awaiter(void 0, void 0, void 0, function (
         switch (_a.label) {
             case 0:
                 rpc_address = 'http://127.0.0.1:11101';
-                sdk = new casper_sdk_1.SDK(rpc_address);
+                sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address);
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-                public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
+                public_key = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
                 payment_amount = '5000000000';
                 entity_hash_hex_string = '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
                 entry_point = 'set_variables';
-                transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key, secret_key);
+                transaction_params = new casper_rust_wasm_sdk_1.TransactionStrParams(chain_name, public_key, secret_key);
                 transaction_params.payment_amount = payment_amount;
-                entity_hash = new casper_sdk_1.AddressableEntityHash(entity_hash_hex_string);
-                builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
+                entity_hash = new casper_rust_wasm_sdk_1.AddressableEntityHash(entity_hash_hex_string);
+                builder_params = casper_rust_wasm_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
                 return [4 /*yield*/, sdk.transaction(builder_params, transaction_params)];
             case 1:
                 transaction_result = _a.sent();
@@ -244,18 +244,18 @@ var example9 = function () { return __awaiter(void 0, void 0, void 0, function (
         switch (_a.label) {
             case 0:
                 rpc_address = 'http://127.0.0.1:11101';
-                sdk = new casper_sdk_1.SDK(rpc_address);
+                sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address);
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-                public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
+                public_key = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
                 payment_amount = '5000000000';
                 entity_hash_formatted_string = 'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
                 entry_point = 'set_variables';
-                transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key, secret_key);
+                transaction_params = new casper_rust_wasm_sdk_1.TransactionStrParams(chain_name, public_key, secret_key);
                 transaction_params.payment_amount = payment_amount;
-                entity_hash = casper_sdk_1.AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
-                builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
-                transaction = casper_sdk_1.Transaction.newSession(builder_params, transaction_params);
+                entity_hash = casper_rust_wasm_sdk_1.AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
+                builder_params = casper_rust_wasm_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
+                transaction = casper_rust_wasm_sdk_1.Transaction.newSession(builder_params, transaction_params);
                 return [4 /*yield*/, sdk.put_transaction(transaction)];
             case 1:
                 put_transaction_result = _a.sent();
@@ -272,17 +272,18 @@ var example10 = function () { return __awaiter(void 0, void 0, void 0, function 
         switch (_a.label) {
             case 0:
                 rpc_address = 'http://127.0.0.1:11101';
-                sdk = new casper_sdk_1.SDK(rpc_address);
+                sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address);
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-                public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
+                public_key = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
                 payment_amount = '100000000';
                 transfer_amount = '2500000000';
                 target_account = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
-                transfer_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key, secret_key);
+                transfer_params = new casper_rust_wasm_sdk_1.TransactionStrParams(chain_name, public_key, secret_key);
                 transfer_params.payment_amount = payment_amount;
-                transfer_transaction = casper_sdk_1.Transaction.newTransfer(undefined, // optional maybe_source
-                target_account, transfer_amount, transfer_params, undefined);
+                transfer_transaction = casper_rust_wasm_sdk_1.Transaction.newTransfer(undefined, // optional maybe_source
+                target_account, transfer_amount, transfer_params, undefined // optional transfer_id
+                );
                 return [4 /*yield*/, sdk.put_transaction(transfer_transaction)];
             case 1:
                 put_transaction_result = _a.sent();
@@ -320,23 +321,23 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
             case 0:
                 rpc_address = 'http://127.0.0.1:11101';
                 events_address = 'http://127.0.0.1:18101/events';
-                sdk = new casper_sdk_1.SDK(rpc_address);
+                sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address);
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-                initiator_addr = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
-                transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, initiator_addr, secret_key);
+                initiator_addr = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
+                transaction_params = new casper_rust_wasm_sdk_1.TransactionStrParams(chain_name, initiator_addr, secret_key);
                 transaction_params.session_args_json = JSON.stringify([
-                    { "name": "collection_name", "type": "String", "value": "enhanced-nft-1" },
-                    { "name": "collection_symbol", "type": "String", "value": "ENFT-1" },
-                    { "name": "total_token_supply", "type": "U64", "value": 100 },
-                    { "name": "ownership_mode", "type": "U8", "value": 0 },
-                    { "name": "nft_kind", "type": "U8", "value": 1 },
-                    { "name": "allow_minting", "type": "Bool", "value": true },
-                    { "name": "owner_reverse_lookup_mode", "type": "U8", "value": 0 },
-                    { "name": "nft_metadata_kind", "type": "U8", "value": 2 },
-                    { "name": "identifier_mode", "type": "U8", "value": 0 },
-                    { "name": "metadata_mutability", "type": "U8", "value": 0 },
-                    { "name": "events_mode", "type": "U8", "value": 1 }
+                    { name: 'collection_name', type: 'String', value: 'enhanced-nft-1' },
+                    { name: 'collection_symbol', type: 'String', value: 'ENFT-1' },
+                    { name: 'total_token_supply', type: 'U64', value: 100 },
+                    { name: 'ownership_mode', type: 'U8', value: 0 },
+                    { name: 'nft_kind', type: 'U8', value: 1 },
+                    { name: 'allow_minting', type: 'Bool', value: true },
+                    { name: 'owner_reverse_lookup_mode', type: 'U8', value: 0 },
+                    { name: 'nft_metadata_kind', type: 'U8', value: 2 },
+                    { name: 'identifier_mode', type: 'U8', value: 0 },
+                    { name: 'metadata_mutability', type: 'U8', value: 0 },
+                    { name: 'events_mode', type: 'U8', value: 1 },
                 ]);
                 transaction_params.payment_amount = '500000000000';
                 return [4 /*yield*/, loadFile()];
@@ -348,7 +349,7 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
                     console.error('Failed to read wasm file.');
                     return [2 /*return*/];
                 }
-                return [4 /*yield*/, sdk.install(transaction_params, casper_sdk_1.Bytes.fromUint8Array(wasm))];
+                return [4 /*yield*/, sdk.install(transaction_params, casper_rust_wasm_sdk_1.Bytes.fromUint8Array(wasm))];
             case 2:
                 install_result = _d.sent();
                 install_result_as_json = install_result.toJson();
@@ -371,24 +372,29 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
             case 0:
                 rpc_address = 'http://127.0.0.1:11101';
                 events_address = 'http://127.0.0.1:18101/events';
-                sdk = new casper_sdk_1.SDK(rpc_address);
+                sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address);
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-                initiator_addr = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
+                initiator_addr = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
                 entity_hash_formatted_string = 'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
                 entry_point = 'mint';
                 token_owner = 'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
                 payment_amount = '5000000000';
-                transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, initiator_addr, secret_key);
-                transaction_params.session_args_simple = ["token_meta_data:String='test_meta_data'", "token_owner:Key='".concat(token_owner, "'")];
+                transaction_params = new casper_rust_wasm_sdk_1.TransactionStrParams(chain_name, initiator_addr, secret_key);
+                transaction_params.session_args_simple = [
+                    "token_meta_data:String='test_meta_data'",
+                    "token_owner:Key='".concat(token_owner, "'"),
+                ];
                 transaction_params.payment_amount = payment_amount;
-                entity_hash = casper_sdk_1.AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
-                builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
+                entity_hash = casper_rust_wasm_sdk_1.AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
+                builder_params = casper_rust_wasm_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
                 return [4 /*yield*/, sdk.call_entrypoint(builder_params, transaction_params)];
             case 1:
                 call_entrypoint_result = _a.sent();
                 call_entrypoint_result_as_json = call_entrypoint_result.toJson();
-                transaction_hash_results = [call_entrypoint_result_as_json.transaction_hash];
+                transaction_hash_results = [
+                    call_entrypoint_result_as_json.transaction_hash,
+                ];
                 watcher = sdk.watchTransaction(events_address);
                 Subscriptions = [];
                 getEventHandlerFn = function (transactionHash) {
@@ -406,7 +412,6 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                             console.error((_f = (_e = eventParseResult.body) === null || _e === void 0 ? void 0 : _e.transaction_processed) === null || _f === void 0 ? void 0 : _f.execution_result.Failure);
                             return false;
                         }
-                        ;
                     };
                     return eventHandlerFn;
                 };
@@ -415,7 +420,7 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                     return __generator(this, function (_a) {
                         eventHandlerFn = getEventHandlerFn(transaction_hash);
                         console.log(transaction_hash);
-                        subscription = new casper_sdk_1.Subscription(transaction_hash, eventHandlerFn);
+                        subscription = new casper_rust_wasm_sdk_1.Subscription(transaction_hash, eventHandlerFn);
                         Subscriptions.push(subscription);
                         return [2 /*return*/];
                     });
@@ -438,11 +443,11 @@ var example13 = function () { return __awaiter(void 0, void 0, void 0, function 
         payment_amount = '5000000000';
         entity_hash_formatted_string = 'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
         secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-        initiator_addr = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
-        transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, initiator_addr);
+        initiator_addr = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
+        transaction_params = new casper_rust_wasm_sdk_1.TransactionStrParams(chain_name, initiator_addr);
         transaction_params.payment_amount = payment_amount;
-        entity_hash = casper_sdk_1.AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
-        builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, 'set_variables');
+        entity_hash = casper_rust_wasm_sdk_1.AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
+        builder_params = casper_rust_wasm_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, 'set_variables');
         transaction = sdk.make_transaction(builder_params, transaction_params);
         signed_transaction = transaction.sign(secret_key);
         console.log(signed_transaction.approvals());
@@ -457,10 +462,10 @@ var example14 = function () { return __awaiter(void 0, void 0, void 0, function 
         payment_amount = '5000000000';
         entity_hash_hex_string = '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
         public_key_kms = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
-        transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key_kms);
+        transaction_params = new casper_rust_wasm_sdk_1.TransactionStrParams(chain_name, public_key_kms);
         transaction_params.payment_amount = payment_amount;
-        entity_hash = new casper_sdk_1.AddressableEntityHash(entity_hash_hex_string);
-        builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, 'set_variables');
+        entity_hash = new casper_rust_wasm_sdk_1.AddressableEntityHash(entity_hash_hex_string);
+        builder_params = casper_rust_wasm_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, 'set_variables');
         transaction = sdk.make_transaction(builder_params, transaction_params);
         signature_kms = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980b';
         signed_transaction = transaction.addSignature(public_key_kms, signature_kms);
@@ -501,13 +506,13 @@ var example5_legacy = function () { return __awaiter(void 0, void 0, void 0, fun
         chain_name = 'casper-net-1';
         public_key = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
         secret_key = undefined;
-        timestamp = (0, casper_sdk_1.getTimestamp)();
+        timestamp = (0, casper_rust_wasm_sdk_1.getTimestamp)();
         ttl = '1h';
         payment_amount = '100000000';
         transfer_amount = '2500000000';
         target_account = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
-        deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, secret_key, timestamp, ttl);
-        payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
+        deploy_params = new casper_rust_wasm_sdk_1.DeployStrParams(chain_name, public_key, secret_key, timestamp, ttl);
+        payment_params = new casper_rust_wasm_sdk_1.PaymentStrParams(payment_amount);
         transfer_deploy = sdk.make_transfer(transfer_amount, target_account, undefined, // transfer_id
         deploy_params, payment_params);
         transfer_deploy_as_json = transfer_deploy.toJson();
@@ -522,17 +527,17 @@ var example6_legacy = function () { return __awaiter(void 0, void 0, void 0, fun
         switch (_a.label) {
             case 0:
                 rpc_address = 'http://127.0.0.1:11101';
-                sdk = new casper_sdk_1.SDK(rpc_address);
+                sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address);
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-                public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
-                timestamp = (0, casper_sdk_1.getTimestamp)();
+                public_key = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
+                timestamp = (0, casper_rust_wasm_sdk_1.getTimestamp)();
                 ttl = '1h';
                 payment_amount = '100000000';
                 transfer_amount = '2500000000';
                 target_account = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
-                deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, secret_key, timestamp, ttl);
-                payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
+                deploy_params = new casper_rust_wasm_sdk_1.DeployStrParams(chain_name, public_key, secret_key, timestamp, ttl);
+                payment_params = new casper_rust_wasm_sdk_1.PaymentStrParams(payment_amount);
                 return [4 /*yield*/, sdk.transfer(transfer_amount, target_account, undefined, // transfer_id
                     deploy_params, payment_params)];
             case 1:
@@ -552,11 +557,11 @@ var example7_legacy = function () { return __awaiter(void 0, void 0, void 0, fun
         public_key = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
         payment_amount = '5000000000';
         contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-        deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key);
-        session_params = new casper_sdk_1.SessionStrParams();
+        deploy_params = new casper_rust_wasm_sdk_1.DeployStrParams(chain_name, public_key);
+        session_params = new casper_rust_wasm_sdk_1.SessionStrParams();
         session_params.session_hash = contract_hash;
         session_params.session_entry_point = 'set_variables';
-        payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
+        payment_params = new casper_rust_wasm_sdk_1.PaymentStrParams(payment_amount);
         deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
         deploy_as_json = deploy.toJson();
         console.log(deploy_as_json);
@@ -570,17 +575,17 @@ var example8_legacy = function () { return __awaiter(void 0, void 0, void 0, fun
         switch (_a.label) {
             case 0:
                 rpc_address = 'http://127.0.0.1:11101';
-                sdk = new casper_sdk_1.SDK(rpc_address);
+                sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address);
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-                public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
+                public_key = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
                 payment_amount = '5000000000';
                 contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-                deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, secret_key);
-                session_params = new casper_sdk_1.SessionStrParams();
+                deploy_params = new casper_rust_wasm_sdk_1.DeployStrParams(chain_name, public_key, secret_key);
+                session_params = new casper_rust_wasm_sdk_1.SessionStrParams();
                 session_params.session_hash = contract_hash;
                 session_params.session_entry_point = 'set_variables';
-                payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
+                payment_params = new casper_rust_wasm_sdk_1.PaymentStrParams(payment_amount);
                 return [4 /*yield*/, sdk.deploy(deploy_params, session_params, payment_params)];
             case 1:
                 deploy_result = _a.sent();
@@ -597,19 +602,19 @@ var example9_legacy = function () { return __awaiter(void 0, void 0, void 0, fun
         switch (_a.label) {
             case 0:
                 rpc_address = 'http://127.0.0.1:11101';
-                sdk = new casper_sdk_1.SDK(rpc_address);
+                sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address);
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-                public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
+                public_key = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
                 payment_amount = '5000000000';
                 contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
                 entry_point = 'set_variables';
-                deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, secret_key);
-                session_params = new casper_sdk_1.SessionStrParams();
+                deploy_params = new casper_rust_wasm_sdk_1.DeployStrParams(chain_name, public_key, secret_key);
+                session_params = new casper_rust_wasm_sdk_1.SessionStrParams();
                 session_params.session_hash = contract_hash;
                 session_params.session_entry_point = entry_point;
-                payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
-                deploy = casper_sdk_1.Deploy.withPaymentAndSession(deploy_params, session_params, payment_params);
+                payment_params = new casper_rust_wasm_sdk_1.PaymentStrParams(payment_amount);
+                deploy = casper_rust_wasm_sdk_1.Deploy.withPaymentAndSession(deploy_params, session_params, payment_params);
                 return [4 /*yield*/, sdk.put_deploy(deploy)];
             case 1:
                 put_deploy_result = _a.sent();
@@ -626,16 +631,16 @@ var example10_legacy = function () { return __awaiter(void 0, void 0, void 0, fu
         switch (_a.label) {
             case 0:
                 rpc_address = 'http://127.0.0.1:11101';
-                sdk = new casper_sdk_1.SDK(rpc_address);
+                sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address);
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-                public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
+                public_key = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
                 payment_amount = '100000000';
                 transfer_amount = '2500000000';
                 target_account = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
-                deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, secret_key);
-                payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
-                transfer_deploy = casper_sdk_1.Deploy.withTransfer(transfer_amount, target_account, undefined, // transfer_id
+                deploy_params = new casper_rust_wasm_sdk_1.DeployStrParams(chain_name, public_key, secret_key);
+                payment_params = new casper_rust_wasm_sdk_1.PaymentStrParams(payment_amount);
+                transfer_deploy = casper_rust_wasm_sdk_1.Deploy.withTransfer(transfer_amount, target_account, undefined, // transfer_id
                 deploy_params, payment_params);
                 return [4 /*yield*/, sdk.put_deploy(transfer_deploy)];
             case 1:
@@ -674,24 +679,24 @@ var example11_legacy = function () { return __awaiter(void 0, void 0, void 0, fu
             case 0:
                 rpc_address = 'http://127.0.0.1:11101';
                 events_address = 'http://127.0.0.1:18101/events';
-                sdk = new casper_sdk_1.SDK(rpc_address);
+                sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address);
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-                public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
-                deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, secret_key);
-                session_params = new casper_sdk_1.SessionStrParams();
+                public_key = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
+                deploy_params = new casper_rust_wasm_sdk_1.DeployStrParams(chain_name, public_key, secret_key);
+                session_params = new casper_rust_wasm_sdk_1.SessionStrParams();
                 session_params.session_args_json = JSON.stringify([
-                    { "name": "collection_name", "type": "String", "value": "enhanced-nft-1" },
-                    { "name": "collection_symbol", "type": "String", "value": "ENFT-1" },
-                    { "name": "total_token_supply", "type": "U64", "value": 100 },
-                    { "name": "ownership_mode", "type": "U8", "value": 0 },
-                    { "name": "nft_kind", "type": "U8", "value": 1 },
-                    { "name": "allow_minting", "type": "Bool", "value": true },
-                    { "name": "owner_reverse_lookup_mode", "type": "U8", "value": 0 },
-                    { "name": "nft_metadata_kind", "type": "U8", "value": 2 },
-                    { "name": "identifier_mode", "type": "U8", "value": 0 },
-                    { "name": "metadata_mutability", "type": "U8", "value": 0 },
-                    { "name": "events_mode", "type": "U8", "value": 1 }
+                    { name: 'collection_name', type: 'String', value: 'enhanced-nft-1' },
+                    { name: 'collection_symbol', type: 'String', value: 'ENFT-1' },
+                    { name: 'total_token_supply', type: 'U64', value: 100 },
+                    { name: 'ownership_mode', type: 'U8', value: 0 },
+                    { name: 'nft_kind', type: 'U8', value: 1 },
+                    { name: 'allow_minting', type: 'Bool', value: true },
+                    { name: 'owner_reverse_lookup_mode', type: 'U8', value: 0 },
+                    { name: 'nft_metadata_kind', type: 'U8', value: 2 },
+                    { name: 'identifier_mode', type: 'U8', value: 0 },
+                    { name: 'metadata_mutability', type: 'U8', value: 0 },
+                    { name: 'events_mode', type: 'U8', value: 1 },
                 ]);
                 payment_amount = '500000000000';
                 return [4 /*yield*/, loadFile()];
@@ -703,7 +708,7 @@ var example11_legacy = function () { return __awaiter(void 0, void 0, void 0, fu
                     console.error('Failed to read wasm file.');
                     return [2 /*return*/];
                 }
-                session_params.session_bytes = casper_sdk_1.Bytes.fromUint8Array(wasm);
+                session_params.session_bytes = casper_rust_wasm_sdk_1.Bytes.fromUint8Array(wasm);
                 return [4 /*yield*/, sdk.install_deploy(deploy_params, session_params, payment_amount)];
             case 2:
                 install_result = _d.sent();
@@ -727,24 +732,29 @@ var example12_legacy = function () { return __awaiter(void 0, void 0, void 0, fu
             case 0:
                 rpc_address = 'http://127.0.0.1:11101';
                 events_address = 'http://127.0.0.1:18101/events';
-                sdk = new casper_sdk_1.SDK(rpc_address);
+                sdk = new casper_rust_wasm_sdk_1.SDK(rpc_address);
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-                public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
+                public_key = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
                 contract_hash = 'hash-7705c58f20c445c605ba1bf5adab66686a8f891879d6012e07fe24c8bf3af3f2';
                 entry_point = 'mint';
                 token_owner = 'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
                 payment_amount = '5000000000';
-                deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key, secret_key);
-                session_params = new casper_sdk_1.SessionStrParams();
+                deploy_params = new casper_rust_wasm_sdk_1.DeployStrParams(chain_name, public_key, secret_key);
+                session_params = new casper_rust_wasm_sdk_1.SessionStrParams();
                 session_params.session_hash = contract_hash;
                 session_params.session_entry_point = entry_point;
-                session_params.session_args_simple = ["token_meta_data:String='test_meta_data'", "token_owner:Key='".concat(token_owner, "'")];
+                session_params.session_args_simple = [
+                    "token_meta_data:String='test_meta_data'",
+                    "token_owner:Key='".concat(token_owner, "'"),
+                ];
                 return [4 /*yield*/, sdk.call_entrypoint_deploy(deploy_params, session_params, payment_amount)];
             case 1:
                 call_entrypoint_deploy_result = _a.sent();
                 call_entrypoint_deploy_result_as_json = call_entrypoint_deploy_result.toJson();
-                deploy_hash_results = [call_entrypoint_deploy_result_as_json.deploy_hash];
+                deploy_hash_results = [
+                    call_entrypoint_deploy_result_as_json.deploy_hash,
+                ];
                 watcher = sdk.watchDeploy(events_address);
                 subscriptions = [];
                 getEventHandlerFn = function (deployHash) {
@@ -762,7 +772,6 @@ var example12_legacy = function () { return __awaiter(void 0, void 0, void 0, fu
                             console.error((_f = (_e = eventParseResult.body) === null || _e === void 0 ? void 0 : _e.transaction_processed) === null || _f === void 0 ? void 0 : _f.execution_result.Failure);
                             return false;
                         }
-                        ;
                     };
                     return eventHandlerFn;
                 };
@@ -771,7 +780,7 @@ var example12_legacy = function () { return __awaiter(void 0, void 0, void 0, fu
                     return __generator(this, function (_a) {
                         eventHandlerFn = getEventHandlerFn(deploy_hash);
                         console.log(deploy_hash);
-                        subscription = new casper_sdk_1.Subscription(deploy_hash, eventHandlerFn);
+                        subscription = new casper_rust_wasm_sdk_1.Subscription(deploy_hash, eventHandlerFn);
                         subscriptions.push(subscription);
                         return [2 /*return*/];
                     });
@@ -794,12 +803,12 @@ var example13_legacy = function () { return __awaiter(void 0, void 0, void 0, fu
         payment_amount = '5000000000';
         contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
         secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
-        public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
-        deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key);
-        session_params = new casper_sdk_1.SessionStrParams();
+        public_key = (0, casper_rust_wasm_sdk_1.publicKeyFromSecretKey)(secret_key);
+        deploy_params = new casper_rust_wasm_sdk_1.DeployStrParams(chain_name, public_key);
+        session_params = new casper_rust_wasm_sdk_1.SessionStrParams();
         session_params.session_hash = contract_hash;
         session_params.session_entry_point = 'set_variables';
-        payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
+        payment_params = new casper_rust_wasm_sdk_1.PaymentStrParams(payment_amount);
         deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
         deploy_signed = deploy.sign(secret_key);
         console.log(deploy_signed.toJson());
@@ -814,11 +823,11 @@ var example14_legacy = function () { return __awaiter(void 0, void 0, void 0, fu
         payment_amount = '5000000000';
         contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
         public_key_kms = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
-        deploy_params = new casper_sdk_1.DeployStrParams(chain_name, public_key_kms);
-        session_params = new casper_sdk_1.SessionStrParams();
+        deploy_params = new casper_rust_wasm_sdk_1.DeployStrParams(chain_name, public_key_kms);
+        session_params = new casper_rust_wasm_sdk_1.SessionStrParams();
         session_params.session_hash = contract_hash;
         session_params.session_entry_point = 'set_variables';
-        payment_params = new casper_sdk_1.PaymentStrParams(payment_amount);
+        payment_params = new casper_rust_wasm_sdk_1.PaymentStrParams(payment_amount);
         deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
         signature_kms = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980b';
         deploy_signed = deploy.addSignature(public_key_kms, signature_kms);

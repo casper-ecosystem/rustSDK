@@ -9,7 +9,7 @@ import {
   Output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SDK } from 'casper-sdk';
+import { SDK } from 'casper-rust-wasm-sdk';
 import { SDK_TOKEN } from '@util/wasm';
 import { Subscription } from 'rxjs';
 import { State, StateService } from '@util/state';

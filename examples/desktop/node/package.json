@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "casper-sdk": "file:../../../pkg-nodejs"
+    "casper-rust-wasm-sdk": "file:../../../pkg-nodejs"
   },
   "devDependencies": {
     "@types/node": "^22.13.14",

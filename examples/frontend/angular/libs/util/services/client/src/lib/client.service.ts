@@ -34,7 +34,7 @@ import {
   PricingMode,
   EntityAddr,
   PeerEntry,
-} from 'casper-sdk';
+} from 'casper-rust-wasm-sdk';
 
 @Injectable({
   providedIn: 'root',

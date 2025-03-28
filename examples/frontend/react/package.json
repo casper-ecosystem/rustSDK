@@ -11,7 +11,7 @@
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "bootstrap": "^5.3.3",
-    "casper-sdk": "file:../../../pkg",
+    "casper-rust-wasm-sdk": "file:../../../pkg",
     "http-proxy-middleware": "^3.0.3",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.8",

@@ -24,7 +24,7 @@
     "@angular/platform-browser-dynamic": "~19.2.4",
     "@angular/router": "~19.2.4",
     "@nx/angular": "20.6.4",
-    "casper-sdk": "file:../../../pkg",
+    "casper-rust-wasm-sdk": "file:../../../pkg",
     "highlight.js": "^11.11.1",
     "promise-worker": "^2.0.1",
     "rxjs": "~7.8.2",
