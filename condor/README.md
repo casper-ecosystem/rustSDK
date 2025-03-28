@@ -154,7 +154,7 @@ $ npm start
   "name": "my-angular-app",
   "dependencies": {
     // This path is relative
-    "casper-sdk": "file:pkg", // [TODO] Npm package
+    "casper-rust-wasm-sdk": "file:pkg", // [TODO] Npm package
     ...
 }
 ```
@@ -242,7 +242,7 @@ $ npm build
   "name": "my-node-app",
   "dependencies": {
     // This path is relative
-    "casper-sdk": "file:pkg-nodejs", // [TODO] Npm package
+    "casper-rust-wasm-sdk": "file:pkg-nodejs", // [TODO] Npm package
     ...
 }
 ```
