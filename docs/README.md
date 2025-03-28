@@ -2511,5 +2511,4 @@ SECRET_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
 ## Todo
 
 - Expose more CL Types and Casper Client result Types
-- EventStream
-- Wallet connect
+- EventStream for other events than transaction processed
