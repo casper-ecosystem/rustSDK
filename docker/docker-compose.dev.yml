@@ -1,7 +1,7 @@
 services:
   casper-webclient:
     container_name: casper-webclient
-    image: casper-webclient:latest
+    image: casper-webclient-dev:latest
     build:
       dockerfile: ./docker/Dockerfile.dev
       context: ../

@@ -12,7 +12,7 @@ services:
 
   # Build and run image with Dockerfile
   # docker build -t casper-webclient . --force-rm
-  # docker container run -t -i --rm -h casper-webclient -p 4200:4200 casper-webclient
+  # docker container run -t -i --rm -h casper-webclient -p 8080:8080 casper-webclient
 
   cors-anywhere:
     image: cors-anywhere:latest

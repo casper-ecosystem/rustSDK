@@ -1,0 +1,44 @@
+services:
+  casper-webclient:
+    image: gregoshop/casper-webclient:latest # Pulls the image from Docker Hub
+    container_name: casper-webclient
+    ports:
+      - '8080:8080'
+    networks:
+      - casper-network
+
+  cors-anywhere:
+    image: gregoshop/cors-anywhere:latest # Pulls the image from Docker Hub
+    container_name: cors-anywhere
+    environment:
+      PORT: 11100
+      ORIGIN_WHITELIST: |
+        http://localhost:8080,
+        http://localhost:4200,
+        http://127.0.0.1:8080,
+        http://127.0.0.1:4200
+    ports:
+      - '11100:11100'
+    networks:
+      - casper-network
+
+  ws-proxy:
+    image: gregoshop/ws-proxy:latest # Pulls the image from Docker Hub
+    container_name: ws-proxy
+    environment:
+      PORT: 4300
+      ALLOWED_HOSTS: |
+        localhost,
+        127.0.0.1,
+        172.17.0.1
+      ALLOWED_PORTS: |
+        28101,
+        7779
+    ports:
+      - '4300:4300'
+    networks:
+      - casper-network
+
+networks:
+  casper-network:
+    external: false

@@ -80,8 +80,17 @@ docker-start:
 docker-stop:
 	$(DEV_DC) stop
 
+docker-build-prod:
+	$(CICD_DC) build
+
+docker-up-prod:
+	$(CICD_DC) up --build --remove-orphans -d
+
 docker-start-prod:
 	$(CICD_DC) up --build --remove-orphans -d
+
+docker-stop-prod:
+	$(CICD_DC) stop
 
 docker-deploy-prod:
 	rm webclient.tar
