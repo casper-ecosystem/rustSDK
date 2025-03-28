@@ -20,20 +20,6 @@ jobs:
         node-version: [22.x]
     runs-on: ${{ matrix.os }}
 
-    # services:
-    #   # Label used to access the service container
-    #   casper-nctl:
-    #     # Docker Hub image
-    #     image: gregoshop/casper-nctl:2.0
-    #     ports:
-    #       - 11101-11105:11101-11105
-    #       - 14101-14105:14101-14105
-    #       - 18101-18105:18101-18105
-    #       - 25101-25105:25101-25105
-    #       - 28101-28105:28101-28105
-    #     volumes:
-    #       - ./assets/users:/app/casper-nctl/assets/net-1/users/
-
     steps:
       - name: Install dependencies
         run: |
@@ -55,16 +41,28 @@ jobs:
       - name: Install cargo-audit
         run: cargo install cargo-audit
 
-      # Replace by above service with docker image of stable 2.0
-      - name: Clone casper-nctl-2-docker repository
-        run: |
-          git clone https://github.com/gRoussac/casper-nctl-2-docker.git
+      # - name: Clone casper-nctl-2-docker repository
+      #   run: |
+      #     git clone https://github.com/gRoussac/casper-nctl-2-docker.git
 
-      - name: Build and start the service
+      # - name: Build and start the service
+      #   run: |
+      #     cd casper-nctl-2-docker
+      #     make build-start dev
+      #     cd ..
+
+      - name: Start Casper NCTL Service
         run: |
-          cd casper-nctl-2-docker
-          make build-start dev
-          cd ..
+          docker run -d \
+            --name casper-nctl \
+            -p 11101-11105:11101-11105 \
+            -p 14101-14105:14101-14105 \
+            -p 18101-18105:18101-18105 \
+            -p 25101-25105:25101-25105 \
+            -p 28101-28105:28101-28105 \
+            -v $PWD/assets/users:/app/casper-nctl/assets/net-1/users/ \
+            -v $PWD/assets/faucet:/app/casper-nctl/assets/net-1/faucet/ \
+            gregoshop/casper-nctl:dev
 
       - name: Wait for the service to be ready
         run: |
@@ -117,8 +115,8 @@ jobs:
       # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
       - name: Set SECRET_KEY_USER_1 and SECRET_KEY_USER_2 environment variables
         run: |
-          echo "SECRET_KEY_USER_1=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
-          echo "SECRET_KEY_USER_2=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
+          echo "SECRET_KEY_USER_1=$(sed -n '2p' ./assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
+          echo "SECRET_KEY_USER_2=$(sed -n '2p' ./assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
           echo "ENABLE_ADDRESSABLE_ENTITY=false" >> $GITHUB_ENV
 
       - name: Print GITHUB_ENV
