@@ -9,6 +9,8 @@ You can use the Casper Rust/Wasm SDK in two ways:
 
 This page covers different examples of using the SDK.
 
+⚠ WARNING: This application is for testing and development purposes. Do NOT use private keys or perform real transactions on the testnet/mainnet unless you fully understand the security risks.
+
 ## Install
 
 <details>
@@ -2520,3 +2522,5 @@ SECRET_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
 
 - Expose more CL Types and Casper Client result Types
 - EventStream for other events than transaction processed
+
+⚠ **Reminder**: Do not use private keys or perform real transactions on the testnet/mainnet unless you are fully aware of the security risks.
