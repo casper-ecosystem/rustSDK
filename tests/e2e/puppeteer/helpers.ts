@@ -37,7 +37,7 @@ export async function clear() {
     () => !document.querySelector('[e2e-id="clear result"]')
   );
   // wait for document to refresh
-  await delay(150);
+  await delay(180);
   let result = await variables.page.evaluate(() => {
     return document.querySelector('[e2e-id="result"]')?.textContent;
   });
