@@ -27,4 +27,4 @@ extraResources:
     to: node_modules/ws
     filter:
       - '**/*'
-electronVersion: 35.1.2
+electronVersion: 36.1.0
