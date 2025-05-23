@@ -31,7 +31,7 @@ impl SDK {
 
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_latest_block_header")]
@@ -42,7 +42,7 @@ impl SDK {
         let result = self.get_binary_latest_block_header(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_block_header_by_height")]
@@ -56,7 +56,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_block_header_by_hash")]
@@ -70,7 +70,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_latest_block_with_signatures")]
@@ -83,7 +83,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_block_with_signatures_by_height")]
@@ -97,7 +97,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_block_with_signatures_by_hash")]
@@ -111,7 +111,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_transaction_by_hash")]
@@ -126,7 +126,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_peers")]
@@ -137,7 +137,7 @@ impl SDK {
         let result = self.get_binary_peers(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_uptime")]
@@ -148,7 +148,7 @@ impl SDK {
         let result = self.get_binary_uptime(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_last_progress")]
@@ -159,7 +159,7 @@ impl SDK {
         let result = self.get_binary_last_progress(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_reactor_state")]
@@ -170,7 +170,7 @@ impl SDK {
         let result = self.get_binary_reactor_state(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_network_name")]
@@ -181,7 +181,7 @@ impl SDK {
         let result = self.get_binary_network_name(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_consensus_validator_changes")]
@@ -194,7 +194,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_block_synchronizer_status")]
@@ -207,7 +207,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_available_block_range")]
@@ -218,7 +218,7 @@ impl SDK {
         let result = self.get_binary_available_block_range(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_next_upgrade")]
@@ -229,7 +229,7 @@ impl SDK {
         let result = self.get_binary_next_upgrade(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_consensus_status")]
@@ -240,7 +240,7 @@ impl SDK {
         let result = self.get_binary_consensus_status(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_chainspec_raw_bytes")]
@@ -251,7 +251,7 @@ impl SDK {
         let result = self.get_binary_chainspec_raw_bytes(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_node_status")]
@@ -262,7 +262,7 @@ impl SDK {
         let result = self.get_binary_node_status(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_validator_reward_by_era")]
@@ -277,7 +277,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_validator_reward_by_block_height")]
@@ -296,7 +296,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_validator_reward_by_block_hash")]
@@ -315,7 +315,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_delegator_reward_by_era")]
@@ -336,7 +336,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_delegator_reward_by_block_height")]
@@ -357,7 +357,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_delegator_reward_by_block_hash")]
@@ -378,7 +378,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_read_record")]
@@ -393,7 +393,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_global_state_item")]
@@ -408,7 +408,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_global_state_item_by_state_root_hash")]
@@ -429,7 +429,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_global_state_item_by_block_hash")]
@@ -450,7 +450,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_global_state_item_by_block_height")]
@@ -471,7 +471,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_try_accept_transaction")]
@@ -486,7 +486,7 @@ impl SDK {
 
         match result {
             Ok(_) => Ok(JsValue::undefined()), // Return an appropriate JsValue for success
-            Err(err) => Err(JsError::new(&format!("Error occurred: {:?}", err))),
+            Err(err) => Err(JsError::new(&format!("Error occurred: {err:?}"))),
         }
     }
 
@@ -501,7 +501,7 @@ impl SDK {
             .await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "get_binary_protocol_version")]
@@ -512,6 +512,6 @@ impl SDK {
         let result = self.get_binary_protocol_version(node_address).await;
         result
             .and_then(|data| JsValue::from_serde(&data).map_err(SdkError::SerializationError))
-            .map_err(|err| JsError::new(&format!("Error occurred: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 }

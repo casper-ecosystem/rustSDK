@@ -745,7 +745,7 @@ fn parse_maybe_entity_version(maybe_entity_version: Option<String>) -> Option<u3
         version
             .parse::<u32>()
             .map_err(|err| {
-                error(&format!("Error parsing version: {}", err));
+                error(&format!("Error parsing version: {err}"));
             })
             .ok()
     })
@@ -755,7 +755,7 @@ fn convert_amount(amount: &str) -> Option<U512> {
     let cloned_amount = amount.to_string();
     U512::from_dec_str(&cloned_amount)
         .map_err(|err| {
-            error(&format!("Error converting amount: {:?}", err));
+            error(&format!("Error converting amount: {err:?}"));
         })
         .ok()
 }

@@ -14,7 +14,7 @@ pub struct ContractHash(_ContractHash);
 
 impl ContractHash {
     pub fn new(contract_hash_hex_str: &str) -> Result<Self, SdkError> {
-        let prefixed_input = format!("{}{}", CONTRACT_ENTITY_PREFIX, contract_hash_hex_str);
+        let prefixed_input = format!("{CONTRACT_ENTITY_PREFIX}{contract_hash_hex_str}");
         Self::from_formatted_str(&prefixed_input)
     }
 
@@ -36,8 +36,7 @@ impl ContractHash {
     pub fn new_js_alias(contract_hash_hex_str: &str) -> Result<ContractHash, JsError> {
         Self::new(contract_hash_hex_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse ContractHash from hex string: {:?}",
-                err
+                "Failed to parse ContractHash from hex string: {err:?}"
             ))
         })
     }
@@ -47,8 +46,7 @@ impl ContractHash {
     pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<ContractHash, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse ContractHash from formatted string: {:?}",
-                err
+                "Failed to parse ContractHash from formatted string: {err:?}"
             ))
         })
     }

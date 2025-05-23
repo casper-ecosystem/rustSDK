@@ -13,7 +13,7 @@ pub struct ContractPackageHash(_ContractPackageHash);
 
 impl ContractPackageHash {
     pub fn new(contract_package_hash_hex_str: &str) -> Result<Self, SdkError> {
-        let prefixed_input = format!("contract-package-{}", contract_package_hash_hex_str);
+        let prefixed_input = format!("contract-package-{contract_package_hash_hex_str}");
         Self::from_formatted_str(&prefixed_input)
     }
 
@@ -36,8 +36,7 @@ impl ContractPackageHash {
     ) -> Result<ContractPackageHash, JsError> {
         Self::new(contract_package_hash_hex_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse ContractPackageHash from hex string: {:?}",
-                err
+                "Failed to parse ContractPackageHash from hex string: {err:?}"
             ))
         })
     }
@@ -49,8 +48,7 @@ impl ContractPackageHash {
     ) -> Result<ContractPackageHash, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse ContractPackageHash from formatted string: {:?}",
-                err
+                "Failed to parse ContractPackageHash from formatted string: {err:?}"
             ))
         })
     }

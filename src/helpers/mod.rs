@@ -326,7 +326,7 @@ pub fn hex_to_uint8_vec(hex_string: &str) -> Vec<u8> {
     let mut bytes = Vec::with_capacity(hex_string.len() / 2);
     let mut hex_chars = hex_string.chars();
     while let (Some(a), Some(b)) = (hex_chars.next(), hex_chars.next()) {
-        if let Ok(byte) = u8::from_str_radix(&format!("{}{}", a, b), 16) {
+        if let Ok(byte) = u8::from_str_radix(&format!("{a}{b}"), 16) {
             bytes.push(byte);
         } else {
             // If an invalid hex pair is encountered, return an empty vector.
@@ -366,7 +366,7 @@ pub fn motes_to_cspr(motes: &str) -> Result<String, SdkError> {
         Ok(motes_decimal) => {
             let divisor = BigDecimal::from(1_000_000_000);
             let cspr_decimal = &motes_decimal / divisor;
-            let formatted_cspr = format!("{:.2}", cspr_decimal);
+            let formatted_cspr = format!("{cspr_decimal:.2}");
 
             if formatted_cspr.ends_with(".00") {
                 Ok(formatted_cspr.replace(".00", ""))
@@ -376,7 +376,7 @@ pub fn motes_to_cspr(motes: &str) -> Result<String, SdkError> {
         }
         Err(err) => Err(SdkError::CustomError {
             context: "Failed to parse input as BigDecimal",
-            error: format!("{:?}", err),
+            error: format!("{err:?}"),
         }),
     }
 }
@@ -402,7 +402,7 @@ where
         Some(Verbosity::Medium) => {
             casper_types::json_pretty_print(&deserialized).map_err(|err| SdkError::CustomError {
                 context: "Error in json_pretty_print",
-                error: format!("{}", err),
+                error: format!("{err}"),
             })
         }
         Some(Verbosity::High) => {
@@ -431,12 +431,12 @@ pub fn insert_js_value_arg(
             .into_serde()
             .map_err(|err| SdkError::CustomError {
                 context: "Error converting to JsonArg",
-                error: format!("{:?}", err),
+                error: format!("{err:?}"),
             })?;
 
         let named_arg = NamedArg::try_from(json_arg).map_err(|err| SdkError::CustomError {
             context: "Error converting to NamedArg",
-            error: format!("{:?}", err),
+            error: format!("{err:?}"),
         })?;
 
         args.insert_cl_value(named_arg.name(), named_arg.cl_value().clone());
@@ -444,7 +444,7 @@ pub fn insert_js_value_arg(
         let simple_arg = string_arg;
         casper_client::cli::insert_arg(&simple_arg, args).map_err(|err| SdkError::CustomError {
             context: "Error inserting simple arg",
-            error: format!("{:?}", err),
+            error: format!("{err:?}"),
         })?;
     } else {
         return Err(SdkError::CustomError {

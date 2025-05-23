@@ -15,7 +15,7 @@ impl TransactionHash {
         let bytes =
             hex::decode(transaction_hash_hex_str).map_err(|err| SdkError::FailedToDecodeHex {
                 context: "TransactionHash::new",
-                error: format!("{}", err),
+                error: format!("{err}"),
             })?;
 
         Self::from_raw(&bytes)
@@ -45,20 +45,20 @@ impl TransactionHash {
     #[wasm_bindgen(constructor)]
     pub fn new_js_alias(transaction_hash_hex_str: &str) -> Result<TransactionHash, JsError> {
         TransactionHash::new(transaction_hash_hex_str)
-            .map_err(|err| JsError::new(&format!("{:?}", err)))
+            .map_err(|err| JsError::new(&format!("{err:?}")))
     }
 
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromRaw")]
     pub fn from_raw_js_alias(bytes: &[u8]) -> Result<TransactionHash, JsError> {
-        TransactionHash::from_raw(bytes).map_err(|err| JsError::new(&format!("{:?}", err)))
+        TransactionHash::from_raw(bytes).map_err(|err| JsError::new(&format!("{err:?}")))
     }
 
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "digest")]
     pub fn digest_js_alias(&self) -> Result<Digest, JsError> {
         self.digest()
-            .map_err(|err| JsError::new(&format!("{:?}", err)))
+            .map_err(|err| JsError::new(&format!("{err:?}")))
     }
 
     #[cfg(target_arch = "wasm32")]

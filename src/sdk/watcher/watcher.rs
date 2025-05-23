@@ -334,7 +334,7 @@ impl Watcher {
         };
 
         let serialized = JsValue::from_serde(&result)
-            .map_err(|err| JsError::new(&format!("Error serializing events: {:?}", err)))?;
+            .map_err(|err| JsError::new(&format!("Error serializing events: {err:?}")))?;
 
         Ok(serialized)
     }
@@ -437,7 +437,7 @@ impl Watcher {
                     }
                     Err(err) => {
                         let event_parse_result = EventParseResult {
-                            err: Some(format!("Error reading chunk: {}", err)),
+                            err: Some(format!("Error reading chunk: {err}")),
                             body: None,
                         };
                         return Some([event_parse_result].to_vec());

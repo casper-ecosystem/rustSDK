@@ -61,7 +61,7 @@ impl Transaction {
     pub fn new(transaction: JsValue) -> Self {
         let transaction: _Transaction = transaction
             .into_serde()
-            .map_err(|err| error(&format!("Failed to deserialize Transaction: {:?}", err)))
+            .map_err(|err| error(&format!("Failed to deserialize Transaction: {err:?}")))
             .unwrap();
         transaction.into()
     }
@@ -72,7 +72,7 @@ impl Transaction {
         match JsValue::from_serde(&self.0) {
             Ok(json) => json,
             Err(err) => {
-                error(&format!("Error serializing data to JSON: {:?}", err));
+                error(&format!("Error serializing data to JSON: {err:?}"));
                 JsValue::null()
             }
         }
@@ -85,7 +85,7 @@ impl Transaction {
         transaction_params: TransactionStrParams,
     ) -> Result<Transaction, String> {
         make_transaction(builder_params, transaction_params).map_err(|err| {
-            let err_msg = format!("Error creating body transaction: {}", err);
+            let err_msg = format!("Error creating body transaction: {err}");
             err_msg
         })
     }
@@ -106,14 +106,14 @@ impl Transaction {
             transaction_params,
             maybe_id,
         )
-        .map_err(|err| format!("Error creating transfer transaction: {}", err))
+        .map_err(|err| format!("Error creating transfer transaction: {err}"))
     }
 
     #[wasm_bindgen(js_name = "withTTL")]
     pub fn with_ttl(&self, ttl: &str, secret_key: Option<String>) -> Transaction {
         let mut ttl = parse_ttl(ttl);
         if let Err(err) = &ttl {
-            error(&format!("Error parsing TTL: {}", err));
+            error(&format!("Error parsing TTL: {err}"));
             ttl = parse_ttl(&get_ttl_or_default(None));
         }
         let transaction_params = TransactionStrParams::default();
@@ -130,7 +130,7 @@ impl Transaction {
     pub fn with_timestamp(&self, timestamp: &str, secret_key: Option<String>) -> Transaction {
         let mut timestamp = parse_timestamp(timestamp);
         if let Err(err) = &timestamp {
-            error(&format!("Error parsing Timestamp: {}", err));
+            error(&format!("Error parsing Timestamp: {err}"));
             timestamp = parse_timestamp(&get_current_timestamp(None));
         }
         let transaction_params = TransactionStrParams::default();
@@ -261,7 +261,7 @@ impl Transaction {
         match self.0.verify() {
             Ok(()) => true,
             Err(err) => {
-                log(&format!("Warning Transaction is not valid: {:?}", err));
+                log(&format!("Warning Transaction is not valid: {err:?}"));
                 false
             }
         }
@@ -292,7 +292,7 @@ impl Transaction {
         match JsValue::from_serde(&self.expires()) {
             Ok(expires) => expires,
             Err(err) => {
-                error(&format!("Error serializing expires to JSON: {:?}", err));
+                error(&format!("Error serializing expires to JSON: {err:?}"));
                 JsValue::null()
             }
         }
@@ -304,7 +304,7 @@ impl Transaction {
         match JsValue::from_serde(&self.signers()) {
             Ok(signers) => signers,
             Err(err) => {
-                error(&format!("Error serializing signers to JSON: {:?}", err));
+                error(&format!("Error serializing signers to JSON: {err:?}"));
                 JsValue::null()
             }
         }
@@ -317,8 +317,7 @@ impl Transaction {
             Ok(authorization_keys) => authorization_keys,
             Err(err) => {
                 error(&format!(
-                    "Error serializing authorization_keys to JSON: {:?}",
-                    err
+                    "Error serializing authorization_keys to JSON: {err:?}"
                 ));
                 JsValue::null()
             }
@@ -330,12 +329,12 @@ impl Transaction {
         let mut transaction: _Transaction = self.0.clone();
         let secret_key_from_pem = secret_key_from_pem(secret_key);
         if let Err(err) = secret_key_from_pem {
-            error(&format!("Error loading secret key: {:?}", err));
+            error(&format!("Error loading secret key: {err:?}"));
             return transaction.into();
         }
         transaction.sign(&secret_key_from_pem.unwrap());
         if let Err(err) = transaction.verify() {
-            error(&format!("Transaction is not a valid: {:?}", err));
+            error(&format!("Transaction is not a valid: {err:?}"));
         }
         transaction.into()
     }
@@ -347,8 +346,7 @@ impl Transaction {
             Ok(json) => json,
             Err(err) => {
                 error(&format!(
-                    "Error serializing compute_approvals_hash to JSON: {:?}",
-                    err
+                    "Error serializing compute_approvals_hash to JSON: {err:?}"
                 ));
                 JsValue::null()
             }
@@ -361,7 +359,7 @@ impl Transaction {
         match JsValue::from_serde(&self.approvals()) {
             Ok(json) => json,
             Err(err) => {
-                error(&format!("Error serializing approvals to JSON: {:?}", err));
+                error(&format!("Error serializing approvals to JSON: {err:?}"));
                 JsValue::null()
             }
         }
@@ -387,12 +385,12 @@ impl Transaction {
             Ok(target_value) => match JsValue::from_serde(&target_value) {
                 Ok(json) => json,
                 Err(err) => {
-                    error(&format!("Error serializing target to JSON: {:?}", err));
+                    error(&format!("Error serializing target to JSON: {err:?}"));
                     JsValue::null()
                 }
             },
             Err(err) => {
-                error(&format!("Error retrieving target: {:?}", err));
+                error(&format!("Error retrieving target: {err:?}"));
                 JsValue::null()
             }
         }
@@ -410,8 +408,7 @@ impl Transaction {
             Ok(json) => json,
             Err(err) => {
                 error(&format!(
-                    "Error serializing session_args to JSON: {:?}",
-                    err
+                    "Error serializing session_args to JSON: {err:?}"
                 ));
                 JsValue::null()
             }
@@ -581,7 +578,7 @@ impl Transaction {
         let mut args = self.session_args().clone();
         let new_args = match insert_js_value_arg(&mut args, js_value_arg) {
             Ok(new_args) => new_args,
-            Err(err) => return Err(JsError::new(&format!("Error adding argument: {}", err))),
+            Err(err) => return Err(JsError::new(&format!("Error adding argument: {err}"))),
         };
         Ok(self.add_arg_common(new_args, secret_key))
     }
@@ -596,7 +593,7 @@ impl Transaction {
                     .deserialize_field::<TransactionArgs>(ARGS_MAP_KEY)
                     .map_err(|err| SdkError::FieldDeserialization {
                         index: TARGET_MAP_KEY,
-                        error: format!("{:?}", err),
+                        error: format!("{err:?}"),
                     })
                     .unwrap();
 
@@ -615,7 +612,7 @@ impl Transaction {
                 .deserialize_field::<TransactionTarget>(TARGET_MAP_KEY)
                 .map_err(|err| SdkError::FieldDeserialization {
                     index: TARGET_MAP_KEY,
-                    error: format!("{:?}", err),
+                    error: format!("{err:?}"),
                 }),
         }
     }
@@ -821,7 +818,7 @@ impl Transaction {
             let json_array = self.args_to_json_array(&self.session_args());
             new_transaction_params.set_session_args_json(
                 &serde_json::to_string(&json_array)
-                    .map_err(|err| error(&format!("Failed to deserialize args: {:?}", err)))
+                    .map_err(|err| error(&format!("Failed to deserialize args: {err:?}")))
                     .unwrap(),
             );
         }
@@ -829,7 +826,7 @@ impl Transaction {
         let builder_params = self.make_transaction_builder_params(new_builder_params);
         let transaction: Transaction = make_transaction(builder_params, new_transaction_params)
             .map_err(|err| {
-                let err_msg = format!("Error building transaction: {}", err);
+                let err_msg = format!("Error building transaction: {err}");
                 log(&err_msg);
                 err_msg
             })
@@ -852,7 +849,7 @@ impl Transaction {
     ) -> TransactionBuilderParams {
         let target = self
             .target()
-            .map_err(|err| error(&format!("Failed to get transaction target: {:?}", err)))
+            .map_err(|err| error(&format!("Failed to get transaction target: {err:?}")))
             .unwrap();
         let entry_point = new_entry_point.unwrap_or_else(|| self.entry_point().clone());
 
@@ -957,20 +954,24 @@ impl Transaction {
                         &entry_point,
                     )
                 }
-                TransactionInvocationTarget::ByPackageHash { addr, version } => {
-                    TransactionBuilderParams::new_package(
-                        new_package_hash.unwrap_or(PackageHash::from_bytes(addr.into())),
-                        &entry_point,
-                        Some(new_version.unwrap_or(version.unwrap_or(1)).to_string()),
-                    )
-                }
-                TransactionInvocationTarget::ByPackageName { name, version } => {
-                    TransactionBuilderParams::new_package_alias(
-                        &new_alias.unwrap_or(name.clone()),
-                        &entry_point,
-                        Some(new_version.unwrap_or(version.unwrap_or(1)).to_string()),
-                    )
-                }
+                TransactionInvocationTarget::ByPackageHash {
+                    addr,
+                    version,
+                    version_key: _,
+                } => TransactionBuilderParams::new_package(
+                    new_package_hash.unwrap_or(PackageHash::from_bytes(addr.into())),
+                    &entry_point,
+                    Some(new_version.unwrap_or(version.unwrap_or(1)).to_string()),
+                ),
+                TransactionInvocationTarget::ByPackageName {
+                    name,
+                    version,
+                    version_key: _,
+                } => TransactionBuilderParams::new_package_alias(
+                    &new_alias.unwrap_or(name.clone()),
+                    &entry_point,
+                    Some(new_version.unwrap_or(version.unwrap_or(1)).to_string()),
+                ),
             },
             casper_types::TransactionTarget::Session {
                 is_install_upgrade,

@@ -69,7 +69,7 @@ pub fn motes_to_cspr_js_alias(motes: &str) -> Result<String, JsError> {
     match motes_to_cspr(motes) {
         Ok(result) => Ok(result),
         Err(err) => {
-            let error_message = format!("motes_to_cspr error: {}", err);
+            let error_message = format!("motes_to_cspr error: {err}");
             Err(JsError::new(&error_message))
         }
     }
@@ -96,7 +96,7 @@ pub fn json_pretty_print_js_alias(
     let deserialized: serde_json::Value = match value.into_serde() {
         Ok(value) => value,
         Err(err) => {
-            let error_text = format!("Error deserializing JSON value: {:?}", err);
+            let error_text = format!("Error deserializing JSON value: {err:?}");
             return Err(JsError::new(&error_text));
         }
     };
@@ -124,12 +124,12 @@ pub fn json_pretty_print_js_alias(
 pub fn public_key_from_secret_key_js_alias(secret_key: &str) -> Result<JsValue, JsError> {
     let public_key = public_key_from_secret_key(secret_key);
     if let Err(err) = public_key {
-        let error_text = format!("Error loading secret key: {:?}", err);
+        let error_text = format!("Error loading secret key: {err:?}");
         return Err(JsError::new(&error_text)); // Return a JavaScript error using JsError
     }
     Ok(
         JsValue::from_serde(&public_key.unwrap()).unwrap_or_else(|err| {
-            let error_text = format!("Error serializing public key: {:?}", err);
+            let error_text = format!("Error serializing public key: {err:?}");
             JsValue::from_str(&error_text) // Return an Ok variant containing JsValue
         }),
     )
@@ -147,15 +147,15 @@ pub fn public_key_from_secret_key_js_alias(secret_key: &str) -> Result<JsValue, 
 #[wasm_bindgen(js_name = "generateSecretKey")]
 pub fn generate_ed25519_js_alias() -> Result<JsValue, JsError> {
     let secret_key = secret_key_generate()
-        .map_err(|err| JsError::new(&format!("Error in secret_key_generate: {:?}", err)))
+        .map_err(|err| JsError::new(&format!("Error in secret_key_generate: {err:?}")))
         .and_then(|secret_key| {
             secret_key
                 .to_pem()
-                .map_err(|err| JsError::new(&format!("Error in secret_key.to_pem: {:?}", err)))
+                .map_err(|err| JsError::new(&format!("Error in secret_key.to_pem: {err:?}")))
         })?;
 
     JsValue::from_serde(&secret_key).map_err(|err| {
-        let error_text = format!("Error serializing secret key: {:?}", err);
+        let error_text = format!("Error serializing secret key: {err:?}");
         JsError::new(&error_text)
     })
 }
@@ -174,18 +174,17 @@ pub fn generate_secp256k1_js_alias() -> Result<JsValue, JsError> {
     let secret_key = secret_key_secp256k1_generate()
         .map_err(|err| {
             JsError::new(&format!(
-                "Error in secret_key_secp256k1_generate: {:?}",
-                err
+                "Error in secret_key_secp256k1_generate: {err:?}"
             ))
         })
         .and_then(|secret_key| {
             secret_key
                 .to_pem()
-                .map_err(|err| JsError::new(&format!("Error in secret_key.to_pem: {:?}", err)))
+                .map_err(|err| JsError::new(&format!("Error in secret_key.to_pem: {err:?}")))
         })?;
 
     JsValue::from_serde(&secret_key).map_err(|err| {
-        let error_text = format!("Error serializing secret key: {:?}", err);
+        let error_text = format!("Error serializing secret key: {err:?}");
         JsError::new(&error_text)
     })
 }
@@ -207,7 +206,7 @@ pub fn get_base64_key_from_account_hash_js_alias(
     formatted_account_hash: &str,
 ) -> Result<String, JsError> {
     get_base64_key_from_account_hash(formatted_account_hash).map_err(|err| {
-        let error_text = format!("Error serializing account hash: {:?}", err);
+        let error_text = format!("Error serializing account hash: {err:?}");
         JsError::new(&error_text)
     })
 }
@@ -236,7 +235,7 @@ pub fn get_base64_key_from_account_hash_js_alias(
 #[wasm_bindgen(js_name = "keyHashToBase64Key")]
 pub fn get_base64_key_from_key_hash_js_alias(formatted_key_hash: &str) -> Result<String, JsError> {
     get_base64_key_from_key_hash(formatted_key_hash).map_err(|err| {
-        let error_text = format!("Error serializing package hash: {:?}", err);
+        let error_text = format!("Error serializing package hash: {err:?}");
         JsError::new(&error_text)
     })
 }
@@ -286,7 +285,7 @@ pub fn make_dictionary_item_key(key: &Key, value: &str) -> Result<String, JsErro
         match Key::from_formatted_str(value) {
             Ok(value_as_key) => Ok(make_dictionary_item_key_helper(key, &value_as_key)),
             Err(err) => {
-                let error_text = format!("Error serializing key: {:?}", err);
+                let error_text = format!("Error serializing key: {err:?}");
                 Err(JsError::new(&error_text))
             }
         }

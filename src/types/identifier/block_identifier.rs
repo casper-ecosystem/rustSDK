@@ -50,10 +50,10 @@ impl fmt::Display for BlockIdentifierInput {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             BlockIdentifierInput::BlockIdentifier(identifier) => match identifier.0 {
-                _BlockIdentifier::Hash(ref hash) => write!(f, "{}", hash),
-                _BlockIdentifier::Height(height) => write!(f, "{}", height),
+                _BlockIdentifier::Hash(ref hash) => write!(f, "{hash}"),
+                _BlockIdentifier::Height(height) => write!(f, "{height}"),
             },
-            BlockIdentifierInput::String(ref value) => write!(f, "{}", value),
+            BlockIdentifierInput::String(ref value) => write!(f, "{value}"),
         }
     }
 }

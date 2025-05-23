@@ -93,7 +93,7 @@ impl SDK {
     pub fn get_block_options(&self, options: JsValue) -> Result<GetBlockOptions, JsError> {
         options
             .into_serde::<GetBlockOptions>()
-            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {err:?}")))
     }
 
     /// Retrieves block information using the provided options.
@@ -135,7 +135,7 @@ impl SDK {
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
-                let err = &format!("Error occurred with {:?}", err);
+                let err = &format!("Error occurred with {err:?}");
                 Err(JsError::new(err))
             }
         }

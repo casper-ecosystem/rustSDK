@@ -43,7 +43,7 @@ impl Digest {
 
     #[wasm_bindgen(js_name = "fromRaw")]
     pub fn from_raw_js_alias(bytes: Vec<u8>) -> Result<Digest, JsError> {
-        Self::from_raw(bytes).map_err(|err| JsError::new(&format!("{:?}", err)))
+        Self::from_raw(bytes).map_err(|err| JsError::new(&format!("{err:?}")))
     }
 
     #[wasm_bindgen(js_name = "toJson")]
@@ -113,7 +113,7 @@ impl TryFrom<&str> for Digest {
     fn try_from(digest_hex_str: &str) -> Result<Self, Self::Error> {
         let bytes = hex::decode(digest_hex_str).map_err(|err| SdkError::FailedToDecodeHex {
             context: "Digest::try_from",
-            error: format!("Decoding hex string {:?}", err),
+            error: format!("Decoding hex string {err:?}"),
         })?;
 
         if bytes.len() != _Digest::LENGTH {

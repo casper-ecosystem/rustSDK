@@ -12,7 +12,7 @@ pub struct PackageHash(_PackageHash);
 
 impl PackageHash {
     pub fn new(package_hash_hex_str: &str) -> Result<Self, SdkError> {
-        let prefixed_input = format!("package-{}", package_hash_hex_str);
+        let prefixed_input = format!("package-{package_hash_hex_str}");
         Self::from_formatted_str(&prefixed_input)
     }
 
@@ -34,8 +34,7 @@ impl PackageHash {
     pub fn new_js_alias(package_hash_hex_str: &str) -> Result<PackageHash, JsError> {
         Self::new(package_hash_hex_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse PackageHash from hex string: {:?}",
-                err
+                "Failed to parse PackageHash from hex string: {err:?}"
             ))
         })
     }
@@ -45,8 +44,7 @@ impl PackageHash {
     pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<PackageHash, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse PackageHash from formatted string: {:?}",
-                err
+                "Failed to parse PackageHash from formatted string: {err:?}"
             ))
         })
     }

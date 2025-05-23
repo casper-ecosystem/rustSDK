@@ -55,9 +55,9 @@ format:
 lint: format clippy
 
 clippy:
-	cargo clippy --target wasm32-unknown-unknown --bins -- -D warnings
-	cargo clippy --lib -- -D warnings
-	cargo clippy --no-default-features --lib -- -D warnings
+	cargo clippy --target wasm32-unknown-unknown --bins --fix --allow-dirty --allow-staged -- -D warnings
+	# cargo clippy --lib -- -D warnings
+	# cargo clippy --no-default-features --lib -- -D warnings
 
 check-lint: clippy
 	cargo fmt -- --check

@@ -72,7 +72,7 @@ impl CasperWallet {
 
         let deploy_json = deploy
             .to_json_string()
-            .map_err(|err| JsError::new(&format!("Failed to serialize deploy: {:?}", err)))?;
+            .map_err(|err| JsError::new(&format!("Failed to serialize deploy: {err:?}")))?;
 
         let sign = JsFuture::from(
             self.provider
@@ -80,19 +80,18 @@ impl CasperWallet {
                     &format!("{{\"deploy\":{deploy_json}}}"),
                     &public_key.to_string(),
                 )
-                .map_err(|err| JsError::new(&format!("Signing failed: {:?}", err)))?,
+                .map_err(|err| JsError::new(&format!("Signing failed: {err:?}")))?,
         )
         .await
-        .map_err(|err| JsError::new(&format!("Signing failed: {:?}", err)))?;
+        .map_err(|err| JsError::new(&format!("Signing failed: {err:?}")))?;
 
         let signature_response: SignatureResponse = sign
             .into_serde()
-            .map_err(|err| JsError::new(&format!("Deserialize signature failed: {:?}", err)))?;
+            .map_err(|err| JsError::new(&format!("Deserialize signature failed: {err:?}")))?;
 
         if signature_response.is_cancelled() {
             return Err(JsError::new(&format!(
-                "Could not sign deploy for key {}",
-                public_key
+                "Could not sign deploy for key {public_key}"
             )));
         }
 
@@ -121,24 +120,23 @@ impl CasperWallet {
 
         let transaction_json = transaction
             .to_json_string()
-            .map_err(|err| JsError::new(&format!("Failed to serialize transaction: {:?}", err)))?;
+            .map_err(|err| JsError::new(&format!("Failed to serialize transaction: {err:?}")))?;
 
         let sign = JsFuture::from(
             self.provider
                 .sign(&transaction_json, &public_key.to_string())
-                .map_err(|err| JsError::new(&format!("Signing failed: {:?}", err)))?,
+                .map_err(|err| JsError::new(&format!("Signing failed: {err:?}")))?,
         )
         .await
-        .map_err(|err| JsError::new(&format!("Signing failed: {:?}", err)))?;
+        .map_err(|err| JsError::new(&format!("Signing failed: {err:?}")))?;
 
         let signature_response: SignatureResponse = sign
             .into_serde()
-            .map_err(|err| JsError::new(&format!("Deserialize signature failed: {:?}", err)))?;
+            .map_err(|err| JsError::new(&format!("Deserialize signature failed: {err:?}")))?;
 
         if signature_response.is_cancelled() {
             return Err(JsError::new(&format!(
-                "Could not sign transaction for key {}",
-                public_key
+                "Could not sign transaction for key {public_key}"
             )));
         }
 
@@ -236,19 +234,18 @@ impl CasperWallet {
         let sign = JsFuture::from(
             self.provider
                 .signMessage(&message, &public_key.to_string())
-                .map_err(|err| JsError::new(&format!("Signing failed: {:?}", err)))?,
+                .map_err(|err| JsError::new(&format!("Signing failed: {err:?}")))?,
         )
         .await
-        .map_err(|err| JsError::new(&format!("Signing failed: {:?}", err)))?;
+        .map_err(|err| JsError::new(&format!("Signing failed: {err:?}")))?;
 
         let signature_response: SignatureResponse = sign
             .into_serde()
-            .map_err(|err| JsError::new(&format!("Deserialize signature failed: {:?}", err)))?;
+            .map_err(|err| JsError::new(&format!("Deserialize signature failed: {err:?}")))?;
 
         if signature_response.is_cancelled() {
             return Err(JsError::new(&format!(
-                "Could not sign deploy for key {}",
-                public_key
+                "Could not sign deploy for key {public_key}"
             )));
         }
         let signature = format!(
@@ -264,10 +261,10 @@ impl CasperWallet {
         let connection = JsFuture::from(
             self.provider
                 .requestConnection()
-                .map_err(|err| JsError::new(&format!("Connection failed: {:?}", err)))?,
+                .map_err(|err| JsError::new(&format!("Connection failed: {err:?}")))?,
         )
         .await
-        .map_err(|err| JsError::new(&format!("Connection failed: {:?}", err)))?;
+        .map_err(|err| JsError::new(&format!("Connection failed: {err:?}")))?;
 
         if connection.as_bool().unwrap_or(false) {
             Ok(true)
@@ -281,10 +278,10 @@ impl CasperWallet {
         let disconnection = JsFuture::from(
             self.provider
                 .disconnectFromSite()
-                .map_err(|err| JsError::new(&format!("Disconnection failed: {:?}", err)))?,
+                .map_err(|err| JsError::new(&format!("Disconnection failed: {err:?}")))?,
         )
         .await
-        .map_err(|err| JsError::new(&format!("Disconnection failed: {:?}", err)))?;
+        .map_err(|err| JsError::new(&format!("Disconnection failed: {err:?}")))?;
 
         if disconnection.as_bool().unwrap_or(false) {
             Ok(true)
@@ -298,10 +295,10 @@ impl CasperWallet {
         let connection = JsFuture::from(
             self.provider
                 .isConnected()
-                .map_err(|err| JsError::new(&format!("Connection failed: {:?}", err)))?,
+                .map_err(|err| JsError::new(&format!("Connection failed: {err:?}")))?,
         )
         .await
-        .map_err(|err| JsError::new(&format!("Connection failed: {:?}", err)))?;
+        .map_err(|err| JsError::new(&format!("Connection failed: {err:?}")))?;
         Ok(connection.as_bool().unwrap_or_default())
     }
 
@@ -310,10 +307,10 @@ impl CasperWallet {
         let version = JsFuture::from(
             self.provider
                 .getVersion()
-                .map_err(|err| JsError::new(&format!("getVersion failed: {:?}", err)))?,
+                .map_err(|err| JsError::new(&format!("getVersion failed: {err:?}")))?,
         )
         .await
-        .map_err(|err| JsError::new(&format!("getVersion failed: {:?}", err)))?;
+        .map_err(|err| JsError::new(&format!("getVersion failed: {err:?}")))?;
 
         let version = version
             .as_string()
@@ -330,10 +327,10 @@ impl CasperWallet {
         let public_key = JsFuture::from(
             self.provider
                 .getActivePublicKey()
-                .map_err(|err| JsError::new(&format!("getActivePublicKey failed: {:?}", err)))?,
+                .map_err(|err| JsError::new(&format!("getActivePublicKey failed: {err:?}")))?,
         )
         .await
-        .map_err(|err| JsError::new(&format!("getActivePublicKey failed: {:?}", err)))?;
+        .map_err(|err| JsError::new(&format!("getActivePublicKey failed: {err:?}")))?;
 
         let public_key = public_key
             .as_string()
@@ -350,10 +347,10 @@ impl CasperWallet {
         let switch = JsFuture::from(
             self.provider
                 .requestSwitchAccount()
-                .map_err(|err| JsError::new(&format!("requestSwitchAccount failed: {:?}", err)))?,
+                .map_err(|err| JsError::new(&format!("requestSwitchAccount failed: {err:?}")))?,
         )
         .await
-        .map_err(|err| JsError::new(&format!("requestSwitchAccount failed: {:?}", err)))?;
+        .map_err(|err| JsError::new(&format!("requestSwitchAccount failed: {err:?}")))?;
 
         if !switch.as_bool().unwrap_or(false) {
             return Err(JsError::new("requestSwitchAccount failed"));
@@ -377,8 +374,7 @@ impl CasperWallet {
 
         PublicKey::new(&public_key).map_err(|err| {
             JsError::new(&format!(
-                "Failed to create Public key from {}: {:?}",
-                public_key, err
+                "Failed to create Public key from {public_key}: {err:?}"
             ))
         })
     }

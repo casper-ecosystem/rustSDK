@@ -18,7 +18,7 @@ impl URef {
             Err(err) => {
                 return Err(SdkError::FailedToDecodeHex {
                     context: "URef::new",
-                    error: format!("Invalid hex string: {:?}", err),
+                    error: format!("Invalid hex string: {err:?}"),
                 });
             }
         };
@@ -50,7 +50,7 @@ impl URef {
     #[wasm_bindgen(constructor)]
     pub fn new_js_alias(uref_hex_str: &str, access_rights: u8) -> Result<URef, JsError> {
         Self::new(uref_hex_str, access_rights).map_err(|err| {
-            JsError::new(&format!("Failed to parse URef from hex string: {:?}", err))
+            JsError::new(&format!("Failed to parse URef from hex string: {err:?}"))
         })
     }
 
@@ -59,8 +59,7 @@ impl URef {
     pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<URef, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse URef from formatted string: {:?}",
-                err
+                "Failed to parse URef from formatted string: {err:?}"
             ))
         })
     }

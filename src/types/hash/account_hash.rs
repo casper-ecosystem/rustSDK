@@ -34,7 +34,7 @@ impl AccountHash {
             })
             .map_err(|err| SdkError::FailedToDecodeHex {
                 context: "AccountHash::new",
-                error: format!("{:?}", err),
+                error: format!("{err:?}"),
             })?
     }
 
@@ -68,8 +68,7 @@ impl AccountHash {
     pub fn new_js_alias(account_hash_hex_str: &str) -> Result<AccountHash, JsError> {
         Self::new(account_hash_hex_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse AccountHash from hex string: {:?}",
-                err
+                "Failed to parse AccountHash from hex string: {err:?}"
             ))
         })
     }
@@ -79,8 +78,7 @@ impl AccountHash {
     pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<AccountHash, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse AccountHash from formatted string: {:?}",
-                err
+                "Failed to parse AccountHash from formatted string: {err:?}"
             ))
         })
     }

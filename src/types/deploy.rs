@@ -60,12 +60,12 @@ impl Deploy {
     pub fn new(deploy: JsValue) -> Deploy {
         let deploy: _Deploy = deploy
             .into_serde()
-            .map_err(|err| error(&format!("Failed to deserialize Deploy: {:?}", err)))
+            .map_err(|err| error(&format!("Failed to deserialize Deploy: {err:?}")))
             .unwrap();
         let deploy = match deploy.is_valid_size(MAX_SERIALIZED_SIZE_OF_DEPLOY) {
             Ok(()) => deploy,
             Err(err) => {
-                error(&format!("Deploy has not a valid size: {:?}", err));
+                error(&format!("Deploy has not a valid size: {err:?}"));
                 deploy
             }
         };
@@ -78,7 +78,7 @@ impl Deploy {
         match JsValue::from_serde(&self.0) {
             Ok(json) => json,
             Err(err) => {
-                error(&format!("Error serializing data to JSON: {:?}", err));
+                error(&format!("Error serializing data to JSON: {err:?}"));
                 JsValue::null()
             }
         }
@@ -92,7 +92,7 @@ impl Deploy {
         payment_params: PaymentStrParams,
     ) -> Result<Deploy, String> {
         make_deploy(deploy_params, session_params, payment_params).map_err(|err| {
-            let err_msg = format!("Error creating session deploy: {}", err);
+            let err_msg = format!("Error creating session deploy: {err}");
             err_msg
         })
     }
@@ -113,14 +113,14 @@ impl Deploy {
             deploy_params,
             payment_params,
         )
-        .map_err(|err| format!("Error creating transfer deploy: {}", err))
+        .map_err(|err| format!("Error creating transfer deploy: {err}"))
     }
 
     #[wasm_bindgen(js_name = "withTTL")]
     pub fn with_ttl(&self, ttl: &str, secret_key: Option<String>) -> Deploy {
         let mut ttl = parse_ttl(ttl);
         if let Err(err) = &ttl {
-            error(&format!("Error parsing TTL: {}", err));
+            error(&format!("Error parsing TTL: {err}"));
             ttl = parse_ttl(&get_ttl_or_default(None));
         }
         self.build(BuildParams {
@@ -134,7 +134,7 @@ impl Deploy {
     pub fn with_timestamp(&self, timestamp: &str, secret_key: Option<String>) -> Deploy {
         let mut timestamp = parse_timestamp(timestamp);
         if let Err(err) = &timestamp {
-            error(&format!("Error parsing Timestamp: {}", err));
+            error(&format!("Error parsing Timestamp: {err}"));
             timestamp = parse_timestamp(&get_current_timestamp(None));
         }
         self.build(BuildParams {
@@ -255,7 +255,7 @@ impl Deploy {
         let cloned_amount = amount.to_string();
         let amount = U512::from_dec_str(&cloned_amount);
         if let Err(err) = amount {
-            error(&format!("Error converting amount: {:?}", err));
+            error(&format!("Error converting amount: {err:?}"));
             return self.0.clone().into();
         }
         self.build(BuildParams {
@@ -278,7 +278,7 @@ impl Deploy {
                 ..Default::default()
             }),
             Err(err) => {
-                error(&format!("Error parsing payment: {}", err));
+                error(&format!("Error parsing payment: {err}"));
                 self.0.clone().into()
             }
         }
@@ -297,7 +297,7 @@ impl Deploy {
                 ..Default::default()
             }),
             Err(err) => {
-                error(&format!("Error parsing session: {}", err));
+                error(&format!("Error parsing session: {err}"));
                 self.0.clone().into()
             }
         }
@@ -309,7 +309,7 @@ impl Deploy {
         match deploy.is_valid_size(MAX_SERIALIZED_SIZE_OF_DEPLOY) {
             Ok(()) => true,
             Err(err) => {
-                error(&format!("Deploy has not a valid size: {:?}", err));
+                error(&format!("Deploy has not a valid size: {err:?}"));
                 false
             }
         }
@@ -321,7 +321,7 @@ impl Deploy {
         match deploy.is_valid() {
             Ok(()) => true,
             Err(err) => {
-                log(&format!("Warning Deploy is not valid: {:?}", err));
+                log(&format!("Warning Deploy is not valid: {err:?}"));
                 false
             }
         }
@@ -339,7 +339,7 @@ impl Deploy {
         match deploy.has_valid_hash() {
             Ok(()) => true,
             Err(err) => {
-                error(&format!("Deploy has not a valid hash: {:?}", err));
+                error(&format!("Deploy has not a valid hash: {err:?}"));
                 false
             }
         }
@@ -365,12 +365,12 @@ impl Deploy {
         let mut deploy: _Deploy = self.0.clone();
         let secret_key_from_pem = secret_key_from_pem(secret_key);
         if let Err(err) = secret_key_from_pem {
-            error(&format!("Error loading secret key: {:?}", err));
+            error(&format!("Error loading secret key: {err:?}"));
             return deploy.into();
         }
         deploy.sign(&secret_key_from_pem.unwrap());
         if let Err(err) = deploy.is_valid_size(MAX_SERIALIZED_SIZE_OF_DEPLOY) {
-            error(&format!("Deploy has not a valid size: {:?}", err));
+            error(&format!("Deploy has not a valid size: {err:?}"));
         }
         deploy.into()
     }
@@ -382,8 +382,7 @@ impl Deploy {
             Ok(json) => json,
             Err(err) => {
                 error(&format!(
-                    "Error serializing compute_approvals_hash to JSON: {:?}",
-                    err
+                    "Error serializing compute_approvals_hash to JSON: {err:?}"
                 ));
                 JsValue::null()
             }
@@ -396,7 +395,7 @@ impl Deploy {
         match JsValue::from_serde(&self.approvals()) {
             Ok(json) => json,
             Err(err) => {
-                error(&format!("Error serializing approvals to JSON: {:?}", err));
+                error(&format!("Error serializing approvals to JSON: {err:?}"));
                 JsValue::null()
             }
         }
@@ -525,7 +524,7 @@ impl Deploy {
         match JsValue::from_serde(&self.args()) {
             Ok(json) => json,
             Err(err) => {
-                error(&format!("Error serializing args to JSON: {:?}", err));
+                error(&format!("Error serializing args to JSON: {err:?}"));
                 JsValue::null()
             }
         }
@@ -544,7 +543,7 @@ impl Deploy {
         let mut args = session.args().clone();
         let new_args = match insert_js_value_arg(&mut args, js_value_arg) {
             Ok(new_args) => new_args,
-            Err(err) => return Err(JsError::new(&format!("Error adding argument: {}", err))),
+            Err(err) => return Err(JsError::new(&format!("Error adding argument: {err}"))),
         };
 
         let new_session = modify_session(
@@ -671,7 +670,7 @@ impl Deploy {
         }
         let deploy = deploy_builder
             .build()
-            .map_err(|err| error(&format!("Failed to build deploy: {:?}", err)))
+            .map_err(|err| error(&format!("Failed to build deploy: {err:?}")))
             .unwrap();
 
         let deploy: Deploy = deploy.into();

@@ -101,7 +101,7 @@ impl SDK {
     ) -> Result<QueryGlobalStateOptions, JsError> {
         options
             .into_serde::<QueryGlobalStateOptions>()
-            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {err:?}")))
     }
 
     /// Retrieves global state information using the provided options.
@@ -128,13 +128,13 @@ impl SDK {
                 match result {
                     Ok(data) => Ok(data.result.into()),
                     Err(err) => {
-                        let err = &format!("Error occurred with {:?}", err);
+                        let err = &format!("Error occurred with {err:?}");
                         Err(JsError::new(err))
                     }
                 }
             }
             Err(err) => {
-                let err = &format!("Error building parameters: {:?}", err);
+                let err = &format!("Error building parameters: {err:?}");
                 Err(JsError::new(err))
             }
         }

@@ -35,8 +35,7 @@ impl EntityAddr {
     pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<EntityAddr, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse Entity from formatted string: {:?}",
-                err
+                "Failed to parse Entity from formatted string: {err:?}"
             ))
         })
     }

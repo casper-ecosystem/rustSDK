@@ -23,7 +23,7 @@ impl PublicKey {
             Err(err) => {
                 return Err(SdkError::FailedToDecodeHex {
                     context: "PublicKey::new",
-                    error: format!("{:?}", err),
+                    error: format!("{err:?}"),
                 });
             }
         };
@@ -59,8 +59,7 @@ impl PublicKey {
     pub fn new_js_alias(public_key_hex_str: &str) -> Result<PublicKey, JsError> {
         Self::new(public_key_hex_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse PublicKey from hex string: {:?}",
-                err
+                "Failed to parse PublicKey from hex string: {err:?}"
             ))
         })
     }
@@ -70,7 +69,7 @@ impl PublicKey {
     pub fn from_bytes_js_alias(bytes: Vec<u8>) -> Result<PublicKey, JsError> {
         Self::from_bytes(&bytes)
             .map(|(public_key, _)| public_key)
-            .map_err(|err| JsError::new(&format!("Failed to parse PublicKey: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Failed to parse PublicKey: {err:?}")))
     }
 
     #[wasm_bindgen(js_name = "toAccountHash")]
@@ -94,7 +93,7 @@ impl Display for PublicKey {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         let bytes = self.0.to_bytes().unwrap_or_default();
         let hex_string = hex::encode(bytes);
-        write!(f, "{}", hex_string)
+        write!(f, "{hex_string}")
     }
 }
 

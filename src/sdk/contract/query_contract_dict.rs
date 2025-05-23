@@ -47,7 +47,7 @@ impl SDK {
     ) -> Result<QueryContractDictOptions, JsError> {
         options
             .into_serde::<QueryContractDictOptions>()
-            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {err:?}")))
     }
 
     /// JavaScript function for query_contract_dict with deserialized options.
@@ -59,7 +59,7 @@ impl SDK {
         let js_value_options =
             JsValue::from_serde::<QueryContractDictOptions>(&options.unwrap_or_default());
         if let Err(err) = js_value_options {
-            let err = &format!("Error serializing options: {:?}", err);
+            let err = &format!("Error serializing options: {err:?}");
             return Err(JsError::new(err));
         }
         let options = self.get_dictionary_item_options(js_value_options.unwrap())?;

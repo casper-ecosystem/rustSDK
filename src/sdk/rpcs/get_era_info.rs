@@ -75,7 +75,7 @@ impl SDK {
     pub fn get_era_info_options(&self, options: JsValue) -> Result<GetEraInfoOptions, JsError> {
         options
             .into_serde::<GetEraInfoOptions>()
-            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {err:?}")))
     }
 
     #[deprecated(note = "prefer 'get_era_summary' as it doesn't require a switch block")]
@@ -105,7 +105,7 @@ impl SDK {
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
-                let err = &format!("Error occurred with {:?}", err);
+                let err = &format!("Error occurred with {err:?}");
 
                 Err(JsError::new(err))
             }

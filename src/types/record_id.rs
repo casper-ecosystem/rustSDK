@@ -21,7 +21,7 @@ impl RecordId {
             Ok(record_id) => Ok(RecordId(record_id)),
             Err(err) => Err(SdkError::CustomError {
                 context: "Invalid RecordId",
-                error: format!("{:?}", err),
+                error: format!("{err:?}"),
             }),
         }
     }

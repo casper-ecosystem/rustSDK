@@ -41,8 +41,7 @@ impl AddressableEntityHash {
     ) -> Result<AddressableEntityHash, JsError> {
         Self::new(addressable_entity_hex_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse AddressableEntityHash from hex string: {:?}",
-                err
+                "Failed to parse AddressableEntityHash from hex string: {err:?}"
             ))
         })
     }
@@ -54,8 +53,7 @@ impl AddressableEntityHash {
     ) -> Result<AddressableEntityHash, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse AddressableEntityHash from formatted string: {:?}",
-                err
+                "Failed to parse AddressableEntityHash from formatted string: {err:?}"
             ))
         })
     }

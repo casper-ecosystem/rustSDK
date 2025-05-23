@@ -15,7 +15,7 @@ impl BlockHash {
         let bytes =
             hex::decode(deploy_hash_hex_str).map_err(|err| SdkError::FailedToDecodeHex {
                 context: "BlockHash::new",
-                error: format!("Decoding hex string {:?}", err),
+                error: format!("Decoding hex string {err:?}"),
             })?;
         let mut hash = [0u8; _Digest::LENGTH];
         hash.copy_from_slice(&bytes);

@@ -40,8 +40,7 @@ impl AccountIdentifier {
     pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<AccountIdentifier, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
             JsError::new(&format!(
-                "Failed to parse AccountIdentifier from formatted string: {:?}",
-                err
+                "Failed to parse AccountIdentifier from formatted string: {err:?}"
             ))
         })
     }

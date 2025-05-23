@@ -18,7 +18,7 @@ impl DictionaryItemIdentifier {
     ) -> Result<DictionaryItemIdentifier, SdkError> {
         let key = Key::from_formatted_str(account_hash).map_err(|err| SdkError::CustomError {
             context: "Failed to parse key from formatted string",
-            error: format!("{:?}", err),
+            error: format!("{err:?}"),
         })?;
 
         Ok(Self(_DictionaryItemIdentifier::AccountNamedKey {
@@ -36,7 +36,7 @@ impl DictionaryItemIdentifier {
     ) -> Result<DictionaryItemIdentifier, SdkError> {
         let key = Key::from_formatted_str(contract_addr).map_err(|err| SdkError::CustomError {
             context: "Failed to parse key from formatted string",
-            error: format!("{:?}", err),
+            error: format!("{err:?}"),
         })?;
 
         Ok(Self(_DictionaryItemIdentifier::ContractNamedKey {
@@ -54,7 +54,7 @@ impl DictionaryItemIdentifier {
     ) -> Result<DictionaryItemIdentifier, SdkError> {
         let key = Key::from_formatted_str(entity_addr).map_err(|err| SdkError::CustomError {
             context: "Failed to parse key from formatted string",
-            error: format!("{:?}", err),
+            error: format!("{err:?}"),
         })?;
 
         Ok(Self(_DictionaryItemIdentifier::EntityNamedKey {
@@ -71,7 +71,7 @@ impl DictionaryItemIdentifier {
     ) -> Result<DictionaryItemIdentifier, SdkError> {
         let key = Key::from_formatted_str(seed_uref).map_err(|err| SdkError::CustomError {
             context: "Failed to parse key from formatted string",
-            error: format!("{:?}", err),
+            error: format!("{err:?}"),
         })?;
 
         let uref = key.into_uref().ok_or_else(|| SdkError::CustomError {
@@ -91,7 +91,7 @@ impl DictionaryItemIdentifier {
     ) -> Result<DictionaryItemIdentifier, SdkError> {
         let key = Key::from_formatted_str(dictionary_key).map_err(|err| SdkError::CustomError {
             context: "Failed to parse key from formatted string",
-            error: format!("{:?}", err),
+            error: format!("{err:?}"),
         })?;
         Ok(Self(_DictionaryItemIdentifier::Dictionary(
             key.to_formatted_string(),
@@ -130,7 +130,7 @@ impl DictionaryItemIdentifier {
         dictionary_item_key: &str,
     ) -> Result<DictionaryItemIdentifier, JsError> {
         Self::new_from_entity_info(entity_addr, dictionary_name, dictionary_item_key)
-            .map_err(|err| JsError::new(&format!("SdkError: {}", err)))
+            .map_err(|err| JsError::new(&format!("SdkError: {err}")))
     }
 
     // static context

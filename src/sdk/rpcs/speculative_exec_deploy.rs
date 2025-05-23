@@ -96,7 +96,7 @@ impl SDK {
     ) -> Result<GetSpeculativeExecDeployOptions, JsError> {
         options
             .into_serde::<GetSpeculativeExecDeployOptions>()
-            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {err:?}")))
     }
 
     /// JS function for speculative execution.
@@ -137,7 +137,7 @@ impl SDK {
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
-                let err = &format!("Error occurred with {:?}", err);
+                let err = &format!("Error occurred with {err:?}");
                 Err(JsError::new(err))
             }
         }

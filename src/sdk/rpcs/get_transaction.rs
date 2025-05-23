@@ -98,8 +98,7 @@ impl SDK {
                 Ok(options)
             }
             Err(err) => Err(JsError::new(&format!(
-                "Error deserializing options: {:?}",
-                err
+                "Error deserializing options: {err:?}"
             ))),
         }
     }
@@ -150,7 +149,7 @@ impl SDK {
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
-                let err = &format!("Error occurred with {:?}", err);
+                let err = &format!("Error occurred with {err:?}");
                 Err(JsError::new(err))
             }
         }

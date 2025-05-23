@@ -108,7 +108,7 @@ impl SDK {
     ) -> Result<GetDictionaryItemOptions, JsError> {
         options
             .into_serde::<GetDictionaryItemOptions>()
-            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {err:?}")))
     }
 
     /// Retrieves dictionary item information using the provided options.
@@ -161,7 +161,7 @@ impl SDK {
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
-                let err = &format!("Error occurred with {:?}", err);
+                let err = &format!("Error occurred with {err:?}");
                 Err(JsError::new(err))
             }
         }

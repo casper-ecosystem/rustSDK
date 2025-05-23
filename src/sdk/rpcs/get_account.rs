@@ -91,7 +91,7 @@ impl SDK {
     pub fn get_account_options(&self, options: JsValue) -> Result<GetAccountOptions, JsError> {
         options
             .into_serde::<GetAccountOptions>()
-            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {err:?}")))
     }
 
     /// Retrieves account information using the provided options.
@@ -152,7 +152,7 @@ impl SDK {
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
-                let err = &format!("Error occurred with {:?}", err);
+                let err = &format!("Error occurred with {err:?}");
                 Err(JsError::new(err))
             }
         }
