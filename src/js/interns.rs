@@ -172,11 +172,7 @@ pub fn generate_ed25519_js_alias() -> Result<JsValue, JsError> {
 #[wasm_bindgen(js_name = "generateSecretKey_secp256k1")]
 pub fn generate_secp256k1_js_alias() -> Result<JsValue, JsError> {
     let secret_key = secret_key_secp256k1_generate()
-        .map_err(|err| {
-            JsError::new(&format!(
-                "Error in secret_key_secp256k1_generate: {err:?}"
-            ))
-        })
+        .map_err(|err| JsError::new(&format!("Error in secret_key_secp256k1_generate: {err:?}")))
         .and_then(|secret_key| {
             secret_key
                 .to_pem()

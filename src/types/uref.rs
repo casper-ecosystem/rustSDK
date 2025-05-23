@@ -49,9 +49,8 @@ impl URef {
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
     pub fn new_js_alias(uref_hex_str: &str, access_rights: u8) -> Result<URef, JsError> {
-        Self::new(uref_hex_str, access_rights).map_err(|err| {
-            JsError::new(&format!("Failed to parse URef from hex string: {err:?}"))
-        })
+        Self::new(uref_hex_str, access_rights)
+            .map_err(|err| JsError::new(&format!("Failed to parse URef from hex string: {err:?}")))
     }
 
     #[cfg(target_arch = "wasm32")]

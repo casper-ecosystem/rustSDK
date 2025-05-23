@@ -407,9 +407,7 @@ impl Transaction {
         match JsValue::from_serde(&self.session_args()) {
             Ok(json) => json,
             Err(err) => {
-                error(&format!(
-                    "Error serializing session_args to JSON: {err:?}"
-                ));
+                error(&format!("Error serializing session_args to JSON: {err:?}"));
                 JsValue::null()
             }
         }

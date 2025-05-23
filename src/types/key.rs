@@ -126,9 +126,8 @@ impl Key {
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedString")]
     pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<Key, JsError> {
-        Self::from_formatted_str(formatted_str).map_err(|err| {
-            JsError::new(&format!("Error parsing Key from formatted string, {err}"))
-        })
+        Self::from_formatted_str(formatted_str)
+            .map_err(|err| JsError::new(&format!("Error parsing Key from formatted string, {err}")))
     }
 
     #[wasm_bindgen(js_name = "fromDictionaryKey")]
