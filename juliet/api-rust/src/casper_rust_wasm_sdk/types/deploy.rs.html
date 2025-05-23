@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/deploy.rs`."><title>deploy.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6c3ea77c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.86.0 (05f9846f8 2025-03-31)" data-channel="1.86.0" data-search-js="search-581efc7a.js" data-settings-js="settings-6dad6058.js" ><script src="../../../static.files/storage-3a5871a4.js"></script><script defer src="../../../static.files/src-script-b8d3f215.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-4d63596a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/types/</div>deploy.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use super</span>::{
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/deploy.rs`."><title>deploy.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-916cea96.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.87.0 (17067e9ac 2025-05-09)" data-channel="1.87.0" data-search-js="search-e7298875.js" data-settings-js="settings-d72f25bb.js" ><script src="../../../static.files/storage-82c7156e.js"></script><script defer src="../../../static.files/src-script-63605ae7.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-fb8c74a8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/types/</div>deploy.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use super</span>::{
 <a href=#2 id=2 data-nosnippet>2</a>    cl::bytes::Bytes,
 <a href=#3 id=3 data-nosnippet>3</a>    contract_hash::ContractHash,
 <a href=#4 id=4 data-nosnippet>4</a>    contract_package_hash::ContractPackageHash,
@@ -52,12 +52,12 @@
 <a href=#52 id=52 data-nosnippet>52</a>    </span><span class="kw">pub fn </span>new(deploy: JsValue) -&gt; Deploy {
 <a href=#53 id=53 data-nosnippet>53</a>        <span class="kw">let </span>deploy: _Deploy = deploy
 <a href=#54 id=54 data-nosnippet>54</a>            .into_serde()
-<a href=#55 id=55 data-nosnippet>55</a>            .map_err(|err| error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Failed to deserialize Deploy: {:?}"</span>, err)))
+<a href=#55 id=55 data-nosnippet>55</a>            .map_err(|err| error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Failed to deserialize Deploy: {err:?}"</span>)))
 <a href=#56 id=56 data-nosnippet>56</a>            .unwrap();
 <a href=#57 id=57 data-nosnippet>57</a>        <span class="kw">let </span>deploy = <span class="kw">match </span>deploy.is_valid_size(MAX_SERIALIZED_SIZE_OF_DEPLOY) {
 <a href=#58 id=58 data-nosnippet>58</a>            <span class="prelude-val">Ok</span>(()) =&gt; deploy,
 <a href=#59 id=59 data-nosnippet>59</a>            <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#60 id=60 data-nosnippet>60</a>                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Deploy has not a valid size: {:?}"</span>, err));
+<a href=#60 id=60 data-nosnippet>60</a>                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Deploy has not a valid size: {err:?}"</span>));
 <a href=#61 id=61 data-nosnippet>61</a>                deploy
 <a href=#62 id=62 data-nosnippet>62</a>            }
 <a href=#63 id=63 data-nosnippet>63</a>        };
@@ -70,7 +70,7 @@
 <a href=#70 id=70 data-nosnippet>70</a>        <span class="kw">match </span>JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>) {
 <a href=#71 id=71 data-nosnippet>71</a>            <span class="prelude-val">Ok</span>(json) =&gt; json,
 <a href=#72 id=72 data-nosnippet>72</a>            <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#73 id=73 data-nosnippet>73</a>                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error serializing data to JSON: {:?}"</span>, err));
+<a href=#73 id=73 data-nosnippet>73</a>                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error serializing data to JSON: {err:?}"</span>));
 <a href=#74 id=74 data-nosnippet>74</a>                JsValue::null()
 <a href=#75 id=75 data-nosnippet>75</a>            }
 <a href=#76 id=76 data-nosnippet>76</a>        }
@@ -84,7 +84,7 @@
 <a href=#84 id=84 data-nosnippet>84</a>        payment_params: PaymentStrParams,
 <a href=#85 id=85 data-nosnippet>85</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Deploy, String&gt; {
 <a href=#86 id=86 data-nosnippet>86</a>        make_deploy(deploy_params, session_params, payment_params).map_err(|err| {
-<a href=#87 id=87 data-nosnippet>87</a>            <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error creating session deploy: {}"</span>, err);
+<a href=#87 id=87 data-nosnippet>87</a>            <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error creating session deploy: {err}"</span>);
 <a href=#88 id=88 data-nosnippet>88</a>            err_msg
 <a href=#89 id=89 data-nosnippet>89</a>        })
 <a href=#90 id=90 data-nosnippet>90</a>    }
@@ -105,14 +105,14 @@
 <a href=#105 id=105 data-nosnippet>105</a>            deploy_params,
 <a href=#106 id=106 data-nosnippet>106</a>            payment_params,
 <a href=#107 id=107 data-nosnippet>107</a>        )
-<a href=#108 id=108 data-nosnippet>108</a>        .map_err(|err| <span class="macro">format!</span>(<span class="string">"Error creating transfer deploy: {}"</span>, err))
+<a href=#108 id=108 data-nosnippet>108</a>        .map_err(|err| <span class="macro">format!</span>(<span class="string">"Error creating transfer deploy: {err}"</span>))
 <a href=#109 id=109 data-nosnippet>109</a>    }
 <a href=#110 id=110 data-nosnippet>110</a>
 <a href=#111 id=111 data-nosnippet>111</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withTTL"</span>)]
 <a href=#112 id=112 data-nosnippet>112</a>    </span><span class="kw">pub fn </span>with_ttl(<span class="kw-2">&amp;</span><span class="self">self</span>, ttl: <span class="kw-2">&amp;</span>str, secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; Deploy {
 <a href=#113 id=113 data-nosnippet>113</a>        <span class="kw">let </span><span class="kw-2">mut </span>ttl = parse_ttl(ttl);
 <a href=#114 id=114 data-nosnippet>114</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = <span class="kw-2">&amp;</span>ttl {
-<a href=#115 id=115 data-nosnippet>115</a>            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing TTL: {}"</span>, err));
+<a href=#115 id=115 data-nosnippet>115</a>            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing TTL: {err}"</span>));
 <a href=#116 id=116 data-nosnippet>116</a>            ttl = parse_ttl(<span class="kw-2">&amp;</span>get_ttl_or_default(<span class="prelude-val">None</span>));
 <a href=#117 id=117 data-nosnippet>117</a>        }
 <a href=#118 id=118 data-nosnippet>118</a>        <span class="self">self</span>.build(BuildParams {
@@ -126,7 +126,7 @@
 <a href=#126 id=126 data-nosnippet>126</a>    </span><span class="kw">pub fn </span>with_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>, timestamp: <span class="kw-2">&amp;</span>str, secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; Deploy {
 <a href=#127 id=127 data-nosnippet>127</a>        <span class="kw">let </span><span class="kw-2">mut </span>timestamp = parse_timestamp(timestamp);
 <a href=#128 id=128 data-nosnippet>128</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = <span class="kw-2">&amp;</span>timestamp {
-<a href=#129 id=129 data-nosnippet>129</a>            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing Timestamp: {}"</span>, err));
+<a href=#129 id=129 data-nosnippet>129</a>            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing Timestamp: {err}"</span>));
 <a href=#130 id=130 data-nosnippet>130</a>            timestamp = parse_timestamp(<span class="kw-2">&amp;</span>get_current_timestamp(<span class="prelude-val">None</span>));
 <a href=#131 id=131 data-nosnippet>131</a>        }
 <a href=#132 id=132 data-nosnippet>132</a>        <span class="self">self</span>.build(BuildParams {
@@ -247,7 +247,7 @@
 <a href=#247 id=247 data-nosnippet>247</a>        <span class="kw">let </span>cloned_amount = amount.to_string();
 <a href=#248 id=248 data-nosnippet>248</a>        <span class="kw">let </span>amount = U512::from_dec_str(<span class="kw-2">&amp;</span>cloned_amount);
 <a href=#249 id=249 data-nosnippet>249</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = amount {
-<a href=#250 id=250 data-nosnippet>250</a>            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error converting amount: {:?}"</span>, err));
+<a href=#250 id=250 data-nosnippet>250</a>            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error converting amount: {err:?}"</span>));
 <a href=#251 id=251 data-nosnippet>251</a>            <span class="kw">return </span><span class="self">self</span>.<span class="number">0</span>.clone().into();
 <a href=#252 id=252 data-nosnippet>252</a>        }
 <a href=#253 id=253 data-nosnippet>253</a>        <span class="self">self</span>.build(BuildParams {
@@ -270,7 +270,7 @@
 <a href=#270 id=270 data-nosnippet>270</a>                ..Default::default()
 <a href=#271 id=271 data-nosnippet>271</a>            }),
 <a href=#272 id=272 data-nosnippet>272</a>            <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#273 id=273 data-nosnippet>273</a>                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing payment: {}"</span>, err));
+<a href=#273 id=273 data-nosnippet>273</a>                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing payment: {err}"</span>));
 <a href=#274 id=274 data-nosnippet>274</a>                <span class="self">self</span>.<span class="number">0</span>.clone().into()
 <a href=#275 id=275 data-nosnippet>275</a>            }
 <a href=#276 id=276 data-nosnippet>276</a>        }
@@ -289,7 +289,7 @@
 <a href=#289 id=289 data-nosnippet>289</a>                ..Default::default()
 <a href=#290 id=290 data-nosnippet>290</a>            }),
 <a href=#291 id=291 data-nosnippet>291</a>            <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#292 id=292 data-nosnippet>292</a>                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing session: {}"</span>, err));
+<a href=#292 id=292 data-nosnippet>292</a>                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing session: {err}"</span>));
 <a href=#293 id=293 data-nosnippet>293</a>                <span class="self">self</span>.<span class="number">0</span>.clone().into()
 <a href=#294 id=294 data-nosnippet>294</a>            }
 <a href=#295 id=295 data-nosnippet>295</a>        }
@@ -301,7 +301,7 @@
 <a href=#301 id=301 data-nosnippet>301</a>        <span class="kw">match </span>deploy.is_valid_size(MAX_SERIALIZED_SIZE_OF_DEPLOY) {
 <a href=#302 id=302 data-nosnippet>302</a>            <span class="prelude-val">Ok</span>(()) =&gt; <span class="bool-val">true</span>,
 <a href=#303 id=303 data-nosnippet>303</a>            <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#304 id=304 data-nosnippet>304</a>                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Deploy has not a valid size: {:?}"</span>, err));
+<a href=#304 id=304 data-nosnippet>304</a>                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Deploy has not a valid size: {err:?}"</span>));
 <a href=#305 id=305 data-nosnippet>305</a>                <span class="bool-val">false
 <a href=#306 id=306 data-nosnippet>306</a>            </span>}
 <a href=#307 id=307 data-nosnippet>307</a>        }
@@ -357,12 +357,12 @@
 <a href=#357 id=357 data-nosnippet>357</a>        <span class="kw">let </span><span class="kw-2">mut </span>deploy: _Deploy = <span class="self">self</span>.<span class="number">0</span>.clone();
 <a href=#358 id=358 data-nosnippet>358</a>        <span class="kw">let </span>secret_key_from_pem = secret_key_from_pem(secret_key);
 <a href=#359 id=359 data-nosnippet>359</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = secret_key_from_pem {
-<a href=#360 id=360 data-nosnippet>360</a>            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error loading secret key: {:?}"</span>, err));
+<a href=#360 id=360 data-nosnippet>360</a>            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error loading secret key: {err:?}"</span>));
 <a href=#361 id=361 data-nosnippet>361</a>            <span class="kw">return </span>deploy.into();
 <a href=#362 id=362 data-nosnippet>362</a>        }
 <a href=#363 id=363 data-nosnippet>363</a>        deploy.sign(<span class="kw-2">&amp;</span>secret_key_from_pem.unwrap());
 <a href=#364 id=364 data-nosnippet>364</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = deploy.is_valid_size(MAX_SERIALIZED_SIZE_OF_DEPLOY) {
-<a href=#365 id=365 data-nosnippet>365</a>            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Deploy has not a valid size: {:?}"</span>, err));
+<a href=#365 id=365 data-nosnippet>365</a>            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Deploy has not a valid size: {err:?}"</span>));
 <a href=#366 id=366 data-nosnippet>366</a>        }
 <a href=#367 id=367 data-nosnippet>367</a>        deploy.into()
 <a href=#368 id=368 data-nosnippet>368</a>    }
@@ -515,7 +515,7 @@
 <a href=#515 id=515 data-nosnippet>515</a>        <span class="kw">match </span>JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.args()) {
 <a href=#516 id=516 data-nosnippet>516</a>            <span class="prelude-val">Ok</span>(json) =&gt; json,
 <a href=#517 id=517 data-nosnippet>517</a>            <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#518 id=518 data-nosnippet>518</a>                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error serializing args to JSON: {:?}"</span>, err));
+<a href=#518 id=518 data-nosnippet>518</a>                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error serializing args to JSON: {err:?}"</span>));
 <a href=#519 id=519 data-nosnippet>519</a>                JsValue::null()
 <a href=#520 id=520 data-nosnippet>520</a>            }
 <a href=#521 id=521 data-nosnippet>521</a>        }
@@ -534,7 +534,7 @@
 <a href=#534 id=534 data-nosnippet>534</a>        <span class="kw">let </span><span class="kw-2">mut </span>args = session.args().clone();
 <a href=#535 id=535 data-nosnippet>535</a>        <span class="kw">let </span>new_args = <span class="kw">match </span>insert_js_value_arg(<span class="kw-2">&amp;mut </span>args, js_value_arg) {
 <a href=#536 id=536 data-nosnippet>536</a>            <span class="prelude-val">Ok</span>(new_args) =&gt; new_args,
-<a href=#537 id=537 data-nosnippet>537</a>            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error adding argument: {}"</span>, err))),
+<a href=#537 id=537 data-nosnippet>537</a>            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error adding argument: {err}"</span>))),
 <a href=#538 id=538 data-nosnippet>538</a>        };
 <a href=#539 id=539 data-nosnippet>539</a>
 <a href=#540 id=540 data-nosnippet>540</a>        <span class="kw">let </span>new_session = modify_session(
@@ -665,7 +665,7 @@
 <a href=#665 id=665 data-nosnippet>665</a>        }
 <a href=#666 id=666 data-nosnippet>666</a>        <span class="kw">let </span>deploy = deploy_builder
 <a href=#667 id=667 data-nosnippet>667</a>            .build()
-<a href=#668 id=668 data-nosnippet>668</a>            .map_err(|err| error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Failed to build deploy: {:?}"</span>, err)))
+<a href=#668 id=668 data-nosnippet>668</a>            .map_err(|err| error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Failed to build deploy: {err:?}"</span>)))
 <a href=#669 id=669 data-nosnippet>669</a>            .unwrap();
 <a href=#670 id=670 data-nosnippet>670</a>
 <a href=#671 id=671 data-nosnippet>671</a>        <span class="kw">let </span>deploy: Deploy = deploy.into();
