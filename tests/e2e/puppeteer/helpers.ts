@@ -37,7 +37,7 @@ export async function clear() {
     () => !document.querySelector('[e2e-id="clear result"]')
   );
   // wait for document to refresh
-  await delay(180);
+  await delay(200);
   let result = await variables.page.evaluate(() => {
     return document.querySelector('[e2e-id="result"]')?.textContent;
   });
@@ -74,7 +74,7 @@ export async function getResult() {
 }
 
 export async function seletAction(action: string) {
-  await delay(300);
+  await delay(400);
   await variables.page.waitForSelector('[e2e-id="state_root_hash"]');
   await variables.page.waitForSelector('[e2e-id="selectActionElt"]');
   await variables.page.select('[e2e-id="selectActionElt"]', action);
@@ -86,7 +86,7 @@ export async function seletAction(action: string) {
   });
   expect(action_selected).toBe(action);
   // wait for document to refresh
-  await delay(300);
+  await delay(400);
 }
 
 export async function setSecretKey() {
