@@ -1165,144 +1165,6 @@ export class RecordId {
 export class SDK {
   free(): void;
   /**
-   * Parses deploy options from a JsValue.
-   *
-   * # Arguments
-   *
-   * * `options` - A JsValue containing deploy options to be parsed.
-   *
-   * # Returns
-   *
-   * Parsed deploy options as a `GetDeployOptions` struct.
-   */
-  get_deploy_options(options: any): getDeployOptions;
-  /**
-   * Retrieves deploy information using the provided options.
-   *
-   * # Arguments
-   *
-   * * `options` - An optional `GetDeployOptions` struct containing retrieval options.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetDeployResult` or an error.
-   */
-  get_deploy(options?: getDeployOptions | null): Promise<GetDeployResult>;
-  /**
-   * Retrieves deploy information using the provided options, alias for `get_deploy`.
-   */
-  info_get_deploy(options?: getDeployOptions | null): Promise<GetDeployResult>;
-  /**
-   * Parses transaction options from a JsValue.
-   *
-   * # Arguments
-   *
-   * * `options` - A JsValue containing transaction options to be parsed.
-   *
-   * # Returns
-   *
-   * Parsed transaction options as a `GetTransactionOptions` struct.
-   */
-  get_transaction_options(options: any): getTransactionOptions;
-  /**
-   * Retrieves transaction information using the provided options.
-   *
-   * # Arguments
-   *
-   * * `options` - An optional `GetTransactionOptions` struct containing retrieval options.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetTransactionResult` or an error.
-   */
-  get_transaction(options?: getTransactionOptions | null): Promise<GetTransactionResult>;
-  /**
-   * Retrieves transaction information using the provided options, alias for `get_transaction`.
-   */
-  info_get_transaction(options?: getTransactionOptions | null): Promise<GetTransactionResult>;
-  /**
-   * Get options for speculative execution from a JavaScript value.
-   */
-  get_speculative_exec_options(options: any): getSpeculativeExecTxnOptions;
-  /**
-   * JS function for speculative execution.
-   *
-   * # Arguments
-   *
-   * * `options` - The options for speculative execution.
-   *
-   * # Returns
-   *
-   * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
-   */
-  speculative_exec(options?: getSpeculativeExecTxnOptions | null): Promise<SpeculativeExecTxnResult>;
-  /**
-   * Get options for speculative execution from a JavaScript value.
-   */
-  get_speculative_exec_deploy_options(options: any): getSpeculativeExecDeployOptions;
-  /**
-   * JS function for speculative execution.
-   *
-   * # Arguments
-   *
-   * * `options` - The options for speculative execution.
-   *
-   * # Returns
-   *
-   * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
-   */
-  speculative_exec_deploy(options?: getSpeculativeExecDeployOptions | null): Promise<SpeculativeExecResult>;
-  /**
-   * JS function for `sign_transaction`.
-   *
-   * # Arguments
-   *
-   * * `transaction` - The transaction to sign.
-   * * `secret_key` - The secret key for signing.
-   *
-   * # Returns
-   *
-   * The signed `Transaction`.
-   */
-  sign_transaction(transaction: Transaction, secret_key: string): Transaction;
-  constructor(rpc_address?: string | null, node_address?: string | null, verbosity?: Verbosity | null);
-  getRPCAddress(rpc_address?: string | null): string;
-  setRPCAddress(rpc_address?: string | null): void;
-  getNodeAddress(node_address?: string | null): string;
-  setNodeAddress(node_address?: string | null): void;
-  getVerbosity(verbosity?: Verbosity | null): Verbosity;
-  setVerbosity(verbosity?: Verbosity | null): void;
-  /**
-   * JavaScript function for deploying with deserialized parameters.
-   *
-   * # Arguments
-   *
-   * * `deploy_params` - Deploy parameters.
-   * * `session_params` - Session parameters.
-   * * `payment_params` - Payment parameters.
-   * * `verbosity` - An optional verbosity level.
-   * * `rpc_address` - An optional rpc address.
-   *
-   * # Returns
-   *
-   * A result containing PutDeployResult or a JsError.
-   */
-  deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutDeployResult>;
-  /**
-   * Retrieves peers asynchronously.
-   *
-   * # Arguments
-   *
-   * * `verbosity` - Optional verbosity level.
-   * * `rpc_address` - Optional rpc address.
-   *
-   * # Returns
-   *
-   * A `Result` containing `GetPeersResult` or a `JsError` if an error occurs.
-   */
-  get_peers(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetPeersResult>;
-  info_get_peers(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetPeersResult>;
-  /**
    * Parses auction info options from a JsValue.
    *
    * # Arguments
@@ -1568,6 +1430,144 @@ export class SDK {
   get_binary_try_speculative_execution(transaction: Transaction, node_address?: string | null): Promise<any>;
   get_binary_protocol_version(node_address?: string | null): Promise<any>;
   /**
+   * Parses deploy options from a JsValue.
+   *
+   * # Arguments
+   *
+   * * `options` - A JsValue containing deploy options to be parsed.
+   *
+   * # Returns
+   *
+   * Parsed deploy options as a `GetDeployOptions` struct.
+   */
+  get_deploy_options(options: any): getDeployOptions;
+  /**
+   * Retrieves deploy information using the provided options.
+   *
+   * # Arguments
+   *
+   * * `options` - An optional `GetDeployOptions` struct containing retrieval options.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetDeployResult` or an error.
+   */
+  get_deploy(options?: getDeployOptions | null): Promise<GetDeployResult>;
+  /**
+   * Retrieves deploy information using the provided options, alias for `get_deploy`.
+   */
+  info_get_deploy(options?: getDeployOptions | null): Promise<GetDeployResult>;
+  /**
+   * Parses transaction options from a JsValue.
+   *
+   * # Arguments
+   *
+   * * `options` - A JsValue containing transaction options to be parsed.
+   *
+   * # Returns
+   *
+   * Parsed transaction options as a `GetTransactionOptions` struct.
+   */
+  get_transaction_options(options: any): getTransactionOptions;
+  /**
+   * Retrieves transaction information using the provided options.
+   *
+   * # Arguments
+   *
+   * * `options` - An optional `GetTransactionOptions` struct containing retrieval options.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetTransactionResult` or an error.
+   */
+  get_transaction(options?: getTransactionOptions | null): Promise<GetTransactionResult>;
+  /**
+   * Retrieves transaction information using the provided options, alias for `get_transaction`.
+   */
+  info_get_transaction(options?: getTransactionOptions | null): Promise<GetTransactionResult>;
+  /**
+   * Get options for speculative execution from a JavaScript value.
+   */
+  get_speculative_exec_options(options: any): getSpeculativeExecTxnOptions;
+  /**
+   * JS function for speculative execution.
+   *
+   * # Arguments
+   *
+   * * `options` - The options for speculative execution.
+   *
+   * # Returns
+   *
+   * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
+   */
+  speculative_exec(options?: getSpeculativeExecTxnOptions | null): Promise<SpeculativeExecTxnResult>;
+  /**
+   * Get options for speculative execution from a JavaScript value.
+   */
+  get_speculative_exec_deploy_options(options: any): getSpeculativeExecDeployOptions;
+  /**
+   * JS function for speculative execution.
+   *
+   * # Arguments
+   *
+   * * `options` - The options for speculative execution.
+   *
+   * # Returns
+   *
+   * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
+   */
+  speculative_exec_deploy(options?: getSpeculativeExecDeployOptions | null): Promise<SpeculativeExecResult>;
+  /**
+   * JS function for `sign_transaction`.
+   *
+   * # Arguments
+   *
+   * * `transaction` - The transaction to sign.
+   * * `secret_key` - The secret key for signing.
+   *
+   * # Returns
+   *
+   * The signed `Transaction`.
+   */
+  sign_transaction(transaction: Transaction, secret_key: string): Transaction;
+  constructor(rpc_address?: string | null, node_address?: string | null, verbosity?: Verbosity | null);
+  getRPCAddress(rpc_address?: string | null): string;
+  setRPCAddress(rpc_address?: string | null): void;
+  getNodeAddress(node_address?: string | null): string;
+  setNodeAddress(node_address?: string | null): void;
+  getVerbosity(verbosity?: Verbosity | null): Verbosity;
+  setVerbosity(verbosity?: Verbosity | null): void;
+  /**
+   * JavaScript function for deploying with deserialized parameters.
+   *
+   * # Arguments
+   *
+   * * `deploy_params` - Deploy parameters.
+   * * `session_params` - Session parameters.
+   * * `payment_params` - Payment parameters.
+   * * `verbosity` - An optional verbosity level.
+   * * `rpc_address` - An optional rpc address.
+   *
+   * # Returns
+   *
+   * A result containing PutDeployResult or a JsError.
+   */
+  deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutDeployResult>;
+  /**
+   * Retrieves peers asynchronously.
+   *
+   * # Arguments
+   *
+   * * `verbosity` - Optional verbosity level.
+   * * `rpc_address` - Optional rpc address.
+   *
+   * # Returns
+   *
+   * A `Result` containing `GetPeersResult` or a `JsError` if an error occurs.
+   */
+  get_peers(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetPeersResult>;
+  info_get_peers(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetPeersResult>;
+  /**
    * This function allows executing a deploy speculatively.
    *
    * # Arguments
@@ -1583,24 +1583,6 @@ export class SDK {
    * A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
    */
   speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecResult>;
-  /**
-   * JS function for speculative transfer.
-   *
-   * # Arguments
-   *
-   * * `amount` - The amount to transfer.
-   * * `target_account` - The target account.
-   * * `transfer_id` - An optional transfer ID (defaults to a random number).
-   * * `deploy_params` - The deployment parameters.
-   * * `payment_params` - The payment parameters.
-   * * `verbosity` - The verbosity level for logging (optional).
-   * * `rpc_address` - The address of the node to connect to (optional).
-   *
-   * # Returns
-   *
-   * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-   */
-  speculative_transfer(amount: string, target_account: string, transfer_id: string | null | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecResult>;
   get_account_options(options: any): getAccountOptions;
   /**
    * Retrieves account information using the provided options.
@@ -1714,28 +1696,6 @@ export class SDK {
   get_era_summary(options?: getEraSummaryOptions | null): Promise<GetEraSummaryResult>;
   chain_get_era_summary(options?: getEraSummaryOptions | null): Promise<GetEraSummaryResult>;
   /**
-   * Puts a transaction using the provided options.
-   *
-   * # Arguments
-   *
-   * * `transaction` - The `Transaction` object to be sent.
-   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the transaction process.
-   */
-  put_transaction(transaction: Transaction, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
-  /**
-   * JavaScript Alias for `put_transaction`.
-   */
-  account_put_transaction(transaction: Transaction, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
-  /**
    * Parses query balance options from a JsValue.
    *
    * # Arguments
@@ -1804,149 +1764,6 @@ export class SDK {
    * The signed `Deploy`.
    */
   sign_deploy(deploy: Deploy, secret_key: string): Deploy;
-  /**
-   * Retrieves node status information using the provided options.
-   *
-   * # Arguments
-   *
-   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetNodeStatusResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the retrieval process.
-   */
-  get_node_status(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetNodeStatusResult>;
-  info_get_status(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetNodeStatusResult>;
-  /**
-   * Lists available RPCs using the provided options.
-   *
-   * # Arguments
-   *
-   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `ListRpcsResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the listing process.
-   */
-  list_rpcs(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<ListRpcsResult>;
-  /**
-   * This function allows executing a transaction speculatively.
-   *
-   * # Arguments
-   *
-   * * `builder_params` - Transaction Builder parameters.
-   * * `transaction_params` - Transactionment parameters for the transaction.
-   * * `verbosity` - Optional verbosity level.
-   * * `rpc_address` - Optional rpc address.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
-   */
-  speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecTxnResult>;
-  /**
-   * JS function for transaction transferring funds.
-   *
-   * # Arguments
-   *
-   * * `maybe_source` - Optional transfer source uref.
-   * * `target_account` - The target account.
-   * * `amount` - The amount to transfer.
-   * * `transaction_params` - The transaction parameters.
-   * * `maybe_id` - An optional transfer ID (defaults to a random number).
-   * * `verbosity` - The verbosity level for logging (optional).
-   * * `rpc_address` - The address of the node to connect to (optional).
-   *
-   * # Returns
-   *
-   * A `Result` containing the result of the transfer or a `JsError` in case of an error.
-   */
-  transfer_transaction(maybe_source: URef | null | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string | null, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
-  /**
-   * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
-   * Legacy alias
-   *
-   * # Arguments
-   *
-   * * `events_url` - The URL to monitor for transaction events.
-   * * `timeout_duration` - An optional timeout duration in seconds.
-   *
-   * # Returns
-   *
-   * A `Watcher` instance.
-   */
-  watchDeploy(events_url: string, timeout_duration?: number | null): Watcher;
-  /**
-   * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
-   *
-   * # Arguments
-   *
-   * * `events_url` - The URL to monitor for transaction events.
-   * * `timeout_duration` - An optional timeout duration in seconds.
-   *
-   * # Returns
-   *
-   * A `Watcher` instance.
-   */
-  watchTransaction(events_url: string, timeout_duration?: number | null): Watcher;
-  /**
-   * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
-   * Legacy alias
-   *
-   * # Arguments
-   *
-   * * `events_url` - The URL to monitor for transaction events.
-   * * `deploy_hash` - The deploy hash to wait for.
-   * * `timeout_duration` - An optional timeout duration in seconds.
-   *
-   * # Returns
-   *
-   * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
-   */
-  waitDeploy(events_url: string, deploy_hash: string, timeout_duration?: number | null): Promise<Promise<any>>;
-  /**
-   * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
-   *
-   * # Arguments
-   *
-   * * `events_url` - The URL to monitor for transaction events.
-   * * `target_hash` - The transaction hash to wait for.
-   * * `timeout_duration` - An optional timeout duration in seconds.
-   *
-   * # Returns
-   *
-   * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
-   */
-  waitTransaction(events_url: string, target_hash: string, timeout_duration?: number | null): Promise<Promise<any>>;
-  /**
-   * Calls a smart contract entry point with the specified parameters and returns the result.
-   *
-   * # Arguments
-   *
-   * * `deploy_params` - The deploy parameters.
-   * * `session_params` - The session parameters.
-   * * `payment_amount` - The payment amount as a string.
-   * * `rpc_address` - An optional rpc address to send the request to.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the call.
-   */
-  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string | null): Promise<PutDeployResult>;
   /**
    * Installs a smart contract with the specified parameters and returns the result.
    *
@@ -2028,28 +1845,6 @@ export class SDK {
    */
   chain_get_state_root_hash(options?: getStateRootHashOptions | null): Promise<GetStateRootHashResult>;
   /**
-   * Puts a deploy using the provided options.
-   *
-   * # Arguments
-   *
-   * * `deploy` - The `Deploy` object to be sent.
-   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the deploy process.
-   */
-  put_deploy(deploy: Deploy, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutDeployResult>;
-  /**
-   * JavaScript Alias for `put_deploy`.
-   */
-  account_put_deploy(deploy: Deploy, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutDeployResult>;
-  /**
    * Parses query balance options from a JsValue.
    *
    * # Arguments
@@ -2078,23 +1873,23 @@ export class SDK {
    */
   query_balance_details(options?: queryBalanceDetailsOptions | null): Promise<QueryBalanceDetailsResult>;
   /**
-   * JS function for speculative transfer transaction.
+   * JS function for transaction transferring funds.
    *
    * # Arguments
    *
    * * `maybe_source` - Optional transfer source uref.
    * * `target_account` - The target account.
    * * `amount` - The amount to transfer.
+   * * `transaction_params` - The transaction parameters.
    * * `maybe_id` - An optional transfer ID (defaults to a random number).
-   * * `transaction_params` - The transactionment parameters.
    * * `verbosity` - The verbosity level for logging (optional).
    * * `rpc_address` - The address of the node to connect to (optional).
    *
    * # Returns
    *
-   * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+   * A `Result` containing the result of the transfer or a `JsError` in case of an error.
    */
-  speculative_transfer_transaction(maybe_source: URef | null | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string | null, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecTxnResult>;
+  transfer_transaction(maybe_source: URef | null | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string | null, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
   /**
    * JS function for `make_transfer`.
    *
@@ -2172,6 +1967,211 @@ export class SDK {
    * JavaScript function for query_contract_key with deserialized options.
    */
   query_contract_key(options?: queryContractKeyOptions | null): Promise<QueryGlobalStateResult>;
+  /**
+   * JS function for speculative transfer.
+   *
+   * # Arguments
+   *
+   * * `amount` - The amount to transfer.
+   * * `target_account` - The target account.
+   * * `transfer_id` - An optional transfer ID (defaults to a random number).
+   * * `deploy_params` - The deployment parameters.
+   * * `payment_params` - The payment parameters.
+   * * `verbosity` - The verbosity level for logging (optional).
+   * * `rpc_address` - The address of the node to connect to (optional).
+   *
+   * # Returns
+   *
+   * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+   */
+  speculative_transfer(amount: string, target_account: string, transfer_id: string | null | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecResult>;
+  /**
+   * Retrieves node status information using the provided options.
+   *
+   * # Arguments
+   *
+   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetNodeStatusResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the retrieval process.
+   */
+  get_node_status(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetNodeStatusResult>;
+  info_get_status(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetNodeStatusResult>;
+  /**
+   * Lists available RPCs using the provided options.
+   *
+   * # Arguments
+   *
+   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `ListRpcsResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the listing process.
+   */
+  list_rpcs(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<ListRpcsResult>;
+  /**
+   * Puts a transaction using the provided options.
+   *
+   * # Arguments
+   *
+   * * `transaction` - The `Transaction` object to be sent.
+   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the transaction process.
+   */
+  put_transaction(transaction: Transaction, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
+  /**
+   * JavaScript Alias for `put_transaction`.
+   */
+  account_put_transaction(transaction: Transaction, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
+  /**
+   * Calls a smart contract entry point with the specified parameters and returns the result.
+   *
+   * # Arguments
+   *
+   * * `deploy_params` - The deploy parameters.
+   * * `session_params` - The session parameters.
+   * * `payment_amount` - The payment amount as a string.
+   * * `rpc_address` - An optional rpc address to send the request to.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the call.
+   */
+  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string | null): Promise<PutDeployResult>;
+  /**
+   * Puts a deploy using the provided options.
+   *
+   * # Arguments
+   *
+   * * `deploy` - The `Deploy` object to be sent.
+   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the deploy process.
+   */
+  put_deploy(deploy: Deploy, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutDeployResult>;
+  /**
+   * JavaScript Alias for `put_deploy`.
+   */
+  account_put_deploy(deploy: Deploy, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutDeployResult>;
+  /**
+   * This function allows executing a transaction speculatively.
+   *
+   * # Arguments
+   *
+   * * `builder_params` - Transaction Builder parameters.
+   * * `transaction_params` - Transactionment parameters for the transaction.
+   * * `verbosity` - Optional verbosity level.
+   * * `rpc_address` - Optional rpc address.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
+   */
+  speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecTxnResult>;
+  /**
+   * JS function for speculative transfer transaction.
+   *
+   * # Arguments
+   *
+   * * `maybe_source` - Optional transfer source uref.
+   * * `target_account` - The target account.
+   * * `amount` - The amount to transfer.
+   * * `maybe_id` - An optional transfer ID (defaults to a random number).
+   * * `transaction_params` - The transactionment parameters.
+   * * `verbosity` - The verbosity level for logging (optional).
+   * * `rpc_address` - The address of the node to connect to (optional).
+   *
+   * # Returns
+   *
+   * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+   */
+  speculative_transfer_transaction(maybe_source: URef | null | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string | null, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecTxnResult>;
+  /**
+   * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
+   * Legacy alias
+   *
+   * # Arguments
+   *
+   * * `events_url` - The URL to monitor for transaction events.
+   * * `timeout_duration` - An optional timeout duration in seconds.
+   *
+   * # Returns
+   *
+   * A `Watcher` instance.
+   */
+  watchDeploy(events_url: string, timeout_duration?: number | null): Watcher;
+  /**
+   * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
+   *
+   * # Arguments
+   *
+   * * `events_url` - The URL to monitor for transaction events.
+   * * `timeout_duration` - An optional timeout duration in seconds.
+   *
+   * # Returns
+   *
+   * A `Watcher` instance.
+   */
+  watchTransaction(events_url: string, timeout_duration?: number | null): Watcher;
+  /**
+   * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
+   * Legacy alias
+   *
+   * # Arguments
+   *
+   * * `events_url` - The URL to monitor for transaction events.
+   * * `deploy_hash` - The deploy hash to wait for.
+   * * `timeout_duration` - An optional timeout duration in seconds.
+   *
+   * # Returns
+   *
+   * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
+   */
+  waitDeploy(events_url: string, deploy_hash: string, timeout_duration?: number | null): Promise<Promise<any>>;
+  /**
+   * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
+   *
+   * # Arguments
+   *
+   * * `events_url` - The URL to monitor for transaction events.
+   * * `target_hash` - The transaction hash to wait for.
+   * * `timeout_duration` - An optional timeout duration in seconds.
+   *
+   * # Returns
+   *
+   * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
+   */
+  waitTransaction(events_url: string, target_hash: string, timeout_duration?: number | null): Promise<Promise<any>>;
 }
 export class SessionStrParams {
   free(): void;
@@ -2911,234 +2911,6 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly __wbg_entityaddr_free: (a: number, b: number) => void;
-  readonly entityaddr_fromFormattedStr: (a: number, b: number) => [number, number, number];
-  readonly entityaddr_toFormattedString: (a: number) => [number, number];
-  readonly entityaddr_toHexString: (a: number) => [number, number];
-  readonly entityaddr_toJson: (a: number) => any;
-  readonly __wbg_deploy_free: (a: number, b: number) => void;
-  readonly deploy_new: (a: any) => number;
-  readonly deploy_toJson: (a: number) => any;
-  readonly deploy_withPaymentAndSession: (a: number, b: number, c: number) => [number, number, number];
-  readonly deploy_withTransfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number];
-  readonly deploy_withTTL: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly deploy_withTimestamp: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly deploy_withChainName: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly deploy_withAccount: (a: number, b: number, c: number, d: number) => number;
-  readonly deploy_withEntryPointName: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly deploy_withHash: (a: number, b: number, c: number, d: number) => number;
-  readonly deploy_withPackageHash: (a: number, b: number, c: number, d: number) => number;
-  readonly deploy_withModuleBytes: (a: number, b: number, c: number, d: number) => number;
-  readonly deploy_withSecretKey: (a: number, b: number, c: number) => number;
-  readonly deploy_withStandardPayment: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly deploy_withPayment: (a: number, b: any, c: number, d: number) => number;
-  readonly deploy_withSession: (a: number, b: any, c: number, d: number) => number;
-  readonly deploy_validateDeploySize: (a: number) => number;
-  readonly deploy_isValid: (a: number) => number;
-  readonly deploy_hash: (a: number) => number;
-  readonly deploy_hasValidHash: (a: number) => number;
-  readonly deploy_isExpired: (a: number) => number;
-  readonly deploy_sign: (a: number, b: number, c: number) => number;
-  readonly deploy_approvalsHash: (a: number) => any;
-  readonly deploy_approvals: (a: number) => any;
-  readonly deploy_isTransfer: (a: number) => number;
-  readonly deploy_isStandardPayment: (a: number, b: number) => number;
-  readonly deploy_isStoredContract: (a: number) => number;
-  readonly deploy_isStoredContractPackage: (a: number) => number;
-  readonly deploy_isModuleBytes: (a: number) => number;
-  readonly deploy_isByName: (a: number) => number;
-  readonly deploy_byName: (a: number) => [number, number];
-  readonly deploy_entryPointName: (a: number) => [number, number];
-  readonly deploy_addSignature: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly deploy_TTL: (a: number) => [number, number];
-  readonly deploy_timestamp: (a: number) => [number, number];
-  readonly deploy_chainName: (a: number) => [number, number];
-  readonly deploy_account: (a: number) => [number, number];
-  readonly deploy_paymentAmount: (a: number, b: number) => [number, number];
-  readonly deploy_args: (a: number) => any;
-  readonly deploy_addArg: (a: number, b: any, c: number, d: number) => [number, number, number];
-  readonly __wbg_addressableentityhash_free: (a: number, b: number) => void;
-  readonly addressableentityhash_new_js_alias: (a: number, b: number) => [number, number, number];
-  readonly addressableentityhash_fromFormattedStr: (a: number, b: number) => [number, number, number];
-  readonly addressableentityhash_toFormattedString: (a: number) => [number, number];
-  readonly addressableentityhash_fromUint8Array: (a: number, b: number) => number;
-  readonly __wbg_contracthash_free: (a: number, b: number) => void;
-  readonly contracthash_new_js_alias: (a: number, b: number) => [number, number, number];
-  readonly contracthash_fromFormattedStr: (a: number, b: number) => [number, number, number];
-  readonly contracthash_toFormattedString: (a: number) => [number, number];
-  readonly contracthash_fromUint8Array: (a: number, b: number) => number;
-  readonly __wbg_transaction_free: (a: number, b: number) => void;
-  readonly transaction_new: (a: any) => number;
-  readonly transaction_toJson: (a: number) => any;
-  readonly transaction_newSession: (a: number, b: number) => [number, number, number];
-  readonly transaction_newTransfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number];
-  readonly transaction_withTTL: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly transaction_withTimestamp: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly transaction_withChainName: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly transaction_withPublicKey: (a: number, b: number, c: number, d: number) => number;
-  readonly transaction_withAccountHash: (a: number, b: number, c: number, d: number) => number;
-  readonly transaction_withEntryPoint: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly transaction_withEntityHash: (a: number, b: number, c: number, d: number) => number;
-  readonly transaction_withPackageHash: (a: number, b: number, c: number, d: number) => number;
-  readonly transaction_withTransactionBytes: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly transaction_withSecretKey: (a: number, b: number, c: number) => number;
-  readonly transaction_verify: (a: number) => number;
-  readonly transaction_hash: (a: number) => number;
-  readonly transaction_expired: (a: number) => number;
-  readonly transaction_expires: (a: number) => any;
-  readonly transaction_signers: (a: number) => any;
-  readonly transaction_authorization_keys: (a: number) => any;
-  readonly transaction_sign: (a: number, b: number, c: number) => number;
-  readonly transaction_approvalsHash: (a: number) => any;
-  readonly transaction_approvals: (a: number) => any;
-  readonly transaction_is_native: (a: number) => number;
-  readonly transaction_target: (a: number) => any;
-  readonly transaction_is_standard_payment: (a: number) => number;
-  readonly transaction_session_args: (a: number) => any;
-  readonly transaction_addSignature: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly transaction_entry_point: (a: number) => [number, number];
-  readonly transaction_ttl: (a: number) => [number, number];
-  readonly transaction_timestamp: (a: number) => [number, number];
-  readonly transaction_size_estimate: (a: number) => number;
-  readonly transaction_chain_name: (a: number) => [number, number];
-  readonly transaction_initiator_addr: (a: number) => [number, number];
-  readonly transaction_pricing_mode: (a: number) => number;
-  readonly transaction_payment_amount: (a: number) => [number, bigint];
-  readonly transaction_additional_computation_factor: (a: number) => number;
-  readonly transaction_receipt: (a: number) => number;
-  readonly transaction_gas_price_tolerance: (a: number) => number;
-  readonly transaction_account_hash: (a: number) => number;
-  readonly transaction_addArg: (a: number, b: any, c: number, d: number) => [number, number, number];
-  readonly __wbg_uref_free: (a: number, b: number) => void;
-  readonly uref_new_js_alias: (a: number, b: number, c: number) => [number, number, number];
-  readonly uref_fromFormattedStr: (a: number, b: number) => [number, number, number];
-  readonly uref_fromUint8Array: (a: number, b: number, c: number) => number;
-  readonly uref_toFormattedString: (a: number) => [number, number];
-  readonly uref_toJson: (a: number) => any;
-  readonly __wbg_getdeployresult_free: (a: number, b: number) => void;
-  readonly getdeployresult_api_version: (a: number) => any;
-  readonly getdeployresult_deploy: (a: number) => number;
-  readonly getdeployresult_execution_info: (a: number) => any;
-  readonly getdeployresult_toJson: (a: number) => any;
-  readonly __wbg_getdeployoptions_free: (a: number, b: number) => void;
-  readonly __wbg_get_getdeployoptions_deploy_hash_as_string: (a: number) => [number, number];
-  readonly __wbg_set_getdeployoptions_deploy_hash_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getdeployoptions_deploy_hash: (a: number) => number;
-  readonly __wbg_set_getdeployoptions_deploy_hash: (a: number, b: number) => void;
-  readonly __wbg_get_getdeployoptions_finalized_approvals: (a: number) => number;
-  readonly __wbg_set_getdeployoptions_finalized_approvals: (a: number, b: number) => void;
-  readonly __wbg_get_getdeployoptions_rpc_address: (a: number) => [number, number];
-  readonly __wbg_set_getdeployoptions_rpc_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getdeployoptions_verbosity: (a: number) => number;
-  readonly __wbg_set_getdeployoptions_verbosity: (a: number, b: number) => void;
-  readonly sdk_get_deploy_options: (a: number, b: any) => [number, number, number];
-  readonly sdk_get_deploy: (a: number, b: number) => any;
-  readonly sdk_info_get_deploy: (a: number, b: number) => any;
-  readonly __wbg_gettransactionresult_free: (a: number, b: number) => void;
-  readonly gettransactionresult_api_version: (a: number) => any;
-  readonly gettransactionresult_transaction: (a: number) => number;
-  readonly gettransactionresult_execution_info: (a: number) => any;
-  readonly gettransactionresult_toJson: (a: number) => any;
-  readonly __wbg_gettransactionoptions_free: (a: number, b: number) => void;
-  readonly __wbg_get_gettransactionoptions_transaction_hash: (a: number) => number;
-  readonly __wbg_set_gettransactionoptions_transaction_hash: (a: number, b: number) => void;
-  readonly sdk_get_transaction_options: (a: number, b: any) => [number, number, number];
-  readonly sdk_get_transaction: (a: number, b: number) => any;
-  readonly sdk_info_get_transaction: (a: number, b: number) => any;
-  readonly __wbg_speculativeexectxnresult_free: (a: number, b: number) => void;
-  readonly speculativeexectxnresult_api_version: (a: number) => any;
-  readonly speculativeexectxnresult_execution_result: (a: number) => any;
-  readonly speculativeexectxnresult_toJson: (a: number) => any;
-  readonly __wbg_getspeculativeexectxnoptions_free: (a: number, b: number) => void;
-  readonly __wbg_get_getspeculativeexectxnoptions_transaction: (a: number) => number;
-  readonly __wbg_set_getspeculativeexectxnoptions_transaction: (a: number, b: number) => void;
-  readonly sdk_get_speculative_exec_options: (a: number, b: any) => [number, number, number];
-  readonly sdk_speculative_exec: (a: number, b: number) => any;
-  readonly __wbg_speculativeexecresult_free: (a: number, b: number) => void;
-  readonly speculativeexecresult_api_version: (a: number) => any;
-  readonly speculativeexecresult_block_hash: (a: number) => number;
-  readonly speculativeexecresult_execution_result: (a: number) => any;
-  readonly speculativeexecresult_toJson: (a: number) => any;
-  readonly __wbg_getspeculativeexecdeployoptions_free: (a: number, b: number) => void;
-  readonly __wbg_get_getspeculativeexecdeployoptions_deploy_as_string: (a: number) => [number, number];
-  readonly __wbg_set_getspeculativeexecdeployoptions_deploy_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getspeculativeexecdeployoptions_deploy: (a: number) => number;
-  readonly __wbg_set_getspeculativeexecdeployoptions_deploy: (a: number, b: number) => void;
-  readonly __wbg_get_getspeculativeexecdeployoptions_rpc_address: (a: number) => [number, number];
-  readonly __wbg_set_getspeculativeexecdeployoptions_rpc_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getspeculativeexecdeployoptions_verbosity: (a: number) => number;
-  readonly __wbg_set_getspeculativeexecdeployoptions_verbosity: (a: number, b: number) => void;
-  readonly sdk_get_speculative_exec_deploy_options: (a: number, b: any) => [number, number, number];
-  readonly sdk_speculative_exec_deploy: (a: number, b: number) => any;
-  readonly sdk_sign_transaction: (a: number, b: number, c: number, d: number) => number;
-  readonly __wbg_sdk_free: (a: number, b: number) => void;
-  readonly sdk_new: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_getRPCAddress: (a: number, b: number, c: number) => [number, number];
-  readonly sdk_setRPCAddress: (a: number, b: number, c: number) => [number, number];
-  readonly sdk_getNodeAddress: (a: number, b: number, c: number) => [number, number];
-  readonly sdk_setNodeAddress: (a: number, b: number, c: number) => [number, number];
-  readonly sdk_getVerbosity: (a: number, b: number) => number;
-  readonly sdk_setVerbosity: (a: number, b: number) => [number, number];
-  readonly hexToString: (a: number, b: number) => [number, number];
-  readonly hexToUint8Array: (a: number, b: number) => [number, number];
-  readonly uint8ArrayToBytes: (a: any) => number;
-  readonly motesToCSPR: (a: number, b: number) => [number, number, number, number];
-  readonly jsonPrettyPrint: (a: any, b: number) => [number, number, number];
-  readonly publicKeyFromSecretKey: (a: number, b: number) => [number, number, number];
-  readonly generateSecretKey: () => [number, number, number];
-  readonly generateSecretKey_secp256k1: () => [number, number, number];
-  readonly accountHashToBase64Key: (a: number, b: number) => [number, number, number, number];
-  readonly keyHashToBase64Key: (a: number, b: number) => [number, number, number, number];
-  readonly getTimestamp: () => any;
-  readonly encodeLowerBlake2b: (a: number, b: number) => any;
-  readonly makeDictionaryItemKey: (a: number, b: number, c: number) => [number, number, number, number];
-  readonly __wbg_set_gettransactionoptions_transaction_hash_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_gettransactionoptions_rpc_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_getspeculativeexectxnoptions_transaction_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_getspeculativeexectxnoptions_rpc_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_gettransactionoptions_transaction_hash_as_string: (a: number) => [number, number];
-  readonly __wbg_get_gettransactionoptions_rpc_address: (a: number) => [number, number];
-  readonly __wbg_get_getspeculativeexectxnoptions_transaction_as_string: (a: number) => [number, number];
-  readonly __wbg_get_getspeculativeexectxnoptions_rpc_address: (a: number) => [number, number];
-  readonly speculativeexectxnresult_block_hash: (a: number) => number;
-  readonly __wbg_get_gettransactionoptions_finalized_approvals: (a: number) => number;
-  readonly __wbg_set_gettransactionoptions_finalized_approvals: (a: number, b: number) => void;
-  readonly __wbg_get_gettransactionoptions_verbosity: (a: number) => number;
-  readonly __wbg_get_getspeculativeexectxnoptions_verbosity: (a: number) => number;
-  readonly __wbg_set_gettransactionoptions_verbosity: (a: number, b: number) => void;
-  readonly __wbg_set_getspeculativeexectxnoptions_verbosity: (a: number, b: number) => void;
-  readonly __wbg_deploystrparams_free: (a: number, b: number) => void;
-  readonly deploystrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
-  readonly deploystrparams_secret_key: (a: number) => [number, number];
-  readonly deploystrparams_set_secret_key: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_timestamp: (a: number) => [number, number];
-  readonly deploystrparams_set_timestamp: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_setDefaultTimestamp: (a: number) => void;
-  readonly deploystrparams_ttl: (a: number) => [number, number];
-  readonly deploystrparams_set_ttl: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_setDefaultTTL: (a: number) => void;
-  readonly deploystrparams_chain_name: (a: number) => [number, number];
-  readonly deploystrparams_set_chain_name: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_session_account: (a: number) => [number, number];
-  readonly deploystrparams_set_session_account: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_gas_price_tolerance: (a: number) => [number, number];
-  readonly deploystrparams_set_gas_price_tolerance: (a: number, b: number, c: number) => void;
-  readonly __wbg_blockidentifier_free: (a: number, b: number) => void;
-  readonly blockidentifier_new: (a: number) => number;
-  readonly blockidentifier_from_hash: (a: number) => number;
-  readonly blockidentifier_fromHeight: (a: bigint) => number;
-  readonly blockidentifier_toJson: (a: number) => any;
-  readonly __wbg_putdeployresult_free: (a: number, b: number) => void;
-  readonly putdeployresult_api_version: (a: number) => any;
-  readonly putdeployresult_deploy_hash: (a: number) => number;
-  readonly putdeployresult_toJson: (a: number) => any;
-  readonly sdk_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => any;
-  readonly __wbg_getpeersresult_free: (a: number, b: number) => void;
-  readonly getpeersresult_api_version: (a: number) => any;
-  readonly getpeersresult_peers: (a: number) => any;
-  readonly getpeersresult_toJson: (a: number) => any;
-  readonly sdk_get_peers: (a: number, b: number, c: number, d: number) => any;
-  readonly sdk_info_get_peers: (a: number, b: number, c: number, d: number) => any;
   readonly __wbg_accessrights_free: (a: number, b: number) => void;
   readonly accessrights_NONE: () => number;
   readonly accessrights_READ: () => number;
@@ -3317,8 +3089,112 @@ export interface InitOutput {
   readonly __wbg_set_getblockoptions_maybe_block_identifier: (a: number, b: number) => void;
   readonly __wbg_set_geterainfooptions_maybe_block_identifier: (a: number, b: number) => void;
   readonly __wbg_querycontractdictoptions_free: (a: number, b: number) => void;
-  readonly __wbg_geterainfooptions_free: (a: number, b: number) => void;
   readonly __wbg_getblockoptions_free: (a: number, b: number) => void;
+  readonly __wbg_geterainfooptions_free: (a: number, b: number) => void;
+  readonly __wbg_entityaddr_free: (a: number, b: number) => void;
+  readonly entityaddr_fromFormattedStr: (a: number, b: number) => [number, number, number];
+  readonly entityaddr_toFormattedString: (a: number) => [number, number];
+  readonly entityaddr_toHexString: (a: number) => [number, number];
+  readonly entityaddr_toJson: (a: number) => any;
+  readonly __wbg_deploy_free: (a: number, b: number) => void;
+  readonly deploy_new: (a: any) => number;
+  readonly deploy_toJson: (a: number) => any;
+  readonly deploy_withPaymentAndSession: (a: number, b: number, c: number) => [number, number, number];
+  readonly deploy_withTransfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number];
+  readonly deploy_withTTL: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly deploy_withTimestamp: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly deploy_withChainName: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly deploy_withAccount: (a: number, b: number, c: number, d: number) => number;
+  readonly deploy_withEntryPointName: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly deploy_withHash: (a: number, b: number, c: number, d: number) => number;
+  readonly deploy_withPackageHash: (a: number, b: number, c: number, d: number) => number;
+  readonly deploy_withModuleBytes: (a: number, b: number, c: number, d: number) => number;
+  readonly deploy_withSecretKey: (a: number, b: number, c: number) => number;
+  readonly deploy_withStandardPayment: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly deploy_withPayment: (a: number, b: any, c: number, d: number) => number;
+  readonly deploy_withSession: (a: number, b: any, c: number, d: number) => number;
+  readonly deploy_validateDeploySize: (a: number) => number;
+  readonly deploy_isValid: (a: number) => number;
+  readonly deploy_hash: (a: number) => number;
+  readonly deploy_hasValidHash: (a: number) => number;
+  readonly deploy_isExpired: (a: number) => number;
+  readonly deploy_sign: (a: number, b: number, c: number) => number;
+  readonly deploy_approvalsHash: (a: number) => any;
+  readonly deploy_approvals: (a: number) => any;
+  readonly deploy_isTransfer: (a: number) => number;
+  readonly deploy_isStandardPayment: (a: number, b: number) => number;
+  readonly deploy_isStoredContract: (a: number) => number;
+  readonly deploy_isStoredContractPackage: (a: number) => number;
+  readonly deploy_isModuleBytes: (a: number) => number;
+  readonly deploy_isByName: (a: number) => number;
+  readonly deploy_byName: (a: number) => [number, number];
+  readonly deploy_entryPointName: (a: number) => [number, number];
+  readonly deploy_addSignature: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly deploy_TTL: (a: number) => [number, number];
+  readonly deploy_timestamp: (a: number) => [number, number];
+  readonly deploy_chainName: (a: number) => [number, number];
+  readonly deploy_account: (a: number) => [number, number];
+  readonly deploy_paymentAmount: (a: number, b: number) => [number, number];
+  readonly deploy_args: (a: number) => any;
+  readonly deploy_addArg: (a: number, b: any, c: number, d: number) => [number, number, number];
+  readonly __wbg_addressableentityhash_free: (a: number, b: number) => void;
+  readonly addressableentityhash_new_js_alias: (a: number, b: number) => [number, number, number];
+  readonly addressableentityhash_fromFormattedStr: (a: number, b: number) => [number, number, number];
+  readonly addressableentityhash_toFormattedString: (a: number) => [number, number];
+  readonly addressableentityhash_fromUint8Array: (a: number, b: number) => number;
+  readonly __wbg_contracthash_free: (a: number, b: number) => void;
+  readonly contracthash_new_js_alias: (a: number, b: number) => [number, number, number];
+  readonly contracthash_fromFormattedStr: (a: number, b: number) => [number, number, number];
+  readonly contracthash_toFormattedString: (a: number) => [number, number];
+  readonly contracthash_fromUint8Array: (a: number, b: number) => number;
+  readonly __wbg_transaction_free: (a: number, b: number) => void;
+  readonly transaction_new: (a: any) => number;
+  readonly transaction_toJson: (a: number) => any;
+  readonly transaction_newSession: (a: number, b: number) => [number, number, number];
+  readonly transaction_newTransfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number];
+  readonly transaction_withTTL: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly transaction_withTimestamp: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly transaction_withChainName: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly transaction_withPublicKey: (a: number, b: number, c: number, d: number) => number;
+  readonly transaction_withAccountHash: (a: number, b: number, c: number, d: number) => number;
+  readonly transaction_withEntryPoint: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly transaction_withEntityHash: (a: number, b: number, c: number, d: number) => number;
+  readonly transaction_withPackageHash: (a: number, b: number, c: number, d: number) => number;
+  readonly transaction_withTransactionBytes: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly transaction_withSecretKey: (a: number, b: number, c: number) => number;
+  readonly transaction_verify: (a: number) => number;
+  readonly transaction_hash: (a: number) => number;
+  readonly transaction_expired: (a: number) => number;
+  readonly transaction_expires: (a: number) => any;
+  readonly transaction_signers: (a: number) => any;
+  readonly transaction_authorization_keys: (a: number) => any;
+  readonly transaction_sign: (a: number, b: number, c: number) => number;
+  readonly transaction_approvalsHash: (a: number) => any;
+  readonly transaction_approvals: (a: number) => any;
+  readonly transaction_is_native: (a: number) => number;
+  readonly transaction_target: (a: number) => any;
+  readonly transaction_is_standard_payment: (a: number) => number;
+  readonly transaction_session_args: (a: number) => any;
+  readonly transaction_addSignature: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly transaction_entry_point: (a: number) => [number, number];
+  readonly transaction_ttl: (a: number) => [number, number];
+  readonly transaction_timestamp: (a: number) => [number, number];
+  readonly transaction_size_estimate: (a: number) => number;
+  readonly transaction_chain_name: (a: number) => [number, number];
+  readonly transaction_initiator_addr: (a: number) => [number, number];
+  readonly transaction_pricing_mode: (a: number) => number;
+  readonly transaction_payment_amount: (a: number) => [number, bigint];
+  readonly transaction_additional_computation_factor: (a: number) => number;
+  readonly transaction_receipt: (a: number) => number;
+  readonly transaction_gas_price_tolerance: (a: number) => number;
+  readonly transaction_account_hash: (a: number) => number;
+  readonly transaction_addArg: (a: number, b: any, c: number, d: number) => [number, number, number];
+  readonly __wbg_uref_free: (a: number, b: number) => void;
+  readonly uref_new_js_alias: (a: number, b: number, c: number) => [number, number, number];
+  readonly uref_fromFormattedStr: (a: number, b: number) => [number, number, number];
+  readonly uref_fromUint8Array: (a: number, b: number, c: number) => number;
+  readonly uref_toFormattedString: (a: number) => [number, number];
+  readonly uref_toJson: (a: number) => any;
   readonly sdk_get_binary_latest_switch_block_header: (a: number, b: number, c: number) => any;
   readonly sdk_get_binary_latest_block_header: (a: number, b: number, c: number) => any;
   readonly sdk_get_binary_block_header_by_height: (a: number, b: bigint, c: number, d: number) => any;
@@ -3353,6 +3229,130 @@ export interface InitOutput {
   readonly sdk_get_binary_try_accept_transaction: (a: number, b: number, c: number, d: number) => any;
   readonly sdk_get_binary_try_speculative_execution: (a: number, b: number, c: number, d: number) => any;
   readonly sdk_get_binary_protocol_version: (a: number, b: number, c: number) => any;
+  readonly __wbg_getdeployresult_free: (a: number, b: number) => void;
+  readonly getdeployresult_api_version: (a: number) => any;
+  readonly getdeployresult_deploy: (a: number) => number;
+  readonly getdeployresult_execution_info: (a: number) => any;
+  readonly getdeployresult_toJson: (a: number) => any;
+  readonly __wbg_getdeployoptions_free: (a: number, b: number) => void;
+  readonly __wbg_get_getdeployoptions_deploy_hash_as_string: (a: number) => [number, number];
+  readonly __wbg_set_getdeployoptions_deploy_hash_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getdeployoptions_deploy_hash: (a: number) => number;
+  readonly __wbg_set_getdeployoptions_deploy_hash: (a: number, b: number) => void;
+  readonly __wbg_get_getdeployoptions_finalized_approvals: (a: number) => number;
+  readonly __wbg_set_getdeployoptions_finalized_approvals: (a: number, b: number) => void;
+  readonly __wbg_get_getdeployoptions_rpc_address: (a: number) => [number, number];
+  readonly __wbg_set_getdeployoptions_rpc_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getdeployoptions_verbosity: (a: number) => number;
+  readonly __wbg_set_getdeployoptions_verbosity: (a: number, b: number) => void;
+  readonly sdk_get_deploy_options: (a: number, b: any) => [number, number, number];
+  readonly sdk_get_deploy: (a: number, b: number) => any;
+  readonly sdk_info_get_deploy: (a: number, b: number) => any;
+  readonly __wbg_gettransactionresult_free: (a: number, b: number) => void;
+  readonly gettransactionresult_api_version: (a: number) => any;
+  readonly gettransactionresult_transaction: (a: number) => number;
+  readonly gettransactionresult_execution_info: (a: number) => any;
+  readonly gettransactionresult_toJson: (a: number) => any;
+  readonly __wbg_gettransactionoptions_free: (a: number, b: number) => void;
+  readonly __wbg_get_gettransactionoptions_transaction_hash: (a: number) => number;
+  readonly __wbg_set_gettransactionoptions_transaction_hash: (a: number, b: number) => void;
+  readonly sdk_get_transaction_options: (a: number, b: any) => [number, number, number];
+  readonly sdk_get_transaction: (a: number, b: number) => any;
+  readonly sdk_info_get_transaction: (a: number, b: number) => any;
+  readonly __wbg_speculativeexectxnresult_free: (a: number, b: number) => void;
+  readonly speculativeexectxnresult_api_version: (a: number) => any;
+  readonly speculativeexectxnresult_execution_result: (a: number) => any;
+  readonly speculativeexectxnresult_toJson: (a: number) => any;
+  readonly __wbg_getspeculativeexectxnoptions_free: (a: number, b: number) => void;
+  readonly __wbg_get_getspeculativeexectxnoptions_transaction: (a: number) => number;
+  readonly __wbg_set_getspeculativeexectxnoptions_transaction: (a: number, b: number) => void;
+  readonly sdk_get_speculative_exec_options: (a: number, b: any) => [number, number, number];
+  readonly sdk_speculative_exec: (a: number, b: number) => any;
+  readonly __wbg_speculativeexecresult_free: (a: number, b: number) => void;
+  readonly speculativeexecresult_api_version: (a: number) => any;
+  readonly speculativeexecresult_block_hash: (a: number) => number;
+  readonly speculativeexecresult_execution_result: (a: number) => any;
+  readonly speculativeexecresult_toJson: (a: number) => any;
+  readonly __wbg_getspeculativeexecdeployoptions_free: (a: number, b: number) => void;
+  readonly __wbg_get_getspeculativeexecdeployoptions_deploy_as_string: (a: number) => [number, number];
+  readonly __wbg_set_getspeculativeexecdeployoptions_deploy_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getspeculativeexecdeployoptions_deploy: (a: number) => number;
+  readonly __wbg_set_getspeculativeexecdeployoptions_deploy: (a: number, b: number) => void;
+  readonly __wbg_get_getspeculativeexecdeployoptions_rpc_address: (a: number) => [number, number];
+  readonly __wbg_set_getspeculativeexecdeployoptions_rpc_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getspeculativeexecdeployoptions_verbosity: (a: number) => number;
+  readonly __wbg_set_getspeculativeexecdeployoptions_verbosity: (a: number, b: number) => void;
+  readonly sdk_get_speculative_exec_deploy_options: (a: number, b: any) => [number, number, number];
+  readonly sdk_speculative_exec_deploy: (a: number, b: number) => any;
+  readonly sdk_sign_transaction: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbg_sdk_free: (a: number, b: number) => void;
+  readonly sdk_new: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_getRPCAddress: (a: number, b: number, c: number) => [number, number];
+  readonly sdk_setRPCAddress: (a: number, b: number, c: number) => [number, number];
+  readonly sdk_getNodeAddress: (a: number, b: number, c: number) => [number, number];
+  readonly sdk_setNodeAddress: (a: number, b: number, c: number) => [number, number];
+  readonly sdk_getVerbosity: (a: number, b: number) => number;
+  readonly sdk_setVerbosity: (a: number, b: number) => [number, number];
+  readonly hexToString: (a: number, b: number) => [number, number];
+  readonly hexToUint8Array: (a: number, b: number) => [number, number];
+  readonly uint8ArrayToBytes: (a: any) => number;
+  readonly motesToCSPR: (a: number, b: number) => [number, number, number, number];
+  readonly jsonPrettyPrint: (a: any, b: number) => [number, number, number];
+  readonly publicKeyFromSecretKey: (a: number, b: number) => [number, number, number];
+  readonly generateSecretKey: () => [number, number, number];
+  readonly generateSecretKey_secp256k1: () => [number, number, number];
+  readonly accountHashToBase64Key: (a: number, b: number) => [number, number, number, number];
+  readonly keyHashToBase64Key: (a: number, b: number) => [number, number, number, number];
+  readonly getTimestamp: () => any;
+  readonly encodeLowerBlake2b: (a: number, b: number) => any;
+  readonly makeDictionaryItemKey: (a: number, b: number, c: number) => [number, number, number, number];
+  readonly __wbg_set_gettransactionoptions_transaction_hash_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_gettransactionoptions_rpc_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_getspeculativeexectxnoptions_transaction_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_getspeculativeexectxnoptions_rpc_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_gettransactionoptions_transaction_hash_as_string: (a: number) => [number, number];
+  readonly __wbg_get_gettransactionoptions_rpc_address: (a: number) => [number, number];
+  readonly __wbg_get_getspeculativeexectxnoptions_transaction_as_string: (a: number) => [number, number];
+  readonly __wbg_get_getspeculativeexectxnoptions_rpc_address: (a: number) => [number, number];
+  readonly speculativeexectxnresult_block_hash: (a: number) => number;
+  readonly __wbg_get_gettransactionoptions_finalized_approvals: (a: number) => number;
+  readonly __wbg_set_gettransactionoptions_finalized_approvals: (a: number, b: number) => void;
+  readonly __wbg_get_gettransactionoptions_verbosity: (a: number) => number;
+  readonly __wbg_get_getspeculativeexectxnoptions_verbosity: (a: number) => number;
+  readonly __wbg_set_gettransactionoptions_verbosity: (a: number, b: number) => void;
+  readonly __wbg_set_getspeculativeexectxnoptions_verbosity: (a: number, b: number) => void;
+  readonly __wbg_deploystrparams_free: (a: number, b: number) => void;
+  readonly deploystrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
+  readonly deploystrparams_secret_key: (a: number) => [number, number];
+  readonly deploystrparams_set_secret_key: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_timestamp: (a: number) => [number, number];
+  readonly deploystrparams_set_timestamp: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_setDefaultTimestamp: (a: number) => void;
+  readonly deploystrparams_ttl: (a: number) => [number, number];
+  readonly deploystrparams_set_ttl: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_setDefaultTTL: (a: number) => void;
+  readonly deploystrparams_chain_name: (a: number) => [number, number];
+  readonly deploystrparams_set_chain_name: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_session_account: (a: number) => [number, number];
+  readonly deploystrparams_set_session_account: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_gas_price_tolerance: (a: number) => [number, number];
+  readonly deploystrparams_set_gas_price_tolerance: (a: number, b: number, c: number) => void;
+  readonly __wbg_blockidentifier_free: (a: number, b: number) => void;
+  readonly blockidentifier_new: (a: number) => number;
+  readonly blockidentifier_from_hash: (a: number) => number;
+  readonly blockidentifier_fromHeight: (a: bigint) => number;
+  readonly blockidentifier_toJson: (a: number) => any;
+  readonly __wbg_putdeployresult_free: (a: number, b: number) => void;
+  readonly putdeployresult_api_version: (a: number) => any;
+  readonly putdeployresult_deploy_hash: (a: number) => number;
+  readonly putdeployresult_toJson: (a: number) => any;
+  readonly sdk_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => any;
+  readonly __wbg_getpeersresult_free: (a: number, b: number) => void;
+  readonly getpeersresult_api_version: (a: number) => any;
+  readonly getpeersresult_peers: (a: number) => any;
+  readonly getpeersresult_toJson: (a: number) => any;
+  readonly sdk_get_peers: (a: number, b: number, c: number, d: number) => any;
+  readonly sdk_info_get_peers: (a: number, b: number, c: number, d: number) => any;
   readonly __wbg_sessionstrparams_free: (a: number, b: number) => void;
   readonly sessionstrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => number;
   readonly sessionstrparams_session_hash: (a: number) => [number, number];
@@ -3378,7 +3378,6 @@ export interface InitOutput {
   readonly sessionstrparams_is_session_transfer: (a: number) => number;
   readonly sessionstrparams_set_is_session_transfer: (a: number, b: number) => void;
   readonly sdk_speculative_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => any;
-  readonly sdk_speculative_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => any;
   readonly __wbg_getaccountresult_free: (a: number, b: number) => void;
   readonly getaccountresult_api_version: (a: number) => any;
   readonly getaccountresult_account: (a: number) => any;
@@ -3434,8 +3433,6 @@ export interface InitOutput {
   readonly sdk_get_era_summary_options: (a: number, b: any) => [number, number, number];
   readonly sdk_get_era_summary: (a: number, b: number) => any;
   readonly sdk_chain_get_era_summary: (a: number, b: number) => any;
-  readonly sdk_put_transaction: (a: number, b: number, c: number, d: number, e: number) => any;
-  readonly sdk_account_put_transaction: (a: number, b: number, c: number, d: number, e: number) => any;
   readonly __wbg_querybalanceresult_free: (a: number, b: number) => void;
   readonly querybalanceresult_api_version: (a: number) => any;
   readonly querybalanceresult_balance: (a: number) => any;
@@ -3483,6 +3480,7 @@ export interface InitOutput {
   readonly sdk_query_global_state_options: (a: number, b: any) => [number, number, number];
   readonly sdk_query_global_state: (a: number, b: number) => any;
   readonly sdk_sign_deploy: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number) => any;
   readonly __wbg_get_getblocktransfersoptions_maybe_block_identifier: (a: number) => number;
   readonly __wbg_get_getentityoptions_maybe_block_identifier: (a: number) => number;
   readonly __wbg_get_geterasummaryoptions_maybe_block_identifier: (a: number) => number;
@@ -3509,201 +3507,6 @@ export interface InitOutput {
   readonly __wbg_set_getblocktransfersoptions_maybe_block_identifier: (a: number, b: number) => void;
   readonly __wbg_set_getentityoptions_maybe_block_identifier: (a: number, b: number) => void;
   readonly __wbg_set_geterasummaryoptions_maybe_block_identifier: (a: number, b: number) => void;
-  readonly __wbg_argssimple_free: (a: number, b: number) => void;
-  readonly __wbg_paymentstrparams_free: (a: number, b: number) => void;
-  readonly paymentstrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => number;
-  readonly paymentstrparams_payment_amount: (a: number) => [number, number];
-  readonly paymentstrparams_set_payment_amount: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_hash: (a: number) => [number, number];
-  readonly paymentstrparams_set_payment_hash: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_name: (a: number) => [number, number];
-  readonly paymentstrparams_set_payment_name: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_package_hash: (a: number) => [number, number];
-  readonly paymentstrparams_set_payment_package_hash: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_package_name: (a: number) => [number, number];
-  readonly paymentstrparams_set_payment_package_name: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_path: (a: number) => [number, number];
-  readonly paymentstrparams_set_payment_path: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_args_simple: (a: number) => any;
-  readonly paymentstrparams_set_payment_args_simple: (a: number, b: any) => void;
-  readonly paymentstrparams_payment_args_json: (a: number) => [number, number];
-  readonly paymentstrparams_set_payment_args_json: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_version: (a: number) => [number, number];
-  readonly paymentstrparams_set_payment_version: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_entry_point: (a: number) => [number, number];
-  readonly paymentstrparams_set_payment_entry_point: (a: number, b: number, c: number) => void;
-  readonly __wbg_globalstateidentifier_free: (a: number, b: number) => void;
-  readonly globalstateidentifier_new: (a: number) => number;
-  readonly globalstateidentifier_fromBlockHash: (a: number) => number;
-  readonly globalstateidentifier_fromBlockHeight: (a: bigint) => number;
-  readonly globalstateidentifier_fromStateRootHash: (a: number) => number;
-  readonly globalstateidentifier_toJson: (a: number) => any;
-  readonly __wbg_peerentry_free: (a: number, b: number) => void;
-  readonly peerentry_node_id: (a: number) => [number, number];
-  readonly peerentry_address: (a: number) => [number, number];
-  readonly __wbg_getnodestatusresult_free: (a: number, b: number) => void;
-  readonly getnodestatusresult_api_version: (a: number) => any;
-  readonly getnodestatusresult_chainspec_name: (a: number) => [number, number];
-  readonly getnodestatusresult_starting_state_root_hash: (a: number) => number;
-  readonly getnodestatusresult_peers: (a: number) => any;
-  readonly getnodestatusresult_last_added_block_info: (a: number) => any;
-  readonly getnodestatusresult_our_public_signing_key: (a: number) => number;
-  readonly getnodestatusresult_round_length: (a: number) => any;
-  readonly getnodestatusresult_next_upgrade: (a: number) => any;
-  readonly getnodestatusresult_build_version: (a: number) => [number, number];
-  readonly getnodestatusresult_uptime: (a: number) => any;
-  readonly getnodestatusresult_reactor_state: (a: number) => any;
-  readonly getnodestatusresult_last_progress: (a: number) => any;
-  readonly getnodestatusresult_available_block_range: (a: number) => any;
-  readonly getnodestatusresult_block_sync: (a: number) => any;
-  readonly getnodestatusresult_toJson: (a: number) => any;
-  readonly sdk_get_node_status: (a: number, b: number, c: number, d: number) => any;
-  readonly sdk_info_get_status: (a: number, b: number, c: number, d: number) => any;
-  readonly __wbg_listrpcsresult_free: (a: number, b: number) => void;
-  readonly listrpcsresult_api_version: (a: number) => any;
-  readonly listrpcsresult_name: (a: number) => [number, number];
-  readonly listrpcsresult_schema: (a: number) => any;
-  readonly listrpcsresult_toJson: (a: number) => any;
-  readonly sdk_list_rpcs: (a: number, b: number, c: number, d: number) => any;
-  readonly sdk_speculative_transaction: (a: number, b: number, c: number, d: number, e: number, f: number) => any;
-  readonly sdk_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => any;
-  readonly __wbg_casperwallet_free: (a: number, b: number) => void;
-  readonly casperwallet_new: () => number;
-  readonly casperwallet_signDeploy: (a: number, b: number, c: number, d: number) => any;
-  readonly casperwallet_signTransaction: (a: number, b: number, c: number, d: number) => any;
-  readonly casperwallet_signDeployHash: (a: number, b: number, c: number, d: number, e: number) => any;
-  readonly casperwallet_signTransactionHash: (a: number, b: number, c: number, d: number, e: number) => any;
-  readonly casperwallet_signMessage: (a: number, b: number, c: number, d: number, e: number) => any;
-  readonly casperwallet_connect: (a: number) => any;
-  readonly casperwallet_disconnect: (a: number) => any;
-  readonly casperwallet_isConnected: (a: number) => any;
-  readonly casperwallet_getVersion: (a: number) => any;
-  readonly casperwallet_getActivePublicKey: (a: number) => any;
-  readonly casperwallet_switchAccount: (a: number) => any;
-  readonly __wbg_hashaddr_free: (a: number, b: number) => void;
-  readonly hashaddr_new: (a: number, b: number) => [number, number, number];
-  readonly hashaddr_toBytes: (a: number) => [number, number];
-  readonly hashaddr_toHexString: (a: number) => [number, number];
-  readonly __wbg_bytes_free: (a: number, b: number) => void;
-  readonly bytes_new: () => number;
-  readonly bytes_fromUint8Array: (a: any) => number;
-  readonly __wbg_dictionaryitemstrparams_free: (a: number, b: number) => void;
-  readonly dictionaryitemstrparams_new: () => number;
-  readonly dictionaryitemstrparams_setAccountNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
-  readonly dictionaryitemstrparams_setContractNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
-  readonly dictionaryitemstrparams_setEntityNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
-  readonly dictionaryitemstrparams_setUref: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly dictionaryitemstrparams_setDictionary: (a: number, b: number, c: number) => void;
-  readonly dictionaryitemstrparams_toJson: (a: number) => any;
-  readonly __wbg_entityidentifier_free: (a: number, b: number) => void;
-  readonly entityidentifier_fromFormattedStr: (a: number, b: number) => [number, number, number];
-  readonly entityidentifier_fromPublicKey: (a: number) => number;
-  readonly entityidentifier_fromAccountHash: (a: number) => number;
-  readonly entityidentifier_fromEntityAddr: (a: number) => number;
-  readonly entityidentifier_toJson: (a: number) => any;
-  readonly __wbg_path_free: (a: number, b: number) => void;
-  readonly path_new: (a: any) => number;
-  readonly path_fromArray: (a: any) => number;
-  readonly path_toJson: (a: number) => any;
-  readonly path_toString: (a: number) => [number, number];
-  readonly path_is_empty: (a: number) => number;
-  readonly __wbg_signatureresponse_free: (a: number, b: number) => void;
-  readonly signatureresponse_is_cancelled: (a: number) => number;
-  readonly signatureresponse_get_signature_hex: (a: number) => [number, number];
-  readonly signatureresponse_get_signature: (a: number) => [number, number];
-  readonly sdk_watchDeploy: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_watchTransaction: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_waitDeploy: (a: number, b: number, c: number, d: number, e: number, f: number) => any;
-  readonly sdk_waitTransaction: (a: number, b: number, c: number, d: number, e: number, f: number) => any;
-  readonly __wbg_watcher_free: (a: number, b: number) => void;
-  readonly watcher_new: (a: number, b: number, c: number, d: bigint) => number;
-  readonly watcher_subscribe: (a: number, b: number, c: number) => [number, number];
-  readonly watcher_unsubscribe: (a: number, b: number, c: number) => void;
-  readonly watcher_start: (a: number) => any;
-  readonly watcher_stop: (a: number) => void;
-  readonly __wbg_subscription_free: (a: number, b: number) => void;
-  readonly __wbg_get_subscription_eventHandlerFn: (a: number) => any;
-  readonly __wbg_set_subscription_eventHandlerFn: (a: number, b: any) => void;
-  readonly subscription_new: (a: number, b: number, c: any) => number;
-  readonly __wbg_failure_free: (a: number, b: number) => void;
-  readonly __wbg_get_failure_cost: (a: number) => [number, number];
-  readonly __wbg_set_failure_cost: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_failure_error_message: (a: number) => [number, number];
-  readonly __wbg_set_failure_error_message: (a: number, b: number, c: number) => void;
-  readonly __wbg_version2_free: (a: number, b: number) => void;
-  readonly __wbg_get_version2_error_message: (a: number) => [number, number];
-  readonly __wbg_set_version2_error_message: (a: number, b: number, c: number) => void;
-  readonly __wbg_payment_free: (a: number, b: number) => void;
-  readonly __wbg_executionresult_free: (a: number, b: number) => void;
-  readonly __wbg_get_executionresult_Success: (a: number) => number;
-  readonly __wbg_set_executionresult_Success: (a: number, b: number) => void;
-  readonly __wbg_get_executionresult_Failure: (a: number) => number;
-  readonly __wbg_set_executionresult_Failure: (a: number, b: number) => void;
-  readonly __wbg_hashstring_free: (a: number, b: number) => void;
-  readonly hashstring_Deploy: (a: number) => [number, number];
-  readonly hashstring_toString: (a: number) => [number, number];
-  readonly __wbg_publickeystring_free: (a: number, b: number) => void;
-  readonly __wbg_message_free: (a: number, b: number) => void;
-  readonly __wbg_messages_free: (a: number, b: number) => void;
-  readonly __wbg_set_messages_entity_hash: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_messages_message: (a: number) => number;
-  readonly __wbg_set_messages_message: (a: number, b: number) => void;
-  readonly __wbg_get_messages_topic_name: (a: number) => [number, number];
-  readonly __wbg_set_messages_topic_name: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_messages_topic_name_hash: (a: number) => [number, number];
-  readonly __wbg_set_messages_topic_name_hash: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_messages_topic_index: (a: number) => number;
-  readonly __wbg_set_messages_topic_index: (a: number, b: number) => void;
-  readonly __wbg_get_messages_block_index: (a: number) => bigint;
-  readonly __wbg_set_messages_block_index: (a: number, b: bigint) => void;
-  readonly __wbg_transactionprocessed_free: (a: number, b: number) => void;
-  readonly __wbg_get_transactionprocessed_hash: (a: number) => number;
-  readonly __wbg_set_transactionprocessed_hash: (a: number, b: number) => void;
-  readonly __wbg_get_transactionprocessed_initiator_addr: (a: number) => number;
-  readonly __wbg_set_transactionprocessed_initiator_addr: (a: number, b: number) => void;
-  readonly __wbg_get_transactionprocessed_timestamp: (a: number) => [number, number];
-  readonly __wbg_set_transactionprocessed_timestamp: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_transactionprocessed_ttl: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_transactionprocessed_execution_result: (a: number) => number;
-  readonly __wbg_set_transactionprocessed_execution_result: (a: number, b: number) => void;
-  readonly __wbg_get_transactionprocessed_messages: (a: number) => [number, number];
-  readonly __wbg_set_transactionprocessed_messages: (a: number, b: number, c: number) => void;
-  readonly __wbg_body_free: (a: number, b: number) => void;
-  readonly __wbg_get_body_transaction_processed: (a: number) => number;
-  readonly __wbg_set_body_transaction_processed: (a: number, b: number) => void;
-  readonly body_get_deploy_processed: (a: number) => number;
-  readonly __wbg_eventparseresult_free: (a: number, b: number) => void;
-  readonly __wbg_get_eventparseresult_err: (a: number) => [number, number];
-  readonly __wbg_set_eventparseresult_err: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_eventparseresult_body: (a: number) => number;
-  readonly __wbg_set_eventparseresult_body: (a: number, b: number) => void;
-  readonly sdk_call_entrypoint_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => any;
-  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number) => any;
-  readonly __wbg_set_subscription_targetHash: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_version2_limit: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_payment_source: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_hashstring_hash: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_publickeystring_PublicKey: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_message_String: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_version2_consumed: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_version2_cost: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_transactionprocessed_block_hash: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_subscription_targetHash: (a: number) => [number, number];
-  readonly __wbg_get_version2_limit: (a: number) => [number, number];
-  readonly __wbg_get_payment_source: (a: number) => [number, number];
-  readonly __wbg_get_hashstring_hash: (a: number) => [number, number];
-  readonly __wbg_get_publickeystring_PublicKey: (a: number) => [number, number];
-  readonly __wbg_get_message_String: (a: number) => [number, number];
-  readonly __wbg_get_messages_entity_hash: (a: number) => [number, number];
-  readonly __wbg_get_version2_cost: (a: number) => [number, number];
-  readonly __wbg_get_version2_consumed: (a: number) => [number, number];
-  readonly __wbg_get_transactionprocessed_ttl: (a: number) => [number, number];
-  readonly __wbg_get_transactionprocessed_block_hash: (a: number) => [number, number];
-  readonly __wbg_set_version2_initiator: (a: number, b: number) => void;
-  readonly __wbg_get_version2_initiator: (a: number) => number;
-  readonly hashstring_Version1: (a: number) => [number, number];
-  readonly body_get_transaction_processed: (a: number) => number;
-  readonly entityidentifier_new_js_alias: (a: number, b: number) => [number, number, number];
   readonly __wbg_dictionaryaddr_free: (a: number, b: number) => void;
   readonly dictionaryaddr_new: (a: number, b: number) => [number, number, number];
   readonly __wbg_transferaddr_free: (a: number, b: number) => void;
@@ -3871,8 +3674,6 @@ export interface InitOutput {
   readonly sdk_get_state_root_hash_options: (a: number, b: any) => [number, number, number];
   readonly sdk_get_state_root_hash: (a: number, b: number) => any;
   readonly sdk_chain_get_state_root_hash: (a: number, b: number) => any;
-  readonly sdk_put_deploy: (a: number, b: number, c: number, d: number, e: number) => any;
-  readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => any;
   readonly __wbg_querybalancedetailsresult_free: (a: number, b: number) => void;
   readonly querybalancedetailsresult_api_version: (a: number) => any;
   readonly querybalancedetailsresult_total_balance: (a: number) => any;
@@ -3899,7 +3700,7 @@ export interface InitOutput {
   readonly __wbg_set_querybalancedetailsoptions_verbosity: (a: number, b: number) => void;
   readonly sdk_query_balance_details_options: (a: number, b: any) => [number, number, number];
   readonly sdk_query_balance_details: (a: number, b: number) => any;
-  readonly sdk_speculative_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => any;
+  readonly sdk_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => any;
   readonly sdk_make_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => [number, number, number];
   readonly sdk_make_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => [number, number, number];
   readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number) => any;
@@ -3928,6 +3729,205 @@ export interface InitOutput {
   readonly getstateroothashresult_toString: (a: number) => [number, number];
   readonly deployhash_fromDigest: (a: number) => [number, number, number];
   readonly __wbg_set_querycontractkeyoptions_maybe_block_identifier: (a: number, b: number) => void;
+  readonly __wbg_argssimple_free: (a: number, b: number) => void;
+  readonly __wbg_paymentstrparams_free: (a: number, b: number) => void;
+  readonly paymentstrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => number;
+  readonly paymentstrparams_payment_amount: (a: number) => [number, number];
+  readonly paymentstrparams_set_payment_amount: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_hash: (a: number) => [number, number];
+  readonly paymentstrparams_set_payment_hash: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_name: (a: number) => [number, number];
+  readonly paymentstrparams_set_payment_name: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_package_hash: (a: number) => [number, number];
+  readonly paymentstrparams_set_payment_package_hash: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_package_name: (a: number) => [number, number];
+  readonly paymentstrparams_set_payment_package_name: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_path: (a: number) => [number, number];
+  readonly paymentstrparams_set_payment_path: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_args_simple: (a: number) => any;
+  readonly paymentstrparams_set_payment_args_simple: (a: number, b: any) => void;
+  readonly paymentstrparams_payment_args_json: (a: number) => [number, number];
+  readonly paymentstrparams_set_payment_args_json: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_version: (a: number) => [number, number];
+  readonly paymentstrparams_set_payment_version: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_entry_point: (a: number) => [number, number];
+  readonly paymentstrparams_set_payment_entry_point: (a: number, b: number, c: number) => void;
+  readonly __wbg_globalstateidentifier_free: (a: number, b: number) => void;
+  readonly globalstateidentifier_new: (a: number) => number;
+  readonly globalstateidentifier_fromBlockHash: (a: number) => number;
+  readonly globalstateidentifier_fromBlockHeight: (a: bigint) => number;
+  readonly globalstateidentifier_fromStateRootHash: (a: number) => number;
+  readonly globalstateidentifier_toJson: (a: number) => any;
+  readonly __wbg_peerentry_free: (a: number, b: number) => void;
+  readonly peerentry_node_id: (a: number) => [number, number];
+  readonly peerentry_address: (a: number) => [number, number];
+  readonly sdk_speculative_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => any;
+  readonly __wbg_getnodestatusresult_free: (a: number, b: number) => void;
+  readonly getnodestatusresult_api_version: (a: number) => any;
+  readonly getnodestatusresult_chainspec_name: (a: number) => [number, number];
+  readonly getnodestatusresult_starting_state_root_hash: (a: number) => number;
+  readonly getnodestatusresult_peers: (a: number) => any;
+  readonly getnodestatusresult_last_added_block_info: (a: number) => any;
+  readonly getnodestatusresult_our_public_signing_key: (a: number) => number;
+  readonly getnodestatusresult_round_length: (a: number) => any;
+  readonly getnodestatusresult_next_upgrade: (a: number) => any;
+  readonly getnodestatusresult_build_version: (a: number) => [number, number];
+  readonly getnodestatusresult_uptime: (a: number) => any;
+  readonly getnodestatusresult_reactor_state: (a: number) => any;
+  readonly getnodestatusresult_last_progress: (a: number) => any;
+  readonly getnodestatusresult_available_block_range: (a: number) => any;
+  readonly getnodestatusresult_block_sync: (a: number) => any;
+  readonly getnodestatusresult_toJson: (a: number) => any;
+  readonly sdk_get_node_status: (a: number, b: number, c: number, d: number) => any;
+  readonly sdk_info_get_status: (a: number, b: number, c: number, d: number) => any;
+  readonly __wbg_listrpcsresult_free: (a: number, b: number) => void;
+  readonly listrpcsresult_api_version: (a: number) => any;
+  readonly listrpcsresult_name: (a: number) => [number, number];
+  readonly listrpcsresult_schema: (a: number) => any;
+  readonly listrpcsresult_toJson: (a: number) => any;
+  readonly sdk_list_rpcs: (a: number, b: number, c: number, d: number) => any;
+  readonly sdk_put_transaction: (a: number, b: number, c: number, d: number, e: number) => any;
+  readonly sdk_account_put_transaction: (a: number, b: number, c: number, d: number, e: number) => any;
+  readonly sdk_call_entrypoint_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => any;
+  readonly __wbg_casperwallet_free: (a: number, b: number) => void;
+  readonly casperwallet_new: () => number;
+  readonly casperwallet_signDeploy: (a: number, b: number, c: number, d: number) => any;
+  readonly casperwallet_signTransaction: (a: number, b: number, c: number, d: number) => any;
+  readonly casperwallet_signDeployHash: (a: number, b: number, c: number, d: number, e: number) => any;
+  readonly casperwallet_signTransactionHash: (a: number, b: number, c: number, d: number, e: number) => any;
+  readonly casperwallet_signMessage: (a: number, b: number, c: number, d: number, e: number) => any;
+  readonly casperwallet_connect: (a: number) => any;
+  readonly casperwallet_disconnect: (a: number) => any;
+  readonly casperwallet_isConnected: (a: number) => any;
+  readonly casperwallet_getVersion: (a: number) => any;
+  readonly casperwallet_getActivePublicKey: (a: number) => any;
+  readonly casperwallet_switchAccount: (a: number) => any;
+  readonly __wbg_hashaddr_free: (a: number, b: number) => void;
+  readonly hashaddr_new: (a: number, b: number) => [number, number, number];
+  readonly hashaddr_toBytes: (a: number) => [number, number];
+  readonly hashaddr_toHexString: (a: number) => [number, number];
+  readonly __wbg_bytes_free: (a: number, b: number) => void;
+  readonly bytes_new: () => number;
+  readonly bytes_fromUint8Array: (a: any) => number;
+  readonly __wbg_dictionaryitemstrparams_free: (a: number, b: number) => void;
+  readonly dictionaryitemstrparams_new: () => number;
+  readonly dictionaryitemstrparams_setAccountNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly dictionaryitemstrparams_setContractNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly dictionaryitemstrparams_setEntityNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly dictionaryitemstrparams_setUref: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly dictionaryitemstrparams_setDictionary: (a: number, b: number, c: number) => void;
+  readonly dictionaryitemstrparams_toJson: (a: number) => any;
+  readonly __wbg_entityidentifier_free: (a: number, b: number) => void;
+  readonly entityidentifier_fromFormattedStr: (a: number, b: number) => [number, number, number];
+  readonly entityidentifier_fromPublicKey: (a: number) => number;
+  readonly entityidentifier_fromAccountHash: (a: number) => number;
+  readonly entityidentifier_fromEntityAddr: (a: number) => number;
+  readonly entityidentifier_toJson: (a: number) => any;
+  readonly __wbg_path_free: (a: number, b: number) => void;
+  readonly path_new: (a: any) => number;
+  readonly path_fromArray: (a: any) => number;
+  readonly path_toJson: (a: number) => any;
+  readonly path_toString: (a: number) => [number, number];
+  readonly path_is_empty: (a: number) => number;
+  readonly __wbg_signatureresponse_free: (a: number, b: number) => void;
+  readonly signatureresponse_is_cancelled: (a: number) => number;
+  readonly signatureresponse_get_signature_hex: (a: number) => [number, number];
+  readonly signatureresponse_get_signature: (a: number) => [number, number];
+  readonly sdk_put_deploy: (a: number, b: number, c: number, d: number, e: number) => any;
+  readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => any;
+  readonly sdk_speculative_transaction: (a: number, b: number, c: number, d: number, e: number, f: number) => any;
+  readonly sdk_speculative_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => any;
+  readonly sdk_watchDeploy: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_watchTransaction: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_waitDeploy: (a: number, b: number, c: number, d: number, e: number, f: number) => any;
+  readonly sdk_waitTransaction: (a: number, b: number, c: number, d: number, e: number, f: number) => any;
+  readonly __wbg_watcher_free: (a: number, b: number) => void;
+  readonly watcher_new: (a: number, b: number, c: number, d: bigint) => number;
+  readonly watcher_subscribe: (a: number, b: number, c: number) => [number, number];
+  readonly watcher_unsubscribe: (a: number, b: number, c: number) => void;
+  readonly watcher_start: (a: number) => any;
+  readonly watcher_stop: (a: number) => void;
+  readonly __wbg_subscription_free: (a: number, b: number) => void;
+  readonly __wbg_get_subscription_eventHandlerFn: (a: number) => any;
+  readonly __wbg_set_subscription_eventHandlerFn: (a: number, b: any) => void;
+  readonly subscription_new: (a: number, b: number, c: any) => number;
+  readonly __wbg_failure_free: (a: number, b: number) => void;
+  readonly __wbg_get_failure_cost: (a: number) => [number, number];
+  readonly __wbg_set_failure_cost: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_failure_error_message: (a: number) => [number, number];
+  readonly __wbg_set_failure_error_message: (a: number, b: number, c: number) => void;
+  readonly __wbg_version2_free: (a: number, b: number) => void;
+  readonly __wbg_get_version2_error_message: (a: number) => [number, number];
+  readonly __wbg_set_version2_error_message: (a: number, b: number, c: number) => void;
+  readonly __wbg_payment_free: (a: number, b: number) => void;
+  readonly __wbg_executionresult_free: (a: number, b: number) => void;
+  readonly __wbg_get_executionresult_Success: (a: number) => number;
+  readonly __wbg_set_executionresult_Success: (a: number, b: number) => void;
+  readonly __wbg_get_executionresult_Failure: (a: number) => number;
+  readonly __wbg_set_executionresult_Failure: (a: number, b: number) => void;
+  readonly __wbg_hashstring_free: (a: number, b: number) => void;
+  readonly hashstring_Deploy: (a: number) => [number, number];
+  readonly hashstring_toString: (a: number) => [number, number];
+  readonly __wbg_publickeystring_free: (a: number, b: number) => void;
+  readonly __wbg_message_free: (a: number, b: number) => void;
+  readonly __wbg_messages_free: (a: number, b: number) => void;
+  readonly __wbg_set_messages_entity_hash: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_messages_message: (a: number) => number;
+  readonly __wbg_set_messages_message: (a: number, b: number) => void;
+  readonly __wbg_get_messages_topic_name: (a: number) => [number, number];
+  readonly __wbg_set_messages_topic_name: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_messages_topic_name_hash: (a: number) => [number, number];
+  readonly __wbg_set_messages_topic_name_hash: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_messages_topic_index: (a: number) => number;
+  readonly __wbg_set_messages_topic_index: (a: number, b: number) => void;
+  readonly __wbg_get_messages_block_index: (a: number) => bigint;
+  readonly __wbg_set_messages_block_index: (a: number, b: bigint) => void;
+  readonly __wbg_transactionprocessed_free: (a: number, b: number) => void;
+  readonly __wbg_get_transactionprocessed_hash: (a: number) => number;
+  readonly __wbg_set_transactionprocessed_hash: (a: number, b: number) => void;
+  readonly __wbg_get_transactionprocessed_initiator_addr: (a: number) => number;
+  readonly __wbg_set_transactionprocessed_initiator_addr: (a: number, b: number) => void;
+  readonly __wbg_get_transactionprocessed_timestamp: (a: number) => [number, number];
+  readonly __wbg_set_transactionprocessed_timestamp: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_transactionprocessed_ttl: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_transactionprocessed_execution_result: (a: number) => number;
+  readonly __wbg_set_transactionprocessed_execution_result: (a: number, b: number) => void;
+  readonly __wbg_get_transactionprocessed_messages: (a: number) => [number, number];
+  readonly __wbg_set_transactionprocessed_messages: (a: number, b: number, c: number) => void;
+  readonly __wbg_body_free: (a: number, b: number) => void;
+  readonly __wbg_get_body_transaction_processed: (a: number) => number;
+  readonly __wbg_set_body_transaction_processed: (a: number, b: number) => void;
+  readonly body_get_deploy_processed: (a: number) => number;
+  readonly __wbg_eventparseresult_free: (a: number, b: number) => void;
+  readonly __wbg_get_eventparseresult_err: (a: number) => [number, number];
+  readonly __wbg_set_eventparseresult_err: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_eventparseresult_body: (a: number) => number;
+  readonly __wbg_set_eventparseresult_body: (a: number, b: number) => void;
+  readonly __wbg_set_subscription_targetHash: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_version2_limit: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_payment_source: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_hashstring_hash: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_publickeystring_PublicKey: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_message_String: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_version2_consumed: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_version2_cost: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_transactionprocessed_block_hash: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_subscription_targetHash: (a: number) => [number, number];
+  readonly __wbg_get_version2_limit: (a: number) => [number, number];
+  readonly __wbg_get_payment_source: (a: number) => [number, number];
+  readonly __wbg_get_hashstring_hash: (a: number) => [number, number];
+  readonly __wbg_get_publickeystring_PublicKey: (a: number) => [number, number];
+  readonly __wbg_get_message_String: (a: number) => [number, number];
+  readonly __wbg_get_messages_entity_hash: (a: number) => [number, number];
+  readonly __wbg_get_version2_cost: (a: number) => [number, number];
+  readonly __wbg_get_version2_consumed: (a: number) => [number, number];
+  readonly __wbg_get_transactionprocessed_ttl: (a: number) => [number, number];
+  readonly __wbg_get_transactionprocessed_block_hash: (a: number) => [number, number];
+  readonly __wbg_set_version2_initiator: (a: number, b: number) => void;
+  readonly __wbg_get_version2_initiator: (a: number) => number;
+  readonly hashstring_Version1: (a: number) => [number, number];
+  readonly body_get_transaction_processed: (a: number) => number;
+  readonly entityidentifier_new_js_alias: (a: number, b: number) => [number, number, number];
   readonly __wbg_intounderlyingsink_free: (a: number, b: number) => void;
   readonly intounderlyingsink_write: (a: number, b: any) => any;
   readonly intounderlyingsink_close: (a: number) => any;
@@ -3950,10 +3950,10 @@ export interface InitOutput {
   readonly __externref_table_dealloc: (a: number) => void;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __externref_drop_slice: (a: number, b: number) => void;
-  readonly closure979_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure980_externref_shim: (a: number, b: number, c: any) => void;
   readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h7f2b93f0eeda7682: (a: number, b: number) => void;
-  readonly closure1193_externref_shim: (a: number, b: number, c: any) => void;
-  readonly closure1767_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly closure1194_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure1768_externref_shim: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_start: () => void;
 }
 

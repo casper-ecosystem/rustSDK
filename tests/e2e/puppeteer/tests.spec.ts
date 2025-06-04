@@ -1135,9 +1135,8 @@ describe('Angular App Tests', () => {
       });
       expect(call).toBeUndefined();
       await submit();
-      await delay(7000);
       call = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
+        return document.querySelector('[e2e-id="error"]')?.textContent;
       });
       console.log(call);
       await test.page.waitForSelector('[e2e-id="result"]');
@@ -1145,7 +1144,7 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(call).toBeDefined();
-    }, 40000);
+    });
   });
 
   describe('Contract call entry point transaction', () => {
