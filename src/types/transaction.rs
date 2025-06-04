@@ -643,7 +643,7 @@ impl Transaction {
         serde_json::to_string(&self.0).map_err(SdkError::from)
     }
 
-    pub fn from_json_string(json_str: &str) -> Result<Deploy, SdkError> {
+    pub fn from_json_string(json_str: &str) -> Result<Self, SdkError> {
         serde_json::from_str(json_str).map_err(Into::into)
     }
 

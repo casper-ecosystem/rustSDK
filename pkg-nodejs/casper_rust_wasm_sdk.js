@@ -7536,6 +7536,47 @@ class SDK {
         return ret;
     }
     /**
+     * JS function for speculative transfer.
+     *
+     * # Arguments
+     *
+     * * `amount` - The amount to transfer.
+     * * `target_account` - The target account.
+     * * `transfer_id` - An optional transfer ID (defaults to a random number).
+     * * `deploy_params` - The deployment parameters.
+     * * `payment_params` - The payment parameters.
+     * * `verbosity` - The verbosity level for logging (optional).
+     * * `rpc_address` - The address of the node to connect to (optional).
+     *
+     * # Returns
+     *
+     * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+     * @param {string} amount
+     * @param {string} target_account
+     * @param {string | null | undefined} transfer_id
+     * @param {DeployStrParams} deploy_params
+     * @param {PaymentStrParams} payment_params
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<SpeculativeExecResult>}
+     */
+    speculative_transfer(amount, target_account, transfer_id, deploy_params, payment_params, verbosity, rpc_address) {
+        const ptr0 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        var ptr2 = isLikeNone(transfer_id) ? 0 : passStringToWasm0(transfer_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len2 = WASM_VECTOR_LEN;
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr3 = deploy_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr4 = payment_params.__destroy_into_raw();
+        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len5 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_speculative_transfer(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, ptr4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
+        return ret;
+    }
+    /**
      * @param {any} options
      * @returns {getAccountOptions}
      */
@@ -8031,6 +8072,50 @@ class SDK {
         return ret;
     }
     /**
+     * Puts a deploy using the provided options.
+     *
+     * # Arguments
+     *
+     * * `deploy` - The `Deploy` object to be sent.
+     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the deploy process.
+     * @param {Deploy} deploy
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<PutDeployResult>}
+     */
+    put_deploy(deploy, verbosity, rpc_address) {
+        _assertClass(deploy, Deploy);
+        var ptr0 = deploy.__destroy_into_raw();
+        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_put_deploy(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
+        return ret;
+    }
+    /**
+     * JavaScript Alias for `put_deploy`.
+     * @param {Deploy} deploy
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<PutDeployResult>}
+     */
+    account_put_deploy(deploy, verbosity, rpc_address) {
+        _assertClass(deploy, Deploy);
+        var ptr0 = deploy.__destroy_into_raw();
+        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_account_put_deploy(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
+        return ret;
+    }
+    /**
      * Parses query balance options from a JsValue.
      *
      * # Arguments
@@ -8292,47 +8377,6 @@ class SDK {
         return ret;
     }
     /**
-     * JS function for speculative transfer.
-     *
-     * # Arguments
-     *
-     * * `amount` - The amount to transfer.
-     * * `target_account` - The target account.
-     * * `transfer_id` - An optional transfer ID (defaults to a random number).
-     * * `deploy_params` - The deployment parameters.
-     * * `payment_params` - The payment parameters.
-     * * `verbosity` - The verbosity level for logging (optional).
-     * * `rpc_address` - The address of the node to connect to (optional).
-     *
-     * # Returns
-     *
-     * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-     * @param {string} amount
-     * @param {string} target_account
-     * @param {string | null | undefined} transfer_id
-     * @param {DeployStrParams} deploy_params
-     * @param {PaymentStrParams} payment_params
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<SpeculativeExecResult>}
-     */
-    speculative_transfer(amount, target_account, transfer_id, deploy_params, payment_params, verbosity, rpc_address) {
-        const ptr0 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        var ptr2 = isLikeNone(transfer_id) ? 0 : passStringToWasm0(transfer_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len2 = WASM_VECTOR_LEN;
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr3 = deploy_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr4 = payment_params.__destroy_into_raw();
-        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len5 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_speculative_transfer(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, ptr4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
-        return ret;
-    }
-    /**
      * Retrieves node status information using the provided options.
      *
      * # Arguments
@@ -8470,50 +8514,6 @@ class SDK {
         var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len3 = WASM_VECTOR_LEN;
         const ret = wasm.sdk_call_entrypoint_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
-        return ret;
-    }
-    /**
-     * Puts a deploy using the provided options.
-     *
-     * # Arguments
-     *
-     * * `deploy` - The `Deploy` object to be sent.
-     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the deploy process.
-     * @param {Deploy} deploy
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<PutDeployResult>}
-     */
-    put_deploy(deploy, verbosity, rpc_address) {
-        _assertClass(deploy, Deploy);
-        var ptr0 = deploy.__destroy_into_raw();
-        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_put_deploy(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
-        return ret;
-    }
-    /**
-     * JavaScript Alias for `put_deploy`.
-     * @param {Deploy} deploy
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<PutDeployResult>}
-     */
-    account_put_deploy(deploy, verbosity, rpc_address) {
-        _assertClass(deploy, Deploy);
-        var ptr0 = deploy.__destroy_into_raw();
-        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_account_put_deploy(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
         return ret;
     }
     /**
@@ -14542,22 +14542,22 @@ module.exports.__wbindgen_cb_drop = function(arg0) {
     return ret;
 };
 
-module.exports.__wbindgen_closure_wrapper5472 = function(arg0, arg1, arg2) {
+module.exports.__wbindgen_closure_wrapper5476 = function(arg0, arg1, arg2) {
     const ret = makeMutClosure(arg0, arg1, 981, __wbg_adapter_38);
     return ret;
 };
 
-module.exports.__wbindgen_closure_wrapper5474 = function(arg0, arg1, arg2) {
+module.exports.__wbindgen_closure_wrapper5478 = function(arg0, arg1, arg2) {
     const ret = makeMutClosure(arg0, arg1, 981, __wbg_adapter_38);
     return ret;
 };
 
-module.exports.__wbindgen_closure_wrapper6107 = function(arg0, arg1, arg2) {
+module.exports.__wbindgen_closure_wrapper6105 = function(arg0, arg1, arg2) {
     const ret = makeMutClosure(arg0, arg1, 1147, __wbg_adapter_43);
     return ret;
 };
 
-module.exports.__wbindgen_closure_wrapper6230 = function(arg0, arg1, arg2) {
+module.exports.__wbindgen_closure_wrapper6228 = function(arg0, arg1, arg2) {
     const ret = makeMutClosure(arg0, arg1, 1195, __wbg_adapter_46);
     return ret;
 };
