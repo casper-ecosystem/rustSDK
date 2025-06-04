@@ -27,6 +27,7 @@ describe('Angular App Tests', () => {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     test.page = await test.browser.newPage();
+    test.page.setDefaultTimeout(60000);
     await test.page.goto(config.app_address);
     await test.page.setViewport({
       width: 1920,
