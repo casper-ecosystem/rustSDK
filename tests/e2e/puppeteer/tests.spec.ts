@@ -1093,6 +1093,7 @@ describe('Angular App Tests', () => {
     });
 
     it('should should call entry point with package hash and args simple', async () => {
+      console.log(test);
       let args_simple_mint = `token_meta_data:String='test_meta_data',token_owner:Key='${test.account_hash}'`;
       await test.page.type(
         '[e2e-id="paymentAmountElt"]',
