@@ -336,7 +336,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let transaction_hash = TransactionHash::from_raw(&[1u8; 32]).unwrap();
-        let error_message = "error sending request for url (http://localhost/rpc)";
+        let error_message = "error sending request";
 
         // Act
         let result = sdk

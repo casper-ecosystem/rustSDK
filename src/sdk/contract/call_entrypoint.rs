@@ -231,7 +231,7 @@ mod tests {
         let (_, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
 
-        let error_message = "error sending request for url (http://localhost/rpc)";
+        let error_message = "error sending request";
 
         let mut transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&secret_key);

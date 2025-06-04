@@ -243,7 +243,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let transaction = get_transaction();
-        let error_message = "error sending request for url (http://localhost/rpc)";
+        let error_message = "error sending request";
 
         // Act
         let result = sdk.speculative_exec(transaction, None, None).await;

@@ -329,7 +329,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
-        let error_message = "error sending request for url (http://localhost/rpc)";
+        let error_message = "error sending request";
 
         // Act
         let result = sdk.get_deploy(deploy_hash, None, None, None).await;

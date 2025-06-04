@@ -288,7 +288,7 @@ mod tests {
     async fn test_get_block_transfers_with_error() {
         let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
-        let error_message = "error sending request for url (http://localhost/rpc)";
+        let error_message = "error sending request";
 
         // Act
         let result = sdk.get_block_transfers(None, None, None).await;

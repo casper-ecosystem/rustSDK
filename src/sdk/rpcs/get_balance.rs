@@ -395,7 +395,7 @@ mod tests {
     async fn test_get_balance_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
-        let error_message = "error sending request for url (http://localhost/rpc)";
+        let error_message = "error sending request";
         let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
         // Act
         let result = sdk

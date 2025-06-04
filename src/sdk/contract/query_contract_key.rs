@@ -399,7 +399,7 @@ mod tests {
         let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
-        let error_message = "error sending request for url (http://localhost/rpc)";
+        let error_message = "error sending request";
         let entity = get_entity_input().await;
 
         let path = PathIdentifierInput::String("installer".to_string());

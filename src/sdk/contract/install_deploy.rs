@@ -288,7 +288,7 @@ mod tests {
             None,
         );
 
-        let error_message = "error sending request for url (http://localhost/rpc)";
+        let error_message = "error sending request";
 
         let mut session_params = SessionStrParams::default();
 

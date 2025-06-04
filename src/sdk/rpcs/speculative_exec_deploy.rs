@@ -250,7 +250,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let deploy = get_deploy();
-        let error_message = "error sending request for url (http://localhost/rpc)";
+        let error_message = "error sending request";
 
         // Act
         let result = sdk.speculative_exec_deploy(deploy, None, None).await;

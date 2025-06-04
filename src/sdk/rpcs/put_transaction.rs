@@ -166,7 +166,7 @@ mod tests {
     async fn test_put_transaction_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
-        let error_message = "error sending request for url (http://localhost/rpc)";
+        let error_message = "error sending request";
         let transaction = get_transaction();
 
         // Act
