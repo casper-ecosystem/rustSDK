@@ -74,6 +74,7 @@ pub struct TransactionBuilderParams {
     minimum_delegation_amount: Option<Option<u64>>,
     maximum_delegation_amount: Option<Option<u64>>,
     reserved_slots: Option<Option<u32>>,
+    min_bid_override: Option<bool>,
 }
 
 #[wasm_bindgen]
@@ -122,6 +123,7 @@ impl TransactionBuilderParams {
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
             reserved_slots: None,
+            min_bid_override: None,
         }
     }
 
@@ -155,6 +157,7 @@ impl TransactionBuilderParams {
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
             reserved_slots: None,
+            min_bid_override: None,
         }
     }
 
@@ -185,6 +188,7 @@ impl TransactionBuilderParams {
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
             reserved_slots: None,
+            min_bid_override: None,
         }
     }
 
@@ -215,6 +219,7 @@ impl TransactionBuilderParams {
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
             reserved_slots: None,
+            min_bid_override: None,
         }
     }
 
@@ -248,6 +253,7 @@ impl TransactionBuilderParams {
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
             reserved_slots: None,
+            min_bid_override: None,
         }
     }
 
@@ -280,6 +286,7 @@ impl TransactionBuilderParams {
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
             reserved_slots: None,
+            min_bid_override: None,
         }
     }
 
@@ -315,6 +322,7 @@ impl TransactionBuilderParams {
             minimum_delegation_amount: Some(minimum_delegation_amount),
             maximum_delegation_amount: Some(maximum_delegation_amount),
             reserved_slots: Some(reserved_slots),
+            min_bid_override: None,
         }
     }
 
@@ -347,6 +355,7 @@ impl TransactionBuilderParams {
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
             reserved_slots: None,
+            min_bid_override: None,
         }
     }
 
@@ -379,6 +388,7 @@ impl TransactionBuilderParams {
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
             reserved_slots: None,
+            min_bid_override: None,
         }
     }
 
@@ -412,11 +422,16 @@ impl TransactionBuilderParams {
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
             reserved_slots: None,
+            min_bid_override: None,
         }
     }
 
     #[wasm_bindgen(js_name = "newWithdrawBid")]
-    pub fn new_withdraw_bid(public_key: PublicKey, amount: &str) -> TransactionBuilderParams {
+    pub fn new_withdraw_bid(
+        public_key: PublicKey,
+        amount: &str,
+        min_bid_override: bool,
+    ) -> TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::WithdrawBid,
@@ -440,6 +455,7 @@ impl TransactionBuilderParams {
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
             reserved_slots: None,
+            min_bid_override: Some(min_bid_override),
         }
     }
 
@@ -736,6 +752,7 @@ pub fn transaction_builder_params_to_casper_client(
         TransactionKind::WithdrawBid => _TransactionBuilderParams::WithdrawBid {
             public_key: transaction_params.public_key.clone().unwrap().into(),
             amount: transaction_params.amount.unwrap_or_default(),
+            min_bid_override: transaction_params.min_bid_override.unwrap_or_default(),
         },
     }
 }

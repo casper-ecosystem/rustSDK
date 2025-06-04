@@ -192,9 +192,20 @@ pub enum SdkError {
     #[error(transparent)]
     Core(#[from] CasperClientError),
 
-    /// Error when handling the response from the binary port.
     #[error("Failed to handle response: {0}")]
     Response(String),
+
+    #[error("Failed to get auction state")]
+    FailedToGetAuctionState,
+
+    #[error("Attempting to withdraw bid will reduce stake below the minimum amount.")]
+    ReducedStakeBelowMinAmount,
+
+    #[error("Failed to parse the chainspec as raw bytes")]
+    FailedToParseChainspecBytes,
+
+    #[error("Major version is missing when specifying entity version")]
+    MissingMajorVersion,
 }
 
 impl From<CLValueError> for SdkError {
@@ -270,6 +281,10 @@ impl From<CliError> for SdkError {
             CliError::UnexpectedTransactionArgsVariant => {
                 SdkError::UnexpectedTransactionArgsVariant
             }
+            CliError::FailedToGetAuctionState => SdkError::FailedToGetAuctionState,
+            CliError::ReducedStakeBelowMinAmount => SdkError::ReducedStakeBelowMinAmount,
+            CliError::FailedToParseChainspecBytes => SdkError::FailedToParseChainspecBytes,
+            CliError::MissingMajorVersion => SdkError::MissingMajorVersion,
         }
     }
 }
