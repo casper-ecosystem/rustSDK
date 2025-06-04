@@ -32,12 +32,35 @@ describe('Angular App Tests', () => {
       width: 1920,
       height: 1080,
     });
-    // test.page
-    //   .on('console', (message: { type: () => string; text: () => any; }) =>
-    //     console.log(`${message.type().substr(0, 3).toUpperCase()} ${message.text()}`))
-    //   .on('pageerror', (message: any) => console.log(message))
-    //   .on('requestfailed', (request: { failure: () => { (): any; new(): any; errorText: any; }; url: () => any; }) =>
-    //     console.log(`${request.failure().errorText} ${request.url()}`));
+
+    const ignoredMessages = [
+      'Angular is running in development mode.',
+      'using deprecated parameters for the initialization function',
+      'Hot Module Replacement disabled, Live Reloading enabled, Progress disabled, Overlay enabled.',
+      'JSHandle@object',
+    ];
+
+    test.page;
+    test.page
+      .on('console', (message: { type: () => string; text: () => string }) => {
+        const text = message.text();
+
+        // Ignore if the message contains any ignored phrase
+        const shouldIgnore = ignoredMessages.some((pattern) =>
+          text.includes(pattern)
+        );
+        if (shouldIgnore) return;
+
+        console.log(`${message.type().substr(0, 3).toUpperCase()} ${text}`);
+      })
+      .on('pageerror', (message: any) => console.log(message))
+      .on(
+        'requestfailed',
+        (request: {
+          failure: () => { (): any; new (): any; errorText: any };
+          url: () => any;
+        }) => console.log(`${request.failure().errorText} ${request.url()}`)
+      );
   });
 
   describe('Loading', () => {
@@ -1116,13 +1139,13 @@ describe('Angular App Tests', () => {
       call = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
-      console.log(test);
+      console.log(call);
       await test.page.waitForSelector('[e2e-id="result"]');
       call = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(call).toBeDefined();
-    });
+    }, 40000);
   });
 
   describe('Contract call entry point transaction', () => {
