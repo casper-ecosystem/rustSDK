@@ -27,7 +27,6 @@ describe('Angular App Tests', () => {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     test.page = await test.browser.newPage();
-    test.page.setDefaultTimeout(60000);
     await test.page.goto(config.app_address);
     await test.page.setViewport({
       width: 1920,
@@ -1093,7 +1092,6 @@ describe('Angular App Tests', () => {
     });
 
     it('should should call entry point with package hash and args simple', async () => {
-      console.log(test);
       let args_simple_mint = `token_meta_data:String='test_meta_data',token_owner:Key='${test.account_hash}'`;
       await test.page.type(
         '[e2e-id="paymentAmountElt"]',
@@ -1114,6 +1112,11 @@ describe('Angular App Tests', () => {
       });
       expect(call).toBeUndefined();
       await submit();
+      await delay(7000);
+      call = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      console.log(test);
       await test.page.waitForSelector('[e2e-id="result"]');
       call = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
