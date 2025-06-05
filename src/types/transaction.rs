@@ -414,45 +414,8 @@ impl Transaction {
     }
 
     #[wasm_bindgen(js_name = "addSignature")]
-    pub fn add_signature(&self, public_key: &str, signature: &str) -> Transaction {
-        // Serialize the existing approvals to JSON
-        let casper_transaction: _Transaction = self.0.clone();
-        let existing_approvals_json = casper_transaction
-            .approvals()
-            .iter()
-            .map(|approval| {
-                json!({
-                    "signer": approval.signer().to_hex(),
-                    "signature": approval.signature().to_hex(),
-                })
-            })
-            .collect::<Vec<_>>();
-
-        // Create JSON object for the new approval
-        let new_approval_json = json!({
-            "signer": public_key,
-            "signature": signature,
-        });
-
-        // Append the new approval to existing approvals
-        let mut all_approvals_json = existing_approvals_json;
-        all_approvals_json.push(new_approval_json);
-
-        // Convert the approvals JSON back to string
-        let updated_approvals_str = serde_json::to_string(&all_approvals_json)
-            .expect("Failed to serialize updated approvals JSON");
-
-        // Replace the approvals field in the original transaction JSON string
-        let mut transaction_json: Value = serde_json::from_str(&self.to_json_string().unwrap())
-            .expect("Failed to deserialize transaction JSON");
-        transaction_json["Version1"]["approvals"] = serde_json::from_str(&updated_approvals_str)
-            .expect("Failed to deserialize updated approvals JSON");
-
-        // Convert the updated transaction JSON back to a Transaction struct
-        let updated_transaction: Transaction = serde_json::from_value(transaction_json)
-            .expect("Failed to deserialize updated transaction JSON");
-
-        updated_transaction
+    pub fn add_signature_json_alias(&self, public_key: &str, signature: &str) -> Transaction {
+        self.add_signature(public_key, signature)
     }
 
     #[wasm_bindgen(getter)]
@@ -643,7 +606,7 @@ impl Transaction {
         serde_json::to_string(&self.0).map_err(SdkError::from)
     }
 
-    pub fn from_json_string(json_str: &str) -> Result<Self, SdkError> {
+    pub fn from_json_string(json_str: &str) -> Result<Transaction, SdkError> {
         serde_json::from_str(json_str).map_err(Into::into)
     }
 
@@ -674,6 +637,47 @@ impl Transaction {
             .map(|approval| approval.signer().to_account_hash())
             .map(Into::into)
             .collect()
+    }
+
+    pub fn add_signature(&self, public_key: &str, signature: &str) -> Transaction {
+        // Serialize the existing approvals to JSON
+        let casper_transaction: _Transaction = self.0.clone();
+        let existing_approvals_json = casper_transaction
+            .approvals()
+            .iter()
+            .map(|approval| {
+                json!({
+                    "signer": approval.signer().to_hex(),
+                    "signature": approval.signature().to_hex(),
+                })
+            })
+            .collect::<Vec<_>>();
+
+        // Create JSON object for the new approval
+        let new_approval_json = json!({
+            "signer": public_key,
+            "signature": signature,
+        });
+
+        // Append the new approval to existing approvals
+        let mut all_approvals_json = existing_approvals_json;
+        all_approvals_json.push(new_approval_json);
+
+        // Convert the approvals JSON back to string
+        let updated_approvals_str = serde_json::to_string(&all_approvals_json)
+            .expect("Failed to serialize updated approvals JSON");
+
+        // Replace the approvals field in the original transaction JSON string
+        let mut transaction_json: Value = serde_json::from_str(&self.to_json_string().unwrap())
+            .expect("Failed to deserialize transaction JSON");
+        transaction_json["Version1"]["approvals"] = serde_json::from_str(&updated_approvals_str)
+            .expect("Failed to deserialize updated approvals JSON");
+
+        // Convert the updated transaction JSON back to a Transaction struct
+        let updated_transaction: Transaction = serde_json::from_value(transaction_json)
+            .expect("Failed to deserialize updated transaction JSON");
+
+        updated_transaction
     }
 
     fn args_to_json_array(&self, new_args: &RuntimeArgs) -> Vec<serde_json::Value> {
