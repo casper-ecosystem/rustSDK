@@ -99,7 +99,8 @@ impl SDK {
             amount,
             transaction_params,
             maybe_id,
-        )?;
+        )
+        .map_err(|e| *e)?;
 
         self.put_transaction(transaction, verbosity, rpc_address)
             .await

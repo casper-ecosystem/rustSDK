@@ -12,12 +12,12 @@ use wasm_bindgen::prelude::*;
 pub struct ContractPackageHash(_ContractPackageHash);
 
 impl ContractPackageHash {
-    pub fn new(contract_package_hash_hex_str: &str) -> Result<Self, SdkError> {
+    pub fn new(contract_package_hash_hex_str: &str) -> Result<Self, Box<SdkError>> {
         let prefixed_input = format!("contract-package-{contract_package_hash_hex_str}");
         Self::from_formatted_str(&prefixed_input)
     }
 
-    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, Box<SdkError>> {
         let contract_package_hash = _ContractPackageHash::from_formatted_str(formatted_str)
             .map_err(|error| SdkError::FailedToParseContractPackageHash {
                 context: "ContractPackageHash::from_formatted_str",

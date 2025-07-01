@@ -352,7 +352,7 @@ pub mod test_module_deploy {
         let module_bytes = match read_wasm_file(file_path) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
+                eprintln!("Error reading file: {err:?}");
                 return;
             }
         };

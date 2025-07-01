@@ -191,12 +191,14 @@ impl Key {
 }
 
 impl Key {
-    pub fn from_formatted_str(formatted_str: &str) -> Result<Key, SdkError> {
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Key, Box<SdkError>> {
         _Key::from_formatted_str(formatted_str)
             .map(Into::into)
-            .map_err(|error| SdkError::FailedToParseKey {
-                context: "Key from formatted string",
-                error,
+            .map_err(|error| {
+                Box::new(SdkError::FailedToParseKey {
+                    context: "Key from formatted string",
+                    error,
+                })
             })
     }
 }

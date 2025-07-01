@@ -16,13 +16,13 @@ use wasm_bindgen::prelude::*;
 pub struct AddressableEntityHash(_AddressableEntityHash);
 
 impl AddressableEntityHash {
-    pub fn new(addressable_entity_hex_str: &str) -> Result<Self, SdkError> {
+    pub fn new(addressable_entity_hex_str: &str) -> Result<Self, Box<SdkError>> {
         let prefixed_input =
             format!("{ADDRESSABLE_ENTITY_STRING_PREFIX}{addressable_entity_hex_str}");
         Self::from_formatted_str(&prefixed_input)
     }
 
-    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, Box<SdkError>> {
         let addressable_entity_hash = _AddressableEntityHash::from_formatted_str(formatted_str)
             .map_err(|error| SdkError::FailedToParseAddressableEntityHash {
                 context: "AddressableEntityHash::from_formatted_str",

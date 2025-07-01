@@ -264,37 +264,37 @@ mod tests {
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount("100");
         let result = payment_str_params_to_casper_client(&payment_params);
-        let result_debug_output = format!("{:?}", result);
+        let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("payment_amount: \"100\""));
 
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_hash("hash_value");
         let result = payment_str_params_to_casper_client(&payment_params);
-        let result_debug_output = format!("{:?}", result);
+        let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("payment_hash: \"hash_value\""));
 
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_name("name_value");
         let result = payment_str_params_to_casper_client(&payment_params);
-        let result_debug_output = format!("{:?}", result);
+        let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("payment_name: \"name_value\""));
 
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_package_hash("package_hash_value");
         let result = payment_str_params_to_casper_client(&payment_params);
-        let result_debug_output = format!("{:?}", result);
+        let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("payment_package_hash: \"package_hash_value\""));
 
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_package_name("package_name_value");
         let result = payment_str_params_to_casper_client(&payment_params);
-        let result_debug_output = format!("{:?}", result);
+        let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("payment_package_name: \"package_name_value\""));
 
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_path("path_value");
         let result = payment_str_params_to_casper_client(&payment_params);
-        let result_debug_output = format!("{:?}", result);
+        let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("payment_path: \"path_value\""));
 
         // TODO Find alternative as no setter in client

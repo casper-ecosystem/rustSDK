@@ -16,13 +16,13 @@ impl RecordId {
 }
 
 impl RecordId {
-    pub fn new(value: u16) -> Result<RecordId, SdkError> {
+    pub fn new(value: u16) -> Result<RecordId, Box<SdkError>> {
         match _RecordId::try_from(value) {
             Ok(record_id) => Ok(RecordId(record_id)),
-            Err(err) => Err(SdkError::CustomError {
+            Err(err) => Err(Box::new(SdkError::CustomError {
                 context: "Invalid RecordId",
                 error: format!("{err:?}"),
-            }),
+            })),
         }
     }
 

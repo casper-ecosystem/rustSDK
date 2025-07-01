@@ -11,15 +11,15 @@ use wasm_bindgen::prelude::*;
 pub struct URef(_URef);
 
 impl URef {
-    pub fn new(uref_hex_str: &str, access_rights: u8) -> Result<Self, SdkError> {
+    pub fn new(uref_hex_str: &str, access_rights: u8) -> Result<Self, Box<SdkError>> {
         // Convert the input hexadecimal string to bytes
         let bytes = match hex::decode(uref_hex_str) {
             Ok(bytes) => bytes,
             Err(err) => {
-                return Err(SdkError::FailedToDecodeHex {
+                return Err(Box::new(SdkError::FailedToDecodeHex {
                     context: "URef::new",
                     error: format!("Invalid hex string: {err:?}"),
-                });
+                }));
             }
         };
 
@@ -33,7 +33,7 @@ impl URef {
         Ok(URef(uref))
     }
 
-    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, Box<SdkError>> {
         let uref = _URef::from_formatted_str(formatted_str).map_err(|error| {
             SdkError::FailedToParseURef {
                 context: "URef::from_formatted_str",

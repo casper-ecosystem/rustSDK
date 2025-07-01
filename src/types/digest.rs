@@ -14,17 +14,17 @@ use wasm_bindgen::prelude::*;
 pub struct Digest(_Digest);
 
 impl Digest {
-    pub fn new(digest_hex_str: &str) -> Result<Digest, SdkError> {
-        Digest::try_from(digest_hex_str)
+    pub fn new(digest_hex_str: &str) -> Result<Digest, Box<SdkError>> {
+        Digest::try_from(digest_hex_str).map_err(Box::new)
     }
 
     pub fn value(&self) -> [u8; _Digest::LENGTH] {
         self.0.value()
     }
 
-    pub fn from_raw(bytes: Vec<u8>) -> Result<Digest, SdkError> {
+    pub fn from_raw(bytes: Vec<u8>) -> Result<Digest, Box<SdkError>> {
         let hex_string = hex::encode(bytes);
-        Digest::try_from(&hex_string[..])
+        Digest::try_from(&hex_string[..]).map_err(Box::new)
     }
 }
 

@@ -68,7 +68,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-    ) -> Result<Deploy, SdkError> {
+    ) -> Result<Deploy, Box<SdkError>> {
         make_deploy(deploy_params, session_params, payment_params)
     }
 }
@@ -80,7 +80,7 @@ pub(crate) fn make_deploy(
     deploy_params: DeployStrParams,
     session_params: SessionStrParams,
     payment_params: PaymentStrParams,
-) -> Result<Deploy, SdkError> {
+) -> Result<Deploy, Box<SdkError>> {
     // log("make_deploy");
     client_make_deploy(
         "",
@@ -90,7 +90,7 @@ pub(crate) fn make_deploy(
         false,
     )
     .map(Into::into)
-    .map_err(SdkError::from)
+    .map_err(|e| Box::new(SdkError::from(e)))
 }
 
 #[cfg(test)]

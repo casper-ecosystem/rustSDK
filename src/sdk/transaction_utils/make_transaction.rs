@@ -63,7 +63,7 @@ impl SDK {
         &self,
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
-    ) -> Result<Transaction, SdkError> {
+    ) -> Result<Transaction, Box<SdkError>> {
         make_transaction(builder_params, transaction_params)
     }
 }
@@ -72,12 +72,14 @@ impl SDK {
 pub(crate) fn make_transaction(
     builder_params: TransactionBuilderParams,
     transaction_params: TransactionStrParams,
-) -> Result<Transaction, SdkError> {
+) -> Result<Transaction, Box<SdkError>> {
     let transaction_builder_params = transaction_builder_params_to_casper_client(&builder_params);
     let transaction_str_params = transaction_str_params_to_casper_client(&transaction_params);
     let transaction =
         client_make_transaction(transaction_builder_params, transaction_str_params, false);
-    transaction.map(Into::into).map_err(SdkError::from)
+    transaction
+        .map(Into::into)
+        .map_err(|e| Box::new(SdkError::from(e)))
 }
 
 #[cfg(test)]

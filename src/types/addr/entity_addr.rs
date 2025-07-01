@@ -13,12 +13,12 @@ use wasm_bindgen::prelude::*;
 pub struct EntityAddr(_EntityAddr);
 
 impl EntityAddr {
-    pub fn from_formatted_str(formatted_str: &str) -> Result<EntityAddr, SdkError> {
+    pub fn from_formatted_str(formatted_str: &str) -> Result<EntityAddr, Box<SdkError>> {
         let entity_addr = _EntityAddr::from_formatted_str(formatted_str).map_err(|error| {
-            SdkError::FailedToParseEntity {
+            Box::new(SdkError::FailedToParseEntity {
                 context: "EntityAddr::from_formatted_str",
                 error,
-            }
+            })
         })?;
         Ok(EntityAddr(entity_addr))
     }

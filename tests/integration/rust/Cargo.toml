@@ -23,6 +23,7 @@ name = "sdk_tests"
 path = "src/lib.rs"
 
 [patch.crates-io]
+casper-client = { version = "3", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "dev", default-features = false }
 casper-types = { version = "6", git = "https://github.com/casper-network/casper-node", branch = "dev" }
 casper-binary-port = { git = "https://github.com/casper-network/casper-node", branch = "dev" }
 casper-binary-port-access = { git = "https://github.com/casper-ecosystem/casper-binary-port-client", branch = "master" }

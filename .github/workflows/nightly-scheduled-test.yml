@@ -35,7 +35,7 @@ jobs:
       - name: Install cargo-audit
         run: cargo install cargo-audit
 
-      # Replace by above service with docker image of stable 2.0
+      # Replace by above service with docker image of stable dev
       - name: Clone casper-nctl-2-docker repository
         run: |
           git clone https://github.com/gRoussac/casper-nctl-2-docker.git

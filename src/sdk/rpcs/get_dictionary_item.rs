@@ -141,7 +141,7 @@ impl SDK {
         let dictionary_item = if let Some(identifier) = dictionary_item_identifier {
             DictionaryItemInput::Identifier(identifier)
         } else if let Some(params) = dictionary_item_params {
-            DictionaryItemInput::Params(params)
+            DictionaryItemInput::Params(Box::new(params))
         } else {
             let err = "Error: Missing dictionary item identifier or params";
             return Err(JsError::new(err));
@@ -180,7 +180,7 @@ impl SDK {
 #[derive(Debug, Clone)]
 pub enum DictionaryItemInput {
     Identifier(DictionaryItemIdentifier),
-    Params(DictionaryItemStrParams),
+    Params(Box<DictionaryItemStrParams>),
 }
 
 impl SDK {
@@ -405,7 +405,7 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                DictionaryItemInput::Params(params),
+                DictionaryItemInput::Params(Box::new(params)),
                 Some(state_root_hash),
                 verbosity,
                 Some(rpc_address),

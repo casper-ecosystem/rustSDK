@@ -117,7 +117,7 @@ pub(crate) mod intern {
                 dictionary_item_key,
             );
         }
-        let dictionary_item = DictionaryItemInput::Params(params);
+        let dictionary_item = DictionaryItemInput::Params(Box::new(params));
 
         let get_dictionary_item = create_test_sdk(None)
             .get_dictionary_item(

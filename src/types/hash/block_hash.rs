@@ -11,7 +11,7 @@ use wasm_bindgen::prelude::*;
 pub struct BlockHash(_BlockHash);
 
 impl BlockHash {
-    pub fn new(deploy_hash_hex_str: &str) -> Result<BlockHash, SdkError> {
+    pub fn new(deploy_hash_hex_str: &str) -> Result<BlockHash, Box<SdkError>> {
         let bytes =
             hex::decode(deploy_hash_hex_str).map_err(|err| SdkError::FailedToDecodeHex {
                 context: "BlockHash::new",
@@ -22,7 +22,7 @@ impl BlockHash {
         Self::from_digest(Digest::from(hash))
     }
 
-    pub fn from_digest(digest: Digest) -> Result<BlockHash, SdkError> {
+    pub fn from_digest(digest: Digest) -> Result<BlockHash, Box<SdkError>> {
         Ok(_BlockHash::new(digest.into()).into())
     }
 }

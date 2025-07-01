@@ -83,7 +83,7 @@ impl SDK {
         amount: &str,
         transaction_params: TransactionStrParams,
         maybe_id: Option<String>,
-    ) -> Result<Transaction, SdkError> {
+    ) -> Result<Transaction, Box<SdkError>> {
         // log("make_transfer_transaction");
         make_transfer_transaction(maybe_source, target, amount, transaction_params, maybe_id)
     }
@@ -96,18 +96,25 @@ pub(crate) fn make_transfer_transaction(
     amount: &str,
     transaction_params: TransactionStrParams,
     maybe_id: Option<String>,
-) -> Result<Transaction, SdkError> {
+) -> Result<Transaction, Box<SdkError>> {
     let id = if let Some(maybe_id) = maybe_id {
         u64::from_str(&maybe_id).unwrap_or_else(|_| rand::thread_rng().gen::<u64>())
     } else {
         rand::thread_rng().gen::<u64>()
     };
 
-    let target = transfer_target(target)?;
+    let target = transfer_target(target).map_err(|e| {
+        Box::new(SdkError::FailedToDecodeHex {
+            context: "make_transfer_transaction: transfer_target",
+            error: e.to_string(),
+        })
+    })?;
 
-    let amount = U512::from_dec_str(amount).map_err(|error| SdkError::FailedToDecodeHex {
-        context: "make_transfer_transaction",
-        error: error.to_string(),
+    let amount = U512::from_dec_str(amount).map_err(|error| {
+        Box::new(SdkError::FailedToDecodeHex {
+            context: "make_transfer_transaction",
+            error: error.to_string(),
+        })
     })?;
 
     let builder_params = TransactionBuilderParams::Transfer {
@@ -124,7 +131,9 @@ pub(crate) fn make_transfer_transaction(
         transaction_str_params_to_casper_client(&transaction_params),
         false,
     );
-    transaction.map(Into::into).map_err(SdkError::from)
+    transaction
+        .map(Into::into)
+        .map_err(|e| Box::new(SdkError::from(e)))
 }
 
 #[cfg(test)]

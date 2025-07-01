@@ -17,11 +17,11 @@ use wasm_bindgen::prelude::*;
 pub struct EntityIdentifier(_EntityIdentifier);
 
 impl EntityIdentifier {
-    pub fn new(formatted_str: &str) -> Result<Self, SdkError> {
+    pub fn new(formatted_str: &str) -> Result<Self, Box<SdkError>> {
         Self::from_formatted_str(formatted_str)
     }
 
-    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, Box<SdkError>> {
         if formatted_str.starts_with(ACCOUNT_HASH_FORMATTED_STRING_PREFIX) {
             let account_hash = AccountHash::from_formatted_str(formatted_str)?;
             Ok(Self::from_entity_under_account_hash(account_hash))

@@ -16,7 +16,7 @@ pub fn log(s: &str) {
     #[cfg(target_arch = "wasm32")]
     log_with_prefix(&prefixed_s);
     #[cfg(not(target_arch = "wasm32"))]
-    println!("{}", prefixed_s);
+    println!("{prefixed_s}");
 }
 
 /// Logs an error message, prefixing it with "error wasm" and sends it to the console in JavaScript when running in a WebAssembly environment.
@@ -34,7 +34,7 @@ pub fn error(s: &str) {
     #[cfg(target_arch = "wasm32")]
     error_with_prefix(&prefixed_s);
     #[cfg(not(target_arch = "wasm32"))]
-    println!("{}", prefixed_s);
+    println!("{prefixed_s}");
 }
 
 #[wasm_bindgen]

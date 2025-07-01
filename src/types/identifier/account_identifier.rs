@@ -14,7 +14,7 @@ pub struct AccountIdentifier(_AccountIdentifier);
 #[deprecated(note = "prefer 'EntityIdentifier'")]
 #[allow(deprecated)]
 impl AccountIdentifier {
-    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, Box<SdkError>> {
         if formatted_str.contains(ACCOUNT_HASH_FORMATTED_STRING_PREFIX) {
             let account_hash = AccountHash::from_formatted_str(formatted_str)?;
             Ok(Self::from_account_under_account_hash(account_hash))

@@ -1,4 +1,4 @@
-name: CI/CD Image 2.0
+name: CI/CD Image dev
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   nightly-build-push-2-0:
-    name: Build and Push Docker Image 2.0
+    name: Build and Push Docker Image dev
     runs-on: ubuntu-latest
 
     steps:
@@ -30,8 +30,8 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Step 5: Build the Docker image using 'make build 2.0'
-      - name: Build Docker image for 2.0
+      # Step 5: Build the Docker image using 'make build dev'
+      - name: Build Docker image for dev
         run: |
           make docker-build-prod
           docker tag casper-webclient:latest ${{ secrets.DOCKER_USERNAME }}/casper-webclient:latest

@@ -15,7 +15,7 @@ impl DictionaryItemIdentifier {
         account_hash: &str,
         dictionary_name: &str,
         dictionary_item_key: &str,
-    ) -> Result<DictionaryItemIdentifier, SdkError> {
+    ) -> Result<DictionaryItemIdentifier, Box<SdkError>> {
         let key = Key::from_formatted_str(account_hash).map_err(|err| SdkError::CustomError {
             context: "Failed to parse key from formatted string",
             error: format!("{err:?}"),
@@ -33,7 +33,7 @@ impl DictionaryItemIdentifier {
         contract_addr: &str,
         dictionary_name: &str,
         dictionary_item_key: &str,
-    ) -> Result<DictionaryItemIdentifier, SdkError> {
+    ) -> Result<DictionaryItemIdentifier, Box<SdkError>> {
         let key = Key::from_formatted_str(contract_addr).map_err(|err| SdkError::CustomError {
             context: "Failed to parse key from formatted string",
             error: format!("{err:?}"),
@@ -51,7 +51,7 @@ impl DictionaryItemIdentifier {
         entity_addr: &str,
         dictionary_name: &str,
         dictionary_item_key: &str,
-    ) -> Result<DictionaryItemIdentifier, SdkError> {
+    ) -> Result<DictionaryItemIdentifier, Box<SdkError>> {
         let key = Key::from_formatted_str(entity_addr).map_err(|err| SdkError::CustomError {
             context: "Failed to parse key from formatted string",
             error: format!("{err:?}"),
@@ -68,7 +68,7 @@ impl DictionaryItemIdentifier {
     pub fn new_from_seed_uref(
         seed_uref: &str,
         dictionary_item_key: &str,
-    ) -> Result<DictionaryItemIdentifier, SdkError> {
+    ) -> Result<DictionaryItemIdentifier, Box<SdkError>> {
         let key = Key::from_formatted_str(seed_uref).map_err(|err| SdkError::CustomError {
             context: "Failed to parse key from formatted string",
             error: format!("{err:?}"),
@@ -88,7 +88,7 @@ impl DictionaryItemIdentifier {
     // static context
     pub fn new_from_dictionary_key(
         dictionary_key: &str,
-    ) -> Result<DictionaryItemIdentifier, SdkError> {
+    ) -> Result<DictionaryItemIdentifier, Box<SdkError>> {
         let key = Key::from_formatted_str(dictionary_key).map_err(|err| SdkError::CustomError {
             context: "Failed to parse key from formatted string",
             error: format!("{err:?}"),

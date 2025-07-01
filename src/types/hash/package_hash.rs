@@ -11,12 +11,12 @@ use wasm_bindgen::prelude::*;
 pub struct PackageHash(_PackageHash);
 
 impl PackageHash {
-    pub fn new(package_hash_hex_str: &str) -> Result<Self, SdkError> {
+    pub fn new(package_hash_hex_str: &str) -> Result<Self, Box<SdkError>> {
         let prefixed_input = format!("package-{package_hash_hex_str}");
         Self::from_formatted_str(&prefixed_input)
     }
 
-    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, Box<SdkError>> {
         let package_hash = _PackageHash::from_formatted_str(formatted_str).map_err(|error| {
             SdkError::FailedToParsePackageHash {
                 context: "PackageHash::from_formatted_str",

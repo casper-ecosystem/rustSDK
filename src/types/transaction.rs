@@ -566,15 +566,15 @@ impl Transaction {
         }
     }
 
-    pub fn target(&self) -> Result<TransactionTarget, SdkError> {
+    pub fn target(&self) -> Result<TransactionTarget, Box<SdkError>> {
         match &self.0 {
             _Transaction::Deploy(_deploy) => unimplemented!("target not implemented for deploy!"),
-            _Transaction::V1(transaction_v1) => transaction_v1
+            _Transaction::V1(transaction_v1) => Ok(transaction_v1
                 .deserialize_field::<TransactionTarget>(TARGET_MAP_KEY)
                 .map_err(|err| SdkError::FieldDeserialization {
                     index: TARGET_MAP_KEY,
                     error: format!("{err:?}"),
-                }),
+                })?),
         }
     }
 
@@ -602,12 +602,12 @@ impl Transaction {
         self.rebuild(transaction_params, NewBuilderParams::default())
     }
 
-    pub fn to_json_string(&self) -> Result<String, SdkError> {
-        serde_json::to_string(&self.0).map_err(SdkError::from)
+    pub fn to_json_string(&self) -> Result<String, Box<SdkError>> {
+        Ok(serde_json::to_string(&self.0).map_err(SdkError::from)?)
     }
 
-    pub fn from_json_string(json_str: &str) -> Result<Transaction, SdkError> {
-        serde_json::from_str(json_str).map_err(Into::into)
+    pub fn from_json_string(json_str: &str) -> Result<Self, Box<SdkError>> {
+        Ok(serde_json::from_str(json_str).map_err(SdkError::from)?)
     }
 
     pub fn compute_approvals_hash(&self) -> Result<ApprovalsHash, bytesrepr::Error> {
@@ -959,20 +959,22 @@ impl Transaction {
                 TransactionInvocationTarget::ByPackageHash {
                     addr,
                     version,
-                    version_key: _,
-                } => TransactionBuilderParams::new_package(
+                    protocol_version_major,
+                } => TransactionBuilderParams::new_package_with_major(
                     new_package_hash.unwrap_or(PackageHash::from_bytes(addr.into())),
                     &entry_point,
                     Some(new_version.unwrap_or(version.unwrap_or(1)).to_string()),
+                    protocol_version_major,
                 ),
                 TransactionInvocationTarget::ByPackageName {
                     name,
                     version,
-                    version_key: _,
-                } => TransactionBuilderParams::new_package_alias(
+                    protocol_version_major,
+                } => TransactionBuilderParams::new_package_alias_with_major(
                     &new_alias.unwrap_or(name.clone()),
                     &entry_point,
                     Some(new_version.unwrap_or(version.unwrap_or(1)).to_string()),
+                    protocol_version_major,
                 ),
             },
             casper_types::TransactionTarget::Session {

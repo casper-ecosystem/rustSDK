@@ -129,5 +129,5 @@ async fn get_dictionary_item_params_input(key: &str) -> DictionaryItemInput {
         );
     }
 
-    DictionaryItemInput::Params(params)
+    DictionaryItemInput::Params(Box::new(params))
 }

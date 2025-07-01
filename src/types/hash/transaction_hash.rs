@@ -11,7 +11,7 @@ use wasm_bindgen::prelude::*;
 pub struct TransactionHash(_TransactionHash);
 
 impl TransactionHash {
-    pub fn new(transaction_hash_hex_str: &str) -> Result<Self, SdkError> {
+    pub fn new(transaction_hash_hex_str: &str) -> Result<Self, Box<SdkError>> {
         let bytes =
             hex::decode(transaction_hash_hex_str).map_err(|err| SdkError::FailedToDecodeHex {
                 context: "TransactionHash::new",
@@ -21,12 +21,12 @@ impl TransactionHash {
         Self::from_raw(&bytes)
     }
 
-    pub fn from_raw(bytes: &[u8]) -> Result<Self, SdkError> {
+    pub fn from_raw(bytes: &[u8]) -> Result<Self, Box<SdkError>> {
         if bytes.len() != _Digest::LENGTH {
-            return Err(SdkError::FailedToParseDigest {
+            return Err(Box::new(SdkError::FailedToParseDigest {
                 context: "TransactionHash::from_raw".to_string(),
                 error: DigestError::IncorrectDigestLength(bytes.len()),
-            });
+            }));
         }
 
         let mut hash = [0u8; _Digest::LENGTH];
@@ -34,7 +34,7 @@ impl TransactionHash {
         Ok(Self(_TransactionHash::from_raw(hash)))
     }
 
-    pub fn digest(&self) -> Result<Digest, SdkError> {
+    pub fn digest(&self) -> Result<Digest, Box<SdkError>> {
         Ok(self.0.digest().into())
     }
 }

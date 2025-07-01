@@ -241,7 +241,7 @@ mod tests {
         // Act
         let result = sdk
             .query_contract_dict(
-                DictionaryItemInput::Params(params),
+                DictionaryItemInput::Params(Box::new(params)),
                 Some(state_root_hash),
                 verbosity,
                 Some(rpc_address),

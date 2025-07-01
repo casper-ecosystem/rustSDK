@@ -336,7 +336,7 @@ pub mod test_module_transaction {
         let transaction_bytes = match read_wasm_file(file_path) {
             Ok(transaction_bytes) => transaction_bytes,
             Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
+                eprintln!("Error reading file: {err:?}");
                 return;
             }
         };

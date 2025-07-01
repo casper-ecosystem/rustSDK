@@ -12,7 +12,10 @@ use crate::{
 };
 
 use casper_client::cli::TransactionBuilderParams as _TransactionBuilderParams;
-use casper_types::{TransactionRuntimeParams, TransferTarget as _TransferTarget, U512};
+use casper_types::{
+    contracts::ProtocolVersionMajor, TransactionRuntimeParams, TransferTarget as _TransferTarget,
+    U512,
+};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -75,6 +78,7 @@ pub struct TransactionBuilderParams {
     maximum_delegation_amount: Option<Option<u64>>,
     reserved_slots: Option<Option<u32>>,
     min_bid_override: Option<bool>,
+    major_protocol_version: Option<ProtocolVersionMajor>,
 }
 
 #[wasm_bindgen]
@@ -124,6 +128,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             min_bid_override: None,
+            major_protocol_version: None,
         }
     }
 
@@ -158,6 +163,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             min_bid_override: None,
+            major_protocol_version: None,
         }
     }
 
@@ -189,6 +195,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             min_bid_override: None,
+            major_protocol_version: None,
         }
     }
 
@@ -220,6 +227,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             min_bid_override: None,
+            major_protocol_version: None,
         }
     }
 
@@ -228,6 +236,16 @@ impl TransactionBuilderParams {
         package_hash: PackageHash,
         entry_point: &str,
         maybe_entity_version: Option<String>,
+    ) -> TransactionBuilderParams {
+        Self::new_package_with_major(package_hash, entry_point, maybe_entity_version, None)
+    }
+
+    #[wasm_bindgen(js_name = "newPackageWithMajor")]
+    pub fn new_package_with_major(
+        package_hash: PackageHash,
+        entry_point: &str,
+        maybe_entity_version: Option<String>,
+        major_protocol_version: Option<ProtocolVersionMajor>,
     ) -> TransactionBuilderParams {
         let maybe_entity_version_as_u32 = parse_maybe_entity_version(maybe_entity_version);
 
@@ -254,6 +272,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             min_bid_override: None,
+            major_protocol_version,
         }
     }
 
@@ -262,6 +281,16 @@ impl TransactionBuilderParams {
         package_alias: &str,
         entry_point: &str,
         maybe_entity_version: Option<String>,
+    ) -> TransactionBuilderParams {
+        Self::new_package_alias_with_major(package_alias, entry_point, maybe_entity_version, None)
+    }
+
+    #[wasm_bindgen(js_name = "newPackageAliasWithMajor")]
+    pub fn new_package_alias_with_major(
+        package_alias: &str,
+        entry_point: &str,
+        maybe_entity_version: Option<String>,
+        major_protocol_version: Option<ProtocolVersionMajor>,
     ) -> TransactionBuilderParams {
         let maybe_entity_version_as_u32 = parse_maybe_entity_version(maybe_entity_version);
         TransactionBuilderParams {
@@ -287,6 +316,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             min_bid_override: None,
+            major_protocol_version,
         }
     }
 
@@ -323,6 +353,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: Some(maximum_delegation_amount),
             reserved_slots: Some(reserved_slots),
             min_bid_override: None,
+            major_protocol_version: None,
         }
     }
 
@@ -356,6 +387,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             min_bid_override: None,
+            major_protocol_version: None,
         }
     }
 
@@ -389,6 +421,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             min_bid_override: None,
+            major_protocol_version: None,
         }
     }
 
@@ -423,6 +456,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             min_bid_override: None,
+            major_protocol_version: None,
         }
     }
 
@@ -456,6 +490,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             min_bid_override: Some(min_bid_override),
+            major_protocol_version: None,
         }
     }
 
@@ -704,7 +739,7 @@ pub fn transaction_builder_params_to_casper_client(
                 .unwrap_or_default(),
             runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
         },
-        TransactionKind::Package => _TransactionBuilderParams::Package {
+        TransactionKind::Package => _TransactionBuilderParams::PackageWithVersionKey {
             package_hash: transaction_params.package_hash.unwrap().into(),
             maybe_entity_version: transaction_params.maybe_entity_version,
             entry_point: transaction_params
@@ -712,8 +747,9 @@ pub fn transaction_builder_params_to_casper_client(
                 .as_deref()
                 .unwrap_or_default(),
             runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
+            major_protocol_version: transaction_params.major_protocol_version,
         },
-        TransactionKind::PackageAlias => _TransactionBuilderParams::PackageAlias {
+        TransactionKind::PackageAlias => _TransactionBuilderParams::PackageAliasWithVersionKey {
             package_alias: transaction_params
                 .package_alias
                 .as_deref()
@@ -724,6 +760,7 @@ pub fn transaction_builder_params_to_casper_client(
                 .as_deref()
                 .unwrap_or_default(),
             runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
+            major_protocol_version: transaction_params.major_protocol_version,
         },
         TransactionKind::AddBid => _TransactionBuilderParams::AddBid {
             public_key: transaction_params.public_key.clone().unwrap().into(),

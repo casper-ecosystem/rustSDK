@@ -142,7 +142,7 @@ mod tests {
         let transaction_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(transaction_bytes) => transaction_bytes,
             Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
+                eprintln!("Error reading file: {err:?}");
                 return;
             }
         };
@@ -180,7 +180,7 @@ mod tests {
         let transaction_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(transaction_bytes) => transaction_bytes,
             Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
+                eprintln!("Error reading file: {err:?}");
                 return;
             }
         };
@@ -219,7 +219,7 @@ mod tests {
         let transaction_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(transaction_bytes) => transaction_bytes,
             Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
+                eprintln!("Error reading file: {err:?}");
                 return;
             }
         };
@@ -257,7 +257,7 @@ mod tests {
         let transaction_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(transaction_bytes) => transaction_bytes,
             Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
+                eprintln!("Error reading file: {err:?}");
                 return;
             }
         };

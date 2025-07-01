@@ -138,7 +138,7 @@ pub fn make_dictionary_item_key<V: ToBytes>(key: &Key, value: &V) -> String {
 ///
 /// Returns a `Result` with the base64-encoded string on success, or a `SdkError` on failure.
 /// Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
-pub fn get_base64_key_from_account_hash(account_hash: &str) -> Result<String, SdkError> {
+pub fn get_base64_key_from_account_hash(account_hash: &str) -> Result<String, Box<SdkError>> {
     let account_hash = AccountHash::from_formatted_str(account_hash)?;
     let key = Key::from_account(account_hash).to_bytes().unwrap();
     Ok(general_purpose::STANDARD.encode(key)) // base64.encode
@@ -193,10 +193,12 @@ pub fn get_ttl_or_default(ttl: Option<&str>) -> String {
 /// # Returns
 ///
 /// A `Result` containing the parsed `Timestamp` or an error if parsing fails.
-pub fn parse_timestamp(value: &str) -> Result<Timestamp, SdkError> {
-    Timestamp::from_str(value).map_err(|error| SdkError::FailedToParseTimestamp {
-        context: "timestamp",
-        error,
+pub fn parse_timestamp(value: &str) -> Result<Timestamp, Box<SdkError>> {
+    Timestamp::from_str(value).map_err(|error| {
+        Box::new(SdkError::FailedToParseTimestamp {
+            context: "timestamp",
+            error,
+        })
     })
 }
 
@@ -209,10 +211,12 @@ pub fn parse_timestamp(value: &str) -> Result<Timestamp, SdkError> {
 /// # Returns
 ///
 /// A `Result` containing the parsed `TimeDiff` or an error if parsing fails.
-pub fn parse_ttl(value: &str) -> Result<TimeDiff, SdkError> {
-    TimeDiff::from_str(value).map_err(|error| SdkError::FailedToParseTimeDiff {
-        context: "ttl",
-        error,
+pub fn parse_ttl(value: &str) -> Result<TimeDiff, Box<SdkError>> {
+    TimeDiff::from_str(value).map_err(|error| {
+        Box::new(SdkError::FailedToParseTimeDiff {
+            context: "ttl",
+            error,
+        })
     })
 }
 
@@ -251,10 +255,12 @@ pub(crate) fn get_str_or_default(opt_str: Option<&String>) -> &str {
 /// # Errors
 ///
 /// Returns an `SdkError` if the secret key generation fails.
-pub fn secret_key_generate() -> Result<SecretKey, SdkError> {
-    SecretKey::generate_ed25519().map_err(|err| SdkError::FailedToGenerateSecretKey {
-        context: "secret_key_from_pem".to_string(),
-        error: err,
+pub fn secret_key_generate() -> Result<SecretKey, Box<SdkError>> {
+    SecretKey::generate_ed25519().map_err(|err| {
+        Box::new(SdkError::FailedToGenerateSecretKey {
+            context: "secret_key_from_pem".to_string(),
+            error: err,
+        })
     })
 }
 
@@ -267,10 +273,12 @@ pub fn secret_key_generate() -> Result<SecretKey, SdkError> {
 /// # Errors
 ///
 /// Returns an `SdkError` if the secret key generation fails.
-pub fn secret_key_secp256k1_generate() -> Result<SecretKey, SdkError> {
-    SecretKey::generate_secp256k1().map_err(|err| SdkError::FailedToGenerateSecretKey {
-        context: "secret_key_from_pem".to_string(),
-        error: err,
+pub fn secret_key_secp256k1_generate() -> Result<SecretKey, Box<SdkError>> {
+    SecretKey::generate_secp256k1().map_err(|err| {
+        Box::new(SdkError::FailedToGenerateSecretKey {
+            context: "secret_key_from_pem".to_string(),
+            error: err,
+        })
     })
 }
 
@@ -283,10 +291,12 @@ pub fn secret_key_secp256k1_generate() -> Result<SecretKey, SdkError> {
 /// # Returns
 ///
 /// A `Result` containing the parsed `SecretKey` or an error if parsing fails.
-pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, SdkError> {
-    SecretKey::from_pem(secret_key).map_err(|err| SdkError::FailedToParseSecretKey {
-        context: "secret_key_from_pem".to_string(),
-        error: err,
+pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, Box<SdkError>> {
+    SecretKey::from_pem(secret_key).map_err(|err| {
+        Box::new(SdkError::FailedToParseSecretKey {
+            context: "secret_key_from_pem".to_string(),
+            error: err,
+        })
     })
 }
 
@@ -299,7 +309,7 @@ pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, SdkError> {
 /// # Returns
 ///
 /// A `Result` containing the public key as a string or an error if the conversion fails.
-pub fn public_key_from_secret_key(secret_key: &str) -> Result<String, SdkError> {
+pub fn public_key_from_secret_key(secret_key: &str) -> Result<String, Box<SdkError>> {
     // Handle the secret key parsing and map the error
     let secret_key_from_pem = secret_key_from_pem(secret_key)?;
 
@@ -361,7 +371,7 @@ pub fn hex_to_string(hex_string: &str) -> String {
 /// # Returns
 ///
 /// A string representing the CSPR amount.
-pub fn motes_to_cspr(motes: &str) -> Result<String, SdkError> {
+pub fn motes_to_cspr(motes: &str) -> Result<String, Box<SdkError>> {
     match BigDecimal::from_str(motes) {
         Ok(motes_decimal) => {
             let divisor = BigDecimal::from(1_000_000_000);
@@ -374,10 +384,10 @@ pub fn motes_to_cspr(motes: &str) -> Result<String, SdkError> {
                 Ok(formatted_cspr)
             }
         }
-        Err(err) => Err(SdkError::CustomError {
+        Err(err) => Err(Box::new(SdkError::CustomError {
             context: "Failed to parse input as BigDecimal",
             error: format!("{err:?}"),
-        }),
+        })),
     }
 }
 
@@ -391,22 +401,22 @@ pub fn motes_to_cspr(motes: &str) -> Result<String, SdkError> {
 /// # Returns
 ///
 /// A JSON string representing the pretty printed value.
-pub fn json_pretty_print<T>(value: T, verbosity: Option<Verbosity>) -> Result<String, SdkError>
+pub fn json_pretty_print<T>(value: T, verbosity: Option<Verbosity>) -> Result<String, Box<SdkError>>
 where
     T: Serialize,
 {
-    let deserialized = serde_json::to_value(&value).map_err(SdkError::from)?;
+    let deserialized = serde_json::to_value(&value).map_err(|e| Box::new(SdkError::from(e)))?;
 
     match verbosity {
         Some(Verbosity::Low) | None => Ok(deserialized.to_string()),
-        Some(Verbosity::Medium) => {
-            casper_types::json_pretty_print(&deserialized).map_err(|err| SdkError::CustomError {
+        Some(Verbosity::Medium) => casper_types::json_pretty_print(&deserialized).map_err(|err| {
+            Box::new(SdkError::CustomError {
                 context: "Error in json_pretty_print",
                 error: format!("{err}"),
             })
-        }
+        }),
         Some(Verbosity::High) => {
-            serde_json::to_string_pretty(&deserialized).map_err(SdkError::from)
+            serde_json::to_string_pretty(&deserialized).map_err(|e| Box::new(SdkError::from(e)))
         }
     }
 }

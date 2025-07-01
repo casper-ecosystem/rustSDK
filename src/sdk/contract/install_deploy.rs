@@ -151,7 +151,7 @@ mod tests {
         let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
+                eprintln!("Error reading file: {err:?}");
                 return;
             }
         };
@@ -200,7 +200,7 @@ mod tests {
         let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
+                eprintln!("Error reading file: {err:?}");
                 return;
             }
         };
@@ -247,7 +247,7 @@ mod tests {
         let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
+                eprintln!("Error reading file: {err:?}");
                 return;
             }
         };
@@ -295,7 +295,7 @@ mod tests {
         let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
+                eprintln!("Error reading file: {err:?}");
                 return;
             }
         };
