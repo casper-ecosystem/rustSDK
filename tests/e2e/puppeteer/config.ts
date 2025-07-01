@@ -1,4 +1,4 @@
-const dotenv = require('dotenv');
+import dotenv from 'dotenv';
 dotenv.config({ path: '../../.env' });
 
 export const key_name_default = 'secret_key.pem';

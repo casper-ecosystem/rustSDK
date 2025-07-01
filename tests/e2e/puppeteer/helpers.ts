@@ -1,16 +1,15 @@
-const fs = require('fs');
-const path = require('path');
-const puppeteer = require('puppeteer');
+import fs from 'fs';
+import path from 'path';
+import { Browser, Page } from 'puppeteer';
 import * as config from './config';
 
-const { Browser, Page } = puppeteer;
+import { SDK, publicKeyFromSecretKey, PublicKey } from 'casper-rust-wasm-sdk';
 
-const casper_sdk = require('casper-rust-wasm-sdk');
-const { SDK, publicKeyFromSecretKey, PublicKey } = casper_sdk;
+const sdk = new SDK();
 
 export const variables = {
-  browser: undefined as typeof Browser | undefined,
-  page: undefined as typeof Page | undefined,
+  browser: undefined as unknown as Browser,
+  page: undefined as unknown as Page,
   state_root_hash_default: '',
   secret_key: '',
   account: '',
@@ -27,10 +26,13 @@ export const variables = {
   contract_cep78_hash: '',
   contract_cep78_package_hash: '',
   delete_key_at_root_after_test: false,
-  sdk: undefined as typeof SDK | undefined,
+  sdk: undefined as unknown as typeof SDK,
 };
 
 export async function clear() {
+  if (!variables.page) {
+    throw new Error('Puppeteer page is not initialized.');
+  }
   await variables.page.waitForSelector('[e2e-id="clear result"]');
   await variables.page.click('[e2e-id="clear result"]');
   await variables.page.waitForFunction(
@@ -45,8 +47,11 @@ export async function clear() {
 }
 
 export async function clearInput(id: string) {
+  if (!variables.page) {
+    throw new Error('Puppeteer page is not initialized.');
+  }
   await variables.page.waitForSelector(id);
-  await variables.page.$eval(id, (input: HTMLInputElement) => {
+  await variables.page.$eval(id, (input: any) => {
     input.value = '';
     input.dispatchEvent(new Event('input', { bubbles: true }));
     input.dispatchEvent(new Event('change', { bubbles: true }));
@@ -55,16 +60,25 @@ export async function clearInput(id: string) {
 }
 
 export async function submit() {
+  if (!variables.page) {
+    throw new Error('Puppeteer page is not initialized.');
+  }
   await variables.page.waitForSelector('[e2e-id="submit"]');
   await variables.page.click('[e2e-id="submit"]');
 }
 
 export async function sign() {
+  if (!variables.page) {
+    throw new Error('Puppeteer page is not initialized.');
+  }
   await variables.page.waitForSelector('[e2e-id="sign"]');
   await variables.page.click('[e2e-id="sign"]');
 }
 
 export async function getResult() {
+  if (!variables.page) {
+    throw new Error('Puppeteer page is not initialized.');
+  }
   await variables.page.waitForSelector('[e2e-id="result"]');
   const result = await variables.page.evaluate(() => {
     return document.querySelector('[e2e-id="result"]')?.textContent;
@@ -73,7 +87,10 @@ export async function getResult() {
   return result;
 }
 
-export async function seletAction(action: string) {
+export async function selectAction(action: string) {
+  if (!variables.page) {
+    throw new Error('Puppeteer page is not initialized.');
+  }
   await delay(400);
   await variables.page.waitForSelector('[e2e-id="state_root_hash"]');
   await variables.page.waitForSelector('[e2e-id="selectActionElt"]');
@@ -90,11 +107,20 @@ export async function seletAction(action: string) {
 }
 
 export async function setSecretKey() {
+  if (!variables.page) {
+    throw new Error('Puppeteer page is not initialized.');
+  }
   await variables.page.waitForSelector('[e2e-id="secretKeyElt"]');
   const elementHandle = await variables.page.$('[e2e-id="secretKeyElt"]');
   const resolvedPath = path.resolve(__dirname, '../', config.key_name);
   if (fs.existsSync(resolvedPath)) {
-    await elementHandle.uploadFile(resolvedPath);
+    if (elementHandle) {
+      await (
+        elementHandle as import('puppeteer').ElementHandle<HTMLInputElement>
+      ).uploadFile(resolvedPath);
+    } else {
+      console.error('Element handle for secretKeyElt is null.');
+    }
   } else {
     console.error(`File ${resolvedPath} does not exist.`);
   }
@@ -104,11 +130,20 @@ export async function setSecretKey() {
 }
 
 export async function setWasm(file_name: string) {
+  if (!variables.page) {
+    throw new Error('Puppeteer page is not initialized.');
+  }
   await variables.page.waitForSelector('[e2e-id="wasmElt"]');
   const elementHandle = await variables.page.$('[e2e-id="wasmElt"]');
   const resolvedPath = path.resolve(__dirname, '../../wasm', file_name);
   if (fs.existsSync(resolvedPath)) {
-    await elementHandle.uploadFile(resolvedPath);
+    if (elementHandle) {
+      await (
+        elementHandle as import('puppeteer').ElementHandle<HTMLInputElement>
+      ).uploadFile(resolvedPath);
+    } else {
+      console.error('Element handle for wasmElt is null.');
+    }
   } else {
     console.error(`File ${resolvedPath} does not exist.`);
   }
@@ -120,6 +155,9 @@ export async function setWasm(file_name: string) {
 }
 
 export async function screenshot() {
+  if (!variables.page) {
+    throw new Error('Puppeteer page is not initialized.');
+  }
   await variables.page.screenshot({ path: 'test.png' });
 }
 
@@ -130,7 +168,6 @@ export function delay(time: number | undefined) {
 }
 
 export async function setupFixtures() {
-  variables.sdk = new SDK();
   let copy_key_to_root_folder = true;
 
   // User 1 as target for default account
@@ -189,16 +226,16 @@ export function deleteFile(filePathToDelete: string) {
 }
 
 export async function get_state_root_hash() {
-  const get_state_root_hash_options = variables.sdk.get_state_root_hash_options(
-    {
-      rpc_address: config.rpc_address,
-    }
-  );
-  const get_state_root_hash_result = await variables.sdk.get_state_root_hash(
+  const get_state_root_hash_options = sdk.get_state_root_hash_options({
+    rpc_address: config.rpc_address,
+  });
+  const get_state_root_hash_result = await sdk.get_state_root_hash(
     get_state_root_hash_options
   );
   variables.state_root_hash_default =
-    get_state_root_hash_result?.state_root_hash.toString();
+    get_state_root_hash_result?.state_root_hash
+      ? get_state_root_hash_result.state_root_hash.toString()
+      : '';
 }
 
 function readPEMFile(key_path?: string, copy?: boolean): string {
@@ -240,10 +277,10 @@ function writeFile(content: string, dest: string) {
 }
 
 export async function get_block() {
-  const chain_get_block_options = variables.sdk.get_block_options({
+  const chain_get_block_options = sdk.get_block_options({
     rpc_address: config.rpc_address,
   });
-  const block_result = await variables.sdk.get_block(chain_get_block_options);
+  const block_result = await sdk.get_block(chain_get_block_options);
   variables.block_hash = block_result?.block?.hash?.toString();
   variables.block_height = block_result?.block?.header?.height?.toString();
 }

@@ -1,14 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    "target": "es2020",
+    "module": "esnext",
     "strict": true,
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["jest", "node", "puppeteer"]
+    "types": ["jest", "node", "puppeteer"],
+    "baseUrl": "."
   },
   "paths": {
-    "casper-rust-wasm-sdk": ["../../../pkg"]
+    "casper-rust-wasm-sdk": ["../../../pkg-nodejs"]
   }
 }

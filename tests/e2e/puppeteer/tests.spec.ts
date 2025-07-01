@@ -1,5 +1,5 @@
 import * as config from './config';
-const path = require('path');
+import path from 'path';
 import {
   setupFixtures,
   variables as test,
@@ -8,7 +8,7 @@ import {
   clear,
   clearInput,
   setSecretKey,
-  seletAction,
+  selectAction,
   setWasm,
   submit,
   get_state_root_hash,
@@ -17,13 +17,13 @@ import {
   delay,
   get_block,
 } from './helpers';
-const puppeteer = require('puppeteer');
+import puppeteer, { HTTPRequest } from 'puppeteer';
 
 describe('Angular App Tests', () => {
   beforeAll(async () => {
     setupFixtures();
     test.browser = await puppeteer.launch({
-      headless: 'new',
+      headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     test.page = await test.browser.newPage();
@@ -40,27 +40,24 @@ describe('Angular App Tests', () => {
       'JSHandle@object',
     ];
 
-    test.page;
-    test.page
-      .on('console', (message: { type: () => string; text: () => string }) => {
-        const text = message.text();
+    // test.page
+    //   .on('console', (message) => {
+    //     const text = message.text();
 
-        // Ignore if the message contains any ignored phrase
-        const shouldIgnore = ignoredMessages.some((pattern) =>
-          text.includes(pattern)
-        );
-        if (shouldIgnore) return;
+    //     const shouldIgnore = ignoredMessages.some((pattern) =>
+    //       text.includes(pattern)
+    //     );
+    //     if (shouldIgnore) return;
 
-        console.log(`${message.type().substr(0, 3).toUpperCase()} ${text}`);
-      })
-      .on('pageerror', (message: any) => console.log(message))
-      .on(
-        'requestfailed',
-        (request: {
-          failure: () => { (): any; new (): any; errorText: any };
-          url: () => any;
-        }) => console.log(`${request.failure().errorText} ${request.url()}`)
-      );
+    //     console.log(`${message.type().substr(0, 3).toUpperCase()} ${text}`);
+    //   })
+    //   .on('pageerror', (message: any) => console.log(message))
+    //   .on('requestfailed', (request: HTTPRequest) => {
+    //     const failure = request.failure();
+    //     if (failure) {
+    //       console.log(`${failure.errorText} ${request.url()}`);
+    //     }
+    //   });
   });
 
   describe('Loading', () => {
@@ -78,7 +75,7 @@ describe('Angular App Tests', () => {
       const pattern = /^state root hash is ([0-9a-f]{64})$/i;
       expect(state_root_hash).toMatch(pattern);
       test.state_root_hash_default =
-        (state_root_hash.match(pattern) || [])[1] || '';
+        ((state_root_hash ?? '').match(pattern) || [])[1] || '';
       expect(test.state_root_hash_default).toBeDefined();
     });
 
@@ -126,9 +123,8 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       const account_input = await test.page.evaluate(() => {
         return (
@@ -163,7 +159,7 @@ describe('Angular App Tests', () => {
   describe('Contract install deploy', () => {
     beforeEach(async () => {
       await test.page.reload();
-      await seletAction('install_deploy');
+      await selectAction('install_deploy');
       await setSecretKey();
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
@@ -188,16 +184,17 @@ describe('Angular App Tests', () => {
       deploy = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
-      deploy = JSON.parse(deploy);
-      expect(deploy?.deploy_hash).toBeDefined();
-      test.deploy_hash = deploy.deploy_hash;
+      let deploy_parsed = JSON.parse(deploy!);
+
+      expect(deploy_parsed?.deploy_hash).toBeDefined();
+      test.deploy_hash = deploy_parsed.deploy_hash;
     });
   });
 
   describe('Contract install transaction', () => {
     beforeEach(async () => {
       await test.page.reload();
-      await seletAction('install');
+      await selectAction('install');
       await setSecretKey();
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
@@ -223,10 +220,10 @@ describe('Angular App Tests', () => {
       transaction = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
-      transaction = JSON.parse(transaction);
-      expect(transaction?.transaction_hash).toBeDefined();
+      let transaction_parsed = JSON.parse(transaction!);
+      expect(transaction_parsed?.transaction_hash).toBeDefined();
       test.transaction_hash =
-        transaction.transaction_hash?.Version1?.toString();
+        transaction_parsed.transaction_hash?.Version1?.toString();
     });
   });
 
@@ -236,7 +233,7 @@ describe('Angular App Tests', () => {
     }
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_account');
+      await selectAction('get_account');
     });
 
     it('should get_account from public key', async () => {
@@ -290,7 +287,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_auction_info', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_auction_info');
+      await selectAction('get_auction_info');
     });
 
     it('should get_auction_info', async () => {
@@ -305,12 +302,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
-      await seletAction('get_balance');
+      await selectAction('get_balance');
       await test.page.waitForSelector('[e2e-id="purseUrefElt"]');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
     });
@@ -340,7 +336,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_block', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_block');
+      await selectAction('get_block');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
     });
@@ -378,7 +374,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_block_transfers', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_block_transfers');
+      await selectAction('get_block_transfers');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
     });
 
@@ -412,7 +408,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_chainspec', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_chainspec');
+      await selectAction('get_chainspec');
     });
     it('should get_chainspec', async () => {
       await submit();
@@ -423,7 +419,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_era_info', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_era_info');
+      await selectAction('get_era_info');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
     });
@@ -461,7 +457,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_node_status', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_node_status');
+      await selectAction('get_node_status');
     });
     it('should get_node_status', async () => {
       await submit();
@@ -472,7 +468,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_peers', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_peers');
+      await selectAction('get_peers');
     });
     it('should get_peers', async () => {
       await submit();
@@ -483,7 +479,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_state_root_hash', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_state_root_hash');
+      await selectAction('get_state_root_hash');
     });
     it('should get_state_root_hash', async () => {
       await submit();
@@ -494,7 +490,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_validator_changes', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_validator_changes');
+      await selectAction('get_validator_changes');
     });
     it('should get_validator_changes', async () => {
       await submit();
@@ -505,7 +501,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call list_rpcs', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('list_rpcs');
+      await selectAction('list_rpcs');
     });
     it('should list_rpcs', async () => {
       await submit();
@@ -519,12 +515,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
-      await seletAction('query_balance');
+      await selectAction('query_balance');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="purseIdentifierElt"]');
     });
@@ -587,12 +582,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
-      await seletAction('query_balance_details');
+      await selectAction('query_balance_details');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="purseIdentifierElt"]');
     });
@@ -652,7 +646,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_deploy', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_deploy');
+      await selectAction('get_deploy');
     });
 
     it('should get_deploy', async () => {
@@ -668,7 +662,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_transaction', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_transaction');
+      await selectAction('get_transaction');
       await test.page.waitForSelector('[e2e-id="transactionHashElt"]');
     });
 
@@ -691,12 +685,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
-      await seletAction('query_global_state');
+      await selectAction('query_global_state');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="queryKeyElt"]');
       await test.page.waitForSelector('[e2e-id="queryPathElt"]');
@@ -772,12 +765,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
-      await seletAction('query_global_state');
+      await selectAction('query_global_state');
       await clearInput('[e2e-id="queryPathElt"]');
       await clearInput('[e2e-id="stateRootHashElt"]');
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
@@ -790,7 +782,7 @@ describe('Angular App Tests', () => {
       let result = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
-      let result_json = JSON.parse(result);
+      let result_json = JSON.parse(result!);
 
       // Get account entity
       expect(result_json?.stored_value.CLValue.parsed).toBeDefined();
@@ -808,7 +800,7 @@ describe('Angular App Tests', () => {
       result = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
-      result_json = JSON.parse(result);
+      result_json = JSON.parse(result!);
       expect(result_json?.stored_value.CLValue.parsed).toEqual(
         config.collection_name
       );
@@ -824,12 +816,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
-      await seletAction('query_global_state');
+      await selectAction('query_global_state');
       await clearInput('[e2e-id="queryPathElt"]');
       await clearInput('[e2e-id="stateRootHashElt"]');
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
@@ -842,7 +833,7 @@ describe('Angular App Tests', () => {
       let result = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
-      let result_json = JSON.parse(result);
+      let result_json = JSON.parse(result!);
       expect(result_json?.stored_value.Account.named_keys).toBeDefined();
       let named_keys = result_json?.stored_value.Account.named_keys as Array<{
         name: string;
@@ -874,7 +865,7 @@ describe('Angular App Tests', () => {
       result = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
-      result_json = JSON.parse(result);
+      result_json = JSON.parse(result!);
       expect(result_json?.stored_value.CLValue.parsed).toEqual(
         config.collection_name
       );
@@ -888,7 +879,7 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await get_state_root_hash(); // refresh state root hash
       await test.page.reload();
-      await seletAction('get_entity');
+      await selectAction('get_entity');
     });
 
     it('should get_entity from public key', async () => {
@@ -949,7 +940,7 @@ describe('Angular App Tests', () => {
       const result = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
-      const result_json = JSON.parse(result);
+      const result_json = JSON.parse(result!);
       const named_keys = result_json?.entity_result?.AddressableEntity
         .named_keys as Array<{ name: string; key: string }>;
       test.contract_cep78_entity =
@@ -973,7 +964,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await get_state_root_hash(); // refresh state root hash
       await test.page.reload();
-      await seletAction('query_contract_key');
+      await selectAction('query_contract_key');
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
       await clearInput('[e2e-id="blockIdentifierHashElt"]');
       await test.page.waitForSelector('[e2e-id="queryKeyElt"]');
@@ -1010,7 +1001,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await setSecretKey();
-      await seletAction('call_entrypoint_deploy');
+      await selectAction('call_entrypoint_deploy');
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="sessionHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
@@ -1151,7 +1142,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await setSecretKey();
-      await seletAction('call_entrypoint');
+      await selectAction('call_entrypoint');
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="entityHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
@@ -1294,7 +1285,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await get_state_root_hash(); // refresh state root hash
-      await seletAction('query_contract_dict');
+      await selectAction('query_contract_dict');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="seedContractHashElt"]');
       await test.page.waitForSelector('[e2e-id="seedNameElt"]');
@@ -1336,7 +1327,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await get_state_root_hash(); // refresh state root hash
-      await seletAction('query_contract_dict');
+      await selectAction('query_contract_dict');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="seedEntityHashElt"]');
       await test.page.waitForSelector('[e2e-id="seedNameElt"]');
@@ -1377,12 +1368,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
-      await seletAction('make_deploy');
+      await selectAction('make_deploy');
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="sessionHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
@@ -1529,12 +1519,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
-      await seletAction('make_transaction');
+      await selectAction('make_transaction');
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="entityHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
@@ -1682,12 +1671,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
-      await seletAction('make_transfer');
+      await selectAction('make_transfer');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
       await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
     });
@@ -1732,12 +1720,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
-      await seletAction('make_transfer_transaction');
+      await selectAction('make_transfer_transaction');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
       await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
     });
@@ -1782,12 +1769,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
-      await seletAction('make_transfer');
+      await selectAction('make_transfer');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
       await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
     });
@@ -1806,7 +1792,7 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_transfer).toBeDefined();
-      await seletAction('sign_deploy');
+      await selectAction('sign_deploy');
       const unsigned_deploy = await test.page.evaluate(() => {
         const textarea = document.querySelector(
           '[e2e-id="deployJsonElt"]'
@@ -1833,12 +1819,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await test.page.type('[e2e-id="publicKeyElt"]', test.account);
-      await test.page.$eval(
-        '[e2e-id="publicKeyElt"]',
-        (e: { blur: () => any }) => e.blur()
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: Element) =>
+        (e as HTMLElement).blur()
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
-      await seletAction('make_transfer_transaction');
+      await selectAction('make_transfer_transaction');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
       await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
     });
@@ -1857,7 +1842,7 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_transfer_transaction).toBeDefined();
-      await seletAction('sign_transaction');
+      await selectAction('sign_transaction');
       const unsigned_transaction = await test.page.evaluate(() => {
         const textarea = document.querySelector(
           '[e2e-id="transactionJsonElt"]'
@@ -1882,7 +1867,7 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await test.page.reload();
       await setSecretKey();
-      await seletAction('make_transfer');
+      await selectAction('make_transfer');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
       await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
     });
@@ -1901,7 +1886,7 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_transfer).toBeDefined();
-      await seletAction('put_deploy');
+      await selectAction('put_deploy');
       const signed_deploy = await test.page.evaluate(() => {
         const textarea = document.querySelector(
           '[e2e-id="deployJsonElt"]'
@@ -1918,7 +1903,7 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await test.page.reload();
       await setSecretKey();
-      await seletAction('make_transfer_transaction');
+      await selectAction('make_transfer_transaction');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
       await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
     });
@@ -1937,7 +1922,7 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_transfer).toBeDefined();
-      await seletAction('put_transaction');
+      await selectAction('put_transaction');
       const signed_transaction = await test.page.evaluate(() => {
         const textarea = document.querySelector(
           '[e2e-id="transactionJsonElt"]'
@@ -1954,7 +1939,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await setSecretKey();
-      await seletAction('deploy');
+      await selectAction('deploy');
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="sessionHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
@@ -2126,7 +2111,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await setSecretKey();
-      await seletAction('transaction');
+      await selectAction('transaction');
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="entityHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
@@ -2299,7 +2284,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await setSecretKey();
-      await seletAction('transfer');
+      await selectAction('transfer');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
       await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
     });
@@ -2338,7 +2323,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await setSecretKey();
-      await seletAction('transfer_transaction');
+      await selectAction('transfer_transaction');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
       await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
     });
@@ -2380,7 +2365,7 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await test.page.reload();
       await get_state_root_hash(); // refresh state root hash before querying contract dict
-      await seletAction('get_dictionary_item');
+      await selectAction('get_dictionary_item');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="selectDictIdentifierElt"]');
       await test.page.waitForSelector('[e2e-id="seedContractHashElt"]');
@@ -2418,7 +2403,7 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(result).toBeDefined();
-      const result_json = JSON.parse(result);
+      const result_json = JSON.parse(result!);
       expect(result_json.dictionary_key).toBeDefined();
       test.dictionary_key = result_json.dictionary_key;
     });
@@ -2438,7 +2423,7 @@ describe('Angular App Tests', () => {
 
     it('should get_dictionary_item with dictionary uref', async () => {
       await test.page.reload();
-      await seletAction('query_global_state');
+      await selectAction('query_global_state');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="queryKeyElt"]');
       await test.page.waitForSelector('[e2e-id="queryPathElt"]');
@@ -2450,7 +2435,7 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(result).toBeDefined();
-      let result_json = JSON.parse(result);
+      let result_json = JSON.parse(result!);
       expect(result_json?.stored_value.Contract.named_keys).toBeDefined();
       let named_keys = result_json?.stored_value.Contract.named_keys as Array<{
         name: string;
@@ -2460,7 +2445,7 @@ describe('Angular App Tests', () => {
       test.dictionary_uref =
         named_keys.find((key) => key.name === 'events')?.key || '';
 
-      await seletAction('get_dictionary_item');
+      await selectAction('get_dictionary_item');
       await test.page.waitForSelector('[e2e-id="selectDictIdentifierElt"]');
       await test.page.select(
         '[e2e-id="selectDictIdentifierElt"]',
@@ -2484,7 +2469,7 @@ describe('Angular App Tests', () => {
       await test.page.reload();
       await get_state_root_hash(); // refresh state root hash before querying contract dict
 
-      await seletAction('get_entity');
+      await selectAction('get_entity');
       await test.page.waitForSelector('[e2e-id="entityIdentifierElt"]');
       await clearInput('[e2e-id="entityIdentifierElt"]');
       await test.page.type(
@@ -2496,12 +2481,12 @@ describe('Angular App Tests', () => {
       const result = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
-      const result_json = JSON.parse(result);
+      const result_json = JSON.parse(result!);
       const named_keys = result_json?.entity_result?.AddressableEntity
         .named_keys as Array<{ name: string; key: string }>;
       test.dictionary_uref =
         named_keys.find((key) => key.name === 'events')?.key || '';
-      await seletAction('get_dictionary_item');
+      await selectAction('get_dictionary_item');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="selectDictIdentifierElt"]');
       await test.page.waitForSelector('[e2e-id="seedEntityHashElt"]');
@@ -2543,7 +2528,7 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(result).toBeDefined();
-      const result_json = JSON.parse(result);
+      const result_json = JSON.parse(result!);
       expect(result_json.dictionary_key).toBeDefined();
       test.dictionary_key = result_json.dictionary_key;
     });
@@ -2580,7 +2565,7 @@ describe('Angular App Tests', () => {
   describe('Rpc call get_era_summary', () => {
     beforeAll(async () => {
       await test.page.reload();
-      await seletAction('get_era_summary');
+      await selectAction('get_era_summary');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
     });
