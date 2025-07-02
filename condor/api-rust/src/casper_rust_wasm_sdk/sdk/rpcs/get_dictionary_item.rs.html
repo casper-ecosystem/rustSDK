@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_dictionary_item.rs`."><title>get_dictionary_item.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6c3ea77c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.86.0 (05f9846f8 2025-03-31)" data-channel="1.86.0" data-search-js="search-581efc7a.js" data-settings-js="settings-6dad6058.js" ><script src="../../../../static.files/storage-3a5871a4.js"></script><script defer src="../../../../static.files/src-script-b8d3f215.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-4d63596a.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/rpcs/</div>get_dictionary_item.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_dictionary_item.rs`."><title>get_dictionary_item.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-1a91846b.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.88.0 (6b00bc388 2025-06-23)" data-channel="1.88.0" data-search-js="search-f7877310.js" data-settings-js="settings-5514c975.js" ><script src="../../../../static.files/storage-4e99c027.js"></script><script defer src="../../../../static.files/src-script-63605ae7.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-7ef8a74a.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/rpcs/</div>get_dictionary_item.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
 <a href=#2 id=2 data-nosnippet>2</a><span class="kw">use crate</span>::{
 <a href=#3 id=3 data-nosnippet>3</a>    types::{
 <a href=#4 id=4 data-nosnippet>4</a>        deploy_params::dictionary_item_str_params::{
@@ -108,7 +108,7 @@
 <a href=#108 id=108 data-nosnippet>108</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;GetDictionaryItemOptions, JsError&gt; {
 <a href=#109 id=109 data-nosnippet>109</a>        options
 <a href=#110 id=110 data-nosnippet>110</a>            .into_serde::&lt;GetDictionaryItemOptions&gt;()
-<a href=#111 id=111 data-nosnippet>111</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
+<a href=#111 id=111 data-nosnippet>111</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {err:?}"</span>)))
 <a href=#112 id=112 data-nosnippet>112</a>    }
 <a href=#113 id=113 data-nosnippet>113</a>
 <a href=#114 id=114 data-nosnippet>114</a>    <span class="doccomment">/// Retrieves dictionary item information using the provided options.
@@ -141,7 +141,7 @@
 <a href=#141 id=141 data-nosnippet>141</a>        <span class="kw">let </span>dictionary_item = <span class="kw">if let </span><span class="prelude-val">Some</span>(identifier) = dictionary_item_identifier {
 <a href=#142 id=142 data-nosnippet>142</a>            DictionaryItemInput::Identifier(identifier)
 <a href=#143 id=143 data-nosnippet>143</a>        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(params) = dictionary_item_params {
-<a href=#144 id=144 data-nosnippet>144</a>            DictionaryItemInput::Params(params)
+<a href=#144 id=144 data-nosnippet>144</a>            DictionaryItemInput::Params(Box::new(params))
 <a href=#145 id=145 data-nosnippet>145</a>        } <span class="kw">else </span>{
 <a href=#146 id=146 data-nosnippet>146</a>            <span class="kw">let </span>err = <span class="string">"Error: Missing dictionary item identifier or params"</span>;
 <a href=#147 id=147 data-nosnippet>147</a>            <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(err));
@@ -161,7 +161,7 @@
 <a href=#161 id=161 data-nosnippet>161</a>        <span class="kw">match </span>result {
 <a href=#162 id=162 data-nosnippet>162</a>            <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
 <a href=#163 id=163 data-nosnippet>163</a>            <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#164 id=164 data-nosnippet>164</a>                <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
+<a href=#164 id=164 data-nosnippet>164</a>                <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {err:?}"</span>);
 <a href=#165 id=165 data-nosnippet>165</a>                <span class="prelude-val">Err</span>(JsError::new(err))
 <a href=#166 id=166 data-nosnippet>166</a>            }
 <a href=#167 id=167 data-nosnippet>167</a>        }
@@ -180,7 +180,7 @@
 <a href=#180 id=180 data-nosnippet>180</a><span class="attr">#[derive(Debug, Clone)]
 <a href=#181 id=181 data-nosnippet>181</a></span><span class="kw">pub enum </span>DictionaryItemInput {
 <a href=#182 id=182 data-nosnippet>182</a>    Identifier(DictionaryItemIdentifier),
-<a href=#183 id=183 data-nosnippet>183</a>    Params(DictionaryItemStrParams),
+<a href=#183 id=183 data-nosnippet>183</a>    Params(Box&lt;DictionaryItemStrParams&gt;),
 <a href=#184 id=184 data-nosnippet>184</a>}
 <a href=#185 id=185 data-nosnippet>185</a>
 <a href=#186 id=186 data-nosnippet>186</a><span class="kw">impl </span>SDK {
@@ -405,7 +405,7 @@
 <a href=#405 id=405 data-nosnippet>405</a>        <span class="comment">// Act
 <a href=#406 id=406 data-nosnippet>406</a>        </span><span class="kw">let </span>result = sdk
 <a href=#407 id=407 data-nosnippet>407</a>            .get_dictionary_item(
-<a href=#408 id=408 data-nosnippet>408</a>                DictionaryItemInput::Params(params),
+<a href=#408 id=408 data-nosnippet>408</a>                DictionaryItemInput::Params(Box::new(params)),
 <a href=#409 id=409 data-nosnippet>409</a>                <span class="prelude-val">Some</span>(state_root_hash),
 <a href=#410 id=410 data-nosnippet>410</a>                verbosity,
 <a href=#411 id=411 data-nosnippet>411</a>                <span class="prelude-val">Some</span>(rpc_address),
@@ -422,7 +422,7 @@
 <a href=#422 id=422 data-nosnippet>422</a>    </span><span class="kw">async fn </span>test_get_dictionary_item_with_error() {
 <a href=#423 id=423 data-nosnippet>423</a>        <span class="comment">// Arrange
 <a href=#424 id=424 data-nosnippet>424</a>        </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-<a href=#425 id=425 data-nosnippet>425</a>        <span class="kw">let </span>error_message = <span class="string">"error sending request for url (http://localhost/rpc)"</span>;
+<a href=#425 id=425 data-nosnippet>425</a>        <span class="kw">let </span>error_message = <span class="string">"error sending request"</span>;
 <a href=#426 id=426 data-nosnippet>426</a>
 <a href=#427 id=427 data-nosnippet>427</a>        <span class="comment">// Act
 <a href=#428 id=428 data-nosnippet>428</a>        </span><span class="kw">let </span>result = sdk

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/binary_port/wasm32.rs`."><title>wasm32.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6c3ea77c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.86.0 (05f9846f8 2025-03-31)" data-channel="1.86.0" data-search-js="search-581efc7a.js" data-settings-js="settings-6dad6058.js" ><script src="../../../../static.files/storage-3a5871a4.js"></script><script defer src="../../../../static.files/src-script-b8d3f215.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-4d63596a.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/binary_port/</div>wasm32.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/binary_port/wasm32.rs`."><title>wasm32.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-1a91846b.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.88.0 (6b00bc388 2025-06-23)" data-channel="1.88.0" data-search-js="search-f7877310.js" data-settings-js="settings-5514c975.js" ><script src="../../../../static.files/storage-4e99c027.js"></script><script defer src="../../../../static.files/src-script-63605ae7.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-7ef8a74a.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/binary_port/</div>wasm32.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 <a href=#2 id=2 data-nosnippet>2</a></span><span class="kw">use crate</span>::{
 <a href=#3 id=3 data-nosnippet>3</a>    types::{
 <a href=#4 id=4 data-nosnippet>4</a>        digest::Digest,
@@ -31,7 +31,7 @@
 <a href=#31 id=31 data-nosnippet>31</a>
 <a href=#32 id=32 data-nosnippet>32</a>        result
 <a href=#33 id=33 data-nosnippet>33</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#34 id=34 data-nosnippet>34</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#34 id=34 data-nosnippet>34</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#35 id=35 data-nosnippet>35</a>    }
 <a href=#36 id=36 data-nosnippet>36</a>
 <a href=#37 id=37 data-nosnippet>37</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_latest_block_header"</span>)]
@@ -42,7 +42,7 @@
 <a href=#42 id=42 data-nosnippet>42</a>        <span class="kw">let </span>result = <span class="self">self</span>.get_binary_latest_block_header(node_address).<span class="kw">await</span>;
 <a href=#43 id=43 data-nosnippet>43</a>        result
 <a href=#44 id=44 data-nosnippet>44</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#45 id=45 data-nosnippet>45</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#45 id=45 data-nosnippet>45</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#46 id=46 data-nosnippet>46</a>    }
 <a href=#47 id=47 data-nosnippet>47</a>
 <a href=#48 id=48 data-nosnippet>48</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_block_header_by_height"</span>)]
@@ -56,7 +56,7 @@
 <a href=#56 id=56 data-nosnippet>56</a>            .<span class="kw">await</span>;
 <a href=#57 id=57 data-nosnippet>57</a>        result
 <a href=#58 id=58 data-nosnippet>58</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#59 id=59 data-nosnippet>59</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#59 id=59 data-nosnippet>59</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#60 id=60 data-nosnippet>60</a>    }
 <a href=#61 id=61 data-nosnippet>61</a>
 <a href=#62 id=62 data-nosnippet>62</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_block_header_by_hash"</span>)]
@@ -70,7 +70,7 @@
 <a href=#70 id=70 data-nosnippet>70</a>            .<span class="kw">await</span>;
 <a href=#71 id=71 data-nosnippet>71</a>        result
 <a href=#72 id=72 data-nosnippet>72</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#73 id=73 data-nosnippet>73</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#73 id=73 data-nosnippet>73</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#74 id=74 data-nosnippet>74</a>    }
 <a href=#75 id=75 data-nosnippet>75</a>
 <a href=#76 id=76 data-nosnippet>76</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_latest_block_with_signatures"</span>)]
@@ -83,7 +83,7 @@
 <a href=#83 id=83 data-nosnippet>83</a>            .<span class="kw">await</span>;
 <a href=#84 id=84 data-nosnippet>84</a>        result
 <a href=#85 id=85 data-nosnippet>85</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#86 id=86 data-nosnippet>86</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#86 id=86 data-nosnippet>86</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#87 id=87 data-nosnippet>87</a>    }
 <a href=#88 id=88 data-nosnippet>88</a>
 <a href=#89 id=89 data-nosnippet>89</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_block_with_signatures_by_height"</span>)]
@@ -97,7 +97,7 @@
 <a href=#97 id=97 data-nosnippet>97</a>            .<span class="kw">await</span>;
 <a href=#98 id=98 data-nosnippet>98</a>        result
 <a href=#99 id=99 data-nosnippet>99</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#100 id=100 data-nosnippet>100</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#100 id=100 data-nosnippet>100</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#101 id=101 data-nosnippet>101</a>    }
 <a href=#102 id=102 data-nosnippet>102</a>
 <a href=#103 id=103 data-nosnippet>103</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_block_with_signatures_by_hash"</span>)]
@@ -111,7 +111,7 @@
 <a href=#111 id=111 data-nosnippet>111</a>            .<span class="kw">await</span>;
 <a href=#112 id=112 data-nosnippet>112</a>        result
 <a href=#113 id=113 data-nosnippet>113</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#114 id=114 data-nosnippet>114</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#114 id=114 data-nosnippet>114</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#115 id=115 data-nosnippet>115</a>    }
 <a href=#116 id=116 data-nosnippet>116</a>
 <a href=#117 id=117 data-nosnippet>117</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_transaction_by_hash"</span>)]
@@ -126,7 +126,7 @@
 <a href=#126 id=126 data-nosnippet>126</a>            .<span class="kw">await</span>;
 <a href=#127 id=127 data-nosnippet>127</a>        result
 <a href=#128 id=128 data-nosnippet>128</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#129 id=129 data-nosnippet>129</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#129 id=129 data-nosnippet>129</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#130 id=130 data-nosnippet>130</a>    }
 <a href=#131 id=131 data-nosnippet>131</a>
 <a href=#132 id=132 data-nosnippet>132</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_peers"</span>)]
@@ -137,7 +137,7 @@
 <a href=#137 id=137 data-nosnippet>137</a>        <span class="kw">let </span>result = <span class="self">self</span>.get_binary_peers(node_address).<span class="kw">await</span>;
 <a href=#138 id=138 data-nosnippet>138</a>        result
 <a href=#139 id=139 data-nosnippet>139</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#140 id=140 data-nosnippet>140</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#140 id=140 data-nosnippet>140</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#141 id=141 data-nosnippet>141</a>    }
 <a href=#142 id=142 data-nosnippet>142</a>
 <a href=#143 id=143 data-nosnippet>143</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_uptime"</span>)]
@@ -148,7 +148,7 @@
 <a href=#148 id=148 data-nosnippet>148</a>        <span class="kw">let </span>result = <span class="self">self</span>.get_binary_uptime(node_address).<span class="kw">await</span>;
 <a href=#149 id=149 data-nosnippet>149</a>        result
 <a href=#150 id=150 data-nosnippet>150</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#151 id=151 data-nosnippet>151</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#151 id=151 data-nosnippet>151</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#152 id=152 data-nosnippet>152</a>    }
 <a href=#153 id=153 data-nosnippet>153</a>
 <a href=#154 id=154 data-nosnippet>154</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_last_progress"</span>)]
@@ -159,7 +159,7 @@
 <a href=#159 id=159 data-nosnippet>159</a>        <span class="kw">let </span>result = <span class="self">self</span>.get_binary_last_progress(node_address).<span class="kw">await</span>;
 <a href=#160 id=160 data-nosnippet>160</a>        result
 <a href=#161 id=161 data-nosnippet>161</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#162 id=162 data-nosnippet>162</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#162 id=162 data-nosnippet>162</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#163 id=163 data-nosnippet>163</a>    }
 <a href=#164 id=164 data-nosnippet>164</a>
 <a href=#165 id=165 data-nosnippet>165</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_reactor_state"</span>)]
@@ -170,7 +170,7 @@
 <a href=#170 id=170 data-nosnippet>170</a>        <span class="kw">let </span>result = <span class="self">self</span>.get_binary_reactor_state(node_address).<span class="kw">await</span>;
 <a href=#171 id=171 data-nosnippet>171</a>        result
 <a href=#172 id=172 data-nosnippet>172</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#173 id=173 data-nosnippet>173</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#173 id=173 data-nosnippet>173</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#174 id=174 data-nosnippet>174</a>    }
 <a href=#175 id=175 data-nosnippet>175</a>
 <a href=#176 id=176 data-nosnippet>176</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_network_name"</span>)]
@@ -181,7 +181,7 @@
 <a href=#181 id=181 data-nosnippet>181</a>        <span class="kw">let </span>result = <span class="self">self</span>.get_binary_network_name(node_address).<span class="kw">await</span>;
 <a href=#182 id=182 data-nosnippet>182</a>        result
 <a href=#183 id=183 data-nosnippet>183</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#184 id=184 data-nosnippet>184</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#184 id=184 data-nosnippet>184</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#185 id=185 data-nosnippet>185</a>    }
 <a href=#186 id=186 data-nosnippet>186</a>
 <a href=#187 id=187 data-nosnippet>187</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_consensus_validator_changes"</span>)]
@@ -194,7 +194,7 @@
 <a href=#194 id=194 data-nosnippet>194</a>            .<span class="kw">await</span>;
 <a href=#195 id=195 data-nosnippet>195</a>        result
 <a href=#196 id=196 data-nosnippet>196</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#197 id=197 data-nosnippet>197</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#197 id=197 data-nosnippet>197</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#198 id=198 data-nosnippet>198</a>    }
 <a href=#199 id=199 data-nosnippet>199</a>
 <a href=#200 id=200 data-nosnippet>200</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_block_synchronizer_status"</span>)]
@@ -207,7 +207,7 @@
 <a href=#207 id=207 data-nosnippet>207</a>            .<span class="kw">await</span>;
 <a href=#208 id=208 data-nosnippet>208</a>        result
 <a href=#209 id=209 data-nosnippet>209</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#210 id=210 data-nosnippet>210</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#210 id=210 data-nosnippet>210</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#211 id=211 data-nosnippet>211</a>    }
 <a href=#212 id=212 data-nosnippet>212</a>
 <a href=#213 id=213 data-nosnippet>213</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_available_block_range"</span>)]
@@ -218,7 +218,7 @@
 <a href=#218 id=218 data-nosnippet>218</a>        <span class="kw">let </span>result = <span class="self">self</span>.get_binary_available_block_range(node_address).<span class="kw">await</span>;
 <a href=#219 id=219 data-nosnippet>219</a>        result
 <a href=#220 id=220 data-nosnippet>220</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#221 id=221 data-nosnippet>221</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#221 id=221 data-nosnippet>221</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#222 id=222 data-nosnippet>222</a>    }
 <a href=#223 id=223 data-nosnippet>223</a>
 <a href=#224 id=224 data-nosnippet>224</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_next_upgrade"</span>)]
@@ -229,7 +229,7 @@
 <a href=#229 id=229 data-nosnippet>229</a>        <span class="kw">let </span>result = <span class="self">self</span>.get_binary_next_upgrade(node_address).<span class="kw">await</span>;
 <a href=#230 id=230 data-nosnippet>230</a>        result
 <a href=#231 id=231 data-nosnippet>231</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#232 id=232 data-nosnippet>232</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#232 id=232 data-nosnippet>232</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#233 id=233 data-nosnippet>233</a>    }
 <a href=#234 id=234 data-nosnippet>234</a>
 <a href=#235 id=235 data-nosnippet>235</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_consensus_status"</span>)]
@@ -240,7 +240,7 @@
 <a href=#240 id=240 data-nosnippet>240</a>        <span class="kw">let </span>result = <span class="self">self</span>.get_binary_consensus_status(node_address).<span class="kw">await</span>;
 <a href=#241 id=241 data-nosnippet>241</a>        result
 <a href=#242 id=242 data-nosnippet>242</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#243 id=243 data-nosnippet>243</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#243 id=243 data-nosnippet>243</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#244 id=244 data-nosnippet>244</a>    }
 <a href=#245 id=245 data-nosnippet>245</a>
 <a href=#246 id=246 data-nosnippet>246</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_chainspec_raw_bytes"</span>)]
@@ -251,7 +251,7 @@
 <a href=#251 id=251 data-nosnippet>251</a>        <span class="kw">let </span>result = <span class="self">self</span>.get_binary_chainspec_raw_bytes(node_address).<span class="kw">await</span>;
 <a href=#252 id=252 data-nosnippet>252</a>        result
 <a href=#253 id=253 data-nosnippet>253</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#254 id=254 data-nosnippet>254</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#254 id=254 data-nosnippet>254</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#255 id=255 data-nosnippet>255</a>    }
 <a href=#256 id=256 data-nosnippet>256</a>
 <a href=#257 id=257 data-nosnippet>257</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_node_status"</span>)]
@@ -262,7 +262,7 @@
 <a href=#262 id=262 data-nosnippet>262</a>        <span class="kw">let </span>result = <span class="self">self</span>.get_binary_node_status(node_address).<span class="kw">await</span>;
 <a href=#263 id=263 data-nosnippet>263</a>        result
 <a href=#264 id=264 data-nosnippet>264</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#265 id=265 data-nosnippet>265</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#265 id=265 data-nosnippet>265</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#266 id=266 data-nosnippet>266</a>    }
 <a href=#267 id=267 data-nosnippet>267</a>
 <a href=#268 id=268 data-nosnippet>268</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_validator_reward_by_era"</span>)]
@@ -277,7 +277,7 @@
 <a href=#277 id=277 data-nosnippet>277</a>            .<span class="kw">await</span>;
 <a href=#278 id=278 data-nosnippet>278</a>        result
 <a href=#279 id=279 data-nosnippet>279</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#280 id=280 data-nosnippet>280</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#280 id=280 data-nosnippet>280</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#281 id=281 data-nosnippet>281</a>    }
 <a href=#282 id=282 data-nosnippet>282</a>
 <a href=#283 id=283 data-nosnippet>283</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_validator_reward_by_block_height"</span>)]
@@ -296,7 +296,7 @@
 <a href=#296 id=296 data-nosnippet>296</a>            .<span class="kw">await</span>;
 <a href=#297 id=297 data-nosnippet>297</a>        result
 <a href=#298 id=298 data-nosnippet>298</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#299 id=299 data-nosnippet>299</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#299 id=299 data-nosnippet>299</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#300 id=300 data-nosnippet>300</a>    }
 <a href=#301 id=301 data-nosnippet>301</a>
 <a href=#302 id=302 data-nosnippet>302</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_validator_reward_by_block_hash"</span>)]
@@ -315,7 +315,7 @@
 <a href=#315 id=315 data-nosnippet>315</a>            .<span class="kw">await</span>;
 <a href=#316 id=316 data-nosnippet>316</a>        result
 <a href=#317 id=317 data-nosnippet>317</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#318 id=318 data-nosnippet>318</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#318 id=318 data-nosnippet>318</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#319 id=319 data-nosnippet>319</a>    }
 <a href=#320 id=320 data-nosnippet>320</a>
 <a href=#321 id=321 data-nosnippet>321</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_delegator_reward_by_era"</span>)]
@@ -336,7 +336,7 @@
 <a href=#336 id=336 data-nosnippet>336</a>            .<span class="kw">await</span>;
 <a href=#337 id=337 data-nosnippet>337</a>        result
 <a href=#338 id=338 data-nosnippet>338</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#339 id=339 data-nosnippet>339</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#339 id=339 data-nosnippet>339</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#340 id=340 data-nosnippet>340</a>    }
 <a href=#341 id=341 data-nosnippet>341</a>
 <a href=#342 id=342 data-nosnippet>342</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_delegator_reward_by_block_height"</span>)]
@@ -357,7 +357,7 @@
 <a href=#357 id=357 data-nosnippet>357</a>            .<span class="kw">await</span>;
 <a href=#358 id=358 data-nosnippet>358</a>        result
 <a href=#359 id=359 data-nosnippet>359</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#360 id=360 data-nosnippet>360</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#360 id=360 data-nosnippet>360</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#361 id=361 data-nosnippet>361</a>    }
 <a href=#362 id=362 data-nosnippet>362</a>
 <a href=#363 id=363 data-nosnippet>363</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_delegator_reward_by_block_hash"</span>)]
@@ -378,7 +378,7 @@
 <a href=#378 id=378 data-nosnippet>378</a>            .<span class="kw">await</span>;
 <a href=#379 id=379 data-nosnippet>379</a>        result
 <a href=#380 id=380 data-nosnippet>380</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#381 id=381 data-nosnippet>381</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#381 id=381 data-nosnippet>381</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#382 id=382 data-nosnippet>382</a>    }
 <a href=#383 id=383 data-nosnippet>383</a>
 <a href=#384 id=384 data-nosnippet>384</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_read_record"</span>)]
@@ -393,7 +393,7 @@
 <a href=#393 id=393 data-nosnippet>393</a>            .<span class="kw">await</span>;
 <a href=#394 id=394 data-nosnippet>394</a>        result
 <a href=#395 id=395 data-nosnippet>395</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#396 id=396 data-nosnippet>396</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#396 id=396 data-nosnippet>396</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#397 id=397 data-nosnippet>397</a>    }
 <a href=#398 id=398 data-nosnippet>398</a>
 <a href=#399 id=399 data-nosnippet>399</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_global_state_item"</span>)]
@@ -408,7 +408,7 @@
 <a href=#408 id=408 data-nosnippet>408</a>            .<span class="kw">await</span>;
 <a href=#409 id=409 data-nosnippet>409</a>        result
 <a href=#410 id=410 data-nosnippet>410</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#411 id=411 data-nosnippet>411</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#411 id=411 data-nosnippet>411</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#412 id=412 data-nosnippet>412</a>    }
 <a href=#413 id=413 data-nosnippet>413</a>
 <a href=#414 id=414 data-nosnippet>414</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_global_state_item_by_state_root_hash"</span>)]
@@ -429,7 +429,7 @@
 <a href=#429 id=429 data-nosnippet>429</a>            .<span class="kw">await</span>;
 <a href=#430 id=430 data-nosnippet>430</a>        result
 <a href=#431 id=431 data-nosnippet>431</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#432 id=432 data-nosnippet>432</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#432 id=432 data-nosnippet>432</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#433 id=433 data-nosnippet>433</a>    }
 <a href=#434 id=434 data-nosnippet>434</a>
 <a href=#435 id=435 data-nosnippet>435</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_global_state_item_by_block_hash"</span>)]
@@ -450,7 +450,7 @@
 <a href=#450 id=450 data-nosnippet>450</a>            .<span class="kw">await</span>;
 <a href=#451 id=451 data-nosnippet>451</a>        result
 <a href=#452 id=452 data-nosnippet>452</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#453 id=453 data-nosnippet>453</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#453 id=453 data-nosnippet>453</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#454 id=454 data-nosnippet>454</a>    }
 <a href=#455 id=455 data-nosnippet>455</a>
 <a href=#456 id=456 data-nosnippet>456</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_global_state_item_by_block_height"</span>)]
@@ -471,7 +471,7 @@
 <a href=#471 id=471 data-nosnippet>471</a>            .<span class="kw">await</span>;
 <a href=#472 id=472 data-nosnippet>472</a>        result
 <a href=#473 id=473 data-nosnippet>473</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#474 id=474 data-nosnippet>474</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#474 id=474 data-nosnippet>474</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#475 id=475 data-nosnippet>475</a>    }
 <a href=#476 id=476 data-nosnippet>476</a>
 <a href=#477 id=477 data-nosnippet>477</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_try_accept_transaction"</span>)]
@@ -486,7 +486,7 @@
 <a href=#486 id=486 data-nosnippet>486</a>
 <a href=#487 id=487 data-nosnippet>487</a>        <span class="kw">match </span>result {
 <a href=#488 id=488 data-nosnippet>488</a>            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(JsValue::undefined()), <span class="comment">// Return an appropriate JsValue for success
-<a href=#489 id=489 data-nosnippet>489</a>            </span><span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err))),
+<a href=#489 id=489 data-nosnippet>489</a>            </span><span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>))),
 <a href=#490 id=490 data-nosnippet>490</a>        }
 <a href=#491 id=491 data-nosnippet>491</a>    }
 <a href=#492 id=492 data-nosnippet>492</a>
@@ -501,7 +501,7 @@
 <a href=#501 id=501 data-nosnippet>501</a>            .<span class="kw">await</span>;
 <a href=#502 id=502 data-nosnippet>502</a>        result
 <a href=#503 id=503 data-nosnippet>503</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#504 id=504 data-nosnippet>504</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#504 id=504 data-nosnippet>504</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#505 id=505 data-nosnippet>505</a>    }
 <a href=#506 id=506 data-nosnippet>506</a>
 <a href=#507 id=507 data-nosnippet>507</a>    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_binary_protocol_version"</span>)]
@@ -512,6 +512,6 @@
 <a href=#512 id=512 data-nosnippet>512</a>        <span class="kw">let </span>result = <span class="self">self</span>.get_binary_protocol_version(node_address).<span class="kw">await</span>;
 <a href=#513 id=513 data-nosnippet>513</a>        result
 <a href=#514 id=514 data-nosnippet>514</a>            .and_then(|data| JsValue::from_serde(<span class="kw-2">&amp;</span>data).map_err(SdkError::SerializationError))
-<a href=#515 id=515 data-nosnippet>515</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {:?}"</span>, err)))
+<a href=#515 id=515 data-nosnippet>515</a>            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred: {err:?}"</span>)))
 <a href=#516 id=516 data-nosnippet>516</a>    }
 <a href=#517 id=517 data-nosnippet>517</a>}</code></pre></div></section></main></body></html>
