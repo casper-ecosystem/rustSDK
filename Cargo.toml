@@ -24,7 +24,7 @@ exclude = [
 casper-types = { version = "6", default-features = false, features = [
   "datasize",
 ] }
-casper-client = { version = "3", default-features = false }
+casper-client = { version = "4", default-features = false }
 casper-binary-port = { version = "1.0.0" }
 casper-binary-port-access = { version = "0.1.0" }
 rand = { version = "0.8.5", default-features = false }
@@ -71,7 +71,7 @@ dotenvy = "0.15.7"
 
 
 [patch.crates-io]
-casper-client = { version = "3", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "dev" }
+casper-client = { version = "4", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "dev" }
 casper-types = { version = "6", git = "https://github.com/casper-network/casper-node", branch = "dev" }
 casper-binary-port = { git = "https://github.com/casper-network/casper-node", branch = "dev" }
 casper-binary-port-access = { git = "https://github.com/casper-ecosystem/casper-binary-port-client", branch = "master" }

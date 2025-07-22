@@ -739,7 +739,7 @@ pub fn transaction_builder_params_to_casper_client(
                 .unwrap_or_default(),
             runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
         },
-        TransactionKind::Package => _TransactionBuilderParams::PackageWithVersionKey {
+        TransactionKind::Package => _TransactionBuilderParams::PackageWithMajorVersion {
             package_hash: transaction_params.package_hash.unwrap().into(),
             maybe_entity_version: transaction_params.maybe_entity_version,
             entry_point: transaction_params
@@ -749,7 +749,7 @@ pub fn transaction_builder_params_to_casper_client(
             runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
             major_protocol_version: transaction_params.major_protocol_version,
         },
-        TransactionKind::PackageAlias => _TransactionBuilderParams::PackageAliasWithVersionKey {
+        TransactionKind::PackageAlias => _TransactionBuilderParams::PackageAliasWithMajorVersion {
             package_alias: transaction_params
                 .package_alias
                 .as_deref()
