@@ -739,7 +739,7 @@
 <a href=#739 id=739 data-nosnippet>739</a>                .unwrap_or_default(),
 <a href=#740 id=740 data-nosnippet>740</a>            runtime: TransactionRuntimeParams::VmCasperV1, <span class="comment">// TODO FIX Runtime
 <a href=#741 id=741 data-nosnippet>741</a>        </span>},
-<a href=#742 id=742 data-nosnippet>742</a>        TransactionKind::Package =&gt; _TransactionBuilderParams::PackageWithVersionKey {
+<a href=#742 id=742 data-nosnippet>742</a>        TransactionKind::Package =&gt; _TransactionBuilderParams::PackageWithMajorVersion {
 <a href=#743 id=743 data-nosnippet>743</a>            package_hash: transaction_params.package_hash.unwrap().into(),
 <a href=#744 id=744 data-nosnippet>744</a>            maybe_entity_version: transaction_params.maybe_entity_version,
 <a href=#745 id=745 data-nosnippet>745</a>            entry_point: transaction_params
@@ -749,7 +749,7 @@
 <a href=#749 id=749 data-nosnippet>749</a>            runtime: TransactionRuntimeParams::VmCasperV1, <span class="comment">// TODO FIX Runtime
 <a href=#750 id=750 data-nosnippet>750</a>            </span>major_protocol_version: transaction_params.major_protocol_version,
 <a href=#751 id=751 data-nosnippet>751</a>        },
-<a href=#752 id=752 data-nosnippet>752</a>        TransactionKind::PackageAlias =&gt; _TransactionBuilderParams::PackageAliasWithVersionKey {
+<a href=#752 id=752 data-nosnippet>752</a>        TransactionKind::PackageAlias =&gt; _TransactionBuilderParams::PackageAliasWithMajorVersion {
 <a href=#753 id=753 data-nosnippet>753</a>            package_alias: transaction_params
 <a href=#754 id=754 data-nosnippet>754</a>                .package_alias
 <a href=#755 id=755 data-nosnippet>755</a>                .as_deref()
