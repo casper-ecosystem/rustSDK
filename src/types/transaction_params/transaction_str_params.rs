@@ -504,6 +504,9 @@ mod tests {
             .set(Bytes::from("json".to_bytes().unwrap()))
             .unwrap();
 
+        let min_bid_override = OnceCell::new();
+        let _ = min_bid_override.set(true);
+
         let transaction_params = TransactionStrParams {
             secret_key,
             timestamp,
@@ -521,6 +524,7 @@ mod tests {
             transferred_value,
             session_entry_point,
             chunked_args,
+            min_bid_override,
         };
 
         let result = transaction_str_params_to_casper_client(&transaction_params);
@@ -542,6 +546,7 @@ mod tests {
         assert_eq!(result.session_entry_point, Some("session_entry_point"));
         // TODO FIX
         //assert_eq!(result.chunked_args, Some());
+        assert_eq!(result.min_bid_override, true);
     }
 
     #[test]
@@ -589,5 +594,6 @@ mod tests {
         assert_eq!(result.transferred_value, "");
         assert_eq!(result.session_entry_point, None);
         assert_eq!(result.chunked_args, None);
+        assert!(!result.min_bid_override);
     }
 }

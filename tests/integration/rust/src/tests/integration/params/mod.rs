@@ -128,6 +128,7 @@ pub mod test_module {
             None,
             None,
             None,
+            None,
         );
         assert_eq!(transaction_params.chain_name().unwrap(), config.chain_name);
         assert_eq!(transaction_params.ttl().unwrap(), TTL);
