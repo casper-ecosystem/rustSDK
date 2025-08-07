@@ -27,6 +27,7 @@ pub struct TransactionStrParams {
     transferred_value: OnceCell<String>,
     session_entry_point: OnceCell<String>,
     chunked_args: OnceCell<Bytes>,
+    min_bid_override: OnceCell<bool>,
 }
 
 const DEFAULT_PRICING_MODE: PricingMode = PricingMode::Classic;
@@ -56,6 +57,7 @@ impl TransactionStrParams {
         transferred_value: Option<String>,
         session_entry_point: Option<String>,
         chunked_args: Option<Bytes>,
+        min_bid_override: Option<bool>,
     ) -> Self {
         let mut transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(chain_name);
@@ -104,6 +106,9 @@ impl TransactionStrParams {
         if let Some(chunked_args) = chunked_args {
             transaction_params.set_chunked_args(chunked_args);
         }
+        if let Some(min_bid_override) = min_bid_override {
+            transaction_params.set_min_bid_override(min_bid_override);
+        }
 
         transaction_params
     }
@@ -132,6 +137,7 @@ impl TransactionStrParams {
             None, // transferred_value
             None, // session_entry_point
             None, // chunked_args
+            None, // min_bid_override
         )
     }
 
@@ -340,6 +346,11 @@ impl TransactionStrParams {
     pub fn set_chunked_args(&self, chunked_args: Bytes) {
         self.chunked_args.set(chunked_args).unwrap();
     }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_min_bid_override(&self, min_bid_override: bool) {
+        self.min_bid_override.set(min_bid_override).unwrap();
+    }
 }
 
 // Convert TransactionStrParams to casper_client::cli::TransactionStrParams
@@ -428,6 +439,7 @@ pub fn transaction_str_params_to_casper_client(
                 Some(chunked) // Return Some(Vec) if not empty
             }
         },
+        min_bid_override: *(transaction_params.min_bid_override.get()).unwrap_or(&false),
     }
 }
 
