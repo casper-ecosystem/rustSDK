@@ -8,6 +8,7 @@ use js_sys::Promise;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 use std::{
+    borrow::BorrowMut,
     cell::RefCell,
     fmt,
     rc::Rc,
@@ -258,7 +259,7 @@ impl SDK {
 pub struct Watcher {
     events_url: String,
     subscriptions: Vec<Subscription>,
-    active: Rc<RefCell<bool>>,
+    active: Arc<Mutex<bool>>,
     timeout_duration: Duration,
 }
 
@@ -288,7 +289,7 @@ impl Watcher {
         Watcher {
             events_url,
             subscriptions: Vec::new(),
-            active: Rc::new(RefCell::new(true)),
+            active: Arc::new(Mutex::new(true)),
             timeout_duration,
         }
     }
@@ -344,7 +345,10 @@ impl Watcher {
     /// This method sets the deploy watcher as inactive and stops the event listener if it exists.
     #[wasm_bindgen]
     pub fn stop(&self) {
-        *self.active.borrow_mut() = false;
+        {
+            let mut active = self.active.lock().unwrap();
+            *active = false;
+        }
     }
 }
 
@@ -368,12 +372,15 @@ impl Watcher {
     ///
     /// An `Option` containing the serialized deploy event data or `None` if no events are received.
     async fn start_internal(&self, target_hash: Option<String>) -> Option<Vec<EventParseResult>> {
-        *self.active.borrow_mut() = true;
+        {
+            let mut active = self.active.lock().unwrap();
+            *active = true;
+        }
 
         let client = reqwest::Client::new();
         let url = self.events_url.clone();
 
-        let watcher = Rc::new(RefCell::new(self.clone()));
+        let watcher = Arc::new(Mutex::new(self.clone()));
 
         let start_time = Utc::now();
         let timeout_duration = self.timeout_duration;
@@ -398,8 +405,8 @@ impl Watcher {
             while let Some(chunk) = bytes_stream.next().await {
                 match chunk {
                     Ok(bytes) => {
-                        let this_clone = Rc::clone(&watcher);
-                        if !*this_clone.borrow_mut().active.borrow() {
+                        let this_clone = Arc::clone(&watcher);
+                        if !*this_clone.lock().unwrap().active.lock().unwrap() {
                             return None;
                         }
 
@@ -417,9 +424,10 @@ impl Watcher {
                             let message = buffer.drain(..=index).collect::<Vec<_>>();
 
                             if let Ok(message) = std::str::from_utf8(&message) {
-                                let watcher_clone = this_clone.borrow_mut().clone();
-                                let result =
-                                    watcher_clone.process_events(message, target_hash.as_deref());
+                                let watcher_guard = this_clone.lock().unwrap();
+                                let result = watcher_guard
+                                    .clone()
+                                    .process_events(message, target_hash.as_deref());
                                 match result {
                                     Some(event_parse_result) => return Some(event_parse_result),
                                     None => {
@@ -901,6 +909,8 @@ impl fmt::Display for EventName {
 
 #[cfg(test)]
 mod tests {
+    use std::borrow::Borrow;
+
     use super::*;
     use crate::watcher::{deploy_mock::DEPLOY_MOCK, transaction_mock::TRANSACTION_MOCK};
     use sdk_tests::tests::helpers::get_network_constants;
@@ -918,7 +928,7 @@ mod tests {
         // Assert
         assert_eq!(watcher.events_url, events_url);
         assert_eq!(watcher.subscriptions.len(), 0);
-        assert!(*watcher.active.borrow());
+        assert!(*watcher.active.lock().unwrap());
         assert_eq!(
             watcher.timeout_duration,
             Duration::try_milliseconds(timeout_duration.try_into().unwrap()).unwrap()
@@ -936,7 +946,7 @@ mod tests {
         // Assert
         assert_eq!(watcher.events_url, events_url);
         assert_eq!(watcher.subscriptions.len(), 0);
-        assert!(*watcher.active.borrow());
+        assert!(*watcher.active.lock().unwrap());
         assert_eq!(
             watcher.timeout_duration,
             Duration::try_milliseconds(DEFAULT_TIMEOUT_MS.try_into().unwrap()).unwrap()
@@ -1028,13 +1038,13 @@ mod tests {
         // Arrange
         let (_, events_url, _, _, _) = get_network_constants();
         let watcher = Watcher::new(events_url, None);
-        assert!(*watcher.active.borrow());
+        assert!(*watcher.active.lock().unwrap());
 
         // Act
         watcher.stop();
 
         // Assert
-        assert!(!(*watcher.active.borrow()));
+        assert!(!(*watcher.active.lock().unwrap()));
     }
 
     #[test]
@@ -1112,7 +1122,7 @@ mod tests {
         // Assert
         assert_eq!(watcher.events_url, events_url);
         assert_eq!(watcher.subscriptions.len(), 0);
-        assert!(*watcher.active.borrow());
+        assert!(*watcher.active.lock().unwrap());
         assert_eq!(
             watcher.timeout_duration,
             Duration::try_milliseconds(timeout_duration.try_into().unwrap()).unwrap()
@@ -1132,7 +1142,7 @@ mod tests {
         // Assert
         assert_eq!(watcher.events_url, events_url);
         assert_eq!(watcher.subscriptions.len(), 0);
-        assert!(*watcher.active.borrow());
+        assert!(*watcher.active.lock().unwrap());
         assert_eq!(
             watcher.timeout_duration,
             Duration::try_milliseconds(timeout_duration.try_into().unwrap()).unwrap()
