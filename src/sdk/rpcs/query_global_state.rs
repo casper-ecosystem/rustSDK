@@ -327,15 +327,16 @@ impl SDK {
             Some(p) => p.to_string(),
             None => String::new(),
         };
-
+        let random_id = rand::thread_rng().gen::<u64>().to_string();
         if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
             let path = match path {
                 Some(path) if path.is_empty() => Vec::new(),
                 Some(path) => path.into(),
                 None => Vec::new(),
             };
+            let random_id = JsonRpcId::from(random_id);
             query_global_state_lib(
-                JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
+                random_id,
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 maybe_global_state_identifier.into(),
@@ -345,8 +346,9 @@ impl SDK {
             .await
             .map_err(SdkError::from)
         } else if let Some(state_root_hash) = state_root_hash {
+            let random_id = rand::thread_rng().gen::<u64>().to_string();
             query_global_state_cli(
-                &rand::thread_rng().gen::<u64>().to_string(),
+                &random_id,
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 "",
@@ -357,8 +359,9 @@ impl SDK {
             .await
             .map_err(SdkError::from)
         } else if let Some(maybe_block_id) = maybe_block_id {
+            let random_id = rand::thread_rng().gen::<u64>().to_string();
             query_global_state_cli(
-                &rand::thread_rng().gen::<u64>().to_string(),
+                &random_id,
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &maybe_block_id,
@@ -381,9 +384,9 @@ impl SDK {
                 }
                 Err(_) => "".to_string(),
             };
-
+            let random_id = rand::thread_rng().gen::<u64>().to_string();
             query_global_state_cli(
-                &rand::thread_rng().gen::<u64>().to_string(),
+                &random_id,
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 "",

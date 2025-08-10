@@ -172,10 +172,10 @@ impl SDK {
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetAuctionInfoResult>, SdkError> {
         //log("get_auction_info!");
-
+        let random_id = rand::thread_rng().gen::<u64>().to_string();
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_auction_info_cli(
-                &rand::thread_rng().gen::<u64>().to_string(),
+                &random_id,
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &maybe_block_id,
@@ -192,7 +192,7 @@ impl SDK {
                     None
                 };
             get_auction_info_lib(
-                JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
+                JsonRpcId::from(random_id),
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 maybe_block_identifier.map(Into::into),

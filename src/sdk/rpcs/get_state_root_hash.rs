@@ -204,10 +204,11 @@ impl SDK {
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetStateRootHashResult>, SdkError> {
         //log("get_state_root_hash!");
+        let random_id = rand::thread_rng().gen::<u64>().to_string();
 
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_state_root_hash_cli(
-                &rand::thread_rng().gen::<u64>().to_string(),
+                &random_id,
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &maybe_block_id,
@@ -225,7 +226,7 @@ impl SDK {
                 };
 
             get_state_root_hash_lib(
-                JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
+                JsonRpcId::from(random_id),
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 maybe_block_identifier.map(Into::into),

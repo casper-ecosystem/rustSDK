@@ -244,10 +244,10 @@ impl SDK {
                 Err(_) => "".to_digest(),
             }
         };
-
+        let random_id = rand::thread_rng().gen::<u64>().to_string();
         match dictionary_item_input {
             DictionaryItemInput::Params(dictionary_item_params) => get_dictionary_item_cli(
-                &rand::thread_rng().gen::<u64>().to_string(),
+                &random_id,
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &state_root_hash.to_string(),
@@ -256,7 +256,7 @@ impl SDK {
             .await
             .map_err(SdkError::from),
             DictionaryItemInput::Identifier(dictionary_item_identifier) => get_dictionary_item_lib(
-                JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
+                JsonRpcId::from(random_id),
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 state_root_hash.into(),

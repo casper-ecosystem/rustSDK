@@ -249,10 +249,10 @@ impl SDK {
                 Err(_) => "".to_digest(),
             }
         };
-
+        let random_id = rand::thread_rng().gen::<u64>().to_string();
         match purse_uref {
             GetBalanceInput::PurseUref(purse_uref) => get_balance_lib(
-                JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
+                JsonRpcId::from(random_id),
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 state_root_hash.into(),
@@ -261,7 +261,7 @@ impl SDK {
             .await
             .map_err(SdkError::from),
             GetBalanceInput::PurseUrefAsString(purse_uref) => get_balance_cli(
-                &rand::thread_rng().gen::<u64>().to_string(),
+                &random_id,
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &state_root_hash.to_string(),

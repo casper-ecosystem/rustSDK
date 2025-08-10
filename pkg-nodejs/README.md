@@ -1157,7 +1157,6 @@ pub const ARGS_JSON: &str = r#"[
 ]"#;
 pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
 pub const CEP78_CONTRACT: &str = "cep78.wasm";
-pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
 let transaction_params = TransactionStrParams::default();
@@ -2101,7 +2100,6 @@ pub const ARGS_JSON: &str = r#"[
 ]"#;
 pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
 pub const CEP78_CONTRACT: &str = "cep78.wasm";
-pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 
 let deploy_params = DeployStrParams::new(
     CHAIN_NAME,

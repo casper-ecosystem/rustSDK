@@ -165,9 +165,9 @@ impl SDK {
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         //log("speculative_exec_deploy!");
-
+        let random_id = JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string());
         speculative_exec_deploy_lib(
-            JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string()),
+            JsonRpcId::from(random_id),
             &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
             deploy.into(),
