@@ -197,6 +197,13 @@ export function encodeLowerBlake2b(meta_data: string): any;
 export function makeDictionaryItemKey(key: Key, value: string): string;
 /**
 */
+export enum TransferTargetKind {
+  PublicKey = 0,
+  AccountHash = 1,
+  URef = 2,
+}
+/**
+*/
 export enum TransactionKind {
   InvocableEntity = 0,
   InvocableEntityAlias = 1,
@@ -216,13 +223,6 @@ export enum Verbosity {
   Low = 0,
   Medium = 1,
   High = 2,
-}
-/**
-*/
-export enum TransferTargetKind {
-  PublicKey = 0,
-  AccountHash = 1,
-  URef = 2,
 }
 /**
 */
@@ -2096,6 +2096,383 @@ export class RecordId {
 export class SDK {
   free(): void;
 /**
+* Creates a new Watcher instance to watch deploys (JavaScript-friendly).
+* Legacy alias
+*
+* # Arguments
+*
+* * `events_url` - The URL to monitor for transaction events.
+* * `timeout_duration` - An optional timeout duration in seconds.
+*
+* # Returns
+*
+* A `Watcher` instance.
+* @param {string} events_url
+* @param {number | undefined} [timeout_duration]
+* @returns {Watcher}
+*/
+  watchDeploy(events_url: string, timeout_duration?: number): Watcher;
+/**
+* Creates a new Watcher instance to watch deploys (JavaScript-friendly).
+*
+* # Arguments
+*
+* * `events_url` - The URL to monitor for transaction events.
+* * `timeout_duration` - An optional timeout duration in seconds.
+*
+* # Returns
+*
+* A `Watcher` instance.
+* @param {string} events_url
+* @param {number | undefined} [timeout_duration]
+* @returns {Watcher}
+*/
+  watchTransaction(events_url: string, timeout_duration?: number): Watcher;
+/**
+* Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
+* Legacy alias
+*
+* # Arguments
+*
+* * `events_url` - The URL to monitor for transaction events.
+* * `deploy_hash` - The deploy hash to wait for.
+* * `timeout_duration` - An optional timeout duration in seconds.
+*
+* # Returns
+*
+* A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
+* @param {string} events_url
+* @param {string} deploy_hash
+* @param {number | undefined} [timeout_duration]
+* @returns {Promise<Promise<any>>}
+*/
+  waitDeploy(events_url: string, deploy_hash: string, timeout_duration?: number): Promise<Promise<any>>;
+/**
+* Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
+*
+* # Arguments
+*
+* * `events_url` - The URL to monitor for transaction events.
+* * `target_hash` - The transaction hash to wait for.
+* * `timeout_duration` - An optional timeout duration in seconds.
+*
+* # Returns
+*
+* A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
+* @param {string} events_url
+* @param {string} target_hash
+* @param {number | undefined} [timeout_duration]
+* @returns {Promise<Promise<any>>}
+*/
+  waitTransaction(events_url: string, target_hash: string, timeout_duration?: number): Promise<Promise<any>>;
+/**
+* Get options for speculative execution from a JavaScript value.
+* @param {any} options
+* @returns {getSpeculativeExecDeployOptions}
+*/
+  get_speculative_exec_deploy_options(options: any): getSpeculativeExecDeployOptions;
+/**
+* JS function for speculative execution.
+*
+* # Arguments
+*
+* * `options` - The options for speculative execution.
+*
+* # Returns
+*
+* A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
+* @param {getSpeculativeExecDeployOptions | undefined} [options]
+* @returns {Promise<SpeculativeExecResult>}
+*/
+  speculative_exec_deploy(options?: getSpeculativeExecDeployOptions): Promise<SpeculativeExecResult>;
+/**
+* JS function for `make_transfer`.
+*
+* # Arguments
+*
+* * `amount` - The transfer amount.
+* * `target_account` - The target account.
+* * `transfer_id` - Optional transfer identifier.
+* * `deploy_params` - The deploy parameters.
+* * `payment_params` - The payment parameters.
+*
+* # Returns
+*
+* A `Result` containing the created `Deploy` or a `JsError` in case of an error.
+* @param {string} amount
+* @param {string} target_account
+* @param {string | undefined} transfer_id
+* @param {DeployStrParams} deploy_params
+* @param {PaymentStrParams} payment_params
+* @returns {Deploy}
+*/
+  make_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Deploy;
+/**
+* JS function for `make_transfer_transaction`.
+*
+* # Arguments
+*
+* * `maybe_source` - Optional transfer source uref.
+* * `amount` - The transfer amount.
+* * `target` - The target account.
+* * `transaction_params` - The transaction parameters.
+* * `maybe_id` - Optional transfer identifier.
+*
+* # Returns
+*
+* A `Result` containing the created `Transaction` or a `JsError` in case of an error.
+* @param {URef | undefined} maybe_source
+* @param {string} target
+* @param {string} amount
+* @param {TransactionStrParams} transaction_params
+* @param {string | undefined} [maybe_id]
+* @returns {Transaction}
+*/
+  make_transfer_transaction(maybe_source: URef | undefined, target: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string): Transaction;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_latest_switch_block_header(node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_latest_block_header(node_address?: string): Promise<any>;
+/**
+* @param {bigint} height
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_block_header_by_height(height: bigint, node_address?: string): Promise<any>;
+/**
+* @param {BlockHash} block_hash
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_block_header_by_hash(block_hash: BlockHash, node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_latest_block_with_signatures(node_address?: string): Promise<any>;
+/**
+* @param {bigint} height
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_block_with_signatures_by_height(height: bigint, node_address?: string): Promise<any>;
+/**
+* @param {BlockHash} block_hash
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_block_with_signatures_by_hash(block_hash: BlockHash, node_address?: string): Promise<any>;
+/**
+* @param {TransactionHash} hash
+* @param {boolean} with_finalized_approvals
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_transaction_by_hash(hash: TransactionHash, with_finalized_approvals: boolean, node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_peers(node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_uptime(node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_last_progress(node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_reactor_state(node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_network_name(node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_consensus_validator_changes(node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_block_synchronizer_status(node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_available_block_range(node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_next_upgrade(node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_consensus_status(node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_chainspec_raw_bytes(node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_node_status(node_address?: string): Promise<any>;
+/**
+* @param {PublicKey} validator_key
+* @param {EraId} era
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_validator_reward_by_era(validator_key: PublicKey, era: EraId, node_address?: string): Promise<any>;
+/**
+* @param {PublicKey} validator_key
+* @param {bigint} block_height
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_validator_reward_by_block_height(validator_key: PublicKey, block_height: bigint, node_address?: string): Promise<any>;
+/**
+* @param {PublicKey} validator_key
+* @param {BlockHash} block_hash
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_validator_reward_by_block_hash(validator_key: PublicKey, block_hash: BlockHash, node_address?: string): Promise<any>;
+/**
+* @param {PublicKey} validator_key
+* @param {PublicKey} delegator_key
+* @param {EraId} era
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_delegator_reward_by_era(validator_key: PublicKey, delegator_key: PublicKey, era: EraId, node_address?: string): Promise<any>;
+/**
+* @param {PublicKey} validator_key
+* @param {PublicKey} delegator_key
+* @param {bigint} block_height
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_delegator_reward_by_block_height(validator_key: PublicKey, delegator_key: PublicKey, block_height: bigint, node_address?: string): Promise<any>;
+/**
+* @param {PublicKey} validator_key
+* @param {PublicKey} delegator_key
+* @param {BlockHash} block_hash
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_delegator_reward_by_block_hash(validator_key: PublicKey, delegator_key: PublicKey, block_hash: BlockHash, node_address?: string): Promise<any>;
+/**
+* @param {RecordId} record_id
+* @param {Uint8Array} key
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_read_record(record_id: RecordId, key: Uint8Array, node_address?: string): Promise<any>;
+/**
+* @param {Key} key
+* @param {(string)[]} path
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_global_state_item(key: Key, path: (string)[], node_address?: string): Promise<any>;
+/**
+* @param {Digest} state_root_hash
+* @param {Key} key
+* @param {(string)[]} path
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_global_state_item_by_state_root_hash(state_root_hash: Digest, key: Key, path: (string)[], node_address?: string): Promise<any>;
+/**
+* @param {BlockHash} block_hash
+* @param {Key} key
+* @param {(string)[]} path
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_global_state_item_by_block_hash(block_hash: BlockHash, key: Key, path: (string)[], node_address?: string): Promise<any>;
+/**
+* @param {bigint} block_height
+* @param {Key} key
+* @param {(string)[]} path
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_global_state_item_by_block_height(block_height: bigint, key: Key, path: (string)[], node_address?: string): Promise<any>;
+/**
+* @param {Transaction} transaction
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_try_accept_transaction(transaction: Transaction, node_address?: string): Promise<any>;
+/**
+* @param {Transaction} transaction
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_try_speculative_execution(transaction: Transaction, node_address?: string): Promise<any>;
+/**
+* @param {string | undefined} [node_address]
+* @returns {Promise<any>}
+*/
+  get_binary_protocol_version(node_address?: string): Promise<any>;
+/**
+* @param {any} options
+* @returns {getAccountOptions}
+*/
+  get_account_options(options: any): getAccountOptions;
+/**
+* Retrieves account information using the provided options.
+*
+* This function is an asynchronous JavaScript binding for the Rust `get_account` method.
+*
+* # Arguments
+*
+* * `options` - An optional `GetAccountOptions` struct containing retrieval options, such as:
+*   - `account_identifier`: Identifier for the account.
+*   - `account_identifier_as_string`: String representation of the account identifier.
+*   - `maybe_block_id_as_string`: Optional string representation of the block ID.
+*   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
+*   - `verbosity`: Verbosity level for the output.
+*   - `rpc_address`: Address of the node to query.
+*
+* # Returns
+*
+* A `Result` containing either a `GetAccountResult` on success or a `JsError` on failure.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
+* ```
+* @param {getAccountOptions | undefined} [options]
+* @returns {Promise<GetAccountResult>}
+*/
+  get_account(options?: getAccountOptions): Promise<GetAccountResult>;
+/**
+* @param {getAccountOptions | undefined} [options]
+* @returns {Promise<GetAccountResult>}
+*/
+  state_get_account_info(options?: getAccountOptions): Promise<GetAccountResult>;
+/**
 * Parses auction info options from a JsValue.
 *
 * # Arguments
@@ -2133,43 +2510,6 @@ export class SDK {
 * @returns {Promise<GetAuctionInfoResult>}
 */
   state_get_auction_info_js_alias(options?: getAuctionInfoOptions): Promise<GetAuctionInfoResult>;
-/**
-* Parses block transfers options from a JsValue.
-*
-* # Arguments
-*
-* * `options` - A JsValue containing block transfers options to be parsed.
-*
-* # Returns
-*
-* Parsed block transfers options as a `GetBlockTransfersOptions` struct.
-* @param {any} options
-* @returns {getBlockTransfersOptions}
-*/
-  get_block_transfers_options(options: any): getBlockTransfersOptions;
-/**
-* Retrieves block transfers information using the provided options.
-*
-* # Arguments
-*
-* * `options` - An optional `GetBlockTransfersOptions` struct containing retrieval options.
-*
-* # Returns
-*
-* A `Result` containing either a `GetBlockTransfersResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the retrieval process.
-* @param {getBlockTransfersOptions | undefined} [options]
-* @returns {Promise<GetBlockTransfersResult>}
-*/
-  get_block_transfers(options?: getBlockTransfersOptions): Promise<GetBlockTransfersResult>;
-/**
-* @param {getBlockTransfersOptions | undefined} [options]
-* @returns {Promise<GetBlockTransfersResult>}
-*/
-  chain_get_block_transfers(options?: getBlockTransfersOptions): Promise<GetBlockTransfersResult>;
 /**
 * Parses dictionary item options from a JsValue.
 *
@@ -2282,9 +2622,9 @@ export class SDK {
 /**
 * Get options for speculative execution from a JavaScript value.
 * @param {any} options
-* @returns {getSpeculativeExecDeployOptions}
+* @returns {getSpeculativeExecTxnOptions}
 */
-  get_speculative_exec_deploy_options(options: any): getSpeculativeExecDeployOptions;
+  get_speculative_exec_options(options: any): getSpeculativeExecTxnOptions;
 /**
 * JS function for speculative execution.
 *
@@ -2295,10 +2635,10 @@ export class SDK {
 * # Returns
 *
 * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
-* @param {getSpeculativeExecDeployOptions | undefined} [options]
-* @returns {Promise<SpeculativeExecResult>}
+* @param {getSpeculativeExecTxnOptions | undefined} [options]
+* @returns {Promise<SpeculativeExecTxnResult>}
 */
-  speculative_exec_deploy(options?: getSpeculativeExecDeployOptions): Promise<SpeculativeExecResult>;
+  speculative_exec(options?: getSpeculativeExecTxnOptions): Promise<SpeculativeExecTxnResult>;
 /**
 * JS function for `make_deploy`.
 *
@@ -2366,6 +2706,30 @@ export class SDK {
 */
   sign_transaction(transaction: Transaction, secret_key: string): Transaction;
 /**
+* Calls a smart contract entry point with the specified parameters and returns the result.
+*
+* # Arguments
+*
+* * `deploy_params` - The deploy parameters.
+* * `session_params` - The session parameters.
+* * `payment_amount` - The payment amount as a string.
+* * `rpc_address` - An optional rpc address to send the request to.
+*
+* # Returns
+*
+* A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the call.
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {string} payment_amount
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
+/**
 * Deserialize query_contract_dict_options from a JavaScript object.
 * @param {any} options
 * @returns {queryContractDictOptions}
@@ -2390,64 +2754,94 @@ export class SDK {
 */
   query_contract_key(options?: queryContractKeyOptions): Promise<QueryGlobalStateResult>;
 /**
-* JavaScript function for deploying with deserialized parameters.
+* JS function for speculative transfer.
 *
 * # Arguments
 *
-* * `deploy_params` - Deploy parameters.
-* * `session_params` - Session parameters.
-* * `payment_params` - Payment parameters.
-* * `verbosity` - An optional verbosity level.
-* * `rpc_address` - An optional rpc address.
+* * `amount` - The amount to transfer.
+* * `target_account` - The target account.
+* * `transfer_id` - An optional transfer ID (defaults to a random number).
+* * `deploy_params` - The deployment parameters.
+* * `payment_params` - The payment parameters.
+* * `verbosity` - The verbosity level for logging (optional).
+* * `rpc_address` - The address of the node to connect to (optional).
 *
 * # Returns
 *
-* A result containing PutDeployResult or a JsError.
+* A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+* @param {string} amount
+* @param {string} target_account
+* @param {string | undefined} transfer_id
 * @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
 * @param {PaymentStrParams} payment_params
 * @param {Verbosity | undefined} [verbosity]
 * @param {string | undefined} [rpc_address]
-* @returns {Promise<PutDeployResult>}
+* @returns {Promise<SpeculativeExecResult>}
 */
-  deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
+  speculative_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecResult>;
 /**
-* @param {any} options
-* @returns {getAccountOptions}
-*/
-  get_account_options(options: any): getAccountOptions;
-/**
-* Retrieves account information using the provided options.
-*
-* This function is an asynchronous JavaScript binding for the Rust `get_account` method.
+* JS function for transaction transferring funds.
 *
 * # Arguments
 *
-* * `options` - An optional `GetAccountOptions` struct containing retrieval options, such as:
-*   - `account_identifier`: Identifier for the account.
-*   - `account_identifier_as_string`: String representation of the account identifier.
-*   - `maybe_block_id_as_string`: Optional string representation of the block ID.
-*   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
-*   - `verbosity`: Verbosity level for the output.
-*   - `rpc_address`: Address of the node to query.
+* * `maybe_source` - Optional transfer source uref.
+* * `target_account` - The target account.
+* * `amount` - The amount to transfer.
+* * `transaction_params` - The transaction parameters.
+* * `maybe_id` - An optional transfer ID (defaults to a random number).
+* * `verbosity` - The verbosity level for logging (optional).
+* * `rpc_address` - The address of the node to connect to (optional).
 *
 * # Returns
 *
-* A `Result` containing either a `GetAccountResult` on success or a `JsError` on failure.
+* A `Result` containing the result of the transfer or a `JsError` in case of an error.
+* @param {URef | undefined} maybe_source
+* @param {string} target_account
+* @param {string} amount
+* @param {TransactionStrParams} transaction_params
+* @param {string | undefined} [maybe_id]
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<PutTransactionResult>}
+*/
+  transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
+/**
+* Parses block transfers options from a JsValue.
+*
+* # Arguments
+*
+* * `options` - A JsValue containing block transfers options to be parsed.
+*
+* # Returns
+*
+* Parsed block transfers options as a `GetBlockTransfersOptions` struct.
+* @param {any} options
+* @returns {getBlockTransfersOptions}
+*/
+  get_block_transfers_options(options: any): getBlockTransfersOptions;
+/**
+* Retrieves block transfers information using the provided options.
+*
+* # Arguments
+*
+* * `options` - An optional `GetBlockTransfersOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `GetBlockTransfersResult` or a `JsError` in case of an error.
 *
 * # Errors
 *
-* Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
-* ```
-* @param {getAccountOptions | undefined} [options]
-* @returns {Promise<GetAccountResult>}
+* Returns a `JsError` if there is an error during the retrieval process.
+* @param {getBlockTransfersOptions | undefined} [options]
+* @returns {Promise<GetBlockTransfersResult>}
 */
-  get_account(options?: getAccountOptions): Promise<GetAccountResult>;
+  get_block_transfers(options?: getBlockTransfersOptions): Promise<GetBlockTransfersResult>;
 /**
-* @param {getAccountOptions | undefined} [options]
-* @returns {Promise<GetAccountResult>}
+* @param {getBlockTransfersOptions | undefined} [options]
+* @returns {Promise<GetBlockTransfersResult>}
 */
-  state_get_account_info(options?: getAccountOptions): Promise<GetAccountResult>;
+  chain_get_block_transfers(options?: getBlockTransfersOptions): Promise<GetBlockTransfersResult>;
 /**
 * Parses deploy options from a JsValue.
 *
@@ -2641,302 +3035,6 @@ export class SDK {
 */
   query_global_state(options?: queryGlobalStateOptions): Promise<QueryGlobalStateResult>;
 /**
-* JS function for transferring funds.
-*
-* # Arguments
-*
-* * `amount` - The amount to transfer.
-* * `target_account` - The target account.
-* * `transfer_id` - An optional transfer ID (defaults to a random number).
-* * `deploy_params` - The deployment parameters.
-* * `payment_params` - The payment parameters.
-* * `verbosity` - The verbosity level for logging (optional).
-* * `rpc_address` - The address of the node to connect to (optional).
-*
-* # Returns
-*
-* A `Result` containing the result of the transfer or a `JsError` in case of an error.
-* @param {string} amount
-* @param {string} target_account
-* @param {string | undefined} transfer_id
-* @param {DeployStrParams} deploy_params
-* @param {PaymentStrParams} payment_params
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<PutDeployResult>}
-*/
-  transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
-/**
-* Puts a deploy using the provided options.
-*
-* # Arguments
-*
-* * `deploy` - The `Deploy` object to be sent.
-* * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-* * `rpc_address` - An optional string specifying the rpc address to use for the request.
-*
-* # Returns
-*
-* A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the deploy process.
-* @param {Deploy} deploy
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<PutDeployResult>}
-*/
-  put_deploy(deploy: Deploy, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
-/**
-* JavaScript Alias for `put_deploy`.
-* @param {Deploy} deploy
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<PutDeployResult>}
-*/
-  account_put_deploy(deploy: Deploy, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
-/**
-* Creates a new Watcher instance to watch deploys (JavaScript-friendly).
-* Legacy alias
-*
-* # Arguments
-*
-* * `events_url` - The URL to monitor for transaction events.
-* * `timeout_duration` - An optional timeout duration in seconds.
-*
-* # Returns
-*
-* A `Watcher` instance.
-* @param {string} events_url
-* @param {number | undefined} [timeout_duration]
-* @returns {Watcher}
-*/
-  watchDeploy(events_url: string, timeout_duration?: number): Watcher;
-/**
-* Creates a new Watcher instance to watch deploys (JavaScript-friendly).
-*
-* # Arguments
-*
-* * `events_url` - The URL to monitor for transaction events.
-* * `timeout_duration` - An optional timeout duration in seconds.
-*
-* # Returns
-*
-* A `Watcher` instance.
-* @param {string} events_url
-* @param {number | undefined} [timeout_duration]
-* @returns {Watcher}
-*/
-  watchTransaction(events_url: string, timeout_duration?: number): Watcher;
-/**
-* Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
-* Legacy alias
-*
-* # Arguments
-*
-* * `events_url` - The URL to monitor for transaction events.
-* * `deploy_hash` - The deploy hash to wait for.
-* * `timeout_duration` - An optional timeout duration in seconds.
-*
-* # Returns
-*
-* A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
-* @param {string} events_url
-* @param {string} deploy_hash
-* @param {number | undefined} [timeout_duration]
-* @returns {Promise<Promise<any>>}
-*/
-  waitDeploy(events_url: string, deploy_hash: string, timeout_duration?: number): Promise<Promise<any>>;
-/**
-* Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
-*
-* # Arguments
-*
-* * `events_url` - The URL to monitor for transaction events.
-* * `target_hash` - The transaction hash to wait for.
-* * `timeout_duration` - An optional timeout duration in seconds.
-*
-* # Returns
-*
-* A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
-* @param {string} events_url
-* @param {string} target_hash
-* @param {number | undefined} [timeout_duration]
-* @returns {Promise<Promise<any>>}
-*/
-  waitTransaction(events_url: string, target_hash: string, timeout_duration?: number): Promise<Promise<any>>;
-/**
-* Calls a smart contract entry point with the specified parameters and returns the result.
-*
-* # Arguments
-*
-* * `deploy_params` - The deploy parameters.
-* * `session_params` - The session parameters.
-* * `payment_amount` - The payment amount as a string.
-* * `rpc_address` - An optional rpc address to send the request to.
-*
-* # Returns
-*
-* A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the call.
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {string} payment_amount
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<PutDeployResult>}
-*/
-  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
-/**
-* JS function for transaction transferring funds.
-*
-* # Arguments
-*
-* * `maybe_source` - Optional transfer source uref.
-* * `target_account` - The target account.
-* * `amount` - The amount to transfer.
-* * `transaction_params` - The transaction parameters.
-* * `maybe_id` - An optional transfer ID (defaults to a random number).
-* * `verbosity` - The verbosity level for logging (optional).
-* * `rpc_address` - The address of the node to connect to (optional).
-*
-* # Returns
-*
-* A `Result` containing the result of the transfer or a `JsError` in case of an error.
-* @param {URef | undefined} maybe_source
-* @param {string} target_account
-* @param {string} amount
-* @param {TransactionStrParams} transaction_params
-* @param {string | undefined} [maybe_id]
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<PutTransactionResult>}
-*/
-  transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
-/**
-* This function allows executing a deploy speculatively.
-*
-* # Arguments
-*
-* * `deploy_params` - Deployment parameters for the deploy.
-* * `session_params` - Session parameters for the deploy.
-* * `payment_params` - Payment parameters for the deploy.
-* * `verbosity` - Optional verbosity level.
-* * `rpc_address` - Optional rpc address.
-*
-* # Returns
-*
-* A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {PaymentStrParams} payment_params
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<SpeculativeExecResult>}
-*/
-  speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecResult>;
-/**
-* Asynchronously retrieves the chainspec.
-*
-* # Arguments
-*
-* * `verbosity` - An optional `Verbosity` parameter.
-* * `rpc_address` - An optional rpc address as a string.
-*
-* # Returns
-*
-* A `Result` containing either a `GetChainspecResult` or a `JsError` in case of an error.
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<GetChainspecResult>}
-*/
-  get_chainspec(verbosity?: Verbosity, rpc_address?: string): Promise<GetChainspecResult>;
-/**
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<GetChainspecResult>}
-*/
-  info_get_chainspec(verbosity?: Verbosity, rpc_address?: string): Promise<GetChainspecResult>;
-/**
-* Lists available RPCs using the provided options.
-*
-* # Arguments
-*
-* * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-* * `rpc_address` - An optional string specifying the rpc address to use for the request.
-*
-* # Returns
-*
-* A `Result` containing either a `ListRpcsResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the listing process.
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<ListRpcsResult>}
-*/
-  list_rpcs(verbosity?: Verbosity, rpc_address?: string): Promise<ListRpcsResult>;
-/**
-* Puts a transaction using the provided options.
-*
-* # Arguments
-*
-* * `transaction` - The `Transaction` object to be sent.
-* * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-* * `rpc_address` - An optional string specifying the rpc address to use for the request.
-*
-* # Returns
-*
-* A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the transaction process.
-* @param {Transaction} transaction
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<PutTransactionResult>}
-*/
-  put_transaction(transaction: Transaction, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
-/**
-* JavaScript Alias for `put_transaction`.
-* @param {Transaction} transaction
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<PutTransactionResult>}
-*/
-  account_put_transaction(transaction: Transaction, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
-/**
-* JS function for speculative transfer transaction.
-*
-* # Arguments
-*
-* * `maybe_source` - Optional transfer source uref.
-* * `target_account` - The target account.
-* * `amount` - The amount to transfer.
-* * `maybe_id` - An optional transfer ID (defaults to a random number).
-* * `transaction_params` - The transactionment parameters.
-* * `verbosity` - The verbosity level for logging (optional).
-* * `rpc_address` - The address of the node to connect to (optional).
-*
-* # Returns
-*
-* A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-* @param {URef | undefined} maybe_source
-* @param {string} target_account
-* @param {string} amount
-* @param {TransactionStrParams} transaction_params
-* @param {string | undefined} [maybe_id]
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<SpeculativeExecTxnResult>}
-*/
-  speculative_transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecTxnResult>;
-/**
 * JavaScript function for transactioning with deserialized parameters.
 *
 * # Arguments
@@ -2980,32 +3078,6 @@ export class SDK {
 * @returns {Promise<PutDeployResult>}
 */
   install_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
-/**
-* JS function for speculative transfer.
-*
-* # Arguments
-*
-* * `amount` - The amount to transfer.
-* * `target_account` - The target account.
-* * `transfer_id` - An optional transfer ID (defaults to a random number).
-* * `deploy_params` - The deployment parameters.
-* * `payment_params` - The payment parameters.
-* * `verbosity` - The verbosity level for logging (optional).
-* * `rpc_address` - The address of the node to connect to (optional).
-*
-* # Returns
-*
-* A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-* @param {string} amount
-* @param {string} target_account
-* @param {string | undefined} transfer_id
-* @param {DeployStrParams} deploy_params
-* @param {PaymentStrParams} payment_params
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [rpc_address]
-* @returns {Promise<SpeculativeExecResult>}
-*/
-  speculative_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecResult>;
 /**
 * Parses balance options from a JsValue.
 *
@@ -3237,12 +3309,38 @@ export class SDK {
 */
   speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecTxnResult>;
 /**
-* Installs a smart contract with the specified parameters and returns the result.
+* JS function for speculative transfer transaction.
 *
 * # Arguments
-*.
+*
+* * `maybe_source` - Optional transfer source uref.
+* * `target_account` - The target account.
+* * `amount` - The amount to transfer.
+* * `maybe_id` - An optional transfer ID (defaults to a random number).
+* * `transaction_params` - The transactionment parameters.
+* * `verbosity` - The verbosity level for logging (optional).
+* * `rpc_address` - The address of the node to connect to (optional).
+*
+* # Returns
+*
+* A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+* @param {URef | undefined} maybe_source
+* @param {string} target_account
+* @param {string} amount
+* @param {TransactionStrParams} transaction_params
+* @param {string | undefined} [maybe_id]
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<SpeculativeExecTxnResult>}
+*/
+  speculative_transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecTxnResult>;
+/**
+* Calls a smart contract entry point with the specified parameters and returns the result.
+*
+* # Arguments
+*
 * * `transaction_params` - Transaction parameters.
-* * `transaction_bytes` - Transaction Bytes to install
+* * `builder_params` - Transaction Builder parameters.
 * * `rpc_address` - An optional rpc address to send the request to.
 *
 * # Returns
@@ -3251,13 +3349,13 @@ export class SDK {
 *
 * # Errors
 *
-* Returns a `JsError` if there is an error during the installation.
+* Returns a `JsError` if there is an error during the call.
+* @param {TransactionBuilderParams} builder_params
 * @param {TransactionStrParams} transaction_params
-* @param {Bytes} transaction_bytes
 * @param {string | undefined} [rpc_address]
 * @returns {Promise<PutTransactionResult>}
 */
-  install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, rpc_address?: string): Promise<PutTransactionResult>;
+  call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, rpc_address?: string): Promise<PutTransactionResult>;
 /**
 * @param {string | undefined} [rpc_address]
 * @param {string | undefined} [node_address]
@@ -3292,282 +3390,64 @@ export class SDK {
 */
   setVerbosity(verbosity?: Verbosity): void;
 /**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_latest_switch_block_header(node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_latest_block_header(node_address?: string): Promise<any>;
-/**
-* @param {bigint} height
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_block_header_by_height(height: bigint, node_address?: string): Promise<any>;
-/**
-* @param {BlockHash} block_hash
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_block_header_by_hash(block_hash: BlockHash, node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_latest_block_with_signatures(node_address?: string): Promise<any>;
-/**
-* @param {bigint} height
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_block_with_signatures_by_height(height: bigint, node_address?: string): Promise<any>;
-/**
-* @param {BlockHash} block_hash
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_block_with_signatures_by_hash(block_hash: BlockHash, node_address?: string): Promise<any>;
-/**
-* @param {TransactionHash} hash
-* @param {boolean} with_finalized_approvals
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_transaction_by_hash(hash: TransactionHash, with_finalized_approvals: boolean, node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_peers(node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_uptime(node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_last_progress(node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_reactor_state(node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_network_name(node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_consensus_validator_changes(node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_block_synchronizer_status(node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_available_block_range(node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_next_upgrade(node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_consensus_status(node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_chainspec_raw_bytes(node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_node_status(node_address?: string): Promise<any>;
-/**
-* @param {PublicKey} validator_key
-* @param {EraId} era
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_validator_reward_by_era(validator_key: PublicKey, era: EraId, node_address?: string): Promise<any>;
-/**
-* @param {PublicKey} validator_key
-* @param {bigint} block_height
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_validator_reward_by_block_height(validator_key: PublicKey, block_height: bigint, node_address?: string): Promise<any>;
-/**
-* @param {PublicKey} validator_key
-* @param {BlockHash} block_hash
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_validator_reward_by_block_hash(validator_key: PublicKey, block_hash: BlockHash, node_address?: string): Promise<any>;
-/**
-* @param {PublicKey} validator_key
-* @param {PublicKey} delegator_key
-* @param {EraId} era
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_delegator_reward_by_era(validator_key: PublicKey, delegator_key: PublicKey, era: EraId, node_address?: string): Promise<any>;
-/**
-* @param {PublicKey} validator_key
-* @param {PublicKey} delegator_key
-* @param {bigint} block_height
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_delegator_reward_by_block_height(validator_key: PublicKey, delegator_key: PublicKey, block_height: bigint, node_address?: string): Promise<any>;
-/**
-* @param {PublicKey} validator_key
-* @param {PublicKey} delegator_key
-* @param {BlockHash} block_hash
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_delegator_reward_by_block_hash(validator_key: PublicKey, delegator_key: PublicKey, block_hash: BlockHash, node_address?: string): Promise<any>;
-/**
-* @param {RecordId} record_id
-* @param {Uint8Array} key
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_read_record(record_id: RecordId, key: Uint8Array, node_address?: string): Promise<any>;
-/**
-* @param {Key} key
-* @param {(string)[]} path
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_global_state_item(key: Key, path: (string)[], node_address?: string): Promise<any>;
-/**
-* @param {Digest} state_root_hash
-* @param {Key} key
-* @param {(string)[]} path
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_global_state_item_by_state_root_hash(state_root_hash: Digest, key: Key, path: (string)[], node_address?: string): Promise<any>;
-/**
-* @param {BlockHash} block_hash
-* @param {Key} key
-* @param {(string)[]} path
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_global_state_item_by_block_hash(block_hash: BlockHash, key: Key, path: (string)[], node_address?: string): Promise<any>;
-/**
-* @param {bigint} block_height
-* @param {Key} key
-* @param {(string)[]} path
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_global_state_item_by_block_height(block_height: bigint, key: Key, path: (string)[], node_address?: string): Promise<any>;
-/**
-* @param {Transaction} transaction
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_try_accept_transaction(transaction: Transaction, node_address?: string): Promise<any>;
-/**
-* @param {Transaction} transaction
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_try_speculative_execution(transaction: Transaction, node_address?: string): Promise<any>;
-/**
-* @param {string | undefined} [node_address]
-* @returns {Promise<any>}
-*/
-  get_binary_protocol_version(node_address?: string): Promise<any>;
-/**
-* Get options for speculative execution from a JavaScript value.
-* @param {any} options
-* @returns {getSpeculativeExecTxnOptions}
-*/
-  get_speculative_exec_options(options: any): getSpeculativeExecTxnOptions;
-/**
-* JS function for speculative execution.
+* This function allows executing a deploy speculatively.
 *
 * # Arguments
 *
-* * `options` - The options for speculative execution.
+* * `deploy_params` - Deployment parameters for the deploy.
+* * `session_params` - Session parameters for the deploy.
+* * `payment_params` - Payment parameters for the deploy.
+* * `verbosity` - Optional verbosity level.
+* * `rpc_address` - Optional rpc address.
 *
 * # Returns
 *
-* A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
-* @param {getSpeculativeExecTxnOptions | undefined} [options]
-* @returns {Promise<SpeculativeExecTxnResult>}
-*/
-  speculative_exec(options?: getSpeculativeExecTxnOptions): Promise<SpeculativeExecTxnResult>;
-/**
-* JS function for `make_transfer`.
-*
-* # Arguments
-*
-* * `amount` - The transfer amount.
-* * `target_account` - The target account.
-* * `transfer_id` - Optional transfer identifier.
-* * `deploy_params` - The deploy parameters.
-* * `payment_params` - The payment parameters.
-*
-* # Returns
-*
-* A `Result` containing the created `Deploy` or a `JsError` in case of an error.
-* @param {string} amount
-* @param {string} target_account
-* @param {string | undefined} transfer_id
+* A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
 * @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
 * @param {PaymentStrParams} payment_params
-* @returns {Deploy}
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<SpeculativeExecResult>}
 */
-  make_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Deploy;
+  speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecResult>;
 /**
-* JS function for `make_transfer_transaction`.
+* Puts a deploy using the provided options.
 *
 * # Arguments
 *
-* * `maybe_source` - Optional transfer source uref.
-* * `amount` - The transfer amount.
-* * `target` - The target account.
-* * `transaction_params` - The transaction parameters.
-* * `maybe_id` - Optional transfer identifier.
+* * `deploy` - The `Deploy` object to be sent.
+* * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+* * `rpc_address` - An optional string specifying the rpc address to use for the request.
 *
 * # Returns
 *
-* A `Result` containing the created `Transaction` or a `JsError` in case of an error.
-* @param {URef | undefined} maybe_source
-* @param {string} target
-* @param {string} amount
-* @param {TransactionStrParams} transaction_params
-* @param {string | undefined} [maybe_id]
-* @returns {Transaction}
+* A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the deploy process.
+* @param {Deploy} deploy
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<PutDeployResult>}
 */
-  make_transfer_transaction(maybe_source: URef | undefined, target: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string): Transaction;
+  put_deploy(deploy: Deploy, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
 /**
-* Calls a smart contract entry point with the specified parameters and returns the result.
+* JavaScript Alias for `put_deploy`.
+* @param {Deploy} deploy
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  account_put_deploy(deploy: Deploy, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
+/**
+* Installs a smart contract with the specified parameters and returns the result.
 *
 * # Arguments
-*
+*.
 * * `transaction_params` - Transaction parameters.
-* * `builder_params` - Transaction Builder parameters.
+* * `transaction_bytes` - Transaction Bytes to install
 * * `rpc_address` - An optional rpc address to send the request to.
 *
 * # Returns
@@ -3576,13 +3456,133 @@ export class SDK {
 *
 * # Errors
 *
-* Returns a `JsError` if there is an error during the call.
-* @param {TransactionBuilderParams} builder_params
+* Returns a `JsError` if there is an error during the installation.
 * @param {TransactionStrParams} transaction_params
+* @param {Bytes} transaction_bytes
 * @param {string | undefined} [rpc_address]
 * @returns {Promise<PutTransactionResult>}
 */
-  call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, rpc_address?: string): Promise<PutTransactionResult>;
+  install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, rpc_address?: string): Promise<PutTransactionResult>;
+/**
+* JavaScript function for deploying with deserialized parameters.
+*
+* # Arguments
+*
+* * `deploy_params` - Deploy parameters.
+* * `session_params` - Session parameters.
+* * `payment_params` - Payment parameters.
+* * `verbosity` - An optional verbosity level.
+* * `rpc_address` - An optional rpc address.
+*
+* # Returns
+*
+* A result containing PutDeployResult or a JsError.
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {PaymentStrParams} payment_params
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
+/**
+* JS function for transferring funds.
+*
+* # Arguments
+*
+* * `amount` - The amount to transfer.
+* * `target_account` - The target account.
+* * `transfer_id` - An optional transfer ID (defaults to a random number).
+* * `deploy_params` - The deployment parameters.
+* * `payment_params` - The payment parameters.
+* * `verbosity` - The verbosity level for logging (optional).
+* * `rpc_address` - The address of the node to connect to (optional).
+*
+* # Returns
+*
+* A `Result` containing the result of the transfer or a `JsError` in case of an error.
+* @param {string} amount
+* @param {string} target_account
+* @param {string | undefined} transfer_id
+* @param {DeployStrParams} deploy_params
+* @param {PaymentStrParams} payment_params
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
+/**
+* Asynchronously retrieves the chainspec.
+*
+* # Arguments
+*
+* * `verbosity` - An optional `Verbosity` parameter.
+* * `rpc_address` - An optional rpc address as a string.
+*
+* # Returns
+*
+* A `Result` containing either a `GetChainspecResult` or a `JsError` in case of an error.
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<GetChainspecResult>}
+*/
+  get_chainspec(verbosity?: Verbosity, rpc_address?: string): Promise<GetChainspecResult>;
+/**
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<GetChainspecResult>}
+*/
+  info_get_chainspec(verbosity?: Verbosity, rpc_address?: string): Promise<GetChainspecResult>;
+/**
+* Lists available RPCs using the provided options.
+*
+* # Arguments
+*
+* * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+* * `rpc_address` - An optional string specifying the rpc address to use for the request.
+*
+* # Returns
+*
+* A `Result` containing either a `ListRpcsResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the listing process.
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<ListRpcsResult>}
+*/
+  list_rpcs(verbosity?: Verbosity, rpc_address?: string): Promise<ListRpcsResult>;
+/**
+* Puts a transaction using the provided options.
+*
+* # Arguments
+*
+* * `transaction` - The `Transaction` object to be sent.
+* * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+* * `rpc_address` - An optional string specifying the rpc address to use for the request.
+*
+* # Returns
+*
+* A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the transaction process.
+* @param {Transaction} transaction
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<PutTransactionResult>}
+*/
+  put_transaction(transaction: Transaction, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
+/**
+* JavaScript Alias for `put_transaction`.
+* @param {Transaction} transaction
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [rpc_address]
+* @returns {Promise<PutTransactionResult>}
+*/
+  account_put_transaction(transaction: Transaction, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
 }
 /**
 */
