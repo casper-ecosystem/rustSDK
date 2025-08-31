@@ -102,7 +102,7 @@ impl SDK {
         let transfer_id = if let Some(transfer_id) = transfer_id {
             transfer_id
         } else {
-            rand::thread_rng().gen::<u64>().to_string()
+            rand::rng().random::<u64>().to_string()
         };
         let deploy = make_transfer(
             "",

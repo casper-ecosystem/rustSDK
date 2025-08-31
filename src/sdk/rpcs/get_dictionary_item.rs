@@ -244,7 +244,7 @@ impl SDK {
                 Err(_) => "".to_digest(),
             }
         };
-        let random_id = rand::thread_rng().gen::<u64>().to_string();
+        let random_id = rand::rng().random::<u64>().to_string();
         match dictionary_item_input {
             DictionaryItemInput::Params(dictionary_item_params) => get_dictionary_item_cli(
                 &random_id,

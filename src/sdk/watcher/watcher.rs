@@ -8,10 +8,7 @@ use js_sys::Promise;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 use std::{
-    borrow::BorrowMut,
-    cell::RefCell,
     fmt,
-    rc::Rc,
     sync::{Arc, Mutex},
 };
 use wasm_bindgen::prelude::*;
@@ -909,8 +906,6 @@ impl fmt::Display for EventName {
 
 #[cfg(test)]
 mod tests {
-    use std::borrow::Borrow;
-
     use super::*;
     use crate::watcher::{deploy_mock::DEPLOY_MOCK, transaction_mock::TRANSACTION_MOCK};
     use sdk_tests::tests::helpers::get_network_constants;

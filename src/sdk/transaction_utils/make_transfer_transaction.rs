@@ -98,9 +98,9 @@ pub(crate) fn make_transfer_transaction(
     maybe_id: Option<String>,
 ) -> Result<Transaction, Box<SdkError>> {
     let id = if let Some(maybe_id) = maybe_id {
-        u64::from_str(&maybe_id).unwrap_or_else(|_| rand::thread_rng().gen::<u64>())
+        u64::from_str(&maybe_id).unwrap_or_else(|_| rand::rng().random::<u64>())
     } else {
-        rand::thread_rng().gen::<u64>()
+        rand::rng().random::<u64>()
     };
 
     let target = transfer_target(target).map_err(|e| {

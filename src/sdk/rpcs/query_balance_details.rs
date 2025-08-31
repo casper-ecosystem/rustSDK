@@ -19,7 +19,6 @@ use casper_client::{
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
-use js_sys::Math::random;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
@@ -251,7 +250,7 @@ impl SDK {
                 error: err,
             });
         };
-        let random_id = rand::thread_rng().gen::<u64>().to_string();
+        let random_id = rand::rng().random::<u64>().to_string();
         if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
             query_balance_details_lib(
                 JsonRpcId::from(random_id),

@@ -232,7 +232,7 @@ impl SDK {
                 error: err,
             });
         };
-        let random_id = rand::thread_rng().gen::<u64>().to_string();
+        let random_id = rand::rng().random::<u64>().to_string();
         if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
             query_balance_lib(
                 JsonRpcId::from(random_id),

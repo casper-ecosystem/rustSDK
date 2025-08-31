@@ -86,7 +86,7 @@ impl SDK {
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_PutTransactionResult>, Error> {
-        let random_id = JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string());
+        let random_id = JsonRpcId::from(rand::rng().random::<u64>().to_string());
         //log("account_put_transaction!");
         put_transaction(
             JsonRpcId::from(random_id),

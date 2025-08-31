@@ -133,7 +133,7 @@ impl SDK {
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetEraInfoResult>, SdkError> {
         //log("get_era_info!");
-        let random_id = rand::thread_rng().gen::<u64>().to_string();
+        let random_id = rand::rng().random::<u64>().to_string();
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_era_info_cli(
                 &random_id,

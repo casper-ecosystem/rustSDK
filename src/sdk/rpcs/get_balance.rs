@@ -249,7 +249,7 @@ impl SDK {
                 Err(_) => "".to_digest(),
             }
         };
-        let random_id = rand::thread_rng().gen::<u64>().to_string();
+        let random_id = rand::rng().random::<u64>().to_string();
         match purse_uref {
             GetBalanceInput::PurseUref(purse_uref) => get_balance_lib(
                 JsonRpcId::from(random_id),

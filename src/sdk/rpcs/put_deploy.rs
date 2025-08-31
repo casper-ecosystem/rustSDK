@@ -86,7 +86,7 @@ impl SDK {
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_PutDeployResult>, Error> {
         //log("account_put_deploy!");
-        let random_id = JsonRpcId::from(rand::thread_rng().gen::<u64>().to_string());
+        let random_id = JsonRpcId::from(rand::rng().random::<u64>().to_string());
         put_deploy(
             random_id,
             &self.get_rpc_address(rpc_address),

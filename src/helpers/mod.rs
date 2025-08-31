@@ -6,7 +6,7 @@ use base64::Engine;
 use bigdecimal::BigDecimal;
 use blake2::{
     digest::{Update, VariableOutput},
-    VarBlake2b,
+    Blake2bVar,
 };
 use casper_client::cli::JsonArg;
 use casper_types::{
@@ -66,12 +66,12 @@ pub fn get_current_timestamp(timestamp: Option<String>) -> String {
 /// A hexadecimal string representing the Blake2b hash of the input metadata.
 pub fn get_blake2b_hash(meta_data: &str) -> String {
     let mut result = [0; BLAKE2B_DIGEST_LENGTH];
-    let mut hasher = VarBlake2b::new(BLAKE2B_DIGEST_LENGTH).expect("should create hasher");
+    let mut hasher = Blake2bVar::new(BLAKE2B_DIGEST_LENGTH).expect("should create hasher");
 
-    hasher.update(meta_data);
-    hasher.finalize_variable(|slice| {
-        result.copy_from_slice(slice);
-    });
+    hasher.update(meta_data.as_bytes());
+    hasher
+        .finalize_variable(&mut result)
+        .expect("finalize failed");
     hex::encode(result).to_lowercase()
 }
 
@@ -117,12 +117,12 @@ pub fn make_dictionary_item_key<V: ToBytes>(key: &Key, value: &V) -> String {
     bytes_a.append(&mut bytes_b);
 
     let mut result = [0; BLAKE2B_DIGEST_LENGTH];
-    let mut hasher = VarBlake2b::new(BLAKE2B_DIGEST_LENGTH).expect("should create hasher");
+    let mut hasher = Blake2bVar::new(BLAKE2B_DIGEST_LENGTH).expect("should create hasher");
 
-    hasher.update(bytes_a);
-    hasher.finalize_variable(|slice| {
-        result.copy_from_slice(slice);
-    });
+    hasher.update(&bytes_a);
+    hasher
+        .finalize_variable(&mut result)
+        .expect("finalize failed");
     hex::encode(result)
 }
 
@@ -494,6 +494,8 @@ pub(crate) fn insert_arg(args: &mut RuntimeArgs, new_arg: String) -> &RuntimeArg
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use super::*;
     use casper_types::U256;
 
