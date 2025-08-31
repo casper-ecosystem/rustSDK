@@ -86,7 +86,7 @@
 <a href=#86 id=86 data-nosnippet>86</a>        verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 <a href=#87 id=87 data-nosnippet>87</a>        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
 <a href=#88 id=88 data-nosnippet>88</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_PutTransactionResult&gt;, Error&gt; {
-<a href=#89 id=89 data-nosnippet>89</a>        <span class="kw">let </span>random_id = JsonRpcId::from(rand::thread_rng().gen::&lt;u64&gt;().to_string());
+<a href=#89 id=89 data-nosnippet>89</a>        <span class="kw">let </span>random_id = JsonRpcId::from(rand::rng().random::&lt;u64&gt;().to_string());
 <a href=#90 id=90 data-nosnippet>90</a>        <span class="comment">//log("account_put_transaction!");
 <a href=#91 id=91 data-nosnippet>91</a>        </span>put_transaction(
 <a href=#92 id=92 data-nosnippet>92</a>            random_id,

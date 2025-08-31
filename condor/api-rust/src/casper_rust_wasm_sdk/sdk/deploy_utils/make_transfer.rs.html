@@ -108,7 +108,7 @@
 <a href=#108 id=108 data-nosnippet>108</a>    <span class="kw">let </span>transfer_id = <span class="kw">if let </span><span class="prelude-val">Some</span>(transfer_id) = transfer_id {
 <a href=#109 id=109 data-nosnippet>109</a>        transfer_id
 <a href=#110 id=110 data-nosnippet>110</a>    } <span class="kw">else </span>{
-<a href=#111 id=111 data-nosnippet>111</a>        rand::thread_rng().gen::&lt;u64&gt;().to_string()
+<a href=#111 id=111 data-nosnippet>111</a>        rand::rng().random::&lt;u64&gt;().to_string()
 <a href=#112 id=112 data-nosnippet>112</a>    };
 <a href=#113 id=113 data-nosnippet>113</a>    client_make_transfer(
 <a href=#114 id=114 data-nosnippet>114</a>        <span class="string">""</span>,

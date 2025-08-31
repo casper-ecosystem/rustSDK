@@ -204,7 +204,7 @@
 <a href=#204 id=204 data-nosnippet>204</a>        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
 <a href=#205 id=205 data-nosnippet>205</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetStateRootHashResult&gt;, SdkError&gt; {
 <a href=#206 id=206 data-nosnippet>206</a>        <span class="comment">//log("get_state_root_hash!");
-<a href=#207 id=207 data-nosnippet>207</a>        </span><span class="kw">let </span>random_id = rand::thread_rng().gen::&lt;u64&gt;().to_string();
+<a href=#207 id=207 data-nosnippet>207</a>        </span><span class="kw">let </span>random_id = rand::rng().random::&lt;u64&gt;().to_string();
 <a href=#208 id=208 data-nosnippet>208</a>
 <a href=#209 id=209 data-nosnippet>209</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
 <a href=#210 id=210 data-nosnippet>210</a>            get_state_root_hash_cli(

@@ -133,7 +133,7 @@
 <a href=#133 id=133 data-nosnippet>133</a>        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
 <a href=#134 id=134 data-nosnippet>134</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetEraInfoResult&gt;, SdkError&gt; {
 <a href=#135 id=135 data-nosnippet>135</a>        <span class="comment">//log("get_era_info!");
-<a href=#136 id=136 data-nosnippet>136</a>        </span><span class="kw">let </span>random_id = rand::thread_rng().gen::&lt;u64&gt;().to_string();
+<a href=#136 id=136 data-nosnippet>136</a>        </span><span class="kw">let </span>random_id = rand::rng().random::&lt;u64&gt;().to_string();
 <a href=#137 id=137 data-nosnippet>137</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
 <a href=#138 id=138 data-nosnippet>138</a>            get_era_info_cli(
 <a href=#139 id=139 data-nosnippet>139</a>                <span class="kw-2">&amp;</span>random_id,

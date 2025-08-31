@@ -121,7 +121,7 @@
 <a href=#121 id=121 data-nosnippet>121</a>        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
 <a href=#122 id=122 data-nosnippet>122</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetValidatorChangesResult&gt;, Error&gt; {
 <a href=#123 id=123 data-nosnippet>123</a>        <span class="comment">//log("get_validator_changes!");
-<a href=#124 id=124 data-nosnippet>124</a>        </span><span class="kw">let </span>random_id = JsonRpcId::from(rand::thread_rng().gen::&lt;u64&gt;().to_string());
+<a href=#124 id=124 data-nosnippet>124</a>        </span><span class="kw">let </span>random_id = JsonRpcId::from(rand::rng().random::&lt;u64&gt;().to_string());
 <a href=#125 id=125 data-nosnippet>125</a>        get_validator_changes(
 <a href=#126 id=126 data-nosnippet>126</a>            random_id,
 <a href=#127 id=127 data-nosnippet>127</a>            <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),

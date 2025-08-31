@@ -109,7 +109,7 @@
 <a href=#109 id=109 data-nosnippet>109</a>        verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 <a href=#110 id=110 data-nosnippet>110</a>        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
 <a href=#111 id=111 data-nosnippet>111</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetPeersResult&gt;, Error&gt; {
-<a href=#112 id=112 data-nosnippet>112</a>        <span class="kw">let </span>random_id = JsonRpcId::from(rand::thread_rng().gen::&lt;u64&gt;().to_string());
+<a href=#112 id=112 data-nosnippet>112</a>        <span class="kw">let </span>random_id = JsonRpcId::from(rand::rng().random::&lt;u64&gt;().to_string());
 <a href=#113 id=113 data-nosnippet>113</a>        get_peers(
 <a href=#114 id=114 data-nosnippet>114</a>            random_id,
 <a href=#115 id=115 data-nosnippet>115</a>            <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),

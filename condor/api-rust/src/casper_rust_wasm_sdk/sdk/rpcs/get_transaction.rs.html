@@ -188,7 +188,7 @@
 <a href=#188 id=188 data-nosnippet>188</a>        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
 <a href=#189 id=189 data-nosnippet>189</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetTransactionResult&gt;, Error&gt; {
 <a href=#190 id=190 data-nosnippet>190</a>        <span class="comment">//log("get_transaction!");
-<a href=#191 id=191 data-nosnippet>191</a>        </span><span class="kw">let </span>random_id = JsonRpcId::from(rand::thread_rng().gen::&lt;u64&gt;().to_string());
+<a href=#191 id=191 data-nosnippet>191</a>        </span><span class="kw">let </span>random_id = JsonRpcId::from(rand::rng().random::&lt;u64&gt;().to_string());
 <a href=#192 id=192 data-nosnippet>192</a>        get_transaction(
 <a href=#193 id=193 data-nosnippet>193</a>            random_id,
 <a href=#194 id=194 data-nosnippet>194</a>            <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),

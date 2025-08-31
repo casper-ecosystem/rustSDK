@@ -327,7 +327,7 @@
 <a href=#327 id=327 data-nosnippet>327</a>            <span class="prelude-val">Some</span>(p) =&gt; p.to_string(),
 <a href=#328 id=328 data-nosnippet>328</a>            <span class="prelude-val">None </span>=&gt; String::new(),
 <a href=#329 id=329 data-nosnippet>329</a>        };
-<a href=#330 id=330 data-nosnippet>330</a>        <span class="kw">let </span>random_id = rand::thread_rng().gen::&lt;u64&gt;().to_string();
+<a href=#330 id=330 data-nosnippet>330</a>        <span class="kw">let </span>random_id = rand::rng().random::&lt;u64&gt;().to_string();
 <a href=#331 id=331 data-nosnippet>331</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(maybe_global_state_identifier) = maybe_global_state_identifier {
 <a href=#332 id=332 data-nosnippet>332</a>            <span class="kw">let </span>path = <span class="kw">match </span>path {
 <a href=#333 id=333 data-nosnippet>333</a>                <span class="prelude-val">Some</span>(path) <span class="kw">if </span>path.is_empty() =&gt; Vec::new(),
@@ -346,7 +346,7 @@
 <a href=#346 id=346 data-nosnippet>346</a>            .<span class="kw">await
 <a href=#347 id=347 data-nosnippet>347</a>            </span>.map_err(SdkError::from)
 <a href=#348 id=348 data-nosnippet>348</a>        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(state_root_hash) = state_root_hash {
-<a href=#349 id=349 data-nosnippet>349</a>            <span class="kw">let </span>random_id = rand::thread_rng().gen::&lt;u64&gt;().to_string();
+<a href=#349 id=349 data-nosnippet>349</a>            <span class="kw">let </span>random_id = rand::rng().random::&lt;u64&gt;().to_string();
 <a href=#350 id=350 data-nosnippet>350</a>            query_global_state_cli(
 <a href=#351 id=351 data-nosnippet>351</a>                <span class="kw-2">&amp;</span>random_id,
 <a href=#352 id=352 data-nosnippet>352</a>                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
@@ -359,7 +359,7 @@
 <a href=#359 id=359 data-nosnippet>359</a>            .<span class="kw">await
 <a href=#360 id=360 data-nosnippet>360</a>            </span>.map_err(SdkError::from)
 <a href=#361 id=361 data-nosnippet>361</a>        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(maybe_block_id) = maybe_block_id {
-<a href=#362 id=362 data-nosnippet>362</a>            <span class="kw">let </span>random_id = rand::thread_rng().gen::&lt;u64&gt;().to_string();
+<a href=#362 id=362 data-nosnippet>362</a>            <span class="kw">let </span>random_id = rand::rng().random::&lt;u64&gt;().to_string();
 <a href=#363 id=363 data-nosnippet>363</a>            query_global_state_cli(
 <a href=#364 id=364 data-nosnippet>364</a>                <span class="kw-2">&amp;</span>random_id,
 <a href=#365 id=365 data-nosnippet>365</a>                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
@@ -384,7 +384,7 @@
 <a href=#384 id=384 data-nosnippet>384</a>                }
 <a href=#385 id=385 data-nosnippet>385</a>                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="string">""</span>.to_string(),
 <a href=#386 id=386 data-nosnippet>386</a>            };
-<a href=#387 id=387 data-nosnippet>387</a>            <span class="kw">let </span>random_id = rand::thread_rng().gen::&lt;u64&gt;().to_string();
+<a href=#387 id=387 data-nosnippet>387</a>            <span class="kw">let </span>random_id = rand::rng().random::&lt;u64&gt;().to_string();
 <a href=#388 id=388 data-nosnippet>388</a>            query_global_state_cli(
 <a href=#389 id=389 data-nosnippet>389</a>                <span class="kw-2">&amp;</span>random_id,
 <a href=#390 id=390 data-nosnippet>390</a>                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),

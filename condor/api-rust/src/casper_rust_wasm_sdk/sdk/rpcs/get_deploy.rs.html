@@ -179,7 +179,7 @@
 <a href=#179 id=179 data-nosnippet>179</a>        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
 <a href=#180 id=180 data-nosnippet>180</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetDeployResult&gt;, Error&gt; {
 <a href=#181 id=181 data-nosnippet>181</a>        <span class="comment">//log("get_deploy!");
-<a href=#182 id=182 data-nosnippet>182</a>        </span><span class="kw">let </span>random_id = JsonRpcId::from(rand::thread_rng().gen::&lt;u64&gt;().to_string());
+<a href=#182 id=182 data-nosnippet>182</a>        </span><span class="kw">let </span>random_id = JsonRpcId::from(rand::rng().random::&lt;u64&gt;().to_string());
 <a href=#183 id=183 data-nosnippet>183</a>        get_deploy(
 <a href=#184 id=184 data-nosnippet>184</a>            random_id,
 <a href=#185 id=185 data-nosnippet>185</a>            <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),

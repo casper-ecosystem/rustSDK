@@ -182,7 +182,7 @@
 <a href=#182 id=182 data-nosnippet>182</a>        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
 <a href=#183 id=183 data-nosnippet>183</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetBlockTransfersResult&gt;, SdkError&gt; {
 <a href=#184 id=184 data-nosnippet>184</a>        <span class="comment">//log("get_block_transfers!");
-<a href=#185 id=185 data-nosnippet>185</a>        </span><span class="kw">let </span>random_id = rand::thread_rng().gen::&lt;u64&gt;().to_string();
+<a href=#185 id=185 data-nosnippet>185</a>        </span><span class="kw">let </span>random_id = rand::rng().random::&lt;u64&gt;().to_string();
 <a href=#186 id=186 data-nosnippet>186</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
 <a href=#187 id=187 data-nosnippet>187</a>            get_block_transfers_cli(
 <a href=#188 id=188 data-nosnippet>188</a>                <span class="kw-2">&amp;</span>random_id,
