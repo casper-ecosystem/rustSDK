@@ -377,6 +377,8 @@ impl Watcher {
         let client = reqwest::Client::new();
         let url = self.events_url.clone();
 
+        // TODO fix this warning
+        // https://github.com/rust-lang/rust-clippy/issues/11034
         #[allow(clippy::arc_with_non_send_sync)]
         let watcher = Arc::new(Mutex::new(self.clone()));
 
