@@ -485,7 +485,7 @@ mod tests {
             })
             .await;
 
-        // Assertmake integra
+        // Assert
         assert!(result.is_ok());
     }
 
