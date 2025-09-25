@@ -89,7 +89,7 @@ impl SDK {
         let random_id = JsonRpcId::from(rand::rng().random::<u64>().to_string());
         //log("account_put_transaction!");
         put_transaction(
-            JsonRpcId::from(random_id),
+            random_id,
             &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
             transaction.into(),

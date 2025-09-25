@@ -167,7 +167,7 @@ impl SDK {
         //log("speculative_exec_deploy!");
         let random_id = JsonRpcId::from(rand::rng().random::<u64>().to_string());
         speculative_exec_deploy_lib(
-            JsonRpcId::from(random_id),
+            random_id,
             &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
             deploy.into(),
