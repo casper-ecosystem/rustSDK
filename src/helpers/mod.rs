@@ -494,8 +494,6 @@ pub(crate) fn insert_arg(args: &mut RuntimeArgs, new_arg: String) -> &RuntimeArg
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashSet;
-
     use super::*;
     use casper_types::U256;
 

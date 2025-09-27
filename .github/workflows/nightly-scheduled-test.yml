@@ -32,6 +32,9 @@ jobs:
           components: rustfmt, clippy
           target: wasm32-unknown-unknown
 
+      - name: Add wasm32 target
+        run: rustup target add wasm32-unknown-unknown
+
       - name: Install cargo-audit
         run: cargo install cargo-audit
 
