@@ -30,7 +30,7 @@ services:
       ALLOWED_HOSTS: |
         localhost,
         127.0.0.1,
-        172.18.0.1
+        172.17.0.1
       ALLOWED_PORTS: |
         28101,
         7779
@@ -41,9 +41,4 @@ services:
 
 networks:
   casper-network:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.18.0.0/16
-          gateway: 172.18.0.1
+    external: false

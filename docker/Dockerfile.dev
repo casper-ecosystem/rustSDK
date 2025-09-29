@@ -22,7 +22,7 @@ RUN npm install --ignore-scripts --verbose && npm update
 # Build proxy from template
 RUN npm run build-proxy-conf
 # Proxy localhost to gateway
-RUN sed -i 's|http://localhost|http://172.18.0.1|g' proxy.conf.json
+RUN sed -i 's|http://localhost|http://172.17.0.1|g' proxy.conf.json
 
 CMD npm run serve -- --configuration=$BUILD_CONFIGURATION
 
