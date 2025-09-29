@@ -49,39 +49,39 @@ export const config: EnvironmentConfig = {
     'node-launcher': {
       rpc_address: 'http://localhost:7777',
       node_address: 'localhost:4300?targetPort=7779&targetHost=localhost',
-      stream_address: 'http://localhost:9999/events/main',
+      stream_address: 'http://localhost:9999/events/',
       chain_name: 'casper-net-1',
     },
     ntcl: {
       rpc_address: 'http://localhost:11101',
       node_address: 'localhost:4300/?targetPort=28101&targetHost=localhost',
-      stream_address: 'http://localhost:18101/events/main',
+      stream_address: 'http://localhost:18101/events/',
       chain_name: 'casper-net-1',
     },
     testnet: {
       rpc_address: 'https://node.testnet.casper.network',
       node_address:
         'localhost:4300/?targetPort=7779&targetHost=node.testnet.casper.network',
-      stream_address: 'https://node.testnet.casper.network/events/main',
+      stream_address: 'https://node.testnet.casper.network/events/',
       chain_name: 'casper-test',
     },
     mainnet: {
       rpc_address: 'https://node.mainnet.casper.network',
       node_address:
         'localhost:4300/?targetPort=7779&targetHost=node.mainnet.casper.network',
-      stream_address: 'https://node.mainnet.casper.network/events/main',
+      stream_address: 'https://node.mainnet.casper.network/events/',
       chain_name: 'casper',
     },
     custom: {
       rpc_address: 'http://3.136.227.9:7777',
       node_address: 'localhost:4300/?targetPort=7779&targetHost=3.136.227.9',
-      stream_address: 'http://3.136.227.9:9999/events/main',
+      stream_address: 'http://3.136.227.9:9999/events/',
       chain_name: 'casper-test',
     },
     dev: {
       rpc_address: 'http://localhost:4200',
       node_address: 'localhost:4400/?targetPort=28101&targetHost=localhost',
-      stream_address: 'http://localhost:4200/events/main',
+      stream_address: 'http://localhost:4200/events/',
       chain_name: 'casper-net-1',
     },
   },
@@ -89,7 +89,7 @@ export const config: EnvironmentConfig = {
   app_port: '4200',
   default_port: '7777',
   default_protocol: 'http://',
-  docker_gateway: '172.17.0.1',
+  docker_gateway: '172.18.0.1',
   cors_anywhere_port: '11100',
   enable_addressable_entity: false,
 };
