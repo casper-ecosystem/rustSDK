@@ -87,7 +87,7 @@ docker-up-prod:
 	$(CICD_DC) up --build --remove-orphans -d
 
 docker-start-prod:
-	$(CICD_DC) up --build --remove-orphans -d
+	$(CICD_DC) up --remove-orphans
 
 docker-stop-prod:
 	$(CICD_DC) stop

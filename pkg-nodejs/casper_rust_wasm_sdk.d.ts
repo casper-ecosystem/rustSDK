@@ -13,6 +13,18 @@
  */
 export function encodeLowerBlake2b(meta_data: string): any;
 /**
+ * Converts a hexadecimal string to a regular string.
+ *
+ * # Arguments
+ *
+ * * `hex_string` - The hexadecimal string to convert.
+ *
+ * # Returns
+ *
+ * A regular string containing the converted value.
+ */
+export function hexToString(hex_string: string): string;
+/**
  * Generates a secret key using the Ed25519 algorithm and returns it as a PEM-encoded string.
  *
  * # Returns
@@ -24,33 +36,6 @@ export function encodeLowerBlake2b(meta_data: string): any;
  * Returns an error if the secret key generation or serialization fails.
  */
 export function generateSecretKey(): any;
-/**
- * Generates a secret key using the secp256k1 algorithm and returns it as a PEM-encoded string.
- *
- * # Returns
- *
- * A `JsValue` containing the PEM-encoded secret key or a JavaScript error if an error occurs.
- *
- * # Errors
- *
- * Returns an error if the secret key generation or serialization fails.
- */
-export function generateSecretKey_secp256k1(): any;
-/**
- * Converts a formatted account hash to a base64-encoded string (cep-18 key encoding).
- *
- *
- * # Arguments
- *
- * * `formatted_account_hash` - A hex-formatted string representing the account hash.
- * Example: "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
- *
- * # Returns
- *
- * Returns the base64-encoded string.
- * Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
- */
-export function accountHashToBase64Key(formatted_account_hash: string): string;
 /**
  * Converts motes to CSPR (Casper tokens).
  *
@@ -64,27 +49,6 @@ export function accountHashToBase64Key(formatted_account_hash: string): string;
  */
 export function motesToCSPR(motes: string): string;
 /**
- * Gets the current timestamp.
- *
- * # Returns
- *
- * A JsValue containing the current timestamp.
- */
-export function getTimestamp(): any;
-/**
- * Converts a key and value into a formatted dictionary item key for ditionaries queries.
- *
- * # Arguments
- *
- * * `key` - A string representation of a account/contract hash as a Key.
- * * `value` - A string representation of the value, for now restricted to parse as U256 or Key
- *
- * # Returns
- *
- * A string representing the formatted dictionary item key.
- */
-export function makeDictionaryItemKey(key: Key, value: string): string;
-/**
  * Converts a Uint8Array to a `Bytes` object.
  *
  * # Arguments
@@ -96,31 +60,6 @@ export function makeDictionaryItemKey(key: Key, value: string): string;
  * A `Bytes` object containing the converted value.
  */
 export function uint8ArrayToBytes(uint8_array: Uint8Array): Bytes;
-/**
- * Converts a hexadecimal string to a Uint8Array.
- *
- * # Arguments
- *
- * * `hex_string` - The hexadecimal string to convert.
- *
- * # Returns
- *
- * A Uint8Array containing the converted value.
- */
-export function hexToUint8Array(hex_string: string): Uint8Array;
-/**
- * Pretty prints a JSON value.
- *
- * # Arguments
- *
- * * `value` - The JSON value to pretty print.
- * * `verbosity` - An optional verbosity level for pretty printing.
- *
- * # Returns
- *
- * A pretty printed JSON value as a JsValue.
- */
-export function jsonPrettyPrint(value: any, verbosity?: Verbosity | null): any;
 /**
  * Converts a formatted key hash to a base64-encoded string (CEP-18 key encoding) for use in JavaScript.
  *
@@ -146,6 +85,46 @@ export function jsonPrettyPrint(value: any, verbosity?: Verbosity | null): any;
  */
 export function keyHashToBase64Key(formatted_key_hash: string): string;
 /**
+ * Pretty prints a JSON value.
+ *
+ * # Arguments
+ *
+ * * `value` - The JSON value to pretty print.
+ * * `verbosity` - An optional verbosity level for pretty printing.
+ *
+ * # Returns
+ *
+ * A pretty printed JSON value as a JsValue.
+ */
+export function jsonPrettyPrint(value: any, verbosity?: Verbosity | null): any;
+/**
+ * Converts a formatted account hash to a base64-encoded string (cep-18 key encoding).
+ *
+ *
+ * # Arguments
+ *
+ * * `formatted_account_hash` - A hex-formatted string representing the account hash.
+ * Example: "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+ *
+ * # Returns
+ *
+ * Returns the base64-encoded string.
+ * Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+ */
+export function accountHashToBase64Key(formatted_account_hash: string): string;
+/**
+ * Converts a hexadecimal string to a Uint8Array.
+ *
+ * # Arguments
+ *
+ * * `hex_string` - The hexadecimal string to convert.
+ *
+ * # Returns
+ *
+ * A Uint8Array containing the converted value.
+ */
+export function hexToUint8Array(hex_string: string): Uint8Array;
+/**
  * Converts a secret key to a corresponding public key.
  *
  * # Arguments
@@ -159,17 +138,38 @@ export function keyHashToBase64Key(formatted_key_hash: string): string;
  */
 export function publicKeyFromSecretKey(secret_key: string): any;
 /**
- * Converts a hexadecimal string to a regular string.
- *
- * # Arguments
- *
- * * `hex_string` - The hexadecimal string to convert.
+ * Generates a secret key using the secp256k1 algorithm and returns it as a PEM-encoded string.
  *
  * # Returns
  *
- * A regular string containing the converted value.
+ * A `JsValue` containing the PEM-encoded secret key or a JavaScript error if an error occurs.
+ *
+ * # Errors
+ *
+ * Returns an error if the secret key generation or serialization fails.
  */
-export function hexToString(hex_string: string): string;
+export function generateSecretKey_secp256k1(): any;
+/**
+ * Gets the current timestamp.
+ *
+ * # Returns
+ *
+ * A JsValue containing the current timestamp.
+ */
+export function getTimestamp(): any;
+/**
+ * Converts a key and value into a formatted dictionary item key for ditionaries queries.
+ *
+ * # Arguments
+ *
+ * * `key` - A string representation of a account/contract hash as a Key.
+ * * `value` - A string representation of the value, for now restricted to parse as U256 or Key
+ *
+ * # Returns
+ *
+ * A string representing the formatted dictionary item key.
+ */
+export function makeDictionaryItemKey(key: Key, value: string): string;
 export enum PricingMode {
   Fixed = 0,
   Classic = 1,
@@ -1500,60 +1500,46 @@ export class SDK {
    */
   watchTransaction(events_url: string, timeout_duration?: number | null): Watcher;
   /**
-   * JavaScript function for transactioning with deserialized parameters.
+   * JS function for `make_deploy`.
    *
    * # Arguments
    *
-   * * `transaction_params` - Transaction parameters.
-   * * `builder_params` - Session parameters.
-   * * `verbosity` - An optional verbosity level.
-   * * `rpc_address` - An optional rpc address.
+   * * `deploy_params` - The deploy parameters.
+   * * `session_params` - The session parameters.
+   * * `payment_params` - The payment parameters.
    *
    * # Returns
    *
-   * A result containing PutTransactionResult or a JsError.
+   * A `Result` containing the created `Deploy` or a `JsError` in case of an error.
    */
-  transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
+  make_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Deploy;
   /**
-   * JavaScript Alias for `get_balance`.
+   * JS function for `make_transaction`.
    *
    * # Arguments
    *
-   * * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
+   * * `builder_params` - Transaction Builder parameters.
+   * * `transaction_params` - The transaction parameters.
    *
    * # Returns
    *
-   * A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
+   * A `Result` containing the created `Transaction` or a `JsError` in case of an error.
    */
-  state_get_balance(options?: getBalanceOptions | null): Promise<GetBalanceResult>;
+  make_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams): Transaction;
+  info_get_chainspec(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetChainspecResult>;
   /**
-   * Parses balance options from a JsValue.
+   * Asynchronously retrieves the chainspec.
    *
    * # Arguments
    *
-   * * `options` - A JsValue containing balance options to be parsed.
+   * * `verbosity` - An optional `Verbosity` parameter.
+   * * `rpc_address` - An optional rpc address as a string.
    *
    * # Returns
    *
-   * Parsed balance options as a `GetBalanceOptions` struct.
+   * A `Result` containing either a `GetChainspecResult` or a `JsError` in case of an error.
    */
-  get_balance_options(options: any): getBalanceOptions;
-  /**
-   * Retrieves balance information using the provided options.
-   *
-   * # Arguments
-   *
-   * * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the retrieval process.
-   */
-  get_balance(options?: getBalanceOptions | null): Promise<GetBalanceResult>;
+  get_chainspec(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetChainspecResult>;
   /**
    * Parses query balance options from a JsValue.
    *
@@ -1563,59 +1549,71 @@ export class SDK {
    *
    * # Returns
    *
-   * Parsed query balance options as a `QueryBalanceDetailsOptions` struct.
+   * Parsed query balance options as a `QueryBalanceOptions` struct.
    */
-  query_balance_details_options(options: any): queryBalanceDetailsOptions;
+  query_balance_options(options: any): queryBalanceOptions;
   /**
    * Retrieves balance information using the provided options.
    *
    * # Arguments
    *
-   * * `options` - An optional `QueryBalanceDetailsOptions` struct containing retrieval options.
+   * * `options` - An optional `QueryBalanceOptions` struct containing retrieval options.
    *
    * # Returns
    *
-   * A `Result` containing either a `QueryBalanceDetailsResult` or a `JsError` in case of an error.
+   * A `Result` containing either a `QueryBalanceResult` or a `JsError` in case of an error.
    *
    * # Errors
    *
    * Returns a `JsError` if there is an error during the retrieval process.
    */
-  query_balance_details(options?: queryBalanceDetailsOptions | null): Promise<QueryBalanceDetailsResult>;
-  get_binary_peers(node_address?: string | null): Promise<any>;
-  get_binary_uptime(node_address?: string | null): Promise<any>;
-  get_binary_node_status(node_address?: string | null): Promise<any>;
-  get_binary_read_record(record_id: RecordId, key: Uint8Array, node_address?: string | null): Promise<any>;
-  get_binary_network_name(node_address?: string | null): Promise<any>;
-  get_binary_next_upgrade(node_address?: string | null): Promise<any>;
-  get_binary_last_progress(node_address?: string | null): Promise<any>;
-  get_binary_reactor_state(node_address?: string | null): Promise<any>;
-  get_binary_consensus_status(node_address?: string | null): Promise<any>;
-  get_binary_protocol_version(node_address?: string | null): Promise<any>;
-  get_binary_global_state_item(key: Key, path: string[], node_address?: string | null): Promise<any>;
-  get_binary_chainspec_raw_bytes(node_address?: string | null): Promise<any>;
-  get_binary_latest_block_header(node_address?: string | null): Promise<any>;
-  get_binary_transaction_by_hash(hash: TransactionHash, with_finalized_approvals: boolean, node_address?: string | null): Promise<any>;
-  get_binary_block_header_by_hash(block_hash: BlockHash, node_address?: string | null): Promise<any>;
-  get_binary_available_block_range(node_address?: string | null): Promise<any>;
-  get_binary_block_header_by_height(height: bigint, node_address?: string | null): Promise<any>;
-  get_binary_try_accept_transaction(transaction: Transaction, node_address?: string | null): Promise<any>;
-  get_binary_delegator_reward_by_era(validator_key: PublicKey, delegator_key: PublicKey, era: EraId, node_address?: string | null): Promise<any>;
-  get_binary_validator_reward_by_era(validator_key: PublicKey, era: EraId, node_address?: string | null): Promise<any>;
-  get_binary_block_synchronizer_status(node_address?: string | null): Promise<any>;
-  get_binary_try_speculative_execution(transaction: Transaction, node_address?: string | null): Promise<any>;
-  get_binary_latest_switch_block_header(node_address?: string | null): Promise<any>;
-  get_binary_consensus_validator_changes(node_address?: string | null): Promise<any>;
-  get_binary_latest_block_with_signatures(node_address?: string | null): Promise<any>;
-  get_binary_block_with_signatures_by_hash(block_hash: BlockHash, node_address?: string | null): Promise<any>;
-  get_binary_delegator_reward_by_block_hash(validator_key: PublicKey, delegator_key: PublicKey, block_hash: BlockHash, node_address?: string | null): Promise<any>;
-  get_binary_validator_reward_by_block_hash(validator_key: PublicKey, block_hash: BlockHash, node_address?: string | null): Promise<any>;
-  get_binary_block_with_signatures_by_height(height: bigint, node_address?: string | null): Promise<any>;
-  get_binary_global_state_item_by_block_hash(block_hash: BlockHash, key: Key, path: string[], node_address?: string | null): Promise<any>;
-  get_binary_delegator_reward_by_block_height(validator_key: PublicKey, delegator_key: PublicKey, block_height: bigint, node_address?: string | null): Promise<any>;
-  get_binary_validator_reward_by_block_height(validator_key: PublicKey, block_height: bigint, node_address?: string | null): Promise<any>;
-  get_binary_global_state_item_by_block_height(block_height: bigint, key: Key, path: string[], node_address?: string | null): Promise<any>;
-  get_binary_global_state_item_by_state_root_hash(state_root_hash: Digest, key: Key, path: string[], node_address?: string | null): Promise<any>;
+  query_balance(options?: queryBalanceOptions | null): Promise<QueryBalanceResult>;
+  state_get_auction_info_js_alias(options?: getAuctionInfoOptions | null): Promise<GetAuctionInfoResult>;
+  /**
+   * Parses auction info options from a JsValue.
+   *
+   * # Arguments
+   *
+   * * `options` - A JsValue containing auction info options to be parsed.
+   *
+   * # Returns
+   *
+   * Result containing parsed auction info options as a `GetAuctionInfoOptions` struct,
+   * or a `JsError` if deserialization fails.
+   */
+  get_auction_info_options(options: any): getAuctionInfoOptions;
+  /**
+   * Retrieves auction information using the provided options.
+   *
+   * # Arguments
+   *
+   * * `options` - An optional `GetAuctionInfoOptions` struct containing retrieval options.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetAuctionInfoResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the retrieval process.
+   */
+  get_auction_info(options?: getAuctionInfoOptions | null): Promise<GetAuctionInfoResult>;
+  /**
+   * JS function for speculative execution.
+   *
+   * # Arguments
+   *
+   * * `options` - The options for speculative execution.
+   *
+   * # Returns
+   *
+   * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
+   */
+  speculative_exec_deploy(options?: getSpeculativeExecDeployOptions | null): Promise<SpeculativeExecResult>;
+  /**
+   * Get options for speculative execution from a JavaScript value.
+   */
+  get_speculative_exec_deploy_options(options: any): getSpeculativeExecDeployOptions;
   /**
    * JS function for transaction transferring funds.
    *
@@ -1634,6 +1632,25 @@ export class SDK {
    * A `Result` containing the result of the transfer or a `JsError` in case of an error.
    */
   transfer_transaction(maybe_source: URef | null | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string | null, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
+  /**
+   * Calls a smart contract entry point with the specified parameters and returns the result.
+   *
+   * # Arguments
+   *
+   * * `deploy_params` - The deploy parameters.
+   * * `session_params` - The session parameters.
+   * * `payment_amount` - The payment amount as a string.
+   * * `rpc_address` - An optional rpc address to send the request to.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the call.
+   */
+  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string | null): Promise<PutDeployResult>;
   getVerbosity(verbosity?: Verbosity | null): Verbosity;
   setVerbosity(verbosity?: Verbosity | null): void;
   getRPCAddress(rpc_address?: string | null): string;
@@ -1761,6 +1778,92 @@ export class SDK {
    */
   get_validator_changes(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetValidatorChangesResult>;
   /**
+   * Calls a smart contract entry point with the specified parameters and returns the result.
+   *
+   * # Arguments
+   *
+   * * `transaction_params` - Transaction parameters.
+   * * `builder_params` - Transaction Builder parameters.
+   * * `rpc_address` - An optional rpc address to send the request to.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the call.
+   */
+  call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, rpc_address?: string | null): Promise<PutTransactionResult>;
+  get_binary_peers(node_address?: string | null): Promise<any>;
+  get_binary_uptime(node_address?: string | null): Promise<any>;
+  get_binary_node_status(node_address?: string | null): Promise<any>;
+  get_binary_read_record(record_id: RecordId, key: Uint8Array, node_address?: string | null): Promise<any>;
+  get_binary_network_name(node_address?: string | null): Promise<any>;
+  get_binary_next_upgrade(node_address?: string | null): Promise<any>;
+  get_binary_last_progress(node_address?: string | null): Promise<any>;
+  get_binary_reactor_state(node_address?: string | null): Promise<any>;
+  get_binary_consensus_status(node_address?: string | null): Promise<any>;
+  get_binary_protocol_version(node_address?: string | null): Promise<any>;
+  get_binary_global_state_item(key: Key, path: string[], node_address?: string | null): Promise<any>;
+  get_binary_chainspec_raw_bytes(node_address?: string | null): Promise<any>;
+  get_binary_latest_block_header(node_address?: string | null): Promise<any>;
+  get_binary_transaction_by_hash(hash: TransactionHash, with_finalized_approvals: boolean, node_address?: string | null): Promise<any>;
+  get_binary_block_header_by_hash(block_hash: BlockHash, node_address?: string | null): Promise<any>;
+  get_binary_available_block_range(node_address?: string | null): Promise<any>;
+  get_binary_block_header_by_height(height: bigint, node_address?: string | null): Promise<any>;
+  get_binary_try_accept_transaction(transaction: Transaction, node_address?: string | null): Promise<any>;
+  get_binary_delegator_reward_by_era(validator_key: PublicKey, delegator_key: PublicKey, era: EraId, node_address?: string | null): Promise<any>;
+  get_binary_validator_reward_by_era(validator_key: PublicKey, era: EraId, node_address?: string | null): Promise<any>;
+  get_binary_block_synchronizer_status(node_address?: string | null): Promise<any>;
+  get_binary_try_speculative_execution(transaction: Transaction, node_address?: string | null): Promise<any>;
+  get_binary_latest_switch_block_header(node_address?: string | null): Promise<any>;
+  get_binary_consensus_validator_changes(node_address?: string | null): Promise<any>;
+  get_binary_latest_block_with_signatures(node_address?: string | null): Promise<any>;
+  get_binary_block_with_signatures_by_hash(block_hash: BlockHash, node_address?: string | null): Promise<any>;
+  get_binary_delegator_reward_by_block_hash(validator_key: PublicKey, delegator_key: PublicKey, block_hash: BlockHash, node_address?: string | null): Promise<any>;
+  get_binary_validator_reward_by_block_hash(validator_key: PublicKey, block_hash: BlockHash, node_address?: string | null): Promise<any>;
+  get_binary_block_with_signatures_by_height(height: bigint, node_address?: string | null): Promise<any>;
+  get_binary_global_state_item_by_block_hash(block_hash: BlockHash, key: Key, path: string[], node_address?: string | null): Promise<any>;
+  get_binary_delegator_reward_by_block_height(validator_key: PublicKey, delegator_key: PublicKey, block_height: bigint, node_address?: string | null): Promise<any>;
+  get_binary_validator_reward_by_block_height(validator_key: PublicKey, block_height: bigint, node_address?: string | null): Promise<any>;
+  get_binary_global_state_item_by_block_height(block_height: bigint, key: Key, path: string[], node_address?: string | null): Promise<any>;
+  get_binary_global_state_item_by_state_root_hash(state_root_hash: Digest, key: Key, path: string[], node_address?: string | null): Promise<any>;
+  /**
+   * JS function for transferring funds.
+   *
+   * # Arguments
+   *
+   * * `amount` - The amount to transfer.
+   * * `target_account` - The target account.
+   * * `transfer_id` - An optional transfer ID (defaults to a random number).
+   * * `deploy_params` - The deployment parameters.
+   * * `payment_params` - The payment parameters.
+   * * `verbosity` - The verbosity level for logging (optional).
+   * * `rpc_address` - The address of the node to connect to (optional).
+   *
+   * # Returns
+   *
+   * A `Result` containing the result of the transfer or a `JsError` in case of an error.
+   */
+  transfer(amount: string, target_account: string, transfer_id: string | null | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutDeployResult>;
+  /**
+   * This function allows executing a deploy speculatively.
+   *
+   * # Arguments
+   *
+   * * `deploy_params` - Deployment parameters for the deploy.
+   * * `session_params` - Session parameters for the deploy.
+   * * `payment_params` - Payment parameters for the deploy.
+   * * `verbosity` - Optional verbosity level.
+   * * `rpc_address` - Optional rpc address.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
+   */
+  speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecResult>;
+  /**
    * Installs a smart contract with the specified parameters and returns the result.
    *
    * # Arguments
@@ -1779,6 +1882,162 @@ export class SDK {
    * Returns a `JsError` if there is an error during the installation.
    */
   install_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string | null): Promise<PutDeployResult>;
+  /**
+   * Installs a smart contract with the specified parameters and returns the result.
+   *
+   * # Arguments
+   * .
+   * * `transaction_params` - Transaction parameters.
+   * * `transaction_bytes` - Transaction Bytes to install
+   * * `rpc_address` - An optional rpc address to send the request to.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the installation.
+   */
+  install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, rpc_address?: string | null): Promise<PutTransactionResult>;
+  /**
+   * This function allows executing a transaction speculatively.
+   *
+   * # Arguments
+   *
+   * * `builder_params` - Transaction Builder parameters.
+   * * `transaction_params` - Transactionment parameters for the transaction.
+   * * `verbosity` - Optional verbosity level.
+   * * `rpc_address` - Optional rpc address.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
+   */
+  speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecTxnResult>;
+  /**
+   * JS function for speculative transfer transaction.
+   *
+   * # Arguments
+   *
+   * * `maybe_source` - Optional transfer source uref.
+   * * `target_account` - The target account.
+   * * `amount` - The amount to transfer.
+   * * `maybe_id` - An optional transfer ID (defaults to a random number).
+   * * `transaction_params` - The transactionment parameters.
+   * * `verbosity` - The verbosity level for logging (optional).
+   * * `rpc_address` - The address of the node to connect to (optional).
+   *
+   * # Returns
+   *
+   * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+   */
+  speculative_transfer_transaction(maybe_source: URef | null | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string | null, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecTxnResult>;
+  /**
+   * JavaScript Alias for `put_transaction`.
+   */
+  account_put_transaction(transaction: Transaction, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
+  /**
+   * Puts a transaction using the provided options.
+   *
+   * # Arguments
+   *
+   * * `transaction` - The `Transaction` object to be sent.
+   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the transaction process.
+   */
+  put_transaction(transaction: Transaction, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
+  /**
+   * JavaScript function for transactioning with deserialized parameters.
+   *
+   * # Arguments
+   *
+   * * `transaction_params` - Transaction parameters.
+   * * `builder_params` - Session parameters.
+   * * `verbosity` - An optional verbosity level.
+   * * `rpc_address` - An optional rpc address.
+   *
+   * # Returns
+   *
+   * A result containing PutTransactionResult or a JsError.
+   */
+  transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
+  /**
+   * JavaScript Alias for `get_balance`.
+   *
+   * # Arguments
+   *
+   * * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
+   */
+  state_get_balance(options?: getBalanceOptions | null): Promise<GetBalanceResult>;
+  /**
+   * Parses balance options from a JsValue.
+   *
+   * # Arguments
+   *
+   * * `options` - A JsValue containing balance options to be parsed.
+   *
+   * # Returns
+   *
+   * Parsed balance options as a `GetBalanceOptions` struct.
+   */
+  get_balance_options(options: any): getBalanceOptions;
+  /**
+   * Retrieves balance information using the provided options.
+   *
+   * # Arguments
+   *
+   * * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the retrieval process.
+   */
+  get_balance(options?: getBalanceOptions | null): Promise<GetBalanceResult>;
+  /**
+   * Parses query balance options from a JsValue.
+   *
+   * # Arguments
+   *
+   * * `options` - A JsValue containing query balance options to be parsed.
+   *
+   * # Returns
+   *
+   * Parsed query balance options as a `QueryBalanceDetailsOptions` struct.
+   */
+  query_balance_details_options(options: any): queryBalanceDetailsOptions;
+  /**
+   * Retrieves balance information using the provided options.
+   *
+   * # Arguments
+   *
+   * * `options` - An optional `QueryBalanceDetailsOptions` struct containing retrieval options.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `QueryBalanceDetailsResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the retrieval process.
+   */
+  query_balance_details(options?: queryBalanceDetailsOptions | null): Promise<QueryBalanceDetailsResult>;
   /**
    * JS function for `sign_deploy`.
    *
@@ -1820,6 +2079,28 @@ export class SDK {
    * A `Result` containing either a `GetDeployResult` or an error.
    */
   get_deploy(options?: getDeployOptions | null): Promise<GetDeployResult>;
+  /**
+   * JavaScript Alias for `put_deploy`.
+   */
+  account_put_deploy(deploy: Deploy, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutDeployResult>;
+  /**
+   * Puts a deploy using the provided options.
+   *
+   * # Arguments
+   *
+   * * `deploy` - The `Deploy` object to be sent.
+   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the deploy process.
+   */
+  put_deploy(deploy: Deploy, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutDeployResult>;
   get_account_options(options: any): getAccountOptions;
   /**
    * Retrieves account information using the provided options.
@@ -1957,287 +2238,6 @@ export class SDK {
    * Deserialize query_contract_dict_options from a JavaScript object.
    */
   query_contract_dict_options(options: any): queryContractDictOptions;
-  /**
-   * Installs a smart contract with the specified parameters and returns the result.
-   *
-   * # Arguments
-   * .
-   * * `transaction_params` - Transaction parameters.
-   * * `transaction_bytes` - Transaction Bytes to install
-   * * `rpc_address` - An optional rpc address to send the request to.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the installation.
-   */
-  install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, rpc_address?: string | null): Promise<PutTransactionResult>;
-  /**
-   * This function allows executing a transaction speculatively.
-   *
-   * # Arguments
-   *
-   * * `builder_params` - Transaction Builder parameters.
-   * * `transaction_params` - Transactionment parameters for the transaction.
-   * * `verbosity` - Optional verbosity level.
-   * * `rpc_address` - Optional rpc address.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
-   */
-  speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecTxnResult>;
-  /**
-   * JS function for `make_deploy`.
-   *
-   * # Arguments
-   *
-   * * `deploy_params` - The deploy parameters.
-   * * `session_params` - The session parameters.
-   * * `payment_params` - The payment parameters.
-   *
-   * # Returns
-   *
-   * A `Result` containing the created `Deploy` or a `JsError` in case of an error.
-   */
-  make_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Deploy;
-  /**
-   * JS function for `make_transaction`.
-   *
-   * # Arguments
-   *
-   * * `builder_params` - Transaction Builder parameters.
-   * * `transaction_params` - The transaction parameters.
-   *
-   * # Returns
-   *
-   * A `Result` containing the created `Transaction` or a `JsError` in case of an error.
-   */
-  make_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams): Transaction;
-  info_get_chainspec(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetChainspecResult>;
-  /**
-   * Asynchronously retrieves the chainspec.
-   *
-   * # Arguments
-   *
-   * * `verbosity` - An optional `Verbosity` parameter.
-   * * `rpc_address` - An optional rpc address as a string.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetChainspecResult` or a `JsError` in case of an error.
-   */
-  get_chainspec(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetChainspecResult>;
-  /**
-   * Parses query balance options from a JsValue.
-   *
-   * # Arguments
-   *
-   * * `options` - A JsValue containing query balance options to be parsed.
-   *
-   * # Returns
-   *
-   * Parsed query balance options as a `QueryBalanceOptions` struct.
-   */
-  query_balance_options(options: any): queryBalanceOptions;
-  /**
-   * Retrieves balance information using the provided options.
-   *
-   * # Arguments
-   *
-   * * `options` - An optional `QueryBalanceOptions` struct containing retrieval options.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `QueryBalanceResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the retrieval process.
-   */
-  query_balance(options?: queryBalanceOptions | null): Promise<QueryBalanceResult>;
-  state_get_auction_info_js_alias(options?: getAuctionInfoOptions | null): Promise<GetAuctionInfoResult>;
-  /**
-   * Parses auction info options from a JsValue.
-   *
-   * # Arguments
-   *
-   * * `options` - A JsValue containing auction info options to be parsed.
-   *
-   * # Returns
-   *
-   * Result containing parsed auction info options as a `GetAuctionInfoOptions` struct,
-   * or a `JsError` if deserialization fails.
-   */
-  get_auction_info_options(options: any): getAuctionInfoOptions;
-  /**
-   * Retrieves auction information using the provided options.
-   *
-   * # Arguments
-   *
-   * * `options` - An optional `GetAuctionInfoOptions` struct containing retrieval options.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetAuctionInfoResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the retrieval process.
-   */
-  get_auction_info(options?: getAuctionInfoOptions | null): Promise<GetAuctionInfoResult>;
-  /**
-   * JS function for speculative transfer transaction.
-   *
-   * # Arguments
-   *
-   * * `maybe_source` - Optional transfer source uref.
-   * * `target_account` - The target account.
-   * * `amount` - The amount to transfer.
-   * * `maybe_id` - An optional transfer ID (defaults to a random number).
-   * * `transaction_params` - The transactionment parameters.
-   * * `verbosity` - The verbosity level for logging (optional).
-   * * `rpc_address` - The address of the node to connect to (optional).
-   *
-   * # Returns
-   *
-   * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-   */
-  speculative_transfer_transaction(maybe_source: URef | null | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string | null, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecTxnResult>;
-  /**
-   * Calls a smart contract entry point with the specified parameters and returns the result.
-   *
-   * # Arguments
-   *
-   * * `deploy_params` - The deploy parameters.
-   * * `session_params` - The session parameters.
-   * * `payment_amount` - The payment amount as a string.
-   * * `rpc_address` - An optional rpc address to send the request to.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the call.
-   */
-  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string | null): Promise<PutDeployResult>;
-  /**
-   * JavaScript Alias for `put_deploy`.
-   */
-  account_put_deploy(deploy: Deploy, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutDeployResult>;
-  /**
-   * Puts a deploy using the provided options.
-   *
-   * # Arguments
-   *
-   * * `deploy` - The `Deploy` object to be sent.
-   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the deploy process.
-   */
-  put_deploy(deploy: Deploy, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutDeployResult>;
-  /**
-   * JS function for speculative execution.
-   *
-   * # Arguments
-   *
-   * * `options` - The options for speculative execution.
-   *
-   * # Returns
-   *
-   * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
-   */
-  speculative_exec_deploy(options?: getSpeculativeExecDeployOptions | null): Promise<SpeculativeExecResult>;
-  /**
-   * Get options for speculative execution from a JavaScript value.
-   */
-  get_speculative_exec_deploy_options(options: any): getSpeculativeExecDeployOptions;
-  /**
-   * JS function for transferring funds.
-   *
-   * # Arguments
-   *
-   * * `amount` - The amount to transfer.
-   * * `target_account` - The target account.
-   * * `transfer_id` - An optional transfer ID (defaults to a random number).
-   * * `deploy_params` - The deployment parameters.
-   * * `payment_params` - The payment parameters.
-   * * `verbosity` - The verbosity level for logging (optional).
-   * * `rpc_address` - The address of the node to connect to (optional).
-   *
-   * # Returns
-   *
-   * A `Result` containing the result of the transfer or a `JsError` in case of an error.
-   */
-  transfer(amount: string, target_account: string, transfer_id: string | null | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutDeployResult>;
-  /**
-   * Calls a smart contract entry point with the specified parameters and returns the result.
-   *
-   * # Arguments
-   *
-   * * `transaction_params` - Transaction parameters.
-   * * `builder_params` - Transaction Builder parameters.
-   * * `rpc_address` - An optional rpc address to send the request to.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the call.
-   */
-  call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, rpc_address?: string | null): Promise<PutTransactionResult>;
-  /**
-   * JavaScript Alias for `put_transaction`.
-   */
-  account_put_transaction(transaction: Transaction, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
-  /**
-   * Puts a transaction using the provided options.
-   *
-   * # Arguments
-   *
-   * * `transaction` - The `Transaction` object to be sent.
-   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-   * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the transaction process.
-   */
-  put_transaction(transaction: Transaction, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
-  /**
-   * This function allows executing a deploy speculatively.
-   *
-   * # Arguments
-   *
-   * * `deploy_params` - Deployment parameters for the deploy.
-   * * `session_params` - Session parameters for the deploy.
-   * * `payment_params` - Payment parameters for the deploy.
-   * * `verbosity` - Optional verbosity level.
-   * * `rpc_address` - Optional rpc address.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
-   */
-  speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<SpeculativeExecResult>;
 }
 export class SessionStrParams {
   free(): void;

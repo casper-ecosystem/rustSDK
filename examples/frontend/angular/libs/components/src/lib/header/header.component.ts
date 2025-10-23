@@ -56,6 +56,11 @@ export class HeaderComponent implements AfterViewInit {
   }
 
   async ngAfterViewInit() {
+    // Set default action to get_node_status if not defined
+    if (!this.storageService.get('action')) {
+      this.storageService.setState({ action: 'get_node_status' });
+    }
+
     if (
       this.storageService.get('chain_name') &&
       this.storageService.get('rpc_address')
@@ -76,7 +81,33 @@ export class HeaderComponent implements AfterViewInit {
       rpc_address: this.rpc_address,
       node_address: this.node_address,
     });
-    this.setRPCAndNodeAddress();
+
+    try {
+      this.setRPCAndNodeAddress();
+    } catch (error) {
+      console.error(
+        'Failed to set RPC address from localStorage, falling back to default:',
+        error,
+      );
+      // Reset to default network
+      this.network =
+        this.networks.find((x) => x.name === this.env['default_network']) ||
+        this.network;
+      this.chain_name = this.network.chain_name;
+      this.rpc_address = this.network.rpc_address;
+      this.node_address = this.network.node_address;
+
+      // Clear bad localStorage data with default values
+      this.storageService.setState({
+        chain_name: this.chain_name,
+        rpc_address: this.rpc_address,
+        node_address: this.node_address,
+      });
+
+      // Try again with default values
+      this.setRPCAndNodeAddress();
+    }
+
     this.changeDetectorRef.markForCheck();
   }
 
@@ -114,7 +145,7 @@ export class HeaderComponent implements AfterViewInit {
   onCustomNetworkChange($event: Event) {
     this.rpc_address =
       ($event.target as HTMLInputElement)?.value || this.network.rpc_address;
-    this.node_address = this.nodeAddressElt.nativeElement.value || '';
+    this.node_address = this.nodeAddressElt?.nativeElement?.value || '';
     const customNetwork = this.networks.find(
       (network) => network.name === 'custom',
     );
@@ -137,6 +168,11 @@ export class HeaderComponent implements AfterViewInit {
 
   isCustomNetworkInvalid() {
     return false;
+  }
+
+  isCustomNetworkAllowed() {
+    // Allow custom networks only in dev and electron (not in production/docker for security)
+    return !this.is_docker && (!this.is_production || this.is_electron);
   }
 
   onCcustomChainChange($event: Event) {

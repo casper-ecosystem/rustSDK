@@ -1,18 +1,18 @@
 {
-  "/custom/rpc": {
-    "target": "http://65.21.231.40:7777",
+  "/ntcl/rpc": {
+    "target": "${RPC_ADDRESS}",
     "secure": false,
     "changeOrigin": false,
     "pathRewrite": {
-      "^/custom/rpc": "/rpc"
+      "^/ntcl/rpc": "/rpc"
     }
   },
-  "/mainnet/rpc": {
-    "target": "https://node.mainnet.casper.network",
+  "/dev/rpc": {
+    "target": "${RPC_ADDRESS}",
     "secure": false,
-    "changeOrigin": true,
+    "changeOrigin": false,
     "pathRewrite": {
-      "^/mainnet/rpc": "/rpc"
+      "^/dev/rpc": "/rpc"
     }
   },
   "/testnet/rpc": {
@@ -23,28 +23,12 @@
       "^/testnet/rpc": "/rpc"
     }
   },
-  "/ntcl/rpc": {
-    "target": "http://localhost:11101",
+  "/mainnet/rpc": {
+    "target": "https://node.mainnet.casper.network",
     "secure": false,
-    "changeOrigin": false,
+    "changeOrigin": true,
     "pathRewrite": {
-      "^/ntcl/rpc": "/rpc"
-    }
-  },
-  "/node-launcher/rpc": {
-    "target": "http://localhost:7777",
-    "secure": false,
-    "changeOrigin": false,
-    "pathRewrite": {
-      "^/node\\-launcher/rpc": "/rpc"
-    }
-  },
-  "/dev/rpc": {
-    "target": "${RPC_ADDRESS}",
-    "secure": false,
-    "changeOrigin": false,
-    "pathRewrite": {
-      "^/dev/rpc": "/rpc"
+      "^/mainnet/rpc": "/rpc"
     }
   }
 }

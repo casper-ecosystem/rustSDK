@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  default_network: 'dev',
-  is_docker: false
+  default_network: 'ntcl',
+  is_docker: false,
 };
 
 /*

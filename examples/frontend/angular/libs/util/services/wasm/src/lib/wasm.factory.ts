@@ -21,7 +21,7 @@ type Params = {
 };
 
 export const fetchWasmFactory = async (params: Params): Promise<SDK> => {
-  console.log('Loading wasm from', params.wasm_asset_path);
+  // console.log('Loading wasm from', params.wasm_asset_path);
   const wasm = await init({ module_or_path: params.wasm_asset_path });
   return (
     wasm && new SDK(params.rpc_address, params.node_address, params.verbosity)
