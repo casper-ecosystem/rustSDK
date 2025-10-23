@@ -217,19 +217,36 @@ export class HeaderComponent implements AfterViewInit {
       if (this.is_electron) {
         this.sdk.setRPCAddress(this.rpc_address);
       } else if (this.is_docker && this.is_production) {
-        this.sdk.setRPCAddress(
-          [
-            this.config['default_protocol'],
-            this.config['docker_gateway'],
-            ':',
-            this.config['cors_anywhere_port'],
-            '/',
-            this.rpc_address.replace(
-              /localhost/g,
-              this.config['docker_gateway'] as string,
-            ),
-          ].join(''),
-        );
+        // Use Apache proxy for HTTPS, direct access for HTTP
+        const protocol = this.window?.location?.protocol;
+        if (protocol === 'https:') {
+          // HTTPS: use Apache proxy
+          this.sdk.setRPCAddress(
+            [
+              this.window?.location?.origin,
+              '/cors-anywhere/',
+              this.rpc_address.replace(
+                /localhost/g,
+                this.config['docker_gateway'] as string,
+              ),
+            ].join(''),
+          );
+        } else {
+          // HTTP: direct access
+          this.sdk.setRPCAddress(
+            [
+              'http://',
+              this.config['docker_gateway'],
+              ':',
+              this.config['cors_anywhere_port'],
+              '/',
+              this.rpc_address.replace(
+                /localhost/g,
+                this.config['docker_gateway'] as string,
+              ),
+            ].join(''),
+          );
+        }
       } else {
         const network = this.networks.find(
           (x) => x.rpc_address == this.rpc_address,
