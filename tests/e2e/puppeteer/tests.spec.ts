@@ -101,7 +101,7 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="rpc_address"]')?.textContent;
       });
       expect(chainname).toBe(config.chain_name);
-      expect(rpc_address).toBe(config.app_address);
+      expect(rpc_address).toBe(config.rpc_address);
     });
 
     it('should clear result', async () => {
