@@ -47,13 +47,11 @@ jobs:
       # - name: Clone casper-nctl-2-docker repository
       #   run: |
       #     git clone https://github.com/gRoussac/casper-nctl-2-docker.git
-
       # - name: Build and start the service
       #   run: |
       #     cd casper-nctl-2-docker
       #     make build-start dev
       #     cd ..
-
       - name: Start Casper NCTL Service
         run: |
           docker run -d \
@@ -65,7 +63,8 @@ jobs:
             -p 28101-28105:28101-28105 \
             -v $PWD/assets/users:/app/casper-nctl/assets/net-1/users/ \
             -v $PWD/assets/faucet:/app/casper-nctl/assets/net-1/faucet/ \
-            gregoshop/casper-nctl:dev
+            gregoshop/casper-nctl:2.0
+        # gregoshop/casper-nctl:dev
 
       - name: Wait for the service to be ready
         run: |
