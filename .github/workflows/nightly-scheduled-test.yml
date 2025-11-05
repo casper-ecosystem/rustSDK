@@ -46,7 +46,7 @@ jobs:
       - name: Build and start the service
         run: |
           cd casper-nctl-2-docker
-          make build-start dev
+          make build-start 2.0
           cd ..
 
       - name: Wait for the service to be ready

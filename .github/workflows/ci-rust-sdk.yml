@@ -50,7 +50,7 @@ jobs:
       # - name: Build and start the service
       #   run: |
       #     cd casper-nctl-2-docker
-      #     make build-start dev
+      #     make build-start 2.0
       #     cd ..
       - name: Start Casper NCTL Service
         run: |
@@ -64,7 +64,6 @@ jobs:
             -v $PWD/assets/users:/app/casper-nctl/assets/net-1/users/ \
             -v $PWD/assets/faucet:/app/casper-nctl/assets/net-1/faucet/ \
             gregoshop/casper-nctl:2.0
-        # gregoshop/casper-nctl:dev
 
       - name: Wait for the service to be ready
         run: |
