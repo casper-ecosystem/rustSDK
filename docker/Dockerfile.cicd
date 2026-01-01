@@ -1,6 +1,7 @@
-FROM --platform=linux/amd64 node:22.13-alpine as build
+ARG TARGETPLATFORM=linux/amd64
+FROM --platform=${TARGETPLATFORM} node:22.13-alpine AS build
 
-ENV NODE_ENV "development"
+ENV NODE_ENV=development
 ARG BUILD_CONFIGURATION=docker
 ENV BUILD_CONFIGURATION=$BUILD_CONFIGURATION
 
@@ -21,14 +22,19 @@ RUN npm install --ignore-scripts --verbose && npm update
 
 RUN npm run build -- --configuration=$BUILD_CONFIGURATION --verbose
 
-FROM python:3.13-slim
+ARG TARGETPLATFORM=linux/amd64
+FROM --platform=${TARGETPLATFORM} node:22.13-alpine
 
-ENV PORT 8080
+ENV PORT=8080
 
 WORKDIR /app
+
+# Install serve globally (better SPA support with automatic fallback)
+RUN npm install -g serve
 
 COPY --from=build --chown=node:node /app/dist/casper ./dist/
 
 EXPOSE 8080
 
-CMD ["python3", "-m", "http.server", "8080", "--directory", "/app/dist"]
+# Use serve with SPA mode which automatically serves index.html for all routes
+CMD ["serve", "-s", "/app/dist", "-l", "8080"]
