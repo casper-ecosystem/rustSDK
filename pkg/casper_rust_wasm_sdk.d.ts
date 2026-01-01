@@ -4070,12 +4070,12 @@ export interface InitOutput {
   readonly intounderlyingsink_abort: (a: number, b: any) => any;
   readonly intounderlyingsink_close: (a: number) => any;
   readonly intounderlyingsink_write: (a: number, b: any) => any;
-  readonly wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___web_sys_3db17fd0f0264d19___features__gen_MessageEvent__MessageEvent_____: (a: number, b: number, c: any) => void;
-  readonly wasm_bindgen_941e259a0a2594c3___closure__destroy___dyn_core_f4e37bc59eeea00a___ops__function__FnMut__web_sys_3db17fd0f0264d19___features__gen_MessageEvent__MessageEvent____Output_______: (a: number, b: number) => void;
   readonly wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke______: (a: number, b: number) => void;
   readonly wasm_bindgen_941e259a0a2594c3___closure__destroy___dyn_core_f4e37bc59eeea00a___ops__function__FnMut_____Output_______: (a: number, b: number) => void;
   readonly wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___wasm_bindgen_941e259a0a2594c3___JsValue_____: (a: number, b: number, c: any) => void;
   readonly wasm_bindgen_941e259a0a2594c3___closure__destroy___dyn_core_f4e37bc59eeea00a___ops__function__FnMut__wasm_bindgen_941e259a0a2594c3___JsValue____Output_______: (a: number, b: number) => void;
+  readonly wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___web_sys_3db17fd0f0264d19___features__gen_MessageEvent__MessageEvent_____: (a: number, b: number, c: any) => void;
+  readonly wasm_bindgen_941e259a0a2594c3___closure__destroy___dyn_core_f4e37bc59eeea00a___ops__function__FnMut__web_sys_3db17fd0f0264d19___features__gen_MessageEvent__MessageEvent____Output_______: (a: number, b: number) => void;
   readonly wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___wasm_bindgen_941e259a0a2594c3___JsValue__wasm_bindgen_941e259a0a2594c3___JsValue_____: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
