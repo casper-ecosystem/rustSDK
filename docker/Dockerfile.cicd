@@ -21,14 +21,18 @@ RUN npm install --ignore-scripts --verbose && npm update
 
 RUN npm run build -- --configuration=$BUILD_CONFIGURATION --verbose
 
-FROM python:3.13-slim
+FROM --platform=linux/amd64 node:22.13-alpine
 
 ENV PORT 8080
 
 WORKDIR /app
 
+# Install http-server globally
+RUN npm install -g http-server
+
 COPY --from=build --chown=node:node /app/dist/casper ./dist/
 
 EXPOSE 8080
 
-CMD ["python3", "-m", "http.server", "8080", "--directory", "/app/dist"]
+# Use http-server with --fallback to index.html for SPA routing
+CMD ["http-server", "/app/dist", "-p", "8080", "--fallback", "/index.html"]
