@@ -339,7 +339,7 @@ impl SDK {
                 random_id,
                 &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
-                maybe_global_state_identifier.into(),
+                Some(maybe_global_state_identifier.into()),
                 key.unwrap().into(),
                 path,
             )

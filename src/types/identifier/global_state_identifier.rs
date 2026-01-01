@@ -1,5 +1,5 @@
 use crate::types::{digest::Digest, hash::block_hash::BlockHash};
-use casper_client::rpcs::GlobalStateIdentifier as _GlobalStateIdentifier;
+use casper_client::rpcs::common::GlobalStateIdentifier as _GlobalStateIdentifier;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};

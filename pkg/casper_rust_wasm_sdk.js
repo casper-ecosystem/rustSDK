@@ -1,121 +1,20 @@
 let wasm;
 
-let cachedUint8ArrayMemory0 = null;
-
-function getUint8ArrayMemory0() {
-    if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.byteLength === 0) {
-        cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
-    }
-    return cachedUint8ArrayMemory0;
-}
-
-let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
-
-cachedTextDecoder.decode();
-
-const MAX_SAFARI_DECODE_BYTES = 2146435072;
-let numBytesDecoded = 0;
-function decodeText(ptr, len) {
-    numBytesDecoded += len;
-    if (numBytesDecoded >= MAX_SAFARI_DECODE_BYTES) {
-        cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
-        cachedTextDecoder.decode();
-        numBytesDecoded = len;
-    }
-    return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
-}
-
-function getStringFromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return decodeText(ptr, len);
-}
-
 function addToExternrefTable0(obj) {
     const idx = wasm.__externref_table_alloc();
-    wasm.__wbindgen_export_2.set(idx, obj);
+    wasm.__wbindgen_externrefs.set(idx, obj);
     return idx;
 }
 
-function handleError(f, args) {
-    try {
-        return f.apply(this, args);
-    } catch (e) {
-        const idx = addToExternrefTable0(e);
-        wasm.__wbindgen_exn_store(idx);
+function _assertClass(instance, klass) {
+    if (!(instance instanceof klass)) {
+        throw new Error(`expected instance of ${klass.name}`);
     }
 }
 
-function isLikeNone(x) {
-    return x === undefined || x === null;
-}
-
-function getArrayU8FromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
-}
-
-let WASM_VECTOR_LEN = 0;
-
-const cachedTextEncoder = new TextEncoder();
-
-if (!('encodeInto' in cachedTextEncoder)) {
-    cachedTextEncoder.encodeInto = function (arg, view) {
-        const buf = cachedTextEncoder.encode(arg);
-        view.set(buf);
-        return {
-            read: arg.length,
-            written: buf.length
-        };
-    }
-}
-
-function passStringToWasm0(arg, malloc, realloc) {
-
-    if (realloc === undefined) {
-        const buf = cachedTextEncoder.encode(arg);
-        const ptr = malloc(buf.length, 1) >>> 0;
-        getUint8ArrayMemory0().subarray(ptr, ptr + buf.length).set(buf);
-        WASM_VECTOR_LEN = buf.length;
-        return ptr;
-    }
-
-    let len = arg.length;
-    let ptr = malloc(len, 1) >>> 0;
-
-    const mem = getUint8ArrayMemory0();
-
-    let offset = 0;
-
-    for (; offset < len; offset++) {
-        const code = arg.charCodeAt(offset);
-        if (code > 0x7F) break;
-        mem[ptr + offset] = code;
-    }
-
-    if (offset !== len) {
-        if (offset !== 0) {
-            arg = arg.slice(offset);
-        }
-        ptr = realloc(ptr, len, len = offset + arg.length * 3, 1) >>> 0;
-        const view = getUint8ArrayMemory0().subarray(ptr + offset, ptr + len);
-        const ret = cachedTextEncoder.encodeInto(arg, view);
-
-        offset += ret.written;
-        ptr = realloc(ptr, len, offset, 1) >>> 0;
-    }
-
-    WASM_VECTOR_LEN = offset;
-    return ptr;
-}
-
-let cachedDataViewMemory0 = null;
-
-function getDataViewMemory0() {
-    if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer.detached === true || (cachedDataViewMemory0.buffer.detached === undefined && cachedDataViewMemory0.buffer !== wasm.memory.buffer)) {
-        cachedDataViewMemory0 = new DataView(wasm.memory.buffer);
-    }
-    return cachedDataViewMemory0;
-}
+const CLOSURE_DTORS = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(state => state.dtor(state.a, state.b));
 
 function debugString(val) {
     // primitive types
@@ -182,13 +81,55 @@ function debugString(val) {
     return className;
 }
 
-const CLOSURE_DTORS = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(
-state => {
-    wasm.__wbindgen_export_5.get(state.dtor)(state.a, state.b);
+function getArrayJsValueFromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    const mem = getDataViewMemory0();
+    const result = [];
+    for (let i = ptr; i < ptr + 4 * len; i += 4) {
+        result.push(wasm.__wbindgen_externrefs.get(mem.getUint32(i, true)));
+    }
+    wasm.__externref_drop_slice(ptr, len);
+    return result;
 }
-);
+
+function getArrayU8FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
+}
+
+let cachedDataViewMemory0 = null;
+function getDataViewMemory0() {
+    if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer.detached === true || (cachedDataViewMemory0.buffer.detached === undefined && cachedDataViewMemory0.buffer !== wasm.memory.buffer)) {
+        cachedDataViewMemory0 = new DataView(wasm.memory.buffer);
+    }
+    return cachedDataViewMemory0;
+}
+
+function getStringFromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return decodeText(ptr, len);
+}
+
+let cachedUint8ArrayMemory0 = null;
+function getUint8ArrayMemory0() {
+    if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.byteLength === 0) {
+        cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
+    }
+    return cachedUint8ArrayMemory0;
+}
+
+function handleError(f, args) {
+    try {
+        return f.apply(this, args);
+    } catch (e) {
+        const idx = addToExternrefTable0(e);
+        wasm.__wbindgen_exn_store(idx);
+    }
+}
+
+function isLikeNone(x) {
+    return x === undefined || x === null;
+}
 
 function makeMutClosure(arg0, arg1, dtor, f) {
     const state = { a: arg0, b: arg1, cnt: 1, dtor };
@@ -203,369 +144,19 @@ function makeMutClosure(arg0, arg1, dtor, f) {
         try {
             return f(a, state.b, ...args);
         } finally {
-            if (--state.cnt === 0) {
-                wasm.__wbindgen_export_5.get(state.dtor)(a, state.b);
-                CLOSURE_DTORS.unregister(state);
-            } else {
-                state.a = a;
-            }
+            state.a = a;
+            real._wbg_cb_unref();
         }
     };
-    real.original = state;
+    real._wbg_cb_unref = () => {
+        if (--state.cnt === 0) {
+            state.dtor(state.a, state.b);
+            state.a = 0;
+            CLOSURE_DTORS.unregister(state);
+        }
+    };
     CLOSURE_DTORS.register(real, state, state);
     return real;
-}
-
-function takeFromExternrefTable0(idx) {
-    const value = wasm.__wbindgen_export_2.get(idx);
-    wasm.__externref_table_dealloc(idx);
-    return value;
-}
-/**
- * Generates a secret key using the secp256k1 algorithm and returns it as a PEM-encoded string.
- *
- * # Returns
- *
- * A `JsValue` containing the PEM-encoded secret key or a JavaScript error if an error occurs.
- *
- * # Errors
- *
- * Returns an error if the secret key generation or serialization fails.
- * @returns {any}
- */
-export function generateSecretKey_secp256k1() {
-    const ret = wasm.generateSecretKey_secp256k1();
-    if (ret[2]) {
-        throw takeFromExternrefTable0(ret[1]);
-    }
-    return takeFromExternrefTable0(ret[0]);
-}
-
-/**
- * Converts a secret key to a corresponding public key.
- *
- * # Arguments
- *
- * * `secret_key` - The secret key in PEM format.
- *
- * # Returns
- *
- * A JsValue containing the corresponding public key.
- * If an error occurs during the conversion, JavaScript error is returned.
- * @param {string} secret_key
- * @returns {any}
- */
-export function publicKeyFromSecretKey(secret_key) {
-    const ptr0 = passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.publicKeyFromSecretKey(ptr0, len0);
-    if (ret[2]) {
-        throw takeFromExternrefTable0(ret[1]);
-    }
-    return takeFromExternrefTable0(ret[0]);
-}
-
-/**
- * Converts motes to CSPR (Casper tokens).
- *
- * # Arguments
- *
- * * `motes` - The motes value to convert.
- *
- * # Returns
- *
- * A string representing the CSPR amount.
- * @param {string} motes
- * @returns {string}
- */
-export function motesToCSPR(motes) {
-    let deferred3_0;
-    let deferred3_1;
-    try {
-        const ptr0 = passStringToWasm0(motes, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.motesToCSPR(ptr0, len0);
-        var ptr2 = ret[0];
-        var len2 = ret[1];
-        if (ret[3]) {
-            ptr2 = 0; len2 = 0;
-            throw takeFromExternrefTable0(ret[2]);
-        }
-        deferred3_0 = ptr2;
-        deferred3_1 = len2;
-        return getStringFromWasm0(ptr2, len2);
-    } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
-    }
-}
-
-/**
- * Pretty prints a JSON value.
- *
- * # Arguments
- *
- * * `value` - The JSON value to pretty print.
- * * `verbosity` - An optional verbosity level for pretty printing.
- *
- * # Returns
- *
- * A pretty printed JSON value as a JsValue.
- * @param {any} value
- * @param {Verbosity | null} [verbosity]
- * @returns {any}
- */
-export function jsonPrettyPrint(value, verbosity) {
-    const ret = wasm.jsonPrettyPrint(value, isLikeNone(verbosity) ? 3 : verbosity);
-    if (ret[2]) {
-        throw takeFromExternrefTable0(ret[1]);
-    }
-    return takeFromExternrefTable0(ret[0]);
-}
-
-/**
- * Converts a hexadecimal string to a Uint8Array.
- *
- * # Arguments
- *
- * * `hex_string` - The hexadecimal string to convert.
- *
- * # Returns
- *
- * A Uint8Array containing the converted value.
- * @param {string} hex_string
- * @returns {Uint8Array}
- */
-export function hexToUint8Array(hex_string) {
-    const ptr0 = passStringToWasm0(hex_string, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.hexToUint8Array(ptr0, len0);
-    var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-    return v2;
-}
-
-/**
- * Converts a hexadecimal string to a regular string.
- *
- * # Arguments
- *
- * * `hex_string` - The hexadecimal string to convert.
- *
- * # Returns
- *
- * A regular string containing the converted value.
- * @param {string} hex_string
- * @returns {string}
- */
-export function hexToString(hex_string) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const ptr0 = passStringToWasm0(hex_string, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.hexToString(ptr0, len0);
-        deferred2_0 = ret[0];
-        deferred2_1 = ret[1];
-        return getStringFromWasm0(ret[0], ret[1]);
-    } finally {
-        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
-    }
-}
-
-/**
- * Encodes the given metadata using the lower-level Blake2b hashing algorithm.
- *
- * # Arguments
- *
- * * `meta_data` - A string containing the metadata to be hashed.
- *
- * # Returns
- *
- * A JsValue containing the hash generated using the Blake2b algorithm.
- * @param {string} meta_data
- * @returns {any}
- */
-export function encodeLowerBlake2b(meta_data) {
-    const ptr0 = passStringToWasm0(meta_data, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.encodeLowerBlake2b(ptr0, len0);
-    return ret;
-}
-
-/**
- * Generates a secret key using the Ed25519 algorithm and returns it as a PEM-encoded string.
- *
- * # Returns
- *
- * A `JsValue` containing the PEM-encoded secret key or a JavaScript error if an error occurs.
- *
- * # Errors
- *
- * Returns an error if the secret key generation or serialization fails.
- * @returns {any}
- */
-export function generateSecretKey() {
-    const ret = wasm.generateSecretKey();
-    if (ret[2]) {
-        throw takeFromExternrefTable0(ret[1]);
-    }
-    return takeFromExternrefTable0(ret[0]);
-}
-
-/**
- * Gets the current timestamp.
- *
- * # Returns
- *
- * A JsValue containing the current timestamp.
- * @returns {any}
- */
-export function getTimestamp() {
-    const ret = wasm.getTimestamp();
-    return ret;
-}
-
-function _assertClass(instance, klass) {
-    if (!(instance instanceof klass)) {
-        throw new Error(`expected instance of ${klass.name}`);
-    }
-}
-/**
- * Converts a key and value into a formatted dictionary item key for ditionaries queries.
- *
- * # Arguments
- *
- * * `key` - A string representation of a account/contract hash as a Key.
- * * `value` - A string representation of the value, for now restricted to parse as U256 or Key
- *
- * # Returns
- *
- * A string representing the formatted dictionary item key.
- * @param {Key} key
- * @param {string} value
- * @returns {string}
- */
-export function makeDictionaryItemKey(key, value) {
-    let deferred3_0;
-    let deferred3_1;
-    try {
-        _assertClass(key, Key);
-        const ptr0 = passStringToWasm0(value, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.makeDictionaryItemKey(key.__wbg_ptr, ptr0, len0);
-        var ptr2 = ret[0];
-        var len2 = ret[1];
-        if (ret[3]) {
-            ptr2 = 0; len2 = 0;
-            throw takeFromExternrefTable0(ret[2]);
-        }
-        deferred3_0 = ptr2;
-        deferred3_1 = len2;
-        return getStringFromWasm0(ptr2, len2);
-    } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
-    }
-}
-
-/**
- * Converts a formatted key hash to a base64-encoded string (CEP-18 key encoding) for use in JavaScript.
- *
- * This function acts as a wrapper around `get_base64_key_from_key_hash` and maps errors to JavaScript-compatible errors.
- *
- * # Arguments
- *
- * * `formatted_key_hash` - A hex-formatted string representing the key hash.
- * Example: "hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
- *
- * # Returns
- *
- * Returns a `Result` containing the base64-encoded string on success.
- * Example: "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
- *
- * # Errors
- *
- * This function returns a `JsError` if:
- * - The input string is not a valid formatted key hash.
- * - The conversion to bytes or base64 encoding fails.
- *
- * The error message is formatted as a JavaScript-compatible string.
- * @param {string} formatted_key_hash
- * @returns {string}
- */
-export function keyHashToBase64Key(formatted_key_hash) {
-    let deferred3_0;
-    let deferred3_1;
-    try {
-        const ptr0 = passStringToWasm0(formatted_key_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.keyHashToBase64Key(ptr0, len0);
-        var ptr2 = ret[0];
-        var len2 = ret[1];
-        if (ret[3]) {
-            ptr2 = 0; len2 = 0;
-            throw takeFromExternrefTable0(ret[2]);
-        }
-        deferred3_0 = ptr2;
-        deferred3_1 = len2;
-        return getStringFromWasm0(ptr2, len2);
-    } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
-    }
-}
-
-/**
- * Converts a formatted account hash to a base64-encoded string (cep-18 key encoding).
- *
- *
- * # Arguments
- *
- * * `formatted_account_hash` - A hex-formatted string representing the account hash.
- * Example: "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
- *
- * # Returns
- *
- * Returns the base64-encoded string.
- * Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
- * @param {string} formatted_account_hash
- * @returns {string}
- */
-export function accountHashToBase64Key(formatted_account_hash) {
-    let deferred3_0;
-    let deferred3_1;
-    try {
-        const ptr0 = passStringToWasm0(formatted_account_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.accountHashToBase64Key(ptr0, len0);
-        var ptr2 = ret[0];
-        var len2 = ret[1];
-        if (ret[3]) {
-            ptr2 = 0; len2 = 0;
-            throw takeFromExternrefTable0(ret[2]);
-        }
-        deferred3_0 = ptr2;
-        deferred3_1 = len2;
-        return getStringFromWasm0(ptr2, len2);
-    } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
-    }
-}
-
-/**
- * Converts a Uint8Array to a `Bytes` object.
- *
- * # Arguments
- *
- * * `uint8_array` - The Uint8Array to convert.
- *
- * # Returns
- *
- * A `Bytes` object containing the converted value.
- * @param {Uint8Array} uint8_array
- * @returns {Bytes}
- */
-export function uint8ArrayToBytes(uint8_array) {
-    const ret = wasm.uint8ArrayToBytes(uint8_array);
-    return Bytes.__wrap(ret);
 }
 
 function passArray8ToWasm0(arg, malloc) {
@@ -585,72 +176,93 @@ function passArrayJsValueToWasm0(array, malloc) {
     return ptr;
 }
 
-function getArrayJsValueFromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    const mem = getDataViewMemory0();
-    const result = [];
-    for (let i = ptr; i < ptr + 4 * len; i += 4) {
-        result.push(wasm.__wbindgen_export_2.get(mem.getUint32(i, true)));
+function passStringToWasm0(arg, malloc, realloc) {
+    if (realloc === undefined) {
+        const buf = cachedTextEncoder.encode(arg);
+        const ptr = malloc(buf.length, 1) >>> 0;
+        getUint8ArrayMemory0().subarray(ptr, ptr + buf.length).set(buf);
+        WASM_VECTOR_LEN = buf.length;
+        return ptr;
     }
-    wasm.__externref_drop_slice(ptr, len);
-    return result;
-}
-function __wbg_adapter_6(arg0, arg1, arg2) {
-    wasm.closure985_externref_shim(arg0, arg1, arg2);
+
+    let len = arg.length;
+    let ptr = malloc(len, 1) >>> 0;
+
+    const mem = getUint8ArrayMemory0();
+
+    let offset = 0;
+
+    for (; offset < len; offset++) {
+        const code = arg.charCodeAt(offset);
+        if (code > 0x7F) break;
+        mem[ptr + offset] = code;
+    }
+    if (offset !== len) {
+        if (offset !== 0) {
+            arg = arg.slice(offset);
+        }
+        ptr = realloc(ptr, len, len = offset + arg.length * 3, 1) >>> 0;
+        const view = getUint8ArrayMemory0().subarray(ptr + offset, ptr + len);
+        const ret = cachedTextEncoder.encodeInto(arg, view);
+
+        offset += ret.written;
+        ptr = realloc(ptr, len, offset, 1) >>> 0;
+    }
+
+    WASM_VECTOR_LEN = offset;
+    return ptr;
 }
 
-function __wbg_adapter_9(arg0, arg1) {
-    wasm.wasm_bindgen__convert__closures_____invoke__hb387a093ddd03cf8(arg0, arg1);
+function takeFromExternrefTable0(idx) {
+    const value = wasm.__wbindgen_externrefs.get(idx);
+    wasm.__externref_table_dealloc(idx);
+    return value;
 }
 
-function __wbg_adapter_18(arg0, arg1, arg2) {
-    wasm.closure1198_externref_shim(arg0, arg1, arg2);
+let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+cachedTextDecoder.decode();
+const MAX_SAFARI_DECODE_BYTES = 2146435072;
+let numBytesDecoded = 0;
+function decodeText(ptr, len) {
+    numBytesDecoded += len;
+    if (numBytesDecoded >= MAX_SAFARI_DECODE_BYTES) {
+        cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+        cachedTextDecoder.decode();
+        numBytesDecoded = len;
+    }
+    return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
 }
 
-function __wbg_adapter_1219(arg0, arg1, arg2, arg3) {
-    wasm.closure1748_externref_shim(arg0, arg1, arg2, arg3);
+const cachedTextEncoder = new TextEncoder();
+
+if (!('encodeInto' in cachedTextEncoder)) {
+    cachedTextEncoder.encodeInto = function (arg, view) {
+        const buf = cachedTextEncoder.encode(arg);
+        view.set(buf);
+        return {
+            read: arg.length,
+            written: buf.length
+        };
+    }
 }
 
-/**
- * @enum {0 | 1 | 2}
- */
-export const PricingMode = Object.freeze({
-    Fixed: 0, "0": "Fixed",
-    Classic: 1, "1": "Classic",
-    Reserved: 2, "2": "Reserved",
-});
-/**
- * @enum {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10}
- */
-export const TransactionKind = Object.freeze({
-    InvocableEntity: 0, "0": "InvocableEntity",
-    InvocableEntityAlias: 1, "1": "InvocableEntityAlias",
-    Package: 2, "2": "Package",
-    PackageAlias: 3, "3": "PackageAlias",
-    Session: 4, "4": "Session",
-    Transfer: 5, "5": "Transfer",
-    AddBid: 6, "6": "AddBid",
-    Delegate: 7, "7": "Delegate",
-    Undelegate: 8, "8": "Undelegate",
-    Redelegate: 9, "9": "Redelegate",
-    WithdrawBid: 10, "10": "WithdrawBid",
-});
-/**
- * @enum {0 | 1 | 2}
- */
-export const TransferTargetKind = Object.freeze({
-    PublicKey: 0, "0": "PublicKey",
-    AccountHash: 1, "1": "AccountHash",
-    URef: 2, "2": "URef",
-});
-/**
- * @enum {0 | 1 | 2}
- */
-export const Verbosity = Object.freeze({
-    Low: 0, "0": "Low",
-    Medium: 1, "1": "Medium",
-    High: 2, "2": "High",
-});
+let WASM_VECTOR_LEN = 0;
+
+function wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke______(arg0, arg1) {
+    wasm.wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke______(arg0, arg1);
+}
+
+function wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___web_sys_3db17fd0f0264d19___features__gen_MessageEvent__MessageEvent_____(arg0, arg1, arg2) {
+    wasm.wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___web_sys_3db17fd0f0264d19___features__gen_MessageEvent__MessageEvent_____(arg0, arg1, arg2);
+}
+
+function wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___wasm_bindgen_941e259a0a2594c3___JsValue_____(arg0, arg1, arg2) {
+    wasm.wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___wasm_bindgen_941e259a0a2594c3___JsValue_____(arg0, arg1, arg2);
+}
+
+function wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___wasm_bindgen_941e259a0a2594c3___JsValue__wasm_bindgen_941e259a0a2594c3___JsValue_____(arg0, arg1, arg2, arg3) {
+    wasm.wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___wasm_bindgen_941e259a0a2594c3___JsValue__wasm_bindgen_941e259a0a2594c3___JsValue_____(arg0, arg1, arg2, arg3);
+}
 
 const __wbindgen_enum_ReadableStreamType = ["bytes"];
 
@@ -664,8 +276,407 @@ const AccessRightsFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_accessrights_free(ptr >>> 0, 1));
 
-export class AccessRights {
+const AccountHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_accounthash_free(ptr >>> 0, 1));
 
+const AccountIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_accountidentifier_free(ptr >>> 0, 1));
+
+const AddressableEntityHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_addressableentityhash_free(ptr >>> 0, 1));
+
+const ArgsSimpleFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_argssimple_free(ptr >>> 0, 1));
+
+const BlockHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_blockhash_free(ptr >>> 0, 1));
+
+const BlockIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_blockidentifier_free(ptr >>> 0, 1));
+
+const BodyFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_body_free(ptr >>> 0, 1));
+
+const BytesFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_bytes_free(ptr >>> 0, 1));
+
+const CasperWalletFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_casperwallet_free(ptr >>> 0, 1));
+
+const ContractHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_contracthash_free(ptr >>> 0, 1));
+
+const ContractPackageHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_contractpackagehash_free(ptr >>> 0, 1));
+
+const DeployFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_deploy_free(ptr >>> 0, 1));
+
+const DeployHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_deployhash_free(ptr >>> 0, 1));
+
+const DeployStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_deploystrparams_free(ptr >>> 0, 1));
+
+const DictionaryAddrFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_dictionaryaddr_free(ptr >>> 0, 1));
+
+const DictionaryItemIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_dictionaryitemidentifier_free(ptr >>> 0, 1));
+
+const DictionaryItemStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_dictionaryitemstrparams_free(ptr >>> 0, 1));
+
+const DigestFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_digest_free(ptr >>> 0, 1));
+
+const EntityAddrFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_entityaddr_free(ptr >>> 0, 1));
+
+const EntityIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_entityidentifier_free(ptr >>> 0, 1));
+
+const EraIdFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_eraid_free(ptr >>> 0, 1));
+
+const EventParseResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_eventparseresult_free(ptr >>> 0, 1));
+
+const ExecutionResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_executionresult_free(ptr >>> 0, 1));
+
+const FailureFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_failure_free(ptr >>> 0, 1));
+
+const GetAccountResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getaccountresult_free(ptr >>> 0, 1));
+
+const GetAddressableEntityResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getaddressableentityresult_free(ptr >>> 0, 1));
+
+const GetAuctionInfoResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getauctioninforesult_free(ptr >>> 0, 1));
+
+const GetBalanceResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getbalanceresult_free(ptr >>> 0, 1));
+
+const GetBlockResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getblockresult_free(ptr >>> 0, 1));
+
+const GetBlockTransfersResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getblocktransfersresult_free(ptr >>> 0, 1));
+
+const GetChainspecResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getchainspecresult_free(ptr >>> 0, 1));
+
+const GetDeployResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getdeployresult_free(ptr >>> 0, 1));
+
+const GetDictionaryItemResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getdictionaryitemresult_free(ptr >>> 0, 1));
+
+const GetEraInfoResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_geterainforesult_free(ptr >>> 0, 1));
+
+const GetEraSummaryResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_geterasummaryresult_free(ptr >>> 0, 1));
+
+const GetNodeStatusResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getnodestatusresult_free(ptr >>> 0, 1));
+
+const GetPeersResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getpeersresult_free(ptr >>> 0, 1));
+
+const GetStateRootHashResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getstateroothashresult_free(ptr >>> 0, 1));
+
+const GetTransactionResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_gettransactionresult_free(ptr >>> 0, 1));
+
+const GetValidatorChangesResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getvalidatorchangesresult_free(ptr >>> 0, 1));
+
+const GlobalStateIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_globalstateidentifier_free(ptr >>> 0, 1));
+
+const HashAddrFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_hashaddr_free(ptr >>> 0, 1));
+
+const HashStringFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_hashstring_free(ptr >>> 0, 1));
+
+const IntoUnderlyingByteSourceFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_intounderlyingbytesource_free(ptr >>> 0, 1));
+
+const IntoUnderlyingSinkFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_intounderlyingsink_free(ptr >>> 0, 1));
+
+const IntoUnderlyingSourceFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_intounderlyingsource_free(ptr >>> 0, 1));
+
+const KeyFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_key_free(ptr >>> 0, 1));
+
+const ListRpcsResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_listrpcsresult_free(ptr >>> 0, 1));
+
+const MessageFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_message_free(ptr >>> 0, 1));
+
+const MessagesFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_messages_free(ptr >>> 0, 1));
+
+const PackageHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_packagehash_free(ptr >>> 0, 1));
+
+const PathFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_path_free(ptr >>> 0, 1));
+
+const PaymentFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_payment_free(ptr >>> 0, 1));
+
+const PaymentStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_paymentstrparams_free(ptr >>> 0, 1));
+
+const PeerEntryFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_peerentry_free(ptr >>> 0, 1));
+
+const PublicKeyFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_publickey_free(ptr >>> 0, 1));
+
+const PublicKeyStringFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_publickeystring_free(ptr >>> 0, 1));
+
+const PurseIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_purseidentifier_free(ptr >>> 0, 1));
+
+const PutDeployResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_putdeployresult_free(ptr >>> 0, 1));
+
+const PutTransactionResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_puttransactionresult_free(ptr >>> 0, 1));
+
+const QueryBalanceDetailsResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_querybalancedetailsresult_free(ptr >>> 0, 1));
+
+const QueryBalanceResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_querybalanceresult_free(ptr >>> 0, 1));
+
+const QueryGlobalStateResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_queryglobalstateresult_free(ptr >>> 0, 1));
+
+const RecordIdFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_recordid_free(ptr >>> 0, 1));
+
+const SDKFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_sdk_free(ptr >>> 0, 1));
+
+const SessionStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_sessionstrparams_free(ptr >>> 0, 1));
+
+const SignatureResponseFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_signatureresponse_free(ptr >>> 0, 1));
+
+const SpeculativeExecResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_speculativeexecresult_free(ptr >>> 0, 1));
+
+const SpeculativeExecTxnResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_speculativeexectxnresult_free(ptr >>> 0, 1));
+
+const SubscriptionFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_subscription_free(ptr >>> 0, 1));
+
+const TransactionFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_transaction_free(ptr >>> 0, 1));
+
+const TransactionBuilderParamsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_transactionbuilderparams_free(ptr >>> 0, 1));
+
+const TransactionHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_transactionhash_free(ptr >>> 0, 1));
+
+const TransactionProcessedFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_transactionprocessed_free(ptr >>> 0, 1));
+
+const TransactionStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_transactionstrparams_free(ptr >>> 0, 1));
+
+const TransferAddrFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_transferaddr_free(ptr >>> 0, 1));
+
+const TransferTargetFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_transfertarget_free(ptr >>> 0, 1));
+
+const URefFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_uref_free(ptr >>> 0, 1));
+
+const URefAddrFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_urefaddr_free(ptr >>> 0, 1));
+
+const Version2Finalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_version2_free(ptr >>> 0, 1));
+
+const WatcherFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_watcher_free(ptr >>> 0, 1));
+
+const getAccountOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getaccountoptions_free(ptr >>> 0, 1));
+
+const getAuctionInfoOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getauctioninfooptions_free(ptr >>> 0, 1));
+
+const getBalanceOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getbalanceoptions_free(ptr >>> 0, 1));
+
+const getBlockOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getblockoptions_free(ptr >>> 0, 1));
+
+const getBlockTransfersOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getblocktransfersoptions_free(ptr >>> 0, 1));
+
+const getDeployOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getdeployoptions_free(ptr >>> 0, 1));
+
+const getDictionaryItemOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getdictionaryitemoptions_free(ptr >>> 0, 1));
+
+const getEntityOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getentityoptions_free(ptr >>> 0, 1));
+
+const getEraInfoOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_geterainfooptions_free(ptr >>> 0, 1));
+
+const getEraSummaryOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_geterasummaryoptions_free(ptr >>> 0, 1));
+
+const getSpeculativeExecDeployOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getspeculativeexecdeployoptions_free(ptr >>> 0, 1));
+
+const getSpeculativeExecTxnOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getspeculativeexectxnoptions_free(ptr >>> 0, 1));
+
+const getStateRootHashOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getstateroothashoptions_free(ptr >>> 0, 1));
+
+const getTransactionOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_gettransactionoptions_free(ptr >>> 0, 1));
+
+const queryBalanceDetailsOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_querybalancedetailsoptions_free(ptr >>> 0, 1));
+
+const queryBalanceOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_querybalanceoptions_free(ptr >>> 0, 1));
+
+const queryContractDictOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_querycontractdictoptions_free(ptr >>> 0, 1));
+
+const queryContractKeyOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_querycontractkeyoptions_free(ptr >>> 0, 1));
+
+const queryGlobalStateOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_queryglobalstateoptions_free(ptr >>> 0, 1));
+
+export class AccessRights {
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(AccessRights.prototype);
@@ -673,14 +684,12 @@ export class AccessRights {
         AccessRightsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         AccessRightsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_accessrights_free(ptr, 0);
@@ -794,12 +803,7 @@ export class AccessRights {
 }
 if (Symbol.dispose) AccessRights.prototype[Symbol.dispose] = AccessRights.prototype.free;
 
-const AccountHashFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_accounthash_free(ptr >>> 0, 1));
-
 export class AccountHash {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(AccountHash.prototype);
@@ -807,14 +811,12 @@ export class AccountHash {
         AccountHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         AccountHashFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_accounthash_free(ptr, 0);
@@ -906,12 +908,7 @@ export class AccountHash {
 }
 if (Symbol.dispose) AccountHash.prototype[Symbol.dispose] = AccountHash.prototype.free;
 
-const AccountIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_accountidentifier_free(ptr >>> 0, 1));
-
 export class AccountIdentifier {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(AccountIdentifier.prototype);
@@ -919,14 +916,12 @@ export class AccountIdentifier {
         AccountIdentifierFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         AccountIdentifierFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_accountidentifier_free(ptr, 0);
@@ -988,12 +983,7 @@ export class AccountIdentifier {
 }
 if (Symbol.dispose) AccountIdentifier.prototype[Symbol.dispose] = AccountIdentifier.prototype.free;
 
-const AddressableEntityHashFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_addressableentityhash_free(ptr >>> 0, 1));
-
 export class AddressableEntityHash {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(AddressableEntityHash.prototype);
@@ -1001,14 +991,12 @@ export class AddressableEntityHash {
         AddressableEntityHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         AddressableEntityHashFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_addressableentityhash_free(ptr, 0);
@@ -1068,12 +1056,7 @@ export class AddressableEntityHash {
 }
 if (Symbol.dispose) AddressableEntityHash.prototype[Symbol.dispose] = AddressableEntityHash.prototype.free;
 
-const ArgsSimpleFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_argssimple_free(ptr >>> 0, 1));
-
 export class ArgsSimple {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(ArgsSimple.prototype);
@@ -1081,14 +1064,12 @@ export class ArgsSimple {
         ArgsSimpleFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         ArgsSimpleFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_argssimple_free(ptr, 0);
@@ -1096,12 +1077,7 @@ export class ArgsSimple {
 }
 if (Symbol.dispose) ArgsSimple.prototype[Symbol.dispose] = ArgsSimple.prototype.free;
 
-const BlockHashFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_blockhash_free(ptr >>> 0, 1));
-
 export class BlockHash {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(BlockHash.prototype);
@@ -1109,14 +1085,12 @@ export class BlockHash {
         BlockHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         BlockHashFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_blockhash_free(ptr, 0);
@@ -1173,12 +1147,7 @@ export class BlockHash {
 }
 if (Symbol.dispose) BlockHash.prototype[Symbol.dispose] = BlockHash.prototype.free;
 
-const BlockIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_blockidentifier_free(ptr >>> 0, 1));
-
 export class BlockIdentifier {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(BlockIdentifier.prototype);
@@ -1186,14 +1155,12 @@ export class BlockIdentifier {
         BlockIdentifierFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         BlockIdentifierFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_blockidentifier_free(ptr, 0);
@@ -1237,14 +1204,10 @@ export class BlockIdentifier {
 }
 if (Symbol.dispose) BlockIdentifier.prototype[Symbol.dispose] = BlockIdentifier.prototype.free;
 
-const BodyFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_body_free(ptr >>> 0, 1));
 /**
  * Represents the body of an event, containing processed deploy information.
  */
 export class Body {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(Body.prototype);
@@ -1252,14 +1215,12 @@ export class Body {
         BodyFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         BodyFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_body_free(ptr, 0);
@@ -1299,12 +1260,7 @@ export class Body {
 }
 if (Symbol.dispose) Body.prototype[Symbol.dispose] = Body.prototype.free;
 
-const BytesFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_bytes_free(ptr >>> 0, 1));
-
 export class Bytes {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(Bytes.prototype);
@@ -1312,14 +1268,12 @@ export class Bytes {
         BytesFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         BytesFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_bytes_free(ptr, 0);
@@ -1341,19 +1295,13 @@ export class Bytes {
 }
 if (Symbol.dispose) Bytes.prototype[Symbol.dispose] = Bytes.prototype.free;
 
-const CasperWalletFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_casperwallet_free(ptr >>> 0, 1));
-
 export class CasperWallet {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         CasperWalletFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_casperwallet_free(ptr, 0);
@@ -1550,12 +1498,7 @@ export class CasperWallet {
 }
 if (Symbol.dispose) CasperWallet.prototype[Symbol.dispose] = CasperWallet.prototype.free;
 
-const ContractHashFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_contracthash_free(ptr >>> 0, 1));
-
 export class ContractHash {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(ContractHash.prototype);
@@ -1563,14 +1506,12 @@ export class ContractHash {
         ContractHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         ContractHashFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_contracthash_free(ptr, 0);
@@ -1630,12 +1571,7 @@ export class ContractHash {
 }
 if (Symbol.dispose) ContractHash.prototype[Symbol.dispose] = ContractHash.prototype.free;
 
-const ContractPackageHashFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_contractpackagehash_free(ptr >>> 0, 1));
-
 export class ContractPackageHash {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(ContractPackageHash.prototype);
@@ -1643,14 +1579,12 @@ export class ContractPackageHash {
         ContractPackageHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         ContractPackageHashFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_contractpackagehash_free(ptr, 0);
@@ -1710,12 +1644,7 @@ export class ContractPackageHash {
 }
 if (Symbol.dispose) ContractPackageHash.prototype[Symbol.dispose] = ContractPackageHash.prototype.free;
 
-const DeployFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_deploy_free(ptr >>> 0, 1));
-
 export class Deploy {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(Deploy.prototype);
@@ -1723,14 +1652,12 @@ export class Deploy {
         DeployFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         DeployFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_deploy_free(ptr, 0);
@@ -2186,12 +2113,7 @@ export class Deploy {
 }
 if (Symbol.dispose) Deploy.prototype[Symbol.dispose] = Deploy.prototype.free;
 
-const DeployHashFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_deployhash_free(ptr >>> 0, 1));
-
 export class DeployHash {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(DeployHash.prototype);
@@ -2199,14 +2121,12 @@ export class DeployHash {
         DeployHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         DeployHashFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_deployhash_free(ptr, 0);
@@ -2263,19 +2183,13 @@ export class DeployHash {
 }
 if (Symbol.dispose) DeployHash.prototype[Symbol.dispose] = DeployHash.prototype.free;
 
-const DeployStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_deploystrparams_free(ptr >>> 0, 1));
-
 export class DeployStrParams {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         DeployStrParamsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_deploystrparams_free(ptr, 0);
@@ -2435,12 +2349,7 @@ export class DeployStrParams {
 }
 if (Symbol.dispose) DeployStrParams.prototype[Symbol.dispose] = DeployStrParams.prototype.free;
 
-const DictionaryAddrFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_dictionaryaddr_free(ptr >>> 0, 1));
-
 export class DictionaryAddr {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(DictionaryAddr.prototype);
@@ -2448,14 +2357,12 @@ export class DictionaryAddr {
         DictionaryAddrFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         DictionaryAddrFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_dictionaryaddr_free(ptr, 0);
@@ -2477,12 +2384,7 @@ export class DictionaryAddr {
 }
 if (Symbol.dispose) DictionaryAddr.prototype[Symbol.dispose] = DictionaryAddr.prototype.free;
 
-const DictionaryItemIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_dictionaryitemidentifier_free(ptr >>> 0, 1));
-
 export class DictionaryItemIdentifier {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(DictionaryItemIdentifier.prototype);
@@ -2490,14 +2392,12 @@ export class DictionaryItemIdentifier {
         DictionaryItemIdentifierFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         DictionaryItemIdentifierFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_dictionaryitemidentifier_free(ptr, 0);
@@ -2598,12 +2498,7 @@ export class DictionaryItemIdentifier {
 }
 if (Symbol.dispose) DictionaryItemIdentifier.prototype[Symbol.dispose] = DictionaryItemIdentifier.prototype.free;
 
-const DictionaryItemStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_dictionaryitemstrparams_free(ptr >>> 0, 1));
-
 export class DictionaryItemStrParams {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(DictionaryItemStrParams.prototype);
@@ -2611,14 +2506,12 @@ export class DictionaryItemStrParams {
         DictionaryItemStrParamsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         DictionaryItemStrParamsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_dictionaryitemstrparams_free(ptr, 0);
@@ -2700,12 +2593,7 @@ export class DictionaryItemStrParams {
 }
 if (Symbol.dispose) DictionaryItemStrParams.prototype[Symbol.dispose] = DictionaryItemStrParams.prototype.free;
 
-const DigestFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_digest_free(ptr >>> 0, 1));
-
 export class Digest {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(Digest.prototype);
@@ -2713,14 +2601,12 @@ export class Digest {
         DigestFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         DigestFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_digest_free(ptr, 0);
@@ -2790,12 +2676,7 @@ export class Digest {
 }
 if (Symbol.dispose) Digest.prototype[Symbol.dispose] = Digest.prototype.free;
 
-const EntityAddrFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_entityaddr_free(ptr >>> 0, 1));
-
 export class EntityAddr {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(EntityAddr.prototype);
@@ -2803,14 +2684,12 @@ export class EntityAddr {
         EntityAddrFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         EntityAddrFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_entityaddr_free(ptr, 0);
@@ -2868,12 +2747,7 @@ export class EntityAddr {
 }
 if (Symbol.dispose) EntityAddr.prototype[Symbol.dispose] = EntityAddr.prototype.free;
 
-const EntityIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_entityidentifier_free(ptr >>> 0, 1));
-
 export class EntityIdentifier {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(EntityIdentifier.prototype);
@@ -2881,14 +2755,12 @@ export class EntityIdentifier {
         EntityIdentifierFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         EntityIdentifierFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_entityidentifier_free(ptr, 0);
@@ -2927,7 +2799,7 @@ export class EntityIdentifier {
     static fromPublicKey(key) {
         _assertClass(key, PublicKey);
         var ptr0 = key.__destroy_into_raw();
-        const ret = wasm.accountidentifier_fromPublicKey(ptr0);
+        const ret = wasm.entityidentifier_fromPublicKey(ptr0);
         return EntityIdentifier.__wrap(ret);
     }
     /**
@@ -2947,7 +2819,7 @@ export class EntityIdentifier {
     static fromAccountHash(account_hash) {
         _assertClass(account_hash, AccountHash);
         var ptr0 = account_hash.__destroy_into_raw();
-        const ret = wasm.accountidentifier_fromAccountHash(ptr0);
+        const ret = wasm.entityidentifier_fromAccountHash(ptr0);
         return EntityIdentifier.__wrap(ret);
     }
     /**
@@ -2960,19 +2832,13 @@ export class EntityIdentifier {
 }
 if (Symbol.dispose) EntityIdentifier.prototype[Symbol.dispose] = EntityIdentifier.prototype.free;
 
-const EraIdFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_eraid_free(ptr >>> 0, 1));
-
 export class EraId {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         EraIdFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_eraid_free(ptr, 0);
@@ -2996,21 +2862,16 @@ export class EraId {
 }
 if (Symbol.dispose) EraId.prototype[Symbol.dispose] = EraId.prototype.free;
 
-const EventParseResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_eventparseresult_free(ptr >>> 0, 1));
 /**
  * Represents the result of parsing an event, containing error information and the event body.
  */
 export class EventParseResult {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         EventParseResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_eventparseresult_free(ptr, 0);
@@ -3056,14 +2917,10 @@ export class EventParseResult {
 }
 if (Symbol.dispose) EventParseResult.prototype[Symbol.dispose] = EventParseResult.prototype.free;
 
-const ExecutionResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_executionresult_free(ptr >>> 0, 1));
 /**
  * Represents the result of an execution, either Success or Failure.
  */
 export class ExecutionResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(ExecutionResult.prototype);
@@ -3071,14 +2928,12 @@ export class ExecutionResult {
         ExecutionResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         ExecutionResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_executionresult_free(ptr, 0);
@@ -3126,14 +2981,10 @@ export class ExecutionResult {
 }
 if (Symbol.dispose) ExecutionResult.prototype[Symbol.dispose] = ExecutionResult.prototype.free;
 
-const FailureFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_failure_free(ptr >>> 0, 1));
 /**
  * Represents a failure response containing an error message.
  */
 export class Failure {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(Failure.prototype);
@@ -3141,14 +2992,12 @@ export class Failure {
         FailureFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         FailureFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_failure_free(ptr, 0);
@@ -3202,12 +3051,7 @@ export class Failure {
 }
 if (Symbol.dispose) Failure.prototype[Symbol.dispose] = Failure.prototype.free;
 
-const GetAccountResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getaccountresult_free(ptr >>> 0, 1));
-
 export class GetAccountResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetAccountResult.prototype);
@@ -3215,14 +3059,12 @@ export class GetAccountResult {
         GetAccountResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetAccountResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getaccountresult_free(ptr, 0);
@@ -3266,12 +3108,7 @@ export class GetAccountResult {
 }
 if (Symbol.dispose) GetAccountResult.prototype[Symbol.dispose] = GetAccountResult.prototype.free;
 
-const GetAddressableEntityResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getaddressableentityresult_free(ptr >>> 0, 1));
-
 export class GetAddressableEntityResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetAddressableEntityResult.prototype);
@@ -3279,14 +3116,12 @@ export class GetAddressableEntityResult {
         GetAddressableEntityResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetAddressableEntityResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getaddressableentityresult_free(ptr, 0);
@@ -3330,12 +3165,7 @@ export class GetAddressableEntityResult {
 }
 if (Symbol.dispose) GetAddressableEntityResult.prototype[Symbol.dispose] = GetAddressableEntityResult.prototype.free;
 
-const GetAuctionInfoResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getauctioninforesult_free(ptr >>> 0, 1));
-
 export class GetAuctionInfoResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetAuctionInfoResult.prototype);
@@ -3343,14 +3173,12 @@ export class GetAuctionInfoResult {
         GetAuctionInfoResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetAuctionInfoResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getauctioninforesult_free(ptr, 0);
@@ -3382,12 +3210,7 @@ export class GetAuctionInfoResult {
 }
 if (Symbol.dispose) GetAuctionInfoResult.prototype[Symbol.dispose] = GetAuctionInfoResult.prototype.free;
 
-const GetBalanceResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getbalanceresult_free(ptr >>> 0, 1));
-
 export class GetBalanceResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetBalanceResult.prototype);
@@ -3395,14 +3218,12 @@ export class GetBalanceResult {
         GetBalanceResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetBalanceResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getbalanceresult_free(ptr, 0);
@@ -3450,12 +3271,7 @@ export class GetBalanceResult {
 }
 if (Symbol.dispose) GetBalanceResult.prototype[Symbol.dispose] = GetBalanceResult.prototype.free;
 
-const GetBlockResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getblockresult_free(ptr >>> 0, 1));
-
 export class GetBlockResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetBlockResult.prototype);
@@ -3463,14 +3279,12 @@ export class GetBlockResult {
         GetBlockResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetBlockResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getblockresult_free(ptr, 0);
@@ -3502,12 +3316,7 @@ export class GetBlockResult {
 }
 if (Symbol.dispose) GetBlockResult.prototype[Symbol.dispose] = GetBlockResult.prototype.free;
 
-const GetBlockTransfersResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getblocktransfersresult_free(ptr >>> 0, 1));
-
 export class GetBlockTransfersResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetBlockTransfersResult.prototype);
@@ -3515,14 +3324,12 @@ export class GetBlockTransfersResult {
         GetBlockTransfersResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetBlockTransfersResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getblocktransfersresult_free(ptr, 0);
@@ -3562,14 +3369,10 @@ export class GetBlockTransfersResult {
 }
 if (Symbol.dispose) GetBlockTransfersResult.prototype[Symbol.dispose] = GetBlockTransfersResult.prototype.free;
 
-const GetChainspecResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getchainspecresult_free(ptr >>> 0, 1));
 /**
  * A struct representing the result of the `get_chainspec` function.
  */
 export class GetChainspecResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetChainspecResult.prototype);
@@ -3577,14 +3380,12 @@ export class GetChainspecResult {
         GetChainspecResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetChainspecResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getchainspecresult_free(ptr, 0);
@@ -3616,12 +3417,7 @@ export class GetChainspecResult {
 }
 if (Symbol.dispose) GetChainspecResult.prototype[Symbol.dispose] = GetChainspecResult.prototype.free;
 
-const GetDeployResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getdeployresult_free(ptr >>> 0, 1));
-
 export class GetDeployResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetDeployResult.prototype);
@@ -3629,14 +3425,12 @@ export class GetDeployResult {
         GetDeployResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetDeployResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getdeployresult_free(ptr, 0);
@@ -3676,12 +3470,7 @@ export class GetDeployResult {
 }
 if (Symbol.dispose) GetDeployResult.prototype[Symbol.dispose] = GetDeployResult.prototype.free;
 
-const GetDictionaryItemResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getdictionaryitemresult_free(ptr >>> 0, 1));
-
 export class GetDictionaryItemResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetDictionaryItemResult.prototype);
@@ -3689,14 +3478,12 @@ export class GetDictionaryItemResult {
         GetDictionaryItemResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetDictionaryItemResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getdictionaryitemresult_free(ptr, 0);
@@ -3760,12 +3547,7 @@ export class GetDictionaryItemResult {
 }
 if (Symbol.dispose) GetDictionaryItemResult.prototype[Symbol.dispose] = GetDictionaryItemResult.prototype.free;
 
-const GetEraInfoResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_geterainforesult_free(ptr >>> 0, 1));
-
 export class GetEraInfoResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetEraInfoResult.prototype);
@@ -3773,14 +3555,12 @@ export class GetEraInfoResult {
         GetEraInfoResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetEraInfoResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_geterainforesult_free(ptr, 0);
@@ -3809,14 +3589,10 @@ export class GetEraInfoResult {
 }
 if (Symbol.dispose) GetEraInfoResult.prototype[Symbol.dispose] = GetEraInfoResult.prototype.free;
 
-const GetEraSummaryResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_geterasummaryresult_free(ptr >>> 0, 1));
 /**
  * Wrapper struct for the `GetEraSummaryResult` from casper_client.
  */
 export class GetEraSummaryResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetEraSummaryResult.prototype);
@@ -3824,14 +3600,12 @@ export class GetEraSummaryResult {
         GetEraSummaryResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetEraSummaryResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_geterasummaryresult_free(ptr, 0);
@@ -3863,14 +3637,10 @@ export class GetEraSummaryResult {
 }
 if (Symbol.dispose) GetEraSummaryResult.prototype[Symbol.dispose] = GetEraSummaryResult.prototype.free;
 
-const GetNodeStatusResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getnodestatusresult_free(ptr >>> 0, 1));
 /**
  * Wrapper struct for the `GetNodeStatusResult` from casper_client.
  */
 export class GetNodeStatusResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetNodeStatusResult.prototype);
@@ -3878,14 +3648,12 @@ export class GetNodeStatusResult {
         GetNodeStatusResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetNodeStatusResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getnodestatusresult_free(ptr, 0);
@@ -4029,14 +3797,10 @@ export class GetNodeStatusResult {
 }
 if (Symbol.dispose) GetNodeStatusResult.prototype[Symbol.dispose] = GetNodeStatusResult.prototype.free;
 
-const GetPeersResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getpeersresult_free(ptr >>> 0, 1));
 /**
  * A wrapper for the `GetPeersResult` type from the Casper client.
  */
 export class GetPeersResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetPeersResult.prototype);
@@ -4044,14 +3808,12 @@ export class GetPeersResult {
         GetPeersResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetPeersResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getpeersresult_free(ptr, 0);
@@ -4083,14 +3845,10 @@ export class GetPeersResult {
 }
 if (Symbol.dispose) GetPeersResult.prototype[Symbol.dispose] = GetPeersResult.prototype.free;
 
-const GetStateRootHashResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getstateroothashresult_free(ptr >>> 0, 1));
 /**
  * Wrapper struct for the `GetStateRootHashResult` from casper_client.
  */
 export class GetStateRootHashResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetStateRootHashResult.prototype);
@@ -4098,14 +3856,12 @@ export class GetStateRootHashResult {
         GetStateRootHashResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetStateRootHashResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getstateroothashresult_free(ptr, 0);
@@ -4169,12 +3925,7 @@ export class GetStateRootHashResult {
 }
 if (Symbol.dispose) GetStateRootHashResult.prototype[Symbol.dispose] = GetStateRootHashResult.prototype.free;
 
-const GetTransactionResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_gettransactionresult_free(ptr >>> 0, 1));
-
 export class GetTransactionResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetTransactionResult.prototype);
@@ -4182,14 +3933,12 @@ export class GetTransactionResult {
         GetTransactionResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetTransactionResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_gettransactionresult_free(ptr, 0);
@@ -4229,14 +3978,10 @@ export class GetTransactionResult {
 }
 if (Symbol.dispose) GetTransactionResult.prototype[Symbol.dispose] = GetTransactionResult.prototype.free;
 
-const GetValidatorChangesResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getvalidatorchangesresult_free(ptr >>> 0, 1));
 /**
  * Wrapper struct for the `GetValidatorChangesResult` from casper_client.
  */
 export class GetValidatorChangesResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GetValidatorChangesResult.prototype);
@@ -4244,14 +3989,12 @@ export class GetValidatorChangesResult {
         GetValidatorChangesResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GetValidatorChangesResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getvalidatorchangesresult_free(ptr, 0);
@@ -4283,12 +4026,7 @@ export class GetValidatorChangesResult {
 }
 if (Symbol.dispose) GetValidatorChangesResult.prototype[Symbol.dispose] = GetValidatorChangesResult.prototype.free;
 
-const GlobalStateIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_globalstateidentifier_free(ptr >>> 0, 1));
-
 export class GlobalStateIdentifier {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(GlobalStateIdentifier.prototype);
@@ -4296,14 +4034,12 @@ export class GlobalStateIdentifier {
         GlobalStateIdentifierFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         GlobalStateIdentifierFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_globalstateidentifier_free(ptr, 0);
@@ -4357,12 +4093,7 @@ export class GlobalStateIdentifier {
 }
 if (Symbol.dispose) GlobalStateIdentifier.prototype[Symbol.dispose] = GlobalStateIdentifier.prototype.free;
 
-const HashAddrFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_hashaddr_free(ptr >>> 0, 1));
-
 export class HashAddr {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(HashAddr.prototype);
@@ -4370,14 +4101,12 @@ export class HashAddr {
         HashAddrFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         HashAddrFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_hashaddr_free(ptr, 0);
@@ -4423,12 +4152,7 @@ export class HashAddr {
 }
 if (Symbol.dispose) HashAddr.prototype[Symbol.dispose] = HashAddr.prototype.free;
 
-const HashStringFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_hashstring_free(ptr >>> 0, 1));
-
 export class HashString {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(HashString.prototype);
@@ -4436,17 +4160,38 @@ export class HashString {
         HashStringFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         HashStringFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_hashstring_free(ptr, 0);
+    }
+    /**
+     * @returns {string}
+     */
+    get hash() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.__wbg_get_hashstring_hash(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @param {string} arg0
+     */
+    set hash(arg0) {
+        const ptr0 = passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.__wbg_set_failure_cost(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {string}
@@ -4493,45 +4238,16 @@ export class HashString {
             wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
         }
     }
-    /**
-     * @returns {string}
-     */
-    get hash() {
-        let deferred1_0;
-        let deferred1_1;
-        try {
-            const ret = wasm.__wbg_get_hashstring_hash(this.__wbg_ptr);
-            deferred1_0 = ret[0];
-            deferred1_1 = ret[1];
-            return getStringFromWasm0(ret[0], ret[1]);
-        } finally {
-            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
-        }
-    }
-    /**
-     * @param {string} arg0
-     */
-    set hash(arg0) {
-        const ptr0 = passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_failure_cost(this.__wbg_ptr, ptr0, len0);
-    }
 }
 if (Symbol.dispose) HashString.prototype[Symbol.dispose] = HashString.prototype.free;
 
-const IntoUnderlyingByteSourceFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_intounderlyingbytesource_free(ptr >>> 0, 1));
-
 export class IntoUnderlyingByteSource {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         IntoUnderlyingByteSourceFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_intounderlyingbytesource_free(ptr, 0);
@@ -4571,19 +4287,13 @@ export class IntoUnderlyingByteSource {
 }
 if (Symbol.dispose) IntoUnderlyingByteSource.prototype[Symbol.dispose] = IntoUnderlyingByteSource.prototype.free;
 
-const IntoUnderlyingSinkFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_intounderlyingsink_free(ptr >>> 0, 1));
-
 export class IntoUnderlyingSink {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         IntoUnderlyingSinkFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_intounderlyingsink_free(ptr, 0);
@@ -4616,19 +4326,13 @@ export class IntoUnderlyingSink {
 }
 if (Symbol.dispose) IntoUnderlyingSink.prototype[Symbol.dispose] = IntoUnderlyingSink.prototype.free;
 
-const IntoUnderlyingSourceFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_intounderlyingsource_free(ptr >>> 0, 1));
-
 export class IntoUnderlyingSource {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         IntoUnderlyingSourceFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_intounderlyingsource_free(ptr, 0);
@@ -4648,12 +4352,7 @@ export class IntoUnderlyingSource {
 }
 if (Symbol.dispose) IntoUnderlyingSource.prototype[Symbol.dispose] = IntoUnderlyingSource.prototype.free;
 
-const KeyFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_key_free(ptr >>> 0, 1));
-
 export class Key {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(Key.prototype);
@@ -4661,14 +4360,12 @@ export class Key {
         KeyFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         KeyFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_key_free(ptr, 0);
@@ -4935,14 +4632,10 @@ export class Key {
 }
 if (Symbol.dispose) Key.prototype[Symbol.dispose] = Key.prototype.free;
 
-const ListRpcsResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_listrpcsresult_free(ptr >>> 0, 1));
 /**
  * Wrapper struct for the `ListRpcsResult` from casper_client.
  */
 export class ListRpcsResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(ListRpcsResult.prototype);
@@ -4950,14 +4643,12 @@ export class ListRpcsResult {
         ListRpcsResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         ListRpcsResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_listrpcsresult_free(ptr, 0);
@@ -5005,12 +4696,7 @@ export class ListRpcsResult {
 }
 if (Symbol.dispose) ListRpcsResult.prototype[Symbol.dispose] = ListRpcsResult.prototype.free;
 
-const MessageFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_message_free(ptr >>> 0, 1));
-
 export class Message {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(Message.prototype);
@@ -5018,14 +4704,12 @@ export class Message {
         MessageFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         MessageFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_message_free(ptr, 0);
@@ -5056,12 +4740,7 @@ export class Message {
 }
 if (Symbol.dispose) Message.prototype[Symbol.dispose] = Message.prototype.free;
 
-const MessagesFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_messages_free(ptr >>> 0, 1));
-
 export class Messages {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(Messages.prototype);
@@ -5069,21 +4748,18 @@ export class Messages {
         MessagesFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     static __unwrap(jsValue) {
         if (!(jsValue instanceof Messages)) {
             return 0;
         }
         return jsValue.__destroy_into_raw();
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         MessagesFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_messages_free(ptr, 0);
@@ -5201,12 +4877,7 @@ export class Messages {
 }
 if (Symbol.dispose) Messages.prototype[Symbol.dispose] = Messages.prototype.free;
 
-const PackageHashFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_packagehash_free(ptr >>> 0, 1));
-
 export class PackageHash {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(PackageHash.prototype);
@@ -5214,14 +4885,12 @@ export class PackageHash {
         PackageHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         PackageHashFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_packagehash_free(ptr, 0);
@@ -5281,12 +4950,7 @@ export class PackageHash {
 }
 if (Symbol.dispose) PackageHash.prototype[Symbol.dispose] = PackageHash.prototype.free;
 
-const PathFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_path_free(ptr >>> 0, 1));
-
 export class Path {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(Path.prototype);
@@ -5294,14 +4958,12 @@ export class Path {
         PathFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         PathFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_path_free(ptr, 0);
@@ -5355,19 +5017,13 @@ export class Path {
 }
 if (Symbol.dispose) Path.prototype[Symbol.dispose] = Path.prototype.free;
 
-const PaymentFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_payment_free(ptr >>> 0, 1));
-
 export class Payment {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         PaymentFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_payment_free(ptr, 0);
@@ -5398,19 +5054,13 @@ export class Payment {
 }
 if (Symbol.dispose) Payment.prototype[Symbol.dispose] = Payment.prototype.free;
 
-const PaymentStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_paymentstrparams_free(ptr >>> 0, 1));
-
 export class PaymentStrParams {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         PaymentStrParamsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_paymentstrparams_free(ptr, 0);
@@ -5647,19 +5297,13 @@ export class PaymentStrParams {
 }
 if (Symbol.dispose) PaymentStrParams.prototype[Symbol.dispose] = PaymentStrParams.prototype.free;
 
-const PeerEntryFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_peerentry_free(ptr >>> 0, 1));
-
 export class PeerEntry {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         PeerEntryFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_peerentry_free(ptr, 0);
@@ -5697,12 +5341,16 @@ export class PeerEntry {
 }
 if (Symbol.dispose) PeerEntry.prototype[Symbol.dispose] = PeerEntry.prototype.free;
 
-const PublicKeyFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_publickey_free(ptr >>> 0, 1));
+/**
+ * @enum {0 | 1 | 2}
+ */
+export const PricingMode = Object.freeze({
+    Fixed: 0, "0": "Fixed",
+    Classic: 1, "1": "Classic",
+    Reserved: 2, "2": "Reserved",
+});
 
 export class PublicKey {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(PublicKey.prototype);
@@ -5710,14 +5358,12 @@ export class PublicKey {
         PublicKeyFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         PublicKeyFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_publickey_free(ptr, 0);
@@ -5773,12 +5419,7 @@ export class PublicKey {
 }
 if (Symbol.dispose) PublicKey.prototype[Symbol.dispose] = PublicKey.prototype.free;
 
-const PublicKeyStringFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_publickeystring_free(ptr >>> 0, 1));
-
 export class PublicKeyString {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(PublicKeyString.prototype);
@@ -5786,14 +5427,12 @@ export class PublicKeyString {
         PublicKeyStringFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         PublicKeyStringFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_publickeystring_free(ptr, 0);
@@ -5824,12 +5463,7 @@ export class PublicKeyString {
 }
 if (Symbol.dispose) PublicKeyString.prototype[Symbol.dispose] = PublicKeyString.prototype.free;
 
-const PurseIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_purseidentifier_free(ptr >>> 0, 1));
-
 export class PurseIdentifier {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(PurseIdentifier.prototype);
@@ -5837,14 +5471,12 @@ export class PurseIdentifier {
         PurseIdentifierFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         PurseIdentifierFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_purseidentifier_free(ptr, 0);
@@ -5890,12 +5522,7 @@ export class PurseIdentifier {
 }
 if (Symbol.dispose) PurseIdentifier.prototype[Symbol.dispose] = PurseIdentifier.prototype.free;
 
-const PutDeployResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_putdeployresult_free(ptr >>> 0, 1));
-
 export class PutDeployResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(PutDeployResult.prototype);
@@ -5903,14 +5530,12 @@ export class PutDeployResult {
         PutDeployResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         PutDeployResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_putdeployresult_free(ptr, 0);
@@ -5942,12 +5567,7 @@ export class PutDeployResult {
 }
 if (Symbol.dispose) PutDeployResult.prototype[Symbol.dispose] = PutDeployResult.prototype.free;
 
-const PutTransactionResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_puttransactionresult_free(ptr >>> 0, 1));
-
 export class PutTransactionResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(PutTransactionResult.prototype);
@@ -5955,14 +5575,12 @@ export class PutTransactionResult {
         PutTransactionResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         PutTransactionResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_puttransactionresult_free(ptr, 0);
@@ -5994,12 +5612,7 @@ export class PutTransactionResult {
 }
 if (Symbol.dispose) PutTransactionResult.prototype[Symbol.dispose] = PutTransactionResult.prototype.free;
 
-const QueryBalanceDetailsResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_querybalancedetailsresult_free(ptr >>> 0, 1));
-
 export class QueryBalanceDetailsResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(QueryBalanceDetailsResult.prototype);
@@ -6007,14 +5620,12 @@ export class QueryBalanceDetailsResult {
         QueryBalanceDetailsResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         QueryBalanceDetailsResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_querybalancedetailsresult_free(ptr, 0);
@@ -6066,12 +5677,7 @@ export class QueryBalanceDetailsResult {
 }
 if (Symbol.dispose) QueryBalanceDetailsResult.prototype[Symbol.dispose] = QueryBalanceDetailsResult.prototype.free;
 
-const QueryBalanceResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_querybalanceresult_free(ptr >>> 0, 1));
-
 export class QueryBalanceResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(QueryBalanceResult.prototype);
@@ -6079,14 +5685,12 @@ export class QueryBalanceResult {
         QueryBalanceResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         QueryBalanceResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_querybalanceresult_free(ptr, 0);
@@ -6118,12 +5722,7 @@ export class QueryBalanceResult {
 }
 if (Symbol.dispose) QueryBalanceResult.prototype[Symbol.dispose] = QueryBalanceResult.prototype.free;
 
-const QueryGlobalStateResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_queryglobalstateresult_free(ptr >>> 0, 1));
-
 export class QueryGlobalStateResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(QueryGlobalStateResult.prototype);
@@ -6131,14 +5730,12 @@ export class QueryGlobalStateResult {
         QueryGlobalStateResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         QueryGlobalStateResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_queryglobalstateresult_free(ptr, 0);
@@ -6194,19 +5791,13 @@ export class QueryGlobalStateResult {
 }
 if (Symbol.dispose) QueryGlobalStateResult.prototype[Symbol.dispose] = QueryGlobalStateResult.prototype.free;
 
-const RecordIdFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_recordid_free(ptr >>> 0, 1));
-
 export class RecordId {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         RecordIdFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_recordid_free(ptr, 0);
@@ -6226,818 +5817,110 @@ export class RecordId {
 }
 if (Symbol.dispose) RecordId.prototype[Symbol.dispose] = RecordId.prototype.free;
 
-const SDKFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_sdk_free(ptr >>> 0, 1));
-
 export class SDK {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         SDKFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_sdk_free(ptr, 0);
     }
     /**
-     * JS function for `sign_transaction`.
-     *
-     * # Arguments
-     *
-     * * `transaction` - The transaction to sign.
-     * * `secret_key` - The secret key for signing.
-     *
-     * # Returns
-     *
-     * The signed `Transaction`.
-     * @param {Transaction} transaction
-     * @param {string} secret_key
-     * @returns {Transaction}
+     * @param {getBlockTransfersOptions | null} [options]
+     * @returns {Promise<GetBlockTransfersResult>}
      */
-    sign_transaction(transaction, secret_key) {
-        _assertClass(transaction, Transaction);
-        var ptr0 = transaction.__destroy_into_raw();
-        const ptr1 = passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_sign_transaction(this.__wbg_ptr, ptr0, ptr1, len1);
-        return Transaction.__wrap(ret);
-    }
-    /**
-     * @param {getEntityOptions | null} [options]
-     * @returns {Promise<GetAddressableEntityResult>}
-     */
-    state_get_entity(options) {
+    chain_get_block_transfers(options) {
         let ptr0 = 0;
         if (!isLikeNone(options)) {
-            _assertClass(options, getEntityOptions);
+            _assertClass(options, getBlockTransfersOptions);
             ptr0 = options.__destroy_into_raw();
         }
-        const ret = wasm.sdk_state_get_entity(this.__wbg_ptr, ptr0);
+        const ret = wasm.sdk_chain_get_block_transfers(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
-     * @param {any} options
-     * @returns {getEntityOptions}
-     */
-    get_entity_options(options) {
-        const ret = wasm.sdk_get_entity_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getEntityOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves entity information using the provided options.
-     *
-     * This function is an asynchronous JavaScript binding for the Rust `get_entity` method.
+     * Retrieves block transfers information using the provided options.
      *
      * # Arguments
      *
-     * * `options` - An optional `GetEntityOptions` struct containing retrieval options, such as:
-     *   - `entity_identifier`: Identifier for the entity.
-     *   - `entity_identifier_as_string`: String representation of the entity identifier.
-     *   - `maybe_block_id_as_string`: Optional string representation of the block ID.
-     *   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
-     *   - `verbosity`: Verbosity level for the output.
-     *   - `rpc_address`: Address of the node to query.
+     * * `options` - An optional `GetBlockTransfersOptions` struct containing retrieval options.
      *
      * # Returns
      *
-     * A `Result` containing either a `GetAddressableEntityResult` on success or a `JsError` on failure.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
-     * ```
-     * @param {getEntityOptions | null} [options]
-     * @returns {Promise<GetAddressableEntityResult>}
-     */
-    get_entity(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getEntityOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_entity(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {getEraSummaryOptions | null} [options]
-     * @returns {Promise<GetEraSummaryResult>}
-     */
-    chain_get_era_summary(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getEraSummaryOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_chain_get_era_summary(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Parses era summary options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing era summary options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed era summary options as a `GetEraSummaryOptions` struct.
-     * @param {any} options
-     * @returns {getEraSummaryOptions}
-     */
-    get_era_summary_options(options) {
-        const ret = wasm.sdk_get_era_summary_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getEraSummaryOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves era summary information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetEraSummaryOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetEraSummaryResult` or a `JsError` in case of an error.
+     * A `Result` containing either a `GetBlockTransfersResult` or a `JsError` in case of an error.
      *
      * # Errors
      *
      * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getEraSummaryOptions | null} [options]
-     * @returns {Promise<GetEraSummaryResult>}
+     * @param {getBlockTransfersOptions | null} [options]
+     * @returns {Promise<GetBlockTransfersResult>}
      */
-    get_era_summary(options) {
+    get_block_transfers(options) {
         let ptr0 = 0;
         if (!isLikeNone(options)) {
-            _assertClass(options, getEraSummaryOptions);
+            _assertClass(options, getBlockTransfersOptions);
             ptr0 = options.__destroy_into_raw();
         }
-        const ret = wasm.sdk_get_era_summary(this.__wbg_ptr, ptr0);
+        const ret = wasm.sdk_get_block_transfers(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
-     * JS function for speculative execution.
+     * Retrieves balance information using the provided options.
      *
      * # Arguments
      *
-     * * `options` - The options for speculative execution.
+     * * `options` - An optional `QueryBalanceDetailsOptions` struct containing retrieval options.
      *
      * # Returns
      *
-     * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
-     * @param {getSpeculativeExecTxnOptions | null} [options]
-     * @returns {Promise<SpeculativeExecTxnResult>}
-     */
-    speculative_exec(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getSpeculativeExecTxnOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_speculative_exec(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Get options for speculative execution from a JavaScript value.
-     * @param {any} options
-     * @returns {getSpeculativeExecTxnOptions}
-     */
-    get_speculative_exec_options(options) {
-        const ret = wasm.sdk_get_speculative_exec_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getSpeculativeExecTxnOptions.__wrap(ret[0]);
-    }
-    /**
-     * Parses query global state options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing query global state options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed query global state options as a `QueryGlobalStateOptions` struct.
-     * @param {any} options
-     * @returns {queryGlobalStateOptions}
-     */
-    query_global_state_options(options) {
-        const ret = wasm.sdk_query_global_state_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return queryGlobalStateOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves global state information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `QueryGlobalStateOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `QueryGlobalStateResult` or a `JsError` in case of an error.
+     * A `Result` containing either a `QueryBalanceDetailsResult` or a `JsError` in case of an error.
      *
      * # Errors
      *
      * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {queryGlobalStateOptions | null} [options]
-     * @returns {Promise<QueryGlobalStateResult>}
+     * @param {queryBalanceDetailsOptions | null} [options]
+     * @returns {Promise<QueryBalanceDetailsResult>}
      */
-    query_global_state(options) {
+    query_balance_details(options) {
         let ptr0 = 0;
         if (!isLikeNone(options)) {
-            _assertClass(options, queryGlobalStateOptions);
+            _assertClass(options, queryBalanceDetailsOptions);
             ptr0 = options.__destroy_into_raw();
         }
-        const ret = wasm.sdk_query_global_state(this.__wbg_ptr, ptr0);
+        const ret = wasm.sdk_query_balance_details(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
-     * JavaScript Alias for the `get_block`.
+     * JavaScript function for transactioning with deserialized parameters.
      *
      * # Arguments
      *
-     * * `options` - An optional `GetBlockOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getBlockOptions | null} [options]
-     * @returns {Promise<GetBlockResult>}
-     */
-    chain_get_block(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getBlockOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_chain_get_block(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Parses block options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing block options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed block options as a `GetBlockOptions` struct.
-     * @param {any} options
-     * @returns {getBlockOptions}
-     */
-    get_block_options(options) {
-        const ret = wasm.sdk_get_block_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getBlockOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves block information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetBlockOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getBlockOptions | null} [options]
-     * @returns {Promise<GetBlockResult>}
-     */
-    get_block(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getBlockOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_block(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * JavaScript function for deploying with deserialized parameters.
-     *
-     * # Arguments
-     *
-     * * `deploy_params` - Deploy parameters.
-     * * `session_params` - Session parameters.
-     * * `payment_params` - Payment parameters.
+     * * `transaction_params` - Transaction parameters.
+     * * `builder_params` - Session parameters.
      * * `verbosity` - An optional verbosity level.
      * * `rpc_address` - An optional rpc address.
      *
      * # Returns
      *
-     * A result containing PutDeployResult or a JsError.
-     * @param {DeployStrParams} deploy_params
-     * @param {SessionStrParams} session_params
-     * @param {PaymentStrParams} payment_params
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<PutDeployResult>}
-     */
-    deploy(deploy_params, session_params, payment_params, verbosity, rpc_address) {
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr0 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr1 = session_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr2 = payment_params.__destroy_into_raw();
-        var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, isLikeNone(verbosity) ? 3 : verbosity, ptr3, len3);
-        return ret;
-    }
-    /**
-     * JavaScript function for query_contract_key with deserialized options.
-     * @param {queryContractKeyOptions | null} [options]
-     * @returns {Promise<QueryGlobalStateResult>}
-     */
-    query_contract_key(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, queryContractKeyOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_query_contract_key(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Deserialize query_contract_key_options from a JavaScript object.
-     * @param {any} options
-     * @returns {queryContractKeyOptions}
-     */
-    query_contract_key_options(options) {
-        const ret = wasm.sdk_query_contract_key_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return queryContractKeyOptions.__wrap(ret[0]);
-    }
-    /**
-     * JS function for `sign_deploy`.
-     *
-     * # Arguments
-     *
-     * * `deploy` - The deploy to sign.
-     * * `secret_key` - The secret key for signing.
-     *
-     * # Returns
-     *
-     * The signed `Deploy`.
-     * @param {Deploy} deploy
-     * @param {string} secret_key
-     * @returns {Deploy}
-     */
-    sign_deploy(deploy, secret_key) {
-        _assertClass(deploy, Deploy);
-        var ptr0 = deploy.__destroy_into_raw();
-        const ptr1 = passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_sign_deploy(this.__wbg_ptr, ptr0, ptr1, len1);
-        return Deploy.__wrap(ret);
-    }
-    /**
-     * Retrieves deploy information using the provided options, alias for `get_deploy`.
-     * @param {getDeployOptions | null} [options]
-     * @returns {Promise<GetDeployResult>}
-     */
-    info_get_deploy(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getDeployOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_info_get_deploy(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Parses deploy options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing deploy options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed deploy options as a `GetDeployOptions` struct.
-     * @param {any} options
-     * @returns {getDeployOptions}
-     */
-    get_deploy_options(options) {
-        const ret = wasm.sdk_get_deploy_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getDeployOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves deploy information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetDeployOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetDeployResult` or an error.
-     * @param {getDeployOptions | null} [options]
-     * @returns {Promise<GetDeployResult>}
-     */
-    get_deploy(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getDeployOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_deploy(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {any} options
-     * @returns {getAccountOptions}
-     */
-    get_account_options(options) {
-        const ret = wasm.sdk_get_account_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getAccountOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves account information using the provided options.
-     *
-     * This function is an asynchronous JavaScript binding for the Rust `get_account` method.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetAccountOptions` struct containing retrieval options, such as:
-     *   - `account_identifier`: Identifier for the account.
-     *   - `account_identifier_as_string`: String representation of the account identifier.
-     *   - `maybe_block_id_as_string`: Optional string representation of the block ID.
-     *   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
-     *   - `verbosity`: Verbosity level for the output.
-     *   - `rpc_address`: Address of the node to query.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetAccountResult` on success or a `JsError` on failure.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
-     * ```
-     * @param {getAccountOptions | null} [options]
-     * @returns {Promise<GetAccountResult>}
-     */
-    get_account(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getAccountOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_account(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {getAccountOptions | null} [options]
-     * @returns {Promise<GetAccountResult>}
-     */
-    state_get_account_info(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getAccountOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_state_get_account_info(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {any} options
-     * @returns {getEraInfoOptions}
-     */
-    get_era_info_options(options) {
-        const ret = wasm.sdk_get_era_info_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getEraInfoOptions.__wrap(ret[0]);
-    }
-    /**
-     * @param {getEraInfoOptions | null} [options]
-     * @returns {Promise<GetEraInfoResult>}
-     */
-    get_era_info(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getEraInfoOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_era_info(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {getEraInfoOptions | null} [options]
-     * @returns {Promise<GetEraInfoResult>}
-     */
-    chain_get_era_info_by_switch_block(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getEraInfoOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_chain_get_era_info_by_switch_block(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<GetNodeStatusResult>}
-     */
-    info_get_status(verbosity, rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_info_get_status(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * Retrieves node status information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetNodeStatusResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<GetNodeStatusResult>}
-     */
-    get_node_status(verbosity, rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_get_node_status(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * JavaScript Alias for `get_dictionary_item`
-     * @param {getDictionaryItemOptions | null} [options]
-     * @returns {Promise<GetDictionaryItemResult>}
-     */
-    state_get_dictionary_item(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getDictionaryItemOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_state_get_dictionary_item(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Parses dictionary item options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing dictionary item options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed dictionary item options as a `GetDictionaryItemOptions` struct.
-     * @param {any} options
-     * @returns {getDictionaryItemOptions}
-     */
-    get_dictionary_item_options(options) {
-        const ret = wasm.sdk_get_dictionary_item_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getDictionaryItemOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves dictionary item information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetDictionaryItemOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetDictionaryItemResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getDictionaryItemOptions | null} [options]
-     * @returns {Promise<GetDictionaryItemResult>}
-     */
-    get_dictionary_item(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getDictionaryItemOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_dictionary_item(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<GetPeersResult>}
-     */
-    info_get_peers(verbosity, rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_info_get_peers(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * Retrieves peers asynchronously.
-     *
-     * # Arguments
-     *
-     * * `verbosity` - Optional verbosity level.
-     * * `rpc_address` - Optional rpc address.
-     *
-     * # Returns
-     *
-     * A `Result` containing `GetPeersResult` or a `JsError` if an error occurs.
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<GetPeersResult>}
-     */
-    get_peers(verbosity, rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_get_peers(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * Lists available RPCs using the provided options.
-     *
-     * # Arguments
-     *
-     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `ListRpcsResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the listing process.
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<ListRpcsResult>}
-     */
-    list_rpcs(verbosity, rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_list_rpcs(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * JavaScript function for query_contract_dict with deserialized options.
-     * @param {queryContractDictOptions | null} [options]
-     * @returns {Promise<GetDictionaryItemResult>}
-     */
-    query_contract_dict(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, queryContractDictOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_query_contract_dict(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Deserialize query_contract_dict_options from a JavaScript object.
-     * @param {any} options
-     * @returns {queryContractDictOptions}
-     */
-    query_contract_dict_options(options) {
-        const ret = wasm.sdk_query_contract_dict_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return queryContractDictOptions.__wrap(ret[0]);
-    }
-    /**
-     * JS function for speculative execution.
-     *
-     * # Arguments
-     *
-     * * `options` - The options for speculative execution.
-     *
-     * # Returns
-     *
-     * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
-     * @param {getSpeculativeExecDeployOptions | null} [options]
-     * @returns {Promise<SpeculativeExecResult>}
-     */
-    speculative_exec_deploy(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getSpeculativeExecDeployOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_speculative_exec_deploy(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Get options for speculative execution from a JavaScript value.
-     * @param {any} options
-     * @returns {getSpeculativeExecDeployOptions}
-     */
-    get_speculative_exec_deploy_options(options) {
-        const ret = wasm.sdk_get_speculative_exec_deploy_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getSpeculativeExecDeployOptions.__wrap(ret[0]);
-    }
-    /**
-     * JS function for `make_deploy`.
-     *
-     * # Arguments
-     *
-     * * `deploy_params` - The deploy parameters.
-     * * `session_params` - The session parameters.
-     * * `payment_params` - The payment parameters.
-     *
-     * # Returns
-     *
-     * A `Result` containing the created `Deploy` or a `JsError` in case of an error.
-     * @param {DeployStrParams} deploy_params
-     * @param {SessionStrParams} session_params
-     * @param {PaymentStrParams} payment_params
-     * @returns {Deploy}
-     */
-    make_deploy(deploy_params, session_params, payment_params) {
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr0 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr1 = session_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr2 = payment_params.__destroy_into_raw();
-        const ret = wasm.sdk_make_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return Deploy.__wrap(ret[0]);
-    }
-    /**
-     * JS function for `make_transaction`.
-     *
-     * # Arguments
-     *
-     * * `builder_params` - Transaction Builder parameters.
-     * * `transaction_params` - The transaction parameters.
-     *
-     * # Returns
-     *
-     * A `Result` containing the created `Transaction` or a `JsError` in case of an error.
+     * A result containing PutTransactionResult or a JsError.
      * @param {TransactionBuilderParams} builder_params
      * @param {TransactionStrParams} transaction_params
-     * @returns {Transaction}
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<PutTransactionResult>}
      */
-    make_transaction(builder_params, transaction_params) {
+    transaction(builder_params, transaction_params, verbosity, rpc_address) {
         _assertClass(builder_params, TransactionBuilderParams);
         var ptr0 = builder_params.__destroy_into_raw();
         _assertClass(transaction_params, TransactionStrParams);
         var ptr1 = transaction_params.__destroy_into_raw();
-        const ret = wasm.sdk_make_transaction(this.__wbg_ptr, ptr0, ptr1);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return Transaction.__wrap(ret[0]);
+        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len2 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_transaction(this.__wbg_ptr, ptr0, ptr1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, len2);
+        return ret;
     }
     /**
      * @param {Verbosity | null} [verbosity]
@@ -7072,6 +5955,26 @@ export class SDK {
         return ret;
     }
     /**
+     * Parses block transfers options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing block transfers options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed block transfers options as a `GetBlockTransfersOptions` struct.
+     * @param {any} options
+     * @returns {getBlockTransfersOptions}
+     */
+    get_block_transfers_options(options) {
+        const ret = wasm.sdk_get_block_transfers_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getBlockTransfersOptions.__wrap(ret[0]);
+    }
+    /**
      * Parses query balance options from a JsValue.
      *
      * # Arguments
@@ -7080,16 +5983,259 @@ export class SDK {
      *
      * # Returns
      *
-     * Parsed query balance options as a `QueryBalanceOptions` struct.
+     * Parsed query balance options as a `QueryBalanceDetailsOptions` struct.
      * @param {any} options
-     * @returns {queryBalanceOptions}
+     * @returns {queryBalanceDetailsOptions}
      */
-    query_balance_options(options) {
-        const ret = wasm.sdk_query_balance_options(this.__wbg_ptr, options);
+    query_balance_details_options(options) {
+        const ret = wasm.sdk_query_balance_details_options(this.__wbg_ptr, options);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
-        return queryBalanceOptions.__wrap(ret[0]);
+        return queryBalanceDetailsOptions.__wrap(ret[0]);
+    }
+    /**
+     * Retrieves deploy information using the provided options, alias for `get_deploy`.
+     * @param {getDeployOptions | null} [options]
+     * @returns {Promise<GetDeployResult>}
+     */
+    info_get_deploy(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getDeployOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_info_get_deploy(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Retrieves deploy information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetDeployOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetDeployResult` or an error.
+     * @param {getDeployOptions | null} [options]
+     * @returns {Promise<GetDeployResult>}
+     */
+    get_deploy(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getDeployOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_deploy(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Retrieves transaction information using the provided options, alias for `get_transaction`.
+     * @param {getTransactionOptions | null} [options]
+     * @returns {Promise<GetTransactionResult>}
+     */
+    info_get_transaction(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getTransactionOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_info_get_transaction(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Retrieves transaction information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetTransactionOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetTransactionResult` or an error.
+     * @param {getTransactionOptions | null} [options]
+     * @returns {Promise<GetTransactionResult>}
+     */
+    get_transaction(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getTransactionOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_transaction(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Parses deploy options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing deploy options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed deploy options as a `GetDeployOptions` struct.
+     * @param {any} options
+     * @returns {getDeployOptions}
+     */
+    get_deploy_options(options) {
+        const ret = wasm.sdk_get_deploy_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getDeployOptions.__wrap(ret[0]);
+    }
+    /**
+     * Parses transaction options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing transaction options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed transaction options as a `GetTransactionOptions` struct.
+     * @param {any} options
+     * @returns {getTransactionOptions}
+     */
+    get_transaction_options(options) {
+        const ret = wasm.sdk_get_transaction_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getTransactionOptions.__wrap(ret[0]);
+    }
+    /**
+     * JS function for `make_transfer`.
+     *
+     * # Arguments
+     *
+     * * `amount` - The transfer amount.
+     * * `target_account` - The target account.
+     * * `transfer_id` - Optional transfer identifier.
+     * * `deploy_params` - The deploy parameters.
+     * * `payment_params` - The payment parameters.
+     *
+     * # Returns
+     *
+     * A `Result` containing the created `Deploy` or a `JsError` in case of an error.
+     * @param {string} amount
+     * @param {string} target_account
+     * @param {string | null | undefined} transfer_id
+     * @param {DeployStrParams} deploy_params
+     * @param {PaymentStrParams} payment_params
+     * @returns {Deploy}
+     */
+    make_transfer(amount, target_account, transfer_id, deploy_params, payment_params) {
+        const ptr0 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        var ptr2 = isLikeNone(transfer_id) ? 0 : passStringToWasm0(transfer_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len2 = WASM_VECTOR_LEN;
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr3 = deploy_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr4 = payment_params.__destroy_into_raw();
+        const ret = wasm.sdk_make_transfer(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, ptr4);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return Deploy.__wrap(ret[0]);
+    }
+    /**
+     * JS function for `make_transfer_transaction`.
+     *
+     * # Arguments
+     *
+     * * `maybe_source` - Optional transfer source uref.
+     * * `amount` - The transfer amount.
+     * * `target` - The target account.
+     * * `transaction_params` - The transaction parameters.
+     * * `maybe_id` - Optional transfer identifier.
+     *
+     * # Returns
+     *
+     * A `Result` containing the created `Transaction` or a `JsError` in case of an error.
+     * @param {URef | null | undefined} maybe_source
+     * @param {string} target
+     * @param {string} amount
+     * @param {TransactionStrParams} transaction_params
+     * @param {string | null} [maybe_id]
+     * @returns {Transaction}
+     */
+    make_transfer_transaction(maybe_source, target, amount, transaction_params, maybe_id) {
+        let ptr0 = 0;
+        if (!isLikeNone(maybe_source)) {
+            _assertClass(maybe_source, URef);
+            ptr0 = maybe_source.__destroy_into_raw();
+        }
+        const ptr1 = passStringToWasm0(target, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr3 = transaction_params.__destroy_into_raw();
+        var ptr4 = isLikeNone(maybe_id) ? 0 : passStringToWasm0(maybe_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len4 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_make_transfer_transaction(this.__wbg_ptr, ptr0, ptr1, len1, ptr2, len2, ptr3, ptr4, len4);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return Transaction.__wrap(ret[0]);
+    }
+    /**
+     * JavaScript Alias for the `get_block`.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetBlockOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {getBlockOptions | null} [options]
+     * @returns {Promise<GetBlockResult>}
+     */
+    chain_get_block(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getBlockOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_chain_get_block(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Retrieves block information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetBlockOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {getBlockOptions | null} [options]
+     * @returns {Promise<GetBlockResult>}
+     */
+    get_block(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getBlockOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_block(this.__wbg_ptr, ptr0);
+        return ret;
     }
     /**
      * Retrieves balance information using the provided options.
@@ -7118,178 +6264,180 @@ export class SDK {
         return ret;
     }
     /**
-     * @param {getAuctionInfoOptions | null} [options]
-     * @returns {Promise<GetAuctionInfoResult>}
-     */
-    state_get_auction_info_js_alias(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getAuctionInfoOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_state_get_auction_info_js_alias(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Parses auction info options from a JsValue.
+     * Retrieves global state information using the provided options.
      *
      * # Arguments
      *
-     * * `options` - A JsValue containing auction info options to be parsed.
+     * * `options` - An optional `QueryGlobalStateOptions` struct containing retrieval options.
      *
      * # Returns
      *
-     * Result containing parsed auction info options as a `GetAuctionInfoOptions` struct,
-     * or a `JsError` if deserialization fails.
-     * @param {any} options
-     * @returns {getAuctionInfoOptions}
-     */
-    get_auction_info_options(options) {
-        const ret = wasm.sdk_get_auction_info_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getAuctionInfoOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves auction information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetAuctionInfoOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetAuctionInfoResult` or a `JsError` in case of an error.
+     * A `Result` containing either a `QueryGlobalStateResult` or a `JsError` in case of an error.
      *
      * # Errors
      *
      * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getAuctionInfoOptions | null} [options]
-     * @returns {Promise<GetAuctionInfoResult>}
+     * @param {queryGlobalStateOptions | null} [options]
+     * @returns {Promise<QueryGlobalStateResult>}
      */
-    get_auction_info(options) {
+    query_global_state(options) {
         let ptr0 = 0;
         if (!isLikeNone(options)) {
-            _assertClass(options, getAuctionInfoOptions);
+            _assertClass(options, queryGlobalStateOptions);
             ptr0 = options.__destroy_into_raw();
         }
-        const ret = wasm.sdk_get_auction_info(this.__wbg_ptr, ptr0);
+        const ret = wasm.sdk_query_global_state(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
-     * This function allows executing a transaction speculatively.
+     * Parses block options from a JsValue.
      *
      * # Arguments
      *
-     * * `builder_params` - Transaction Builder parameters.
-     * * `transaction_params` - Transactionment parameters for the transaction.
-     * * `verbosity` - Optional verbosity level.
-     * * `rpc_address` - Optional rpc address.
+     * * `options` - A JsValue containing block options to be parsed.
      *
      * # Returns
      *
-     * A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
-     * @param {TransactionBuilderParams} builder_params
-     * @param {TransactionStrParams} transaction_params
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<SpeculativeExecTxnResult>}
+     * Parsed block options as a `GetBlockOptions` struct.
+     * @param {any} options
+     * @returns {getBlockOptions}
      */
-    speculative_transaction(builder_params, transaction_params, verbosity, rpc_address) {
-        _assertClass(builder_params, TransactionBuilderParams);
-        var ptr0 = builder_params.__destroy_into_raw();
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr1 = transaction_params.__destroy_into_raw();
-        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len2 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_speculative_transaction(this.__wbg_ptr, ptr0, ptr1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, len2);
-        return ret;
-    }
-    /**
-     * JS function for speculative transfer transaction.
-     *
-     * # Arguments
-     *
-     * * `maybe_source` - Optional transfer source uref.
-     * * `target_account` - The target account.
-     * * `amount` - The amount to transfer.
-     * * `maybe_id` - An optional transfer ID (defaults to a random number).
-     * * `transaction_params` - The transactionment parameters.
-     * * `verbosity` - The verbosity level for logging (optional).
-     * * `rpc_address` - The address of the node to connect to (optional).
-     *
-     * # Returns
-     *
-     * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-     * @param {URef | null | undefined} maybe_source
-     * @param {string} target_account
-     * @param {string} amount
-     * @param {TransactionStrParams} transaction_params
-     * @param {string | null} [maybe_id]
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<SpeculativeExecTxnResult>}
-     */
-    speculative_transfer_transaction(maybe_source, target_account, amount, transaction_params, maybe_id, verbosity, rpc_address) {
-        let ptr0 = 0;
-        if (!isLikeNone(maybe_source)) {
-            _assertClass(maybe_source, URef);
-            ptr0 = maybe_source.__destroy_into_raw();
+    get_block_options(options) {
+        const ret = wasm.sdk_get_block_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
         }
-        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ptr2 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len2 = WASM_VECTOR_LEN;
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr3 = transaction_params.__destroy_into_raw();
-        var ptr4 = isLikeNone(maybe_id) ? 0 : passStringToWasm0(maybe_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len4 = WASM_VECTOR_LEN;
-        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len5 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_speculative_transfer_transaction(this.__wbg_ptr, ptr0, ptr1, len1, ptr2, len2, ptr3, ptr4, len4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
-        return ret;
+        return getBlockOptions.__wrap(ret[0]);
     }
     /**
-     * JS function for speculative transfer.
+     * Parses query balance options from a JsValue.
      *
      * # Arguments
      *
-     * * `amount` - The amount to transfer.
-     * * `target_account` - The target account.
-     * * `transfer_id` - An optional transfer ID (defaults to a random number).
-     * * `deploy_params` - The deployment parameters.
-     * * `payment_params` - The payment parameters.
-     * * `verbosity` - The verbosity level for logging (optional).
-     * * `rpc_address` - The address of the node to connect to (optional).
+     * * `options` - A JsValue containing query balance options to be parsed.
      *
      * # Returns
      *
-     * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-     * @param {string} amount
-     * @param {string} target_account
-     * @param {string | null | undefined} transfer_id
-     * @param {DeployStrParams} deploy_params
-     * @param {PaymentStrParams} payment_params
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<SpeculativeExecResult>}
+     * Parsed query balance options as a `QueryBalanceOptions` struct.
+     * @param {any} options
+     * @returns {queryBalanceOptions}
      */
-    speculative_transfer(amount, target_account, transfer_id, deploy_params, payment_params, verbosity, rpc_address) {
-        const ptr0 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        var ptr2 = isLikeNone(transfer_id) ? 0 : passStringToWasm0(transfer_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len2 = WASM_VECTOR_LEN;
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr3 = deploy_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr4 = payment_params.__destroy_into_raw();
-        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len5 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_speculative_transfer(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, ptr4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
+    query_balance_options(options) {
+        const ret = wasm.sdk_query_balance_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return queryBalanceOptions.__wrap(ret[0]);
+    }
+    /**
+     * Parses query global state options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing query global state options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed query global state options as a `QueryGlobalStateOptions` struct.
+     * @param {any} options
+     * @returns {queryGlobalStateOptions}
+     */
+    query_global_state_options(options) {
+        const ret = wasm.sdk_query_global_state_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return queryGlobalStateOptions.__wrap(ret[0]);
+    }
+    /**
+     * @param {Verbosity | null} [verbosity]
+     * @returns {Verbosity}
+     */
+    getVerbosity(verbosity) {
+        const ret = wasm.sdk_getVerbosity(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity);
         return ret;
+    }
+    /**
+     * @param {Verbosity | null} [verbosity]
+     */
+    setVerbosity(verbosity) {
+        const ret = wasm.sdk_setVerbosity(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+    /**
+     * @param {string | null} [rpc_address]
+     * @returns {string}
+     */
+    getRPCAddress(rpc_address) {
+        let deferred2_0;
+        let deferred2_1;
+        try {
+            var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var len0 = WASM_VECTOR_LEN;
+            const ret = wasm.sdk_getRPCAddress(this.__wbg_ptr, ptr0, len0);
+            deferred2_0 = ret[0];
+            deferred2_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+        }
+    }
+    /**
+     * @param {string | null} [rpc_address]
+     */
+    setRPCAddress(rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_setRPCAddress(this.__wbg_ptr, ptr0, len0);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+    /**
+     * @param {string | null} [node_address]
+     * @returns {string}
+     */
+    getNodeAddress(node_address) {
+        let deferred2_0;
+        let deferred2_1;
+        try {
+            var ptr0 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var len0 = WASM_VECTOR_LEN;
+            const ret = wasm.sdk_getNodeAddress(this.__wbg_ptr, ptr0, len0);
+            deferred2_0 = ret[0];
+            deferred2_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+        }
+    }
+    /**
+     * @param {string | null} [node_address]
+     */
+    setNodeAddress(node_address) {
+        var ptr0 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_setNodeAddress(this.__wbg_ptr, ptr0, len0);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+    /**
+     * @param {string | null} [rpc_address]
+     * @param {string | null} [node_address]
+     * @param {Verbosity | null} [verbosity]
+     */
+    constructor(rpc_address, node_address, verbosity) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        var ptr1 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_new(ptr0, len0, ptr1, len1, isLikeNone(verbosity) ? 3 : verbosity);
+        this.__wbg_ptr = ret >>> 0;
+        SDKFinalization.register(this, this.__wbg_ptr, this);
+        return this;
     }
     /**
      * @param {string | null} [node_address]
@@ -7728,208 +6876,125 @@ export class SDK {
         return ret;
     }
     /**
-     * @param {Verbosity | null} [verbosity]
-     * @returns {Verbosity}
+     * @param {getEntityOptions | null} [options]
+     * @returns {Promise<GetAddressableEntityResult>}
      */
-    getVerbosity(verbosity) {
-        const ret = wasm.sdk_getVerbosity(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity);
-        return ret;
-    }
-    /**
-     * @param {Verbosity | null} [verbosity]
-     */
-    setVerbosity(verbosity) {
-        const ret = wasm.sdk_setVerbosity(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity);
-        if (ret[1]) {
-            throw takeFromExternrefTable0(ret[0]);
-        }
-    }
-    /**
-     * @param {string | null} [rpc_address]
-     * @returns {string}
-     */
-    getRPCAddress(rpc_address) {
-        let deferred2_0;
-        let deferred2_1;
-        try {
-            var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-            var len0 = WASM_VECTOR_LEN;
-            const ret = wasm.sdk_getRPCAddress(this.__wbg_ptr, ptr0, len0);
-            deferred2_0 = ret[0];
-            deferred2_1 = ret[1];
-            return getStringFromWasm0(ret[0], ret[1]);
-        } finally {
-            wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
-        }
-    }
-    /**
-     * @param {string | null} [rpc_address]
-     */
-    setRPCAddress(rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_setRPCAddress(this.__wbg_ptr, ptr0, len0);
-        if (ret[1]) {
-            throw takeFromExternrefTable0(ret[0]);
-        }
-    }
-    /**
-     * @param {string | null} [node_address]
-     * @returns {string}
-     */
-    getNodeAddress(node_address) {
-        let deferred2_0;
-        let deferred2_1;
-        try {
-            var ptr0 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-            var len0 = WASM_VECTOR_LEN;
-            const ret = wasm.sdk_getNodeAddress(this.__wbg_ptr, ptr0, len0);
-            deferred2_0 = ret[0];
-            deferred2_1 = ret[1];
-            return getStringFromWasm0(ret[0], ret[1]);
-        } finally {
-            wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
-        }
-    }
-    /**
-     * @param {string | null} [node_address]
-     */
-    setNodeAddress(node_address) {
-        var ptr0 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_setNodeAddress(this.__wbg_ptr, ptr0, len0);
-        if (ret[1]) {
-            throw takeFromExternrefTable0(ret[0]);
-        }
-    }
-    /**
-     * @param {string | null} [rpc_address]
-     * @param {string | null} [node_address]
-     * @param {Verbosity | null} [verbosity]
-     */
-    constructor(rpc_address, node_address, verbosity) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        var ptr1 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_new(ptr0, len0, ptr1, len1, isLikeNone(verbosity) ? 3 : verbosity);
-        this.__wbg_ptr = ret >>> 0;
-        SDKFinalization.register(this, this.__wbg_ptr, this);
-        return this;
-    }
-    /**
-     * Retrieves transaction information using the provided options, alias for `get_transaction`.
-     * @param {getTransactionOptions | null} [options]
-     * @returns {Promise<GetTransactionResult>}
-     */
-    info_get_transaction(options) {
+    state_get_entity(options) {
         let ptr0 = 0;
         if (!isLikeNone(options)) {
-            _assertClass(options, getTransactionOptions);
+            _assertClass(options, getEntityOptions);
             ptr0 = options.__destroy_into_raw();
         }
-        const ret = wasm.sdk_info_get_transaction(this.__wbg_ptr, ptr0);
+        const ret = wasm.sdk_state_get_entity(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
-     * Parses transaction options from a JsValue.
+     * Retrieves entity information using the provided options.
+     *
+     * This function is an asynchronous JavaScript binding for the Rust `get_entity` method.
      *
      * # Arguments
      *
-     * * `options` - A JsValue containing transaction options to be parsed.
+     * * `options` - An optional `GetEntityOptions` struct containing retrieval options, such as:
+     *   - `entity_identifier`: Identifier for the entity.
+     *   - `entity_identifier_as_string`: String representation of the entity identifier.
+     *   - `maybe_block_id_as_string`: Optional string representation of the block ID.
+     *   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
+     *   - `verbosity`: Verbosity level for the output.
+     *   - `rpc_address`: Address of the node to query.
      *
      * # Returns
      *
-     * Parsed transaction options as a `GetTransactionOptions` struct.
-     * @param {any} options
-     * @returns {getTransactionOptions}
+     * A `Result` containing either a `GetAddressableEntityResult` on success or a `JsError` on failure.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
+     * ```
+     * @param {getEntityOptions | null} [options]
+     * @returns {Promise<GetAddressableEntityResult>}
      */
-    get_transaction_options(options) {
-        const ret = wasm.sdk_get_transaction_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getTransactionOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves transaction information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetTransactionOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetTransactionResult` or an error.
-     * @param {getTransactionOptions | null} [options]
-     * @returns {Promise<GetTransactionResult>}
-     */
-    get_transaction(options) {
+    get_entity(options) {
         let ptr0 = 0;
         if (!isLikeNone(options)) {
-            _assertClass(options, getTransactionOptions);
+            _assertClass(options, getEntityOptions);
             ptr0 = options.__destroy_into_raw();
         }
-        const ret = wasm.sdk_get_transaction(this.__wbg_ptr, ptr0);
+        const ret = wasm.sdk_get_entity(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
-     * @param {getBlockTransfersOptions | null} [options]
-     * @returns {Promise<GetBlockTransfersResult>}
+     * JavaScript Alias for `get_balance`.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
+     * @param {getBalanceOptions | null} [options]
+     * @returns {Promise<GetBalanceResult>}
      */
-    chain_get_block_transfers(options) {
+    state_get_balance(options) {
         let ptr0 = 0;
         if (!isLikeNone(options)) {
-            _assertClass(options, getBlockTransfersOptions);
+            _assertClass(options, getBalanceOptions);
             ptr0 = options.__destroy_into_raw();
         }
-        const ret = wasm.sdk_chain_get_block_transfers(this.__wbg_ptr, ptr0);
+        const ret = wasm.sdk_state_get_balance(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
-     * Parses block transfers options from a JsValue.
+     * Retrieves balance information using the provided options.
      *
      * # Arguments
      *
-     * * `options` - A JsValue containing block transfers options to be parsed.
+     * * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
      *
      * # Returns
      *
-     * Parsed block transfers options as a `GetBlockTransfersOptions` struct.
-     * @param {any} options
-     * @returns {getBlockTransfersOptions}
-     */
-    get_block_transfers_options(options) {
-        const ret = wasm.sdk_get_block_transfers_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getBlockTransfersOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves block transfers information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetBlockTransfersOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetBlockTransfersResult` or a `JsError` in case of an error.
+     * A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
      *
      * # Errors
      *
      * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getBlockTransfersOptions | null} [options]
-     * @returns {Promise<GetBlockTransfersResult>}
+     * @param {getBalanceOptions | null} [options]
+     * @returns {Promise<GetBalanceResult>}
      */
-    get_block_transfers(options) {
+    get_balance(options) {
         let ptr0 = 0;
         if (!isLikeNone(options)) {
-            _assertClass(options, getBlockTransfersOptions);
+            _assertClass(options, getBalanceOptions);
             ptr0 = options.__destroy_into_raw();
         }
-        const ret = wasm.sdk_get_block_transfers(this.__wbg_ptr, ptr0);
+        const ret = wasm.sdk_get_balance(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * @param {getEraInfoOptions | null} [options]
+     * @returns {Promise<GetEraInfoResult>}
+     */
+    get_era_info(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getEraInfoOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_era_info(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * @param {getEraInfoOptions | null} [options]
+     * @returns {Promise<GetEraInfoResult>}
+     */
+    chain_get_era_info_by_switch_block(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getEraInfoOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_chain_get_era_info_by_switch_block(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
@@ -7959,26 +7024,6 @@ export class SDK {
         return ret;
     }
     /**
-     * Parses state root hash options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing state root hash options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed state root hash options as a `GetStateRootHashOptions` struct.
-     * @param {any} options
-     * @returns {getStateRootHashOptions}
-     */
-    get_state_root_hash_options(options) {
-        const ret = wasm.sdk_get_state_root_hash_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getStateRootHashOptions.__wrap(ret[0]);
-    }
-    /**
      * Retrieves state root hash information using the provided options.
      *
      * # Arguments
@@ -8005,107 +7050,31 @@ export class SDK {
         return ret;
     }
     /**
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<GetValidatorChangesResult>}
-     */
-    info_get_validator_change(verbosity, rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_info_get_validator_change(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * Retrieves validator changes using the provided options.
+     * JS function for speculative transfer.
      *
      * # Arguments
      *
-     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetValidatorChangesResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<GetValidatorChangesResult>}
-     */
-    get_validator_changes(verbosity, rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_get_validator_changes(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * JS function for transaction transferring funds.
-     *
-     * # Arguments
-     *
-     * * `maybe_source` - Optional transfer source uref.
-     * * `target_account` - The target account.
      * * `amount` - The amount to transfer.
-     * * `transaction_params` - The transaction parameters.
-     * * `maybe_id` - An optional transfer ID (defaults to a random number).
+     * * `target_account` - The target account.
+     * * `transfer_id` - An optional transfer ID (defaults to a random number).
+     * * `deploy_params` - The deployment parameters.
+     * * `payment_params` - The payment parameters.
      * * `verbosity` - The verbosity level for logging (optional).
      * * `rpc_address` - The address of the node to connect to (optional).
      *
      * # Returns
      *
-     * A `Result` containing the result of the transfer or a `JsError` in case of an error.
-     * @param {URef | null | undefined} maybe_source
-     * @param {string} target_account
-     * @param {string} amount
-     * @param {TransactionStrParams} transaction_params
-     * @param {string | null} [maybe_id]
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<PutTransactionResult>}
-     */
-    transfer_transaction(maybe_source, target_account, amount, transaction_params, maybe_id, verbosity, rpc_address) {
-        let ptr0 = 0;
-        if (!isLikeNone(maybe_source)) {
-            _assertClass(maybe_source, URef);
-            ptr0 = maybe_source.__destroy_into_raw();
-        }
-        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ptr2 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len2 = WASM_VECTOR_LEN;
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr3 = transaction_params.__destroy_into_raw();
-        var ptr4 = isLikeNone(maybe_id) ? 0 : passStringToWasm0(maybe_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len4 = WASM_VECTOR_LEN;
-        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len5 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_transfer_transaction(this.__wbg_ptr, ptr0, ptr1, len1, ptr2, len2, ptr3, ptr4, len4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
-        return ret;
-    }
-    /**
-     * JS function for `make_transfer`.
-     *
-     * # Arguments
-     *
-     * * `amount` - The transfer amount.
-     * * `target_account` - The target account.
-     * * `transfer_id` - Optional transfer identifier.
-     * * `deploy_params` - The deploy parameters.
-     * * `payment_params` - The payment parameters.
-     *
-     * # Returns
-     *
-     * A `Result` containing the created `Deploy` or a `JsError` in case of an error.
+     * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
      * @param {string} amount
      * @param {string} target_account
      * @param {string | null | undefined} transfer_id
      * @param {DeployStrParams} deploy_params
      * @param {PaymentStrParams} payment_params
-     * @returns {Deploy}
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<SpeculativeExecResult>}
      */
-    make_transfer(amount, target_account, transfer_id, deploy_params, payment_params) {
+    speculative_transfer(amount, target_account, transfer_id, deploy_params, payment_params, verbosity, rpc_address) {
         const ptr0 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -8116,52 +7085,136 @@ export class SDK {
         var ptr3 = deploy_params.__destroy_into_raw();
         _assertClass(payment_params, PaymentStrParams);
         var ptr4 = payment_params.__destroy_into_raw();
-        const ret = wasm.sdk_make_transfer(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, ptr4);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return Deploy.__wrap(ret[0]);
+        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len5 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_speculative_transfer(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, ptr4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
+        return ret;
     }
     /**
-     * JS function for `make_transfer_transaction`.
+     * Installs a smart contract with the specified parameters and returns the result.
      *
      * # Arguments
-     *
-     * * `maybe_source` - Optional transfer source uref.
-     * * `amount` - The transfer amount.
-     * * `target` - The target account.
-     * * `transaction_params` - The transaction parameters.
-     * * `maybe_id` - Optional transfer identifier.
+     * .
+     * * `transaction_params` - Transaction parameters.
+     * * `transaction_bytes` - Transaction Bytes to install
+     * * `rpc_address` - An optional rpc address to send the request to.
      *
      * # Returns
      *
-     * A `Result` containing the created `Transaction` or a `JsError` in case of an error.
-     * @param {URef | null | undefined} maybe_source
-     * @param {string} target
-     * @param {string} amount
+     * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the installation.
      * @param {TransactionStrParams} transaction_params
-     * @param {string | null} [maybe_id]
-     * @returns {Transaction}
+     * @param {Bytes} transaction_bytes
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<PutTransactionResult>}
      */
-    make_transfer_transaction(maybe_source, target, amount, transaction_params, maybe_id) {
-        let ptr0 = 0;
-        if (!isLikeNone(maybe_source)) {
-            _assertClass(maybe_source, URef);
-            ptr0 = maybe_source.__destroy_into_raw();
-        }
-        const ptr1 = passStringToWasm0(target, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ptr2 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len2 = WASM_VECTOR_LEN;
+    install(transaction_params, transaction_bytes, rpc_address) {
         _assertClass(transaction_params, TransactionStrParams);
-        var ptr3 = transaction_params.__destroy_into_raw();
-        var ptr4 = isLikeNone(maybe_id) ? 0 : passStringToWasm0(maybe_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len4 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_make_transfer_transaction(this.__wbg_ptr, ptr0, ptr1, len1, ptr2, len2, ptr3, ptr4, len4);
+        var ptr0 = transaction_params.__destroy_into_raw();
+        _assertClass(transaction_bytes, Bytes);
+        var ptr1 = transaction_bytes.__destroy_into_raw();
+        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len2 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, ptr1, ptr2, len2);
+        return ret;
+    }
+    /**
+     * JavaScript function for deploying with deserialized parameters.
+     *
+     * # Arguments
+     *
+     * * `deploy_params` - Deploy parameters.
+     * * `session_params` - Session parameters.
+     * * `payment_params` - Payment parameters.
+     * * `verbosity` - An optional verbosity level.
+     * * `rpc_address` - An optional rpc address.
+     *
+     * # Returns
+     *
+     * A result containing PutDeployResult or a JsError.
+     * @param {DeployStrParams} deploy_params
+     * @param {SessionStrParams} session_params
+     * @param {PaymentStrParams} payment_params
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<PutDeployResult>}
+     */
+    deploy(deploy_params, session_params, payment_params, verbosity, rpc_address) {
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr0 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr1 = session_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr2 = payment_params.__destroy_into_raw();
+        var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len3 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, isLikeNone(verbosity) ? 3 : verbosity, ptr3, len3);
+        return ret;
+    }
+    /**
+     * @param {any} options
+     * @returns {getEntityOptions}
+     */
+    get_entity_options(options) {
+        const ret = wasm.sdk_get_entity_options(this.__wbg_ptr, options);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
-        return Transaction.__wrap(ret[0]);
+        return getEntityOptions.__wrap(ret[0]);
+    }
+    /**
+     * Parses balance options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing balance options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed balance options as a `GetBalanceOptions` struct.
+     * @param {any} options
+     * @returns {getBalanceOptions}
+     */
+    get_balance_options(options) {
+        const ret = wasm.sdk_get_balance_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getBalanceOptions.__wrap(ret[0]);
+    }
+    /**
+     * @param {any} options
+     * @returns {getEraInfoOptions}
+     */
+    get_era_info_options(options) {
+        const ret = wasm.sdk_get_era_info_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getEraInfoOptions.__wrap(ret[0]);
+    }
+    /**
+     * Parses state root hash options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing state root hash options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed state root hash options as a `GetStateRootHashOptions` struct.
+     * @param {any} options
+     * @returns {getStateRootHashOptions}
+     */
+    get_state_root_hash_options(options) {
+        const ret = wasm.sdk_get_state_root_hash_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getStateRootHashOptions.__wrap(ret[0]);
     }
     /**
      * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
@@ -8190,28 +7243,6 @@ export class SDK {
         return ret;
     }
     /**
-     * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
-     * Legacy alias
-     *
-     * # Arguments
-     *
-     * * `events_url` - The URL to monitor for transaction events.
-     * * `timeout_duration` - An optional timeout duration in seconds.
-     *
-     * # Returns
-     *
-     * A `Watcher` instance.
-     * @param {string} events_url
-     * @param {number | null} [timeout_duration]
-     * @returns {Watcher}
-     */
-    watchDeploy(events_url, timeout_duration) {
-        const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_watchDeploy(this.__wbg_ptr, ptr0, len0, isLikeNone(timeout_duration) ? 0x100000001 : (timeout_duration) >>> 0);
-        return Watcher.__wrap(ret);
-    }
-    /**
      * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
      *
      * # Arguments
@@ -8234,282 +7265,6 @@ export class SDK {
         const ptr1 = passStringToWasm0(target_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
         const ret = wasm.sdk_waitTransaction(this.__wbg_ptr, ptr0, len0, ptr1, len1, isLikeNone(timeout_duration) ? 0x100000001 : (timeout_duration) >>> 0);
-        return ret;
-    }
-    /**
-     * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
-     *
-     * # Arguments
-     *
-     * * `events_url` - The URL to monitor for transaction events.
-     * * `timeout_duration` - An optional timeout duration in seconds.
-     *
-     * # Returns
-     *
-     * A `Watcher` instance.
-     * @param {string} events_url
-     * @param {number | null} [timeout_duration]
-     * @returns {Watcher}
-     */
-    watchTransaction(events_url, timeout_duration) {
-        const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_watchTransaction(this.__wbg_ptr, ptr0, len0, isLikeNone(timeout_duration) ? 0x100000001 : (timeout_duration) >>> 0);
-        return Watcher.__wrap(ret);
-    }
-    /**
-     * Calls a smart contract entry point with the specified parameters and returns the result.
-     *
-     * # Arguments
-     *
-     * * `deploy_params` - The deploy parameters.
-     * * `session_params` - The session parameters.
-     * * `payment_amount` - The payment amount as a string.
-     * * `rpc_address` - An optional rpc address to send the request to.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the call.
-     * @param {DeployStrParams} deploy_params
-     * @param {SessionStrParams} session_params
-     * @param {string} payment_amount
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<PutDeployResult>}
-     */
-    call_entrypoint_deploy(deploy_params, session_params, payment_amount, rpc_address) {
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr0 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr1 = session_params.__destroy_into_raw();
-        const ptr2 = passStringToWasm0(payment_amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len2 = WASM_VECTOR_LEN;
-        var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_call_entrypoint_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
-        return ret;
-    }
-    /**
-     * JavaScript function for transactioning with deserialized parameters.
-     *
-     * # Arguments
-     *
-     * * `transaction_params` - Transaction parameters.
-     * * `builder_params` - Session parameters.
-     * * `verbosity` - An optional verbosity level.
-     * * `rpc_address` - An optional rpc address.
-     *
-     * # Returns
-     *
-     * A result containing PutTransactionResult or a JsError.
-     * @param {TransactionBuilderParams} builder_params
-     * @param {TransactionStrParams} transaction_params
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<PutTransactionResult>}
-     */
-    transaction(builder_params, transaction_params, verbosity, rpc_address) {
-        _assertClass(builder_params, TransactionBuilderParams);
-        var ptr0 = builder_params.__destroy_into_raw();
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr1 = transaction_params.__destroy_into_raw();
-        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len2 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_transaction(this.__wbg_ptr, ptr0, ptr1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, len2);
-        return ret;
-    }
-    /**
-     * JavaScript Alias for `get_balance`.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
-     * @param {getBalanceOptions | null} [options]
-     * @returns {Promise<GetBalanceResult>}
-     */
-    state_get_balance(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getBalanceOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_state_get_balance(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Parses balance options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing balance options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed balance options as a `GetBalanceOptions` struct.
-     * @param {any} options
-     * @returns {getBalanceOptions}
-     */
-    get_balance_options(options) {
-        const ret = wasm.sdk_get_balance_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getBalanceOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves balance information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getBalanceOptions | null} [options]
-     * @returns {Promise<GetBalanceResult>}
-     */
-    get_balance(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getBalanceOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_balance(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * JavaScript Alias for `put_transaction`.
-     * @param {Transaction} transaction
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<PutTransactionResult>}
-     */
-    account_put_transaction(transaction, verbosity, rpc_address) {
-        _assertClass(transaction, Transaction);
-        var ptr0 = transaction.__destroy_into_raw();
-        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_account_put_transaction(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
-        return ret;
-    }
-    /**
-     * Puts a transaction using the provided options.
-     *
-     * # Arguments
-     *
-     * * `transaction` - The `Transaction` object to be sent.
-     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the transaction process.
-     * @param {Transaction} transaction
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<PutTransactionResult>}
-     */
-    put_transaction(transaction, verbosity, rpc_address) {
-        _assertClass(transaction, Transaction);
-        var ptr0 = transaction.__destroy_into_raw();
-        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_put_transaction(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
-        return ret;
-    }
-    /**
-     * Parses query balance options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing query balance options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed query balance options as a `QueryBalanceDetailsOptions` struct.
-     * @param {any} options
-     * @returns {queryBalanceDetailsOptions}
-     */
-    query_balance_details_options(options) {
-        const ret = wasm.sdk_query_balance_details_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return queryBalanceDetailsOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves balance information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `QueryBalanceDetailsOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `QueryBalanceDetailsResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {queryBalanceDetailsOptions | null} [options]
-     * @returns {Promise<QueryBalanceDetailsResult>}
-     */
-    query_balance_details(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, queryBalanceDetailsOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_query_balance_details(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * This function allows executing a deploy speculatively.
-     *
-     * # Arguments
-     *
-     * * `deploy_params` - Deployment parameters for the deploy.
-     * * `session_params` - Session parameters for the deploy.
-     * * `payment_params` - Payment parameters for the deploy.
-     * * `verbosity` - Optional verbosity level.
-     * * `rpc_address` - Optional rpc address.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
-     * @param {DeployStrParams} deploy_params
-     * @param {SessionStrParams} session_params
-     * @param {PaymentStrParams} payment_params
-     * @param {Verbosity | null} [verbosity]
-     * @param {string | null} [rpc_address]
-     * @returns {Promise<SpeculativeExecResult>}
-     */
-    speculative_deploy(deploy_params, session_params, payment_params, verbosity, rpc_address) {
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr0 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr1 = session_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr2 = payment_params.__destroy_into_raw();
-        var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_speculative_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, isLikeNone(verbosity) ? 3 : verbosity, ptr3, len3);
         return ret;
     }
     /**
@@ -8579,6 +7334,122 @@ export class SDK {
         return ret;
     }
     /**
+     * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
+     * Legacy alias
+     *
+     * # Arguments
+     *
+     * * `events_url` - The URL to monitor for transaction events.
+     * * `timeout_duration` - An optional timeout duration in seconds.
+     *
+     * # Returns
+     *
+     * A `Watcher` instance.
+     * @param {string} events_url
+     * @param {number | null} [timeout_duration]
+     * @returns {Watcher}
+     */
+    watchDeploy(events_url, timeout_duration) {
+        const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_watchDeploy(this.__wbg_ptr, ptr0, len0, isLikeNone(timeout_duration) ? 0x100000001 : (timeout_duration) >>> 0);
+        return Watcher.__wrap(ret);
+    }
+    /**
+     * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
+     *
+     * # Arguments
+     *
+     * * `events_url` - The URL to monitor for transaction events.
+     * * `timeout_duration` - An optional timeout duration in seconds.
+     *
+     * # Returns
+     *
+     * A `Watcher` instance.
+     * @param {string} events_url
+     * @param {number | null} [timeout_duration]
+     * @returns {Watcher}
+     */
+    watchTransaction(events_url, timeout_duration) {
+        const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_watchTransaction(this.__wbg_ptr, ptr0, len0, isLikeNone(timeout_duration) ? 0x100000001 : (timeout_duration) >>> 0);
+        return Watcher.__wrap(ret);
+    }
+    /**
+     * JS function for transaction transferring funds.
+     *
+     * # Arguments
+     *
+     * * `maybe_source` - Optional transfer source uref.
+     * * `target_account` - The target account.
+     * * `amount` - The amount to transfer.
+     * * `transaction_params` - The transaction parameters.
+     * * `maybe_id` - An optional transfer ID (defaults to a random number).
+     * * `verbosity` - The verbosity level for logging (optional).
+     * * `rpc_address` - The address of the node to connect to (optional).
+     *
+     * # Returns
+     *
+     * A `Result` containing the result of the transfer or a `JsError` in case of an error.
+     * @param {URef | null | undefined} maybe_source
+     * @param {string} target_account
+     * @param {string} amount
+     * @param {TransactionStrParams} transaction_params
+     * @param {string | null} [maybe_id]
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<PutTransactionResult>}
+     */
+    transfer_transaction(maybe_source, target_account, amount, transaction_params, maybe_id, verbosity, rpc_address) {
+        let ptr0 = 0;
+        if (!isLikeNone(maybe_source)) {
+            _assertClass(maybe_source, URef);
+            ptr0 = maybe_source.__destroy_into_raw();
+        }
+        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr3 = transaction_params.__destroy_into_raw();
+        var ptr4 = isLikeNone(maybe_id) ? 0 : passStringToWasm0(maybe_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len4 = WASM_VECTOR_LEN;
+        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len5 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_transfer_transaction(this.__wbg_ptr, ptr0, ptr1, len1, ptr2, len2, ptr3, ptr4, len4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
+        return ret;
+    }
+    /**
+     * This function allows executing a transaction speculatively.
+     *
+     * # Arguments
+     *
+     * * `builder_params` - Transaction Builder parameters.
+     * * `transaction_params` - Transactionment parameters for the transaction.
+     * * `verbosity` - Optional verbosity level.
+     * * `rpc_address` - Optional rpc address.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
+     * @param {TransactionBuilderParams} builder_params
+     * @param {TransactionStrParams} transaction_params
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<SpeculativeExecTxnResult>}
+     */
+    speculative_transaction(builder_params, transaction_params, verbosity, rpc_address) {
+        _assertClass(builder_params, TransactionBuilderParams);
+        var ptr0 = builder_params.__destroy_into_raw();
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr1 = transaction_params.__destroy_into_raw();
+        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len2 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_speculative_transaction(this.__wbg_ptr, ptr0, ptr1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, len2);
+        return ret;
+    }
+    /**
      * JavaScript Alias for `put_deploy`.
      * @param {Deploy} deploy
      * @param {Verbosity | null} [verbosity]
@@ -8623,6 +7494,212 @@ export class SDK {
         return ret;
     }
     /**
+     * @param {getEraSummaryOptions | null} [options]
+     * @returns {Promise<GetEraSummaryResult>}
+     */
+    chain_get_era_summary(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getEraSummaryOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_chain_get_era_summary(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Retrieves era summary information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetEraSummaryOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetEraSummaryResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {getEraSummaryOptions | null} [options]
+     * @returns {Promise<GetEraSummaryResult>}
+     */
+    get_era_summary(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getEraSummaryOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_era_summary(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * @param {getAuctionInfoOptions | null} [options]
+     * @returns {Promise<GetAuctionInfoResult>}
+     */
+    state_get_auction_info_js_alias(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getAuctionInfoOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_state_get_auction_info_js_alias(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Retrieves auction information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetAuctionInfoOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetAuctionInfoResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {getAuctionInfoOptions | null} [options]
+     * @returns {Promise<GetAuctionInfoResult>}
+     */
+    get_auction_info(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getAuctionInfoOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_auction_info(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * JS function for speculative execution.
+     *
+     * # Arguments
+     *
+     * * `options` - The options for speculative execution.
+     *
+     * # Returns
+     *
+     * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
+     * @param {getSpeculativeExecTxnOptions | null} [options]
+     * @returns {Promise<SpeculativeExecTxnResult>}
+     */
+    speculative_exec(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getSpeculativeExecTxnOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_speculative_exec(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * JavaScript Alias for `get_dictionary_item`
+     * @param {getDictionaryItemOptions | null} [options]
+     * @returns {Promise<GetDictionaryItemResult>}
+     */
+    state_get_dictionary_item(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getDictionaryItemOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_state_get_dictionary_item(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Retrieves dictionary item information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetDictionaryItemOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetDictionaryItemResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {getDictionaryItemOptions | null} [options]
+     * @returns {Promise<GetDictionaryItemResult>}
+     */
+    get_dictionary_item(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getDictionaryItemOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_dictionary_item(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * JS function for speculative execution.
+     *
+     * # Arguments
+     *
+     * * `options` - The options for speculative execution.
+     *
+     * # Returns
+     *
+     * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
+     * @param {getSpeculativeExecDeployOptions | null} [options]
+     * @returns {Promise<SpeculativeExecResult>}
+     */
+    speculative_exec_deploy(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getSpeculativeExecDeployOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_speculative_exec_deploy(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * JavaScript Alias for `put_transaction`.
+     * @param {Transaction} transaction
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<PutTransactionResult>}
+     */
+    account_put_transaction(transaction, verbosity, rpc_address) {
+        _assertClass(transaction, Transaction);
+        var ptr0 = transaction.__destroy_into_raw();
+        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_account_put_transaction(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
+        return ret;
+    }
+    /**
+     * Puts a transaction using the provided options.
+     *
+     * # Arguments
+     *
+     * * `transaction` - The `Transaction` object to be sent.
+     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the transaction process.
+     * @param {Transaction} transaction
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<PutTransactionResult>}
+     */
+    put_transaction(transaction, verbosity, rpc_address) {
+        _assertClass(transaction, Transaction);
+        var ptr0 = transaction.__destroy_into_raw();
+        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_put_transaction(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
+        return ret;
+    }
+    /**
      * JS function for transferring funds.
      *
      * # Arguments
@@ -8664,52 +7741,554 @@ export class SDK {
         return ret;
     }
     /**
-     * Installs a smart contract with the specified parameters and returns the result.
+     * Calls a smart contract entry point with the specified parameters and returns the result.
      *
      * # Arguments
-     * .
-     * * `transaction_params` - Transaction parameters.
-     * * `transaction_bytes` - Transaction Bytes to install
+     *
+     * * `deploy_params` - The deploy parameters.
+     * * `session_params` - The session parameters.
+     * * `payment_amount` - The payment amount as a string.
      * * `rpc_address` - An optional rpc address to send the request to.
      *
      * # Returns
      *
-     * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+     * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
      *
      * # Errors
      *
-     * Returns a `JsError` if there is an error during the installation.
-     * @param {TransactionStrParams} transaction_params
-     * @param {Bytes} transaction_bytes
+     * Returns a `JsError` if there is an error during the call.
+     * @param {DeployStrParams} deploy_params
+     * @param {SessionStrParams} session_params
+     * @param {string} payment_amount
      * @param {string | null} [rpc_address]
-     * @returns {Promise<PutTransactionResult>}
+     * @returns {Promise<PutDeployResult>}
      */
-    install(transaction_params, transaction_bytes, rpc_address) {
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr0 = transaction_params.__destroy_into_raw();
-        _assertClass(transaction_bytes, Bytes);
-        var ptr1 = transaction_bytes.__destroy_into_raw();
-        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len2 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, ptr1, ptr2, len2);
+    call_entrypoint_deploy(deploy_params, session_params, payment_amount, rpc_address) {
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr0 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr1 = session_params.__destroy_into_raw();
+        const ptr2 = passStringToWasm0(payment_amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len3 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_call_entrypoint_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
         return ret;
+    }
+    /**
+     * JavaScript function for query_contract_dict with deserialized options.
+     * @param {queryContractDictOptions | null} [options]
+     * @returns {Promise<GetDictionaryItemResult>}
+     */
+    query_contract_dict(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, queryContractDictOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_query_contract_dict(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Parses era summary options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing era summary options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed era summary options as a `GetEraSummaryOptions` struct.
+     * @param {any} options
+     * @returns {getEraSummaryOptions}
+     */
+    get_era_summary_options(options) {
+        const ret = wasm.sdk_get_era_summary_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getEraSummaryOptions.__wrap(ret[0]);
+    }
+    /**
+     * Parses auction info options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing auction info options to be parsed.
+     *
+     * # Returns
+     *
+     * Result containing parsed auction info options as a `GetAuctionInfoOptions` struct,
+     * or a `JsError` if deserialization fails.
+     * @param {any} options
+     * @returns {getAuctionInfoOptions}
+     */
+    get_auction_info_options(options) {
+        const ret = wasm.sdk_get_auction_info_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getAuctionInfoOptions.__wrap(ret[0]);
+    }
+    /**
+     * Get options for speculative execution from a JavaScript value.
+     * @param {any} options
+     * @returns {getSpeculativeExecTxnOptions}
+     */
+    get_speculative_exec_options(options) {
+        const ret = wasm.sdk_get_speculative_exec_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getSpeculativeExecTxnOptions.__wrap(ret[0]);
+    }
+    /**
+     * Parses dictionary item options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing dictionary item options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed dictionary item options as a `GetDictionaryItemOptions` struct.
+     * @param {any} options
+     * @returns {getDictionaryItemOptions}
+     */
+    get_dictionary_item_options(options) {
+        const ret = wasm.sdk_get_dictionary_item_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getDictionaryItemOptions.__wrap(ret[0]);
+    }
+    /**
+     * Get options for speculative execution from a JavaScript value.
+     * @param {any} options
+     * @returns {getSpeculativeExecDeployOptions}
+     */
+    get_speculative_exec_deploy_options(options) {
+        const ret = wasm.sdk_get_speculative_exec_deploy_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getSpeculativeExecDeployOptions.__wrap(ret[0]);
+    }
+    /**
+     * JS function for `make_transaction`.
+     *
+     * # Arguments
+     *
+     * * `builder_params` - Transaction Builder parameters.
+     * * `transaction_params` - The transaction parameters.
+     *
+     * # Returns
+     *
+     * A `Result` containing the created `Transaction` or a `JsError` in case of an error.
+     * @param {TransactionBuilderParams} builder_params
+     * @param {TransactionStrParams} transaction_params
+     * @returns {Transaction}
+     */
+    make_transaction(builder_params, transaction_params) {
+        _assertClass(builder_params, TransactionBuilderParams);
+        var ptr0 = builder_params.__destroy_into_raw();
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr1 = transaction_params.__destroy_into_raw();
+        const ret = wasm.sdk_make_transaction(this.__wbg_ptr, ptr0, ptr1);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return Transaction.__wrap(ret[0]);
+    }
+    /**
+     * Deserialize query_contract_dict_options from a JavaScript object.
+     * @param {any} options
+     * @returns {queryContractDictOptions}
+     */
+    query_contract_dict_options(options) {
+        const ret = wasm.sdk_query_contract_dict_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return queryContractDictOptions.__wrap(ret[0]);
+    }
+    /**
+     * Retrieves account information using the provided options.
+     *
+     * This function is an asynchronous JavaScript binding for the Rust `get_account` method.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetAccountOptions` struct containing retrieval options, such as:
+     *   - `account_identifier`: Identifier for the account.
+     *   - `account_identifier_as_string`: String representation of the account identifier.
+     *   - `maybe_block_id_as_string`: Optional string representation of the block ID.
+     *   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
+     *   - `verbosity`: Verbosity level for the output.
+     *   - `rpc_address`: Address of the node to query.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetAccountResult` on success or a `JsError` on failure.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
+     * ```
+     * @param {getAccountOptions | null} [options]
+     * @returns {Promise<GetAccountResult>}
+     */
+    get_account(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getAccountOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_account(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * @param {getAccountOptions | null} [options]
+     * @returns {Promise<GetAccountResult>}
+     */
+    state_get_account_info(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getAccountOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_state_get_account_info(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * JS function for speculative transfer transaction.
+     *
+     * # Arguments
+     *
+     * * `maybe_source` - Optional transfer source uref.
+     * * `target_account` - The target account.
+     * * `amount` - The amount to transfer.
+     * * `maybe_id` - An optional transfer ID (defaults to a random number).
+     * * `transaction_params` - The transactionment parameters.
+     * * `verbosity` - The verbosity level for logging (optional).
+     * * `rpc_address` - The address of the node to connect to (optional).
+     *
+     * # Returns
+     *
+     * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+     * @param {URef | null | undefined} maybe_source
+     * @param {string} target_account
+     * @param {string} amount
+     * @param {TransactionStrParams} transaction_params
+     * @param {string | null} [maybe_id]
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<SpeculativeExecTxnResult>}
+     */
+    speculative_transfer_transaction(maybe_source, target_account, amount, transaction_params, maybe_id, verbosity, rpc_address) {
+        let ptr0 = 0;
+        if (!isLikeNone(maybe_source)) {
+            _assertClass(maybe_source, URef);
+            ptr0 = maybe_source.__destroy_into_raw();
+        }
+        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr3 = transaction_params.__destroy_into_raw();
+        var ptr4 = isLikeNone(maybe_id) ? 0 : passStringToWasm0(maybe_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len4 = WASM_VECTOR_LEN;
+        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len5 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_speculative_transfer_transaction(this.__wbg_ptr, ptr0, ptr1, len1, ptr2, len2, ptr3, ptr4, len4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
+        return ret;
+    }
+    /**
+     * This function allows executing a deploy speculatively.
+     *
+     * # Arguments
+     *
+     * * `deploy_params` - Deployment parameters for the deploy.
+     * * `session_params` - Session parameters for the deploy.
+     * * `payment_params` - Payment parameters for the deploy.
+     * * `verbosity` - Optional verbosity level.
+     * * `rpc_address` - Optional rpc address.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
+     * @param {DeployStrParams} deploy_params
+     * @param {SessionStrParams} session_params
+     * @param {PaymentStrParams} payment_params
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<SpeculativeExecResult>}
+     */
+    speculative_deploy(deploy_params, session_params, payment_params, verbosity, rpc_address) {
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr0 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr1 = session_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr2 = payment_params.__destroy_into_raw();
+        var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len3 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_speculative_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, isLikeNone(verbosity) ? 3 : verbosity, ptr3, len3);
+        return ret;
+    }
+    /**
+     * JavaScript function for query_contract_key with deserialized options.
+     * @param {queryContractKeyOptions | null} [options]
+     * @returns {Promise<QueryGlobalStateResult>}
+     */
+    query_contract_key(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, queryContractKeyOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_query_contract_key(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<GetNodeStatusResult>}
+     */
+    info_get_status(verbosity, rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_info_get_status(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
+        return ret;
+    }
+    /**
+     * Retrieves node status information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetNodeStatusResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<GetNodeStatusResult>}
+     */
+    get_node_status(verbosity, rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_get_node_status(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
+        return ret;
+    }
+    /**
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<GetValidatorChangesResult>}
+     */
+    info_get_validator_change(verbosity, rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_info_get_validator_change(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
+        return ret;
+    }
+    /**
+     * Retrieves validator changes using the provided options.
+     *
+     * # Arguments
+     *
+     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetValidatorChangesResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<GetValidatorChangesResult>}
+     */
+    get_validator_changes(verbosity, rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_get_validator_changes(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
+        return ret;
+    }
+    /**
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<GetPeersResult>}
+     */
+    info_get_peers(verbosity, rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_info_get_peers(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
+        return ret;
+    }
+    /**
+     * Retrieves peers asynchronously.
+     *
+     * # Arguments
+     *
+     * * `verbosity` - Optional verbosity level.
+     * * `rpc_address` - Optional rpc address.
+     *
+     * # Returns
+     *
+     * A `Result` containing `GetPeersResult` or a `JsError` if an error occurs.
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<GetPeersResult>}
+     */
+    get_peers(verbosity, rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_get_peers(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
+        return ret;
+    }
+    /**
+     * Lists available RPCs using the provided options.
+     *
+     * # Arguments
+     *
+     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `ListRpcsResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the listing process.
+     * @param {Verbosity | null} [verbosity]
+     * @param {string | null} [rpc_address]
+     * @returns {Promise<ListRpcsResult>}
+     */
+    list_rpcs(verbosity, rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_list_rpcs(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
+        return ret;
+    }
+    /**
+     * @param {any} options
+     * @returns {getAccountOptions}
+     */
+    get_account_options(options) {
+        const ret = wasm.sdk_get_account_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getAccountOptions.__wrap(ret[0]);
+    }
+    /**
+     * JS function for `make_deploy`.
+     *
+     * # Arguments
+     *
+     * * `deploy_params` - The deploy parameters.
+     * * `session_params` - The session parameters.
+     * * `payment_params` - The payment parameters.
+     *
+     * # Returns
+     *
+     * A `Result` containing the created `Deploy` or a `JsError` in case of an error.
+     * @param {DeployStrParams} deploy_params
+     * @param {SessionStrParams} session_params
+     * @param {PaymentStrParams} payment_params
+     * @returns {Deploy}
+     */
+    make_deploy(deploy_params, session_params, payment_params) {
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr0 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr1 = session_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr2 = payment_params.__destroy_into_raw();
+        const ret = wasm.sdk_make_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return Deploy.__wrap(ret[0]);
+    }
+    /**
+     * JS function for `sign_deploy`.
+     *
+     * # Arguments
+     *
+     * * `deploy` - The deploy to sign.
+     * * `secret_key` - The secret key for signing.
+     *
+     * # Returns
+     *
+     * The signed `Deploy`.
+     * @param {Deploy} deploy
+     * @param {string} secret_key
+     * @returns {Deploy}
+     */
+    sign_deploy(deploy, secret_key) {
+        _assertClass(deploy, Deploy);
+        var ptr0 = deploy.__destroy_into_raw();
+        const ptr1 = passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_sign_deploy(this.__wbg_ptr, ptr0, ptr1, len1);
+        return Deploy.__wrap(ret);
+    }
+    /**
+     * JS function for `sign_transaction`.
+     *
+     * # Arguments
+     *
+     * * `transaction` - The transaction to sign.
+     * * `secret_key` - The secret key for signing.
+     *
+     * # Returns
+     *
+     * The signed `Transaction`.
+     * @param {Transaction} transaction
+     * @param {string} secret_key
+     * @returns {Transaction}
+     */
+    sign_transaction(transaction, secret_key) {
+        _assertClass(transaction, Transaction);
+        var ptr0 = transaction.__destroy_into_raw();
+        const ptr1 = passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_sign_transaction(this.__wbg_ptr, ptr0, ptr1, len1);
+        return Transaction.__wrap(ret);
+    }
+    /**
+     * Deserialize query_contract_key_options from a JavaScript object.
+     * @param {any} options
+     * @returns {queryContractKeyOptions}
+     */
+    query_contract_key_options(options) {
+        const ret = wasm.sdk_query_contract_key_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return queryContractKeyOptions.__wrap(ret[0]);
     }
 }
 if (Symbol.dispose) SDK.prototype[Symbol.dispose] = SDK.prototype.free;
 
-const SessionStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_sessionstrparams_free(ptr >>> 0, 1));
-
 export class SessionStrParams {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         SessionStrParamsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_sessionstrparams_free(ptr, 0);
@@ -8958,19 +8537,13 @@ export class SessionStrParams {
 }
 if (Symbol.dispose) SessionStrParams.prototype[Symbol.dispose] = SessionStrParams.prototype.free;
 
-const SignatureResponseFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_signatureresponse_free(ptr >>> 0, 1));
-
 export class SignatureResponse {
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         SignatureResponseFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_signatureresponse_free(ptr, 0);
@@ -9009,12 +8582,7 @@ export class SignatureResponse {
 }
 if (Symbol.dispose) SignatureResponse.prototype[Symbol.dispose] = SignatureResponse.prototype.free;
 
-const SpeculativeExecResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_speculativeexecresult_free(ptr >>> 0, 1));
-
 export class SpeculativeExecResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(SpeculativeExecResult.prototype);
@@ -9022,14 +8590,12 @@ export class SpeculativeExecResult {
         SpeculativeExecResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         SpeculativeExecResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_speculativeexecresult_free(ptr, 0);
@@ -9069,12 +8635,7 @@ export class SpeculativeExecResult {
 }
 if (Symbol.dispose) SpeculativeExecResult.prototype[Symbol.dispose] = SpeculativeExecResult.prototype.free;
 
-const SpeculativeExecTxnResultFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_speculativeexectxnresult_free(ptr >>> 0, 1));
-
 export class SpeculativeExecTxnResult {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(SpeculativeExecTxnResult.prototype);
@@ -9082,14 +8643,12 @@ export class SpeculativeExecTxnResult {
         SpeculativeExecTxnResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         SpeculativeExecTxnResultFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_speculativeexectxnresult_free(ptr, 0);
@@ -9099,7 +8658,7 @@ export class SpeculativeExecTxnResult {
      * @returns {BlockHash}
      */
     get block_hash() {
-        const ret = wasm.speculativeexectxnresult_block_hash(this.__wbg_ptr);
+        const ret = wasm.speculativeexecresult_block_hash(this.__wbg_ptr);
         return BlockHash.__wrap(ret);
     }
     /**
@@ -9129,49 +8688,25 @@ export class SpeculativeExecTxnResult {
 }
 if (Symbol.dispose) SpeculativeExecTxnResult.prototype[Symbol.dispose] = SpeculativeExecTxnResult.prototype.free;
 
-const SubscriptionFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_subscription_free(ptr >>> 0, 1));
 /**
  * Represents a subscription to transaction events for wasm32 target architecture.
  */
 export class Subscription {
-
     static __unwrap(jsValue) {
         if (!(jsValue instanceof Subscription)) {
             return 0;
         }
         return jsValue.__destroy_into_raw();
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         SubscriptionFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_subscription_free(ptr, 0);
-    }
-    /**
-     * Constructor for Subscription for wasm32 target architecture.
-     *
-     * # Arguments
-     *
-     * * `transaction_hash` - Transaction hash to identify the subscription.
-     * * `event_handler_fn` - Handler function for transaction events.
-     * @param {string} target_hash
-     * @param {Function} event_handler_fn
-     */
-    constructor(target_hash, event_handler_fn) {
-        const ptr0 = passStringToWasm0(target_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.subscription_new(ptr0, len0, event_handler_fn);
-        this.__wbg_ptr = ret >>> 0;
-        SubscriptionFinalization.register(this, this.__wbg_ptr, this);
-        return this;
     }
     /**
      * Transaction target hash to identify the subscription.
@@ -9213,15 +8748,28 @@ export class Subscription {
     set eventHandlerFn(arg0) {
         wasm.__wbg_set_subscription_eventHandlerFn(this.__wbg_ptr, arg0);
     }
+    /**
+     * Constructor for Subscription for wasm32 target architecture.
+     *
+     * # Arguments
+     *
+     * * `transaction_hash` - Transaction hash to identify the subscription.
+     * * `event_handler_fn` - Handler function for transaction events.
+     * @param {string} target_hash
+     * @param {Function} event_handler_fn
+     */
+    constructor(target_hash, event_handler_fn) {
+        const ptr0 = passStringToWasm0(target_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.subscription_new(ptr0, len0, event_handler_fn);
+        this.__wbg_ptr = ret >>> 0;
+        SubscriptionFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
 }
 if (Symbol.dispose) Subscription.prototype[Symbol.dispose] = Subscription.prototype.free;
 
-const TransactionFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_transaction_free(ptr >>> 0, 1));
-
 export class Transaction {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(Transaction.prototype);
@@ -9229,14 +8777,12 @@ export class Transaction {
         TransactionFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         TransactionFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_transaction_free(ptr, 0);
@@ -9677,12 +9223,7 @@ export class Transaction {
 }
 if (Symbol.dispose) Transaction.prototype[Symbol.dispose] = Transaction.prototype.free;
 
-const TransactionBuilderParamsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_transactionbuilderparams_free(ptr >>> 0, 1));
-
 export class TransactionBuilderParams {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(TransactionBuilderParams.prototype);
@@ -9690,14 +9231,12 @@ export class TransactionBuilderParams {
         TransactionBuilderParamsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         TransactionBuilderParamsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_transactionbuilderparams_free(ptr, 0);
@@ -10205,12 +9744,7 @@ export class TransactionBuilderParams {
 }
 if (Symbol.dispose) TransactionBuilderParams.prototype[Symbol.dispose] = TransactionBuilderParams.prototype.free;
 
-const TransactionHashFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_transactionhash_free(ptr >>> 0, 1));
-
 export class TransactionHash {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(TransactionHash.prototype);
@@ -10218,14 +9752,12 @@ export class TransactionHash {
         TransactionHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         TransactionHashFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_transactionhash_free(ptr, 0);
@@ -10292,14 +9824,27 @@ export class TransactionHash {
 }
 if (Symbol.dispose) TransactionHash.prototype[Symbol.dispose] = TransactionHash.prototype.free;
 
-const TransactionProcessedFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_transactionprocessed_free(ptr >>> 0, 1));
+/**
+ * @enum {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10}
+ */
+export const TransactionKind = Object.freeze({
+    InvocableEntity: 0, "0": "InvocableEntity",
+    InvocableEntityAlias: 1, "1": "InvocableEntityAlias",
+    Package: 2, "2": "Package",
+    PackageAlias: 3, "3": "PackageAlias",
+    Session: 4, "4": "Session",
+    Transfer: 5, "5": "Transfer",
+    AddBid: 6, "6": "AddBid",
+    Delegate: 7, "7": "Delegate",
+    Undelegate: 8, "8": "Undelegate",
+    Redelegate: 9, "9": "Redelegate",
+    WithdrawBid: 10, "10": "WithdrawBid",
+});
+
 /**
  * Represents processed deploy information.
  */
 export class TransactionProcessed {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(TransactionProcessed.prototype);
@@ -10307,14 +9852,12 @@ export class TransactionProcessed {
         TransactionProcessedFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         TransactionProcessedFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_transactionprocessed_free(ptr, 0);
@@ -10455,12 +9998,7 @@ export class TransactionProcessed {
 }
 if (Symbol.dispose) TransactionProcessed.prototype[Symbol.dispose] = TransactionProcessed.prototype.free;
 
-const TransactionStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_transactionstrparams_free(ptr >>> 0, 1));
-
 export class TransactionStrParams {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(TransactionStrParams.prototype);
@@ -10468,14 +10006,12 @@ export class TransactionStrParams {
         TransactionStrParamsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         TransactionStrParamsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_transactionstrparams_free(ptr, 0);
@@ -10866,12 +10402,7 @@ export class TransactionStrParams {
 }
 if (Symbol.dispose) TransactionStrParams.prototype[Symbol.dispose] = TransactionStrParams.prototype.free;
 
-const TransferAddrFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_transferaddr_free(ptr >>> 0, 1));
-
 export class TransferAddr {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(TransferAddr.prototype);
@@ -10879,14 +10410,12 @@ export class TransferAddr {
         TransferAddrFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         TransferAddrFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_transferaddr_free(ptr, 0);
@@ -10908,12 +10437,7 @@ export class TransferAddr {
 }
 if (Symbol.dispose) TransferAddr.prototype[Symbol.dispose] = TransferAddr.prototype.free;
 
-const TransferTargetFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_transfertarget_free(ptr >>> 0, 1));
-
 export class TransferTarget {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(TransferTarget.prototype);
@@ -10921,14 +10445,12 @@ export class TransferTarget {
         TransferTargetFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         TransferTargetFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_transfertarget_free(ptr, 0);
@@ -10963,12 +10485,16 @@ export class TransferTarget {
 }
 if (Symbol.dispose) TransferTarget.prototype[Symbol.dispose] = TransferTarget.prototype.free;
 
-const URefFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_uref_free(ptr >>> 0, 1));
+/**
+ * @enum {0 | 1 | 2}
+ */
+export const TransferTargetKind = Object.freeze({
+    PublicKey: 0, "0": "PublicKey",
+    AccountHash: 1, "1": "AccountHash",
+    URef: 2, "2": "URef",
+});
 
 export class URef {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(URef.prototype);
@@ -10976,14 +10502,12 @@ export class URef {
         URefFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         URefFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_uref_free(ptr, 0);
@@ -11052,12 +10576,7 @@ export class URef {
 }
 if (Symbol.dispose) URef.prototype[Symbol.dispose] = URef.prototype.free;
 
-const URefAddrFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_urefaddr_free(ptr >>> 0, 1));
-
 export class URefAddr {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(URefAddr.prototype);
@@ -11065,14 +10584,12 @@ export class URefAddr {
         URefAddrFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         URefAddrFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_urefaddr_free(ptr, 0);
@@ -11094,14 +10611,19 @@ export class URefAddr {
 }
 if (Symbol.dispose) URefAddr.prototype[Symbol.dispose] = URefAddr.prototype.free;
 
-const Version2Finalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_version2_free(ptr >>> 0, 1));
+/**
+ * @enum {0 | 1 | 2}
+ */
+export const Verbosity = Object.freeze({
+    Low: 0, "0": "Low",
+    Medium: 1, "1": "Medium",
+    High: 2, "2": "High",
+});
+
 /**
  * Represents a success response containing a cost value.
  */
 export class Version2 {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(Version2.prototype);
@@ -11109,14 +10631,12 @@ export class Version2 {
         Version2Finalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         Version2Finalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_version2_free(ptr, 0);
@@ -11125,7 +10645,7 @@ export class Version2 {
      * @returns {PublicKeyString}
      */
     get initiator() {
-        const ret = wasm.__wbg_get_version2_initiator(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_transactionprocessed_hash(this.__wbg_ptr);
         return PublicKeyString.__wrap(ret);
     }
     /**
@@ -11228,9 +10748,6 @@ export class Version2 {
 }
 if (Symbol.dispose) Version2.prototype[Symbol.dispose] = Version2.prototype.free;
 
-const WatcherFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_watcher_free(ptr >>> 0, 1));
 /**
  * Represents a deploy watcher responsible for monitoring transaction events.
  *
@@ -11245,7 +10762,6 @@ const WatcherFinalization = (typeof FinalizationRegistry === 'undefined')
  * * `timeout_duration` - Duration representing the optional timeout for watching events.
  */
 export class Watcher {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(Watcher.prototype);
@@ -11253,17 +10769,27 @@ export class Watcher {
         WatcherFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         WatcherFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_watcher_free(ptr, 0);
+    }
+    /**
+     * Starts watching for transaction events (JavaScript-friendly).
+     *
+     * # Returns
+     *
+     * Result containing the serialized transaction events data or an error message.
+     * @returns {Promise<any>}
+     */
+    start() {
+        const ret = wasm.watcher_start(this.__wbg_ptr);
+        return ret;
     }
     /**
      * Unsubscribes from transaction events based on the provided transaction hash.
@@ -11279,18 +10805,6 @@ export class Watcher {
         const ptr0 = passStringToWasm0(target_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         wasm.watcher_unsubscribe(this.__wbg_ptr, ptr0, len0);
-    }
-    /**
-     * Starts watching for transaction events (JavaScript-friendly).
-     *
-     * # Returns
-     *
-     * Result containing the serialized transaction events data or an error message.
-     * @returns {Promise<any>}
-     */
-    start() {
-        const ret = wasm.watcher_start(this.__wbg_ptr);
-        return ret;
     }
     /**
      * Subscribes to transaction events.
@@ -11346,12 +10860,104 @@ export class Watcher {
 }
 if (Symbol.dispose) Watcher.prototype[Symbol.dispose] = Watcher.prototype.free;
 
-const getAccountOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getaccountoptions_free(ptr >>> 0, 1));
+/**
+ * Converts a formatted account hash to a base64-encoded string (cep-18 key encoding).
+ *
+ *
+ * # Arguments
+ *
+ * * `formatted_account_hash` - A hex-formatted string representing the account hash.
+ * Example: "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+ *
+ * # Returns
+ *
+ * Returns the base64-encoded string.
+ * Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+ * @param {string} formatted_account_hash
+ * @returns {string}
+ */
+export function accountHashToBase64Key(formatted_account_hash) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(formatted_account_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.accountHashToBase64Key(ptr0, len0);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Encodes the given metadata using the lower-level Blake2b hashing algorithm.
+ *
+ * # Arguments
+ *
+ * * `meta_data` - A string containing the metadata to be hashed.
+ *
+ * # Returns
+ *
+ * A JsValue containing the hash generated using the Blake2b algorithm.
+ * @param {string} meta_data
+ * @returns {any}
+ */
+export function encodeLowerBlake2b(meta_data) {
+    const ptr0 = passStringToWasm0(meta_data, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.encodeLowerBlake2b(ptr0, len0);
+    return ret;
+}
+
+/**
+ * Generates a secret key using the Ed25519 algorithm and returns it as a PEM-encoded string.
+ *
+ * # Returns
+ *
+ * A `JsValue` containing the PEM-encoded secret key or a JavaScript error if an error occurs.
+ *
+ * # Errors
+ *
+ * Returns an error if the secret key generation or serialization fails.
+ * @returns {any}
+ */
+export function generateSecretKey() {
+    const ret = wasm.generateSecretKey();
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
+ * Generates a secret key using the secp256k1 algorithm and returns it as a PEM-encoded string.
+ *
+ * # Returns
+ *
+ * A `JsValue` containing the PEM-encoded secret key or a JavaScript error if an error occurs.
+ *
+ * # Errors
+ *
+ * Returns an error if the secret key generation or serialization fails.
+ * @returns {any}
+ */
+export function generateSecretKey_secp256k1() {
+    const ret = wasm.generateSecretKey_secp256k1();
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
 
 export class getAccountOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getAccountOptions.prototype);
@@ -11359,14 +10965,12 @@ export class getAccountOptions {
         getAccountOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getAccountOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getaccountoptions_free(ptr, 0);
@@ -11483,14 +11087,10 @@ export class getAccountOptions {
 }
 if (Symbol.dispose) getAccountOptions.prototype[Symbol.dispose] = getAccountOptions.prototype.free;
 
-const getAuctionInfoOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getauctioninfooptions_free(ptr >>> 0, 1));
 /**
  * Options for the `get_auction_info` method.
  */
 export class getAuctionInfoOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getAuctionInfoOptions.prototype);
@@ -11498,14 +11098,12 @@ export class getAuctionInfoOptions {
         getAuctionInfoOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getAuctionInfoOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getauctioninfooptions_free(ptr, 0);
@@ -11584,14 +11182,10 @@ export class getAuctionInfoOptions {
 }
 if (Symbol.dispose) getAuctionInfoOptions.prototype[Symbol.dispose] = getAuctionInfoOptions.prototype.free;
 
-const getBalanceOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getbalanceoptions_free(ptr >>> 0, 1));
 /**
  * Options for the `get_balance` method.
  */
 export class getBalanceOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getBalanceOptions.prototype);
@@ -11599,14 +11193,12 @@ export class getBalanceOptions {
         getBalanceOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getBalanceOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getbalanceoptions_free(ptr, 0);
@@ -11723,14 +11315,10 @@ export class getBalanceOptions {
 }
 if (Symbol.dispose) getBalanceOptions.prototype[Symbol.dispose] = getBalanceOptions.prototype.free;
 
-const getBlockOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getblockoptions_free(ptr >>> 0, 1));
 /**
  * Options for the `get_block` method.
  */
 export class getBlockOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getBlockOptions.prototype);
@@ -11738,14 +11326,12 @@ export class getBlockOptions {
         getBlockOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getBlockOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getblockoptions_free(ptr, 0);
@@ -11824,14 +11410,10 @@ export class getBlockOptions {
 }
 if (Symbol.dispose) getBlockOptions.prototype[Symbol.dispose] = getBlockOptions.prototype.free;
 
-const getBlockTransfersOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getblocktransfersoptions_free(ptr >>> 0, 1));
 /**
  * Options for the `get_block_transfers` method.
  */
 export class getBlockTransfersOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getBlockTransfersOptions.prototype);
@@ -11839,14 +11421,12 @@ export class getBlockTransfersOptions {
         getBlockTransfersOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getBlockTransfersOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getblocktransfersoptions_free(ptr, 0);
@@ -11925,14 +11505,10 @@ export class getBlockTransfersOptions {
 }
 if (Symbol.dispose) getBlockTransfersOptions.prototype[Symbol.dispose] = getBlockTransfersOptions.prototype.free;
 
-const getDeployOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getdeployoptions_free(ptr >>> 0, 1));
 /**
  * Options for the `get_deploy` method.
  */
 export class getDeployOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getDeployOptions.prototype);
@@ -11940,14 +11516,12 @@ export class getDeployOptions {
         getDeployOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getDeployOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getdeployoptions_free(ptr, 0);
@@ -12039,14 +11613,10 @@ export class getDeployOptions {
 }
 if (Symbol.dispose) getDeployOptions.prototype[Symbol.dispose] = getDeployOptions.prototype.free;
 
-const getDictionaryItemOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getdictionaryitemoptions_free(ptr >>> 0, 1));
 /**
  * Options for the `get_dictionary_item` method.
  */
 export class getDictionaryItemOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getDictionaryItemOptions.prototype);
@@ -12054,14 +11624,12 @@ export class getDictionaryItemOptions {
         getDictionaryItemOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getDictionaryItemOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getdictionaryitemoptions_free(ptr, 0);
@@ -12176,12 +11744,7 @@ export class getDictionaryItemOptions {
 }
 if (Symbol.dispose) getDictionaryItemOptions.prototype[Symbol.dispose] = getDictionaryItemOptions.prototype.free;
 
-const getEntityOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getentityoptions_free(ptr >>> 0, 1));
-
 export class getEntityOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getEntityOptions.prototype);
@@ -12189,14 +11752,12 @@ export class getEntityOptions {
         getEntityOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getEntityOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getentityoptions_free(ptr, 0);
@@ -12263,7 +11824,7 @@ export class getEntityOptions {
      * @returns {BlockIdentifier | undefined}
      */
     get maybe_block_identifier() {
-        const ret = wasm.__wbg_get_getblockoptions_maybe_block_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getentityoptions_maybe_block_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : BlockIdentifier.__wrap(ret);
     }
     /**
@@ -12275,7 +11836,7 @@ export class getEntityOptions {
             _assertClass(arg0, BlockIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getblockoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_getentityoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -12313,12 +11874,7 @@ export class getEntityOptions {
 }
 if (Symbol.dispose) getEntityOptions.prototype[Symbol.dispose] = getEntityOptions.prototype.free;
 
-const getEraInfoOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_geterainfooptions_free(ptr >>> 0, 1));
-
 export class getEraInfoOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getEraInfoOptions.prototype);
@@ -12326,14 +11882,12 @@ export class getEraInfoOptions {
         getEraInfoOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getEraInfoOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_geterainfooptions_free(ptr, 0);
@@ -12362,7 +11916,7 @@ export class getEraInfoOptions {
      * @returns {BlockIdentifier | undefined}
      */
     get maybe_block_identifier() {
-        const ret = wasm.__wbg_get_getaccountoptions_maybe_block_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getentityoptions_maybe_block_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : BlockIdentifier.__wrap(ret);
     }
     /**
@@ -12374,7 +11928,7 @@ export class getEraInfoOptions {
             _assertClass(arg0, BlockIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getaccountoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_getentityoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -12412,14 +11966,10 @@ export class getEraInfoOptions {
 }
 if (Symbol.dispose) getEraInfoOptions.prototype[Symbol.dispose] = getEraInfoOptions.prototype.free;
 
-const getEraSummaryOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_geterasummaryoptions_free(ptr >>> 0, 1));
 /**
  * Options for the `get_era_summary` method.
  */
 export class getEraSummaryOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getEraSummaryOptions.prototype);
@@ -12427,14 +11977,12 @@ export class getEraSummaryOptions {
         getEraSummaryOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getEraSummaryOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_geterasummaryoptions_free(ptr, 0);
@@ -12457,13 +12005,13 @@ export class getEraSummaryOptions {
     set maybe_block_id_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getblockoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getauctioninfooptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {BlockIdentifier | undefined}
      */
     get maybe_block_identifier() {
-        const ret = wasm.__wbg_get_getblockoptions_maybe_block_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getauctioninfooptions_maybe_block_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : BlockIdentifier.__wrap(ret);
     }
     /**
@@ -12475,7 +12023,7 @@ export class getEraSummaryOptions {
             _assertClass(arg0, BlockIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getblockoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_getauctioninfooptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -12495,32 +12043,28 @@ export class getEraSummaryOptions {
     set rpc_address(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getblockoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getauctioninfooptions_rpc_address(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {Verbosity | undefined}
      */
     get verbosity() {
-        const ret = wasm.__wbg_get_getblockoptions_verbosity(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getauctioninfooptions_verbosity(this.__wbg_ptr);
         return ret === 3 ? undefined : ret;
     }
     /**
      * @param {Verbosity | null} [arg0]
      */
     set verbosity(arg0) {
-        wasm.__wbg_set_getblockoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
+        wasm.__wbg_set_getauctioninfooptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
     }
 }
 if (Symbol.dispose) getEraSummaryOptions.prototype[Symbol.dispose] = getEraSummaryOptions.prototype.free;
 
-const getSpeculativeExecDeployOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getspeculativeexecdeployoptions_free(ptr >>> 0, 1));
 /**
  * Options for speculative execution.
  */
 export class getSpeculativeExecDeployOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getSpeculativeExecDeployOptions.prototype);
@@ -12528,14 +12072,12 @@ export class getSpeculativeExecDeployOptions {
         getSpeculativeExecDeployOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getSpeculativeExecDeployOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getspeculativeexecdeployoptions_free(ptr, 0);
@@ -12622,14 +12164,10 @@ export class getSpeculativeExecDeployOptions {
 }
 if (Symbol.dispose) getSpeculativeExecDeployOptions.prototype[Symbol.dispose] = getSpeculativeExecDeployOptions.prototype.free;
 
-const getSpeculativeExecTxnOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getspeculativeexectxnoptions_free(ptr >>> 0, 1));
 /**
  * Options for speculative execution.
  */
 export class getSpeculativeExecTxnOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getSpeculativeExecTxnOptions.prototype);
@@ -12637,14 +12175,12 @@ export class getSpeculativeExecTxnOptions {
         getSpeculativeExecTxnOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getSpeculativeExecTxnOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getspeculativeexectxnoptions_free(ptr, 0);
@@ -12669,7 +12205,7 @@ export class getSpeculativeExecTxnOptions {
     set transaction_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getspeculativeexectxnoptions_transaction_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getspeculativeexecdeployoptions_deploy_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * The transaction to execute.
@@ -12711,14 +12247,14 @@ export class getSpeculativeExecTxnOptions {
     set rpc_address(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getspeculativeexectxnoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getspeculativeexecdeployoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * The verbosity level for logging.
      * @returns {Verbosity | undefined}
      */
     get verbosity() {
-        const ret = wasm.__wbg_get_getspeculativeexectxnoptions_verbosity(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getspeculativeexecdeployoptions_verbosity(this.__wbg_ptr);
         return ret === 3 ? undefined : ret;
     }
     /**
@@ -12726,19 +12262,15 @@ export class getSpeculativeExecTxnOptions {
      * @param {Verbosity | null} [arg0]
      */
     set verbosity(arg0) {
-        wasm.__wbg_set_getspeculativeexectxnoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
+        wasm.__wbg_set_getspeculativeexecdeployoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
     }
 }
 if (Symbol.dispose) getSpeculativeExecTxnOptions.prototype[Symbol.dispose] = getSpeculativeExecTxnOptions.prototype.free;
 
-const getStateRootHashOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_getstateroothashoptions_free(ptr >>> 0, 1));
 /**
  * Options for the `get_state_root_hash` method.
  */
 export class getStateRootHashOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getStateRootHashOptions.prototype);
@@ -12746,14 +12278,12 @@ export class getStateRootHashOptions {
         getStateRootHashOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getStateRootHashOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_getstateroothashoptions_free(ptr, 0);
@@ -12776,13 +12306,13 @@ export class getStateRootHashOptions {
     set maybe_block_id_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getblocktransfersoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_geterainfooptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {BlockIdentifier | undefined}
      */
     get maybe_block_identifier() {
-        const ret = wasm.__wbg_get_getblocktransfersoptions_maybe_block_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getentityoptions_maybe_block_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : BlockIdentifier.__wrap(ret);
     }
     /**
@@ -12794,7 +12324,7 @@ export class getStateRootHashOptions {
             _assertClass(arg0, BlockIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getblocktransfersoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_getentityoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -12814,32 +12344,41 @@ export class getStateRootHashOptions {
     set rpc_address(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getblocktransfersoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_geterainfooptions_rpc_address(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {Verbosity | undefined}
      */
     get verbosity() {
-        const ret = wasm.__wbg_get_getblocktransfersoptions_verbosity(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_geterainfooptions_verbosity(this.__wbg_ptr);
         return ret === 3 ? undefined : ret;
     }
     /**
      * @param {Verbosity | null} [arg0]
      */
     set verbosity(arg0) {
-        wasm.__wbg_set_getblocktransfersoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
+        wasm.__wbg_set_geterainfooptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
     }
 }
 if (Symbol.dispose) getStateRootHashOptions.prototype[Symbol.dispose] = getStateRootHashOptions.prototype.free;
 
-const getTransactionOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_gettransactionoptions_free(ptr >>> 0, 1));
+/**
+ * Gets the current timestamp.
+ *
+ * # Returns
+ *
+ * A JsValue containing the current timestamp.
+ * @returns {any}
+ */
+export function getTimestamp() {
+    const ret = wasm.getTimestamp();
+    return ret;
+}
+
 /**
  * Options for the `get_transaction` method.
  */
 export class getTransactionOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(getTransactionOptions.prototype);
@@ -12847,14 +12386,12 @@ export class getTransactionOptions {
         getTransactionOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         getTransactionOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_gettransactionoptions_free(ptr, 0);
@@ -12877,7 +12414,7 @@ export class getTransactionOptions {
     set transaction_hash_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_gettransactionoptions_transaction_hash_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getdeployoptions_deploy_hash_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {TransactionHash | undefined}
@@ -12901,14 +12438,14 @@ export class getTransactionOptions {
      * @returns {boolean | undefined}
      */
     get finalized_approvals() {
-        const ret = wasm.__wbg_get_gettransactionoptions_finalized_approvals(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getdeployoptions_finalized_approvals(this.__wbg_ptr);
         return ret === 0xFFFFFF ? undefined : ret !== 0;
     }
     /**
      * @param {boolean | null} [arg0]
      */
     set finalized_approvals(arg0) {
-        wasm.__wbg_set_gettransactionoptions_finalized_approvals(this.__wbg_ptr, isLikeNone(arg0) ? 0xFFFFFF : arg0 ? 1 : 0);
+        wasm.__wbg_set_getdeployoptions_finalized_approvals(this.__wbg_ptr, isLikeNone(arg0) ? 0xFFFFFF : arg0 ? 1 : 0);
     }
     /**
      * @returns {string | undefined}
@@ -12928,32 +12465,242 @@ export class getTransactionOptions {
     set rpc_address(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_gettransactionoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getdeployoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {Verbosity | undefined}
      */
     get verbosity() {
-        const ret = wasm.__wbg_get_gettransactionoptions_verbosity(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getdeployoptions_verbosity(this.__wbg_ptr);
         return ret === 3 ? undefined : ret;
     }
     /**
      * @param {Verbosity | null} [arg0]
      */
     set verbosity(arg0) {
-        wasm.__wbg_set_gettransactionoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
+        wasm.__wbg_set_getdeployoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
     }
 }
 if (Symbol.dispose) getTransactionOptions.prototype[Symbol.dispose] = getTransactionOptions.prototype.free;
 
-const queryBalanceDetailsOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_querybalancedetailsoptions_free(ptr >>> 0, 1));
+/**
+ * Converts a hexadecimal string to a regular string.
+ *
+ * # Arguments
+ *
+ * * `hex_string` - The hexadecimal string to convert.
+ *
+ * # Returns
+ *
+ * A regular string containing the converted value.
+ * @param {string} hex_string
+ * @returns {string}
+ */
+export function hexToString(hex_string) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passStringToWasm0(hex_string, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.hexToString(ptr0, len0);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Converts a hexadecimal string to a Uint8Array.
+ *
+ * # Arguments
+ *
+ * * `hex_string` - The hexadecimal string to convert.
+ *
+ * # Returns
+ *
+ * A Uint8Array containing the converted value.
+ * @param {string} hex_string
+ * @returns {Uint8Array}
+ */
+export function hexToUint8Array(hex_string) {
+    const ptr0 = passStringToWasm0(hex_string, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.hexToUint8Array(ptr0, len0);
+    var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+    return v2;
+}
+
+/**
+ * Pretty prints a JSON value.
+ *
+ * # Arguments
+ *
+ * * `value` - The JSON value to pretty print.
+ * * `verbosity` - An optional verbosity level for pretty printing.
+ *
+ * # Returns
+ *
+ * A pretty printed JSON value as a JsValue.
+ * @param {any} value
+ * @param {Verbosity | null} [verbosity]
+ * @returns {any}
+ */
+export function jsonPrettyPrint(value, verbosity) {
+    const ret = wasm.jsonPrettyPrint(value, isLikeNone(verbosity) ? 3 : verbosity);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
+ * Converts a formatted key hash to a base64-encoded string (CEP-18 key encoding) for use in JavaScript.
+ *
+ * This function acts as a wrapper around `get_base64_key_from_key_hash` and maps errors to JavaScript-compatible errors.
+ *
+ * # Arguments
+ *
+ * * `formatted_key_hash` - A hex-formatted string representing the key hash.
+ * Example: "hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+ *
+ * # Returns
+ *
+ * Returns a `Result` containing the base64-encoded string on success.
+ * Example: "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+ *
+ * # Errors
+ *
+ * This function returns a `JsError` if:
+ * - The input string is not a valid formatted key hash.
+ * - The conversion to bytes or base64 encoding fails.
+ *
+ * The error message is formatted as a JavaScript-compatible string.
+ * @param {string} formatted_key_hash
+ * @returns {string}
+ */
+export function keyHashToBase64Key(formatted_key_hash) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(formatted_key_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.keyHashToBase64Key(ptr0, len0);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Converts a key and value into a formatted dictionary item key for ditionaries queries.
+ *
+ * # Arguments
+ *
+ * * `key` - A string representation of a account/contract hash as a Key.
+ * * `value` - A string representation of the value, for now restricted to parse as U256 or Key
+ *
+ * # Returns
+ *
+ * A string representing the formatted dictionary item key.
+ * @param {Key} key
+ * @param {string} value
+ * @returns {string}
+ */
+export function makeDictionaryItemKey(key, value) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        _assertClass(key, Key);
+        const ptr0 = passStringToWasm0(value, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.makeDictionaryItemKey(key.__wbg_ptr, ptr0, len0);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Converts motes to CSPR (Casper tokens).
+ *
+ * # Arguments
+ *
+ * * `motes` - The motes value to convert.
+ *
+ * # Returns
+ *
+ * A string representing the CSPR amount.
+ * @param {string} motes
+ * @returns {string}
+ */
+export function motesToCSPR(motes) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(motes, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.motesToCSPR(ptr0, len0);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Converts a secret key to a corresponding public key.
+ *
+ * # Arguments
+ *
+ * * `secret_key` - The secret key in PEM format.
+ *
+ * # Returns
+ *
+ * A JsValue containing the corresponding public key.
+ * If an error occurs during the conversion, JavaScript error is returned.
+ * @param {string} secret_key
+ * @returns {any}
+ */
+export function publicKeyFromSecretKey(secret_key) {
+    const ptr0 = passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.publicKeyFromSecretKey(ptr0, len0);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
 /**
  * Options for the `query_balance` method.
  */
 export class queryBalanceDetailsOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(queryBalanceDetailsOptions.prototype);
@@ -12961,14 +12708,12 @@ export class queryBalanceDetailsOptions {
         queryBalanceDetailsOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         queryBalanceDetailsOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_querybalancedetailsoptions_free(ptr, 0);
@@ -13123,14 +12868,10 @@ export class queryBalanceDetailsOptions {
 }
 if (Symbol.dispose) queryBalanceDetailsOptions.prototype[Symbol.dispose] = queryBalanceDetailsOptions.prototype.free;
 
-const queryBalanceOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_querybalanceoptions_free(ptr >>> 0, 1));
 /**
  * Options for the `query_balance` method.
  */
 export class queryBalanceOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(queryBalanceOptions.prototype);
@@ -13138,14 +12879,12 @@ export class queryBalanceOptions {
         queryBalanceOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         queryBalanceOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_querybalanceoptions_free(ptr, 0);
@@ -13300,12 +13039,7 @@ export class queryBalanceOptions {
 }
 if (Symbol.dispose) queryBalanceOptions.prototype[Symbol.dispose] = queryBalanceOptions.prototype.free;
 
-const queryContractDictOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_querycontractdictoptions_free(ptr >>> 0, 1));
-
 export class queryContractDictOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(queryContractDictOptions.prototype);
@@ -13313,14 +13047,12 @@ export class queryContractDictOptions {
         queryContractDictOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         queryContractDictOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_querycontractdictoptions_free(ptr, 0);
@@ -13435,12 +13167,7 @@ export class queryContractDictOptions {
 }
 if (Symbol.dispose) queryContractDictOptions.prototype[Symbol.dispose] = queryContractDictOptions.prototype.free;
 
-const queryContractKeyOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_querycontractkeyoptions_free(ptr >>> 0, 1));
-
 export class queryContractKeyOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(queryContractKeyOptions.prototype);
@@ -13448,14 +13175,12 @@ export class queryContractKeyOptions {
         queryContractKeyOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         queryContractKeyOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_querycontractkeyoptions_free(ptr, 0);
@@ -13464,7 +13189,7 @@ export class queryContractKeyOptions {
      * @returns {EntityIdentifier | undefined}
      */
     get entity_identifier() {
-        const ret = wasm.__wbg_get_getentityoptions_entity_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_querycontractkeyoptions_entity_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : EntityIdentifier.__wrap(ret);
     }
     /**
@@ -13476,7 +13201,7 @@ export class queryContractKeyOptions {
             _assertClass(arg0, EntityIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getentityoptions_entity_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_querycontractkeyoptions_entity_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -13496,13 +13221,13 @@ export class queryContractKeyOptions {
     set entity_identifier_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getentityoptions_entity_identifier_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getaccountoptions_account_identifier_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {BlockIdentifier | undefined}
      */
     get maybe_block_identifier() {
-        const ret = wasm.__wbg_get_getblockoptions_maybe_block_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getaccountoptions_maybe_block_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : BlockIdentifier.__wrap(ret);
     }
     /**
@@ -13514,7 +13239,7 @@ export class queryContractKeyOptions {
             _assertClass(arg0, BlockIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getblockoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_getaccountoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -13534,7 +13259,7 @@ export class queryContractKeyOptions {
     set maybe_block_id_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getentityoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getaccountoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {string | undefined}
@@ -13554,7 +13279,7 @@ export class queryContractKeyOptions {
     set path_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getentityoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getaccountoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {Path | undefined}
@@ -13610,14 +13335,10 @@ export class queryContractKeyOptions {
 }
 if (Symbol.dispose) queryContractKeyOptions.prototype[Symbol.dispose] = queryContractKeyOptions.prototype.free;
 
-const queryGlobalStateOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_queryglobalstateoptions_free(ptr >>> 0, 1));
 /**
  * Options for the `query_global_state` method.
  */
 export class queryGlobalStateOptions {
-
     static __wrap(ptr) {
         ptr = ptr >>> 0;
         const obj = Object.create(queryGlobalStateOptions.prototype);
@@ -13625,14 +13346,12 @@ export class queryGlobalStateOptions {
         queryGlobalStateOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
-
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
         queryGlobalStateOptionsFinalization.unregister(this);
         return ptr;
     }
-
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_queryglobalstateoptions_free(ptr, 0);
@@ -13825,6 +13544,24 @@ export class queryGlobalStateOptions {
 }
 if (Symbol.dispose) queryGlobalStateOptions.prototype[Symbol.dispose] = queryGlobalStateOptions.prototype.free;
 
+/**
+ * Converts a Uint8Array to a `Bytes` object.
+ *
+ * # Arguments
+ *
+ * * `uint8_array` - The Uint8Array to convert.
+ *
+ * # Returns
+ *
+ * A `Bytes` object containing the converted value.
+ * @param {Uint8Array} uint8_array
+ * @returns {Bytes}
+ */
+export function uint8ArrayToBytes(uint8_array) {
+    const ret = wasm.uint8ArrayToBytes(uint8_array);
+    return Bytes.__wrap(ret);
+}
+
 const EXPECTED_RESPONSE_TYPES = new Set(['basic', 'cors', 'default']);
 
 async function __wbg_load(module, imports) {
@@ -13832,7 +13569,6 @@ async function __wbg_load(module, imports) {
         if (typeof WebAssembly.instantiateStreaming === 'function') {
             try {
                 return await WebAssembly.instantiateStreaming(module, imports);
-
             } catch (e) {
                 const validResponse = module.ok && EXPECTED_RESPONSE_TYPES.has(module.type);
 
@@ -13847,13 +13583,11 @@ async function __wbg_load(module, imports) {
 
         const bytes = await module.arrayBuffer();
         return await WebAssembly.instantiate(bytes, imports);
-
     } else {
         const instance = await WebAssembly.instantiate(module, imports);
 
         if (instance instanceof WebAssembly.Instance) {
             return { instance, module };
-
         } else {
             return instance;
         }
@@ -13867,81 +13601,138 @@ function __wbg_get_imports() {
         const ret = CasperWalletProvider();
         return ret;
     };
-    imports.wbg.__wbg_Error_e17e777aac105295 = function(arg0, arg1) {
+    imports.wbg.__wbg_Error_52673b7de5a0ca89 = function(arg0, arg1) {
         const ret = Error(getStringFromWasm0(arg0, arg1));
         return ret;
     };
-    imports.wbg.__wbg_abort_67e1b49bf6614565 = function(arg0) {
+    imports.wbg.__wbg___wbindgen_boolean_get_dea25b33882b895b = function(arg0) {
+        const v = arg0;
+        const ret = typeof(v) === 'boolean' ? v : undefined;
+        return isLikeNone(ret) ? 0xFFFFFF : ret ? 1 : 0;
+    };
+    imports.wbg.__wbg___wbindgen_debug_string_adfb662ae34724b6 = function(arg0, arg1) {
+        const ret = debugString(arg1);
+        const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+    };
+    imports.wbg.__wbg___wbindgen_is_function_8d400b8b1af978cd = function(arg0) {
+        const ret = typeof(arg0) === 'function';
+        return ret;
+    };
+    imports.wbg.__wbg___wbindgen_is_null_dfda7d66506c95b5 = function(arg0) {
+        const ret = arg0 === null;
+        return ret;
+    };
+    imports.wbg.__wbg___wbindgen_is_object_ce774f3490692386 = function(arg0) {
+        const val = arg0;
+        const ret = typeof(val) === 'object' && val !== null;
+        return ret;
+    };
+    imports.wbg.__wbg___wbindgen_is_string_704ef9c8fc131030 = function(arg0) {
+        const ret = typeof(arg0) === 'string';
+        return ret;
+    };
+    imports.wbg.__wbg___wbindgen_is_undefined_f6b95eab589e0269 = function(arg0) {
+        const ret = arg0 === undefined;
+        return ret;
+    };
+    imports.wbg.__wbg___wbindgen_jsval_eq_b6101cc9cef1fe36 = function(arg0, arg1) {
+        const ret = arg0 === arg1;
+        return ret;
+    };
+    imports.wbg.__wbg___wbindgen_number_get_9619185a74197f95 = function(arg0, arg1) {
+        const obj = arg1;
+        const ret = typeof(obj) === 'number' ? obj : undefined;
+        getDataViewMemory0().setFloat64(arg0 + 8 * 1, isLikeNone(ret) ? 0 : ret, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, !isLikeNone(ret), true);
+    };
+    imports.wbg.__wbg___wbindgen_string_get_a2a31e16edf96e42 = function(arg0, arg1) {
+        const obj = arg1;
+        const ret = typeof(obj) === 'string' ? obj : undefined;
+        var ptr1 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+    };
+    imports.wbg.__wbg___wbindgen_throw_dd24417ed36fc46e = function(arg0, arg1) {
+        throw new Error(getStringFromWasm0(arg0, arg1));
+    };
+    imports.wbg.__wbg__wbg_cb_unref_87dfb5aaa0cbcea7 = function(arg0) {
+        arg0._wbg_cb_unref();
+    };
+    imports.wbg.__wbg_abort_07646c894ebbf2bd = function(arg0) {
         arg0.abort();
     };
-    imports.wbg.__wbg_abort_d830bf2e9aa6ec5b = function(arg0, arg1) {
+    imports.wbg.__wbg_abort_399ecbcfd6ef3c8e = function(arg0, arg1) {
         arg0.abort(arg1);
     };
-    imports.wbg.__wbg_append_72a3c0addd2bce38 = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
+    imports.wbg.__wbg_append_c5cbdf46455cc776 = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
         arg0.append(getStringFromWasm0(arg1, arg2), getStringFromWasm0(arg3, arg4));
     }, arguments) };
-    imports.wbg.__wbg_apply_dc50eb58583d2a57 = function() { return handleError(function (arg0, arg1, arg2) {
+    imports.wbg.__wbg_apply_52e9ae668d017009 = function() { return handleError(function (arg0, arg1, arg2) {
         const ret = arg0.apply(arg1, arg2);
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_arrayBuffer_9c99b8e2809e8cbb = function() { return handleError(function (arg0) {
+    imports.wbg.__wbg_arrayBuffer_c04af4fce566092d = function() { return handleError(function (arg0) {
         const ret = arg0.arrayBuffer();
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_body_4851aa049324a851 = function(arg0) {
+    imports.wbg.__wbg_body_947b901c33f7fe32 = function(arg0) {
         const ret = arg0.body;
         return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
     };
-    imports.wbg.__wbg_buffer_8d40b1d762fb3c66 = function(arg0) {
+    imports.wbg.__wbg_buffer_6cb2fecb1f253d71 = function(arg0) {
         const ret = arg0.buffer;
         return ret;
     };
-    imports.wbg.__wbg_byobRequest_2c036bceca1e6037 = function(arg0) {
+    imports.wbg.__wbg_byobRequest_f8e3517f5f8ad284 = function(arg0) {
         const ret = arg0.byobRequest;
         return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
     };
-    imports.wbg.__wbg_byteLength_331a6b5545834024 = function(arg0) {
+    imports.wbg.__wbg_byteLength_faa9938885bdeee6 = function(arg0) {
         const ret = arg0.byteLength;
         return ret;
     };
-    imports.wbg.__wbg_byteOffset_49a5b5608000358b = function(arg0) {
+    imports.wbg.__wbg_byteOffset_3868b6a19ba01dea = function(arg0) {
         const ret = arg0.byteOffset;
         return ret;
     };
-    imports.wbg.__wbg_call_13410aac570ffff7 = function() { return handleError(function (arg0, arg1) {
-        const ret = arg0.call(arg1);
-        return ret;
-    }, arguments) };
-    imports.wbg.__wbg_call_a5400b25a865cfd8 = function() { return handleError(function (arg0, arg1, arg2) {
+    imports.wbg.__wbg_call_3020136f7a2d6e44 = function() { return handleError(function (arg0, arg1, arg2) {
         const ret = arg0.call(arg1, arg2);
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_cancel_8bb5b8f4906b658a = function(arg0) {
+    imports.wbg.__wbg_call_abb4ff46ce38be40 = function() { return handleError(function (arg0, arg1) {
+        const ret = arg0.call(arg1);
+        return ret;
+    }, arguments) };
+    imports.wbg.__wbg_cancel_a65cf45dca50ba4c = function(arg0) {
         const ret = arg0.cancel();
         return ret;
     };
-    imports.wbg.__wbg_catch_c80ecae90cb8ed4e = function(arg0, arg1) {
+    imports.wbg.__wbg_catch_b9db41d97d42bd02 = function(arg0, arg1) {
         const ret = arg0.catch(arg1);
         return ret;
     };
-    imports.wbg.__wbg_clearTimeout_7a42b49784aea641 = function(arg0) {
+    imports.wbg.__wbg_clearTimeout_42d9ccd50822fd3a = function(arg0) {
         const ret = clearTimeout(arg0);
         return ret;
     };
-    imports.wbg.__wbg_close_6437264570d2d37f = function() { return handleError(function (arg0) {
+    imports.wbg.__wbg_close_0af5661bf3d335f2 = function() { return handleError(function (arg0) {
         arg0.close();
     }, arguments) };
-    imports.wbg.__wbg_close_cccada6053ee3a65 = function() { return handleError(function (arg0) {
+    imports.wbg.__wbg_close_1db3952de1b5b1cf = function() { return handleError(function (arg0) {
         arg0.close();
     }, arguments) };
-    imports.wbg.__wbg_close_d71a78219dc23e91 = function() { return handleError(function (arg0) {
+    imports.wbg.__wbg_close_3ec111e7b23d94d8 = function() { return handleError(function (arg0) {
         arg0.close();
     }, arguments) };
     imports.wbg.__wbg_crypto_574e78ad8b13b65f = function(arg0) {
         const ret = arg0.crypto;
         return ret;
     };
-    imports.wbg.__wbg_data_9ab529722bcc4e6c = function(arg0) {
+    imports.wbg.__wbg_data_8bf4ae669a78a688 = function(arg0) {
         const ret = arg0.data;
         return ret;
     };
@@ -13953,25 +13744,25 @@ function __wbg_get_imports() {
         const ret = arg0.disconnectFromSite();
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_done_75ed0ee6dd243d9d = function(arg0) {
+    imports.wbg.__wbg_done_62ea16af4ce34b24 = function(arg0) {
         const ret = arg0.done;
         return ret;
     };
-    imports.wbg.__wbg_enqueue_452bc2343d1c2ff9 = function() { return handleError(function (arg0, arg1) {
+    imports.wbg.__wbg_enqueue_a7e6b1ee87963aad = function() { return handleError(function (arg0, arg1) {
         arg0.enqueue(arg1);
     }, arguments) };
     imports.wbg.__wbg_error_6ad78a09c1736ccd = function(arg0, arg1) {
         console.error(getStringFromWasm0(arg0, arg1));
     };
-    imports.wbg.__wbg_eval_631dc78d65611b94 = function() { return handleError(function (arg0, arg1) {
+    imports.wbg.__wbg_eval_aa18aa048f37d16d = function() { return handleError(function (arg0, arg1) {
         const ret = eval(getStringFromWasm0(arg0, arg1));
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_fetch_74a3e84ebd2c9a0e = function(arg0) {
+    imports.wbg.__wbg_fetch_6bbc32f991730587 = function(arg0) {
         const ret = fetch(arg0);
         return ret;
     };
-    imports.wbg.__wbg_fetch_87aed7f306ec6d63 = function(arg0, arg1) {
+    imports.wbg.__wbg_fetch_90447c28cc0b095e = function(arg0, arg1) {
         const ret = arg0.fetch(arg1);
         return ret;
     };
@@ -13989,7 +13780,7 @@ function __wbg_get_imports() {
         const ret = arg0.getReader();
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_getTime_6bb3f64e0f18f817 = function(arg0) {
+    imports.wbg.__wbg_getTime_ad1e9878a735af08 = function(arg0) {
         const ret = arg0.getTime();
         return ret;
     };
@@ -13997,14 +13788,26 @@ function __wbg_get_imports() {
         const ret = arg0.getVersion();
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_get_0da715ceaecea5c8 = function(arg0, arg1) {
+    imports.wbg.__wbg_get_6b7bd52aca3f9671 = function(arg0, arg1) {
         const ret = arg0[arg1 >>> 0];
         return ret;
     };
-    imports.wbg.__wbg_get_458e874b43b18b25 = function() { return handleError(function (arg0, arg1) {
+    imports.wbg.__wbg_get_af9dab7e9603ea93 = function() { return handleError(function (arg0, arg1) {
         const ret = Reflect.get(arg0, arg1);
         return ret;
     }, arguments) };
+    imports.wbg.__wbg_get_done_f98a6e62c4e18fb9 = function(arg0) {
+        const ret = arg0.done;
+        return isLikeNone(ret) ? 0xFFFFFF : ret ? 1 : 0;
+    };
+    imports.wbg.__wbg_get_index_4e7b3f629a0ab9cd = function(arg0, arg1) {
+        const ret = arg0[arg1 >>> 0];
+        return ret;
+    };
+    imports.wbg.__wbg_get_value_63e39884ef11812e = function(arg0) {
+        const ret = arg0.value;
+        return ret;
+    };
     imports.wbg.__wbg_getaccountresult_new = function(arg0) {
         const ret = GetAccountResult.__wrap(arg0);
         return ret;
@@ -14041,20 +13844,12 @@ function __wbg_get_imports() {
         const ret = GetDictionaryItemResult.__wrap(arg0);
         return ret;
     };
-    imports.wbg.__wbg_getdone_f026246f6bbe58d3 = function(arg0) {
-        const ret = arg0.done;
-        return isLikeNone(ret) ? 0xFFFFFF : ret ? 1 : 0;
-    };
     imports.wbg.__wbg_geterainforesult_new = function(arg0) {
         const ret = GetEraInfoResult.__wrap(arg0);
         return ret;
     };
     imports.wbg.__wbg_geterasummaryresult_new = function(arg0) {
         const ret = GetEraSummaryResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_getindex_61bb13d19869849b = function(arg0, arg1) {
-        const ret = arg0[arg1 >>> 0];
         return ret;
     };
     imports.wbg.__wbg_getnodestatusresult_new = function(arg0) {
@@ -14077,19 +13872,15 @@ function __wbg_get_imports() {
         const ret = GetValidatorChangesResult.__wrap(arg0);
         return ret;
     };
-    imports.wbg.__wbg_getvalue_31e5a08f61e5aa42 = function(arg0) {
-        const ret = arg0.value;
-        return ret;
-    };
-    imports.wbg.__wbg_has_b89e451f638123e3 = function() { return handleError(function (arg0, arg1) {
+    imports.wbg.__wbg_has_0e670569d65d3a45 = function() { return handleError(function (arg0, arg1) {
         const ret = Reflect.has(arg0, arg1);
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_headers_29fec3c72865cd75 = function(arg0) {
+    imports.wbg.__wbg_headers_654c30e1bcccc552 = function(arg0) {
         const ret = arg0.headers;
         return ret;
     };
-    imports.wbg.__wbg_instanceof_ArrayBuffer_67f3012529f6a2dd = function(arg0) {
+    imports.wbg.__wbg_instanceof_ArrayBuffer_f3320d2419cd0355 = function(arg0) {
         let result;
         try {
             result = arg0 instanceof ArrayBuffer;
@@ -14099,7 +13890,7 @@ function __wbg_get_imports() {
         const ret = result;
         return ret;
     };
-    imports.wbg.__wbg_instanceof_Blob_3db67efd3f1b960f = function(arg0) {
+    imports.wbg.__wbg_instanceof_Blob_e9c51ce33a4b6181 = function(arg0) {
         let result;
         try {
             result = arg0 instanceof Blob;
@@ -14109,7 +13900,7 @@ function __wbg_get_imports() {
         const ret = result;
         return ret;
     };
-    imports.wbg.__wbg_instanceof_Object_fbf5fef4952ff29b = function(arg0) {
+    imports.wbg.__wbg_instanceof_Object_577e21051f7bcb79 = function(arg0) {
         let result;
         try {
             result = arg0 instanceof Object;
@@ -14119,7 +13910,7 @@ function __wbg_get_imports() {
         const ret = result;
         return ret;
     };
-    imports.wbg.__wbg_instanceof_Promise_3ec9e849bf41bdb6 = function(arg0) {
+    imports.wbg.__wbg_instanceof_Promise_eca6c43a2610558d = function(arg0) {
         let result;
         try {
             result = arg0 instanceof Promise;
@@ -14129,7 +13920,7 @@ function __wbg_get_imports() {
         const ret = result;
         return ret;
     };
-    imports.wbg.__wbg_instanceof_Response_50fde2cd696850bf = function(arg0) {
+    imports.wbg.__wbg_instanceof_Response_cd74d1c2ac92cb0b = function(arg0) {
         let result;
         try {
             result = arg0 instanceof Response;
@@ -14139,7 +13930,7 @@ function __wbg_get_imports() {
         const ret = result;
         return ret;
     };
-    imports.wbg.__wbg_isArray_030cce220591fb41 = function(arg0) {
+    imports.wbg.__wbg_isArray_51fd9e6422c0a395 = function(arg0) {
         const ret = Array.isArray(arg0);
         return ret;
     };
@@ -14147,15 +13938,15 @@ function __wbg_get_imports() {
         const ret = arg0.isConnected();
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_iterator_f370b34483c71a1c = function() {
+    imports.wbg.__wbg_iterator_27b7c8b35ab3e86b = function() {
         const ret = Symbol.iterator;
         return ret;
     };
-    imports.wbg.__wbg_length_186546c51cd61acd = function(arg0) {
+    imports.wbg.__wbg_length_22ac23eaec9d8053 = function(arg0) {
         const ret = arg0.length;
         return ret;
     };
-    imports.wbg.__wbg_length_6bb7e81f9d7713e4 = function(arg0) {
+    imports.wbg.__wbg_length_d45040a40c570362 = function(arg0) {
         const ret = arg0.length;
         return ret;
     };
@@ -14181,26 +13972,50 @@ function __wbg_get_imports() {
         const ret = arg0.msCrypto;
         return ret;
     };
-    imports.wbg.__wbg_new0_b0a0a38c201e6df5 = function() {
+    imports.wbg.__wbg_new_0_23cedd11d9b40c9d = function() {
         const ret = new Date();
         return ret;
     };
-    imports.wbg.__wbg_new_19c25a3f2fa63a02 = function() {
+    imports.wbg.__wbg_new_111dde64cffa8ba1 = function() { return handleError(function () {
+        const ret = new FileReader();
+        return ret;
+    }, arguments) };
+    imports.wbg.__wbg_new_1ba21ce319a06297 = function() {
         const ret = new Object();
         return ret;
     };
-    imports.wbg.__wbg_new_1f3a344cf3123716 = function() {
+    imports.wbg.__wbg_new_25f239778d6112b9 = function() {
         const ret = new Array();
         return ret;
     };
-    imports.wbg.__wbg_new_2e3c58a15f39f5f9 = function(arg0, arg1) {
+    imports.wbg.__wbg_new_3c79b3bb1b32b7d3 = function() { return handleError(function () {
+        const ret = new Headers();
+        return ret;
+    }, arguments) };
+    imports.wbg.__wbg_new_6421f6084cc5bc5a = function(arg0) {
+        const ret = new Uint8Array(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_new_7c30d1f874652e62 = function() { return handleError(function (arg0, arg1) {
+        const ret = new WebSocket(getStringFromWasm0(arg0, arg1));
+        return ret;
+    }, arguments) };
+    imports.wbg.__wbg_new_881a222c65f168fc = function() { return handleError(function () {
+        const ret = new AbortController();
+        return ret;
+    }, arguments) };
+    imports.wbg.__wbg_new_df1173567d5ff028 = function(arg0, arg1) {
+        const ret = new Error(getStringFromWasm0(arg0, arg1));
+        return ret;
+    };
+    imports.wbg.__wbg_new_ff12d2b041fb48f1 = function(arg0, arg1) {
         try {
             var state0 = {a: arg0, b: arg1};
             var cb0 = (arg0, arg1) => {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_1219(a, state0.b, arg0, arg1);
+                    return wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___wasm_bindgen_941e259a0a2594c3___JsValue__wasm_bindgen_941e259a0a2594c3___JsValue_____(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -14211,55 +14026,31 @@ function __wbg_get_imports() {
             state0.a = state0.b = 0;
         }
     };
-    imports.wbg.__wbg_new_638ebfaedbf32a5e = function(arg0) {
-        const ret = new Uint8Array(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_new_66b9434b4e59b63e = function() { return handleError(function () {
-        const ret = new AbortController();
-        return ret;
-    }, arguments) };
-    imports.wbg.__wbg_new_bd4cca60314f67a3 = function() { return handleError(function () {
-        const ret = new FileReader();
-        return ret;
-    }, arguments) };
-    imports.wbg.__wbg_new_da9dc54c5db29dfa = function(arg0, arg1) {
-        const ret = new Error(getStringFromWasm0(arg0, arg1));
-        return ret;
-    };
-    imports.wbg.__wbg_new_e213f63d18b0de01 = function() { return handleError(function (arg0, arg1) {
-        const ret = new WebSocket(getStringFromWasm0(arg0, arg1));
-        return ret;
-    }, arguments) };
-    imports.wbg.__wbg_new_f6e53210afea8e45 = function() { return handleError(function () {
-        const ret = new Headers();
-        return ret;
-    }, arguments) };
-    imports.wbg.__wbg_newfromslice_074c56947bd43469 = function(arg0, arg1) {
+    imports.wbg.__wbg_new_from_slice_f9c22b9153b26992 = function(arg0, arg1) {
         const ret = new Uint8Array(getArrayU8FromWasm0(arg0, arg1));
         return ret;
     };
-    imports.wbg.__wbg_newnoargs_254190557c45b4ec = function(arg0, arg1) {
+    imports.wbg.__wbg_new_no_args_cb138f77cf6151ee = function(arg0, arg1) {
         const ret = new Function(getStringFromWasm0(arg0, arg1));
         return ret;
     };
-    imports.wbg.__wbg_newwithbyteoffsetandlength_e8f53910b4d42b45 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbg_new_with_byte_offset_and_length_d85c3da1fd8df149 = function(arg0, arg1, arg2) {
         const ret = new Uint8Array(arg0, arg1 >>> 0, arg2 >>> 0);
         return ret;
     };
-    imports.wbg.__wbg_newwithlength_a167dcc7aaa3ba77 = function(arg0) {
+    imports.wbg.__wbg_new_with_length_aa5eaf41d35235e5 = function(arg0) {
         const ret = new Uint8Array(arg0 >>> 0);
         return ret;
     };
-    imports.wbg.__wbg_newwithstrandinit_b5d168a29a3fd85f = function() { return handleError(function (arg0, arg1, arg2) {
+    imports.wbg.__wbg_new_with_str_and_init_c5748f76f5108934 = function() { return handleError(function (arg0, arg1, arg2) {
         const ret = new Request(getStringFromWasm0(arg0, arg1), arg2);
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_next_5b3530e612fde77d = function(arg0) {
+    imports.wbg.__wbg_next_138a17bbf04e926c = function(arg0) {
         const ret = arg0.next;
         return ret;
     };
-    imports.wbg.__wbg_next_692e82279131b03c = function() { return handleError(function (arg0) {
+    imports.wbg.__wbg_next_3cfe5c0fe2a4cc53 = function() { return handleError(function (arg0) {
         const ret = arg0.next();
         return ret;
     }, arguments) };
@@ -14267,7 +14058,7 @@ function __wbg_get_imports() {
         const ret = arg0.node;
         return ret;
     };
-    imports.wbg.__wbg_parse_442f5ba02e5eaf8b = function() { return handleError(function (arg0, arg1) {
+    imports.wbg.__wbg_parse_a09a54cf72639456 = function() { return handleError(function (arg0, arg1) {
         const ret = JSON.parse(getStringFromWasm0(arg0, arg1));
         return ret;
     }, arguments) };
@@ -14275,10 +14066,10 @@ function __wbg_get_imports() {
         const ret = arg0.process;
         return ret;
     };
-    imports.wbg.__wbg_prototypesetcall_3d4a26c1ed734349 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbg_prototypesetcall_dfe9b766cdc1f1fd = function(arg0, arg1, arg2) {
         Uint8Array.prototype.set.call(getArrayU8FromWasm0(arg0, arg1), arg2);
     };
-    imports.wbg.__wbg_push_330b2eb93e4e1212 = function(arg0, arg1) {
+    imports.wbg.__wbg_push_7d9be8f38fc13975 = function(arg0, arg1) {
         const ret = arg0.push(arg1);
         return ret;
     };
@@ -14302,28 +14093,28 @@ function __wbg_get_imports() {
         const ret = QueryGlobalStateResult.__wrap(arg0);
         return ret;
     };
-    imports.wbg.__wbg_queueMicrotask_25d0739ac89e8c88 = function(arg0) {
-        queueMicrotask(arg0);
-    };
-    imports.wbg.__wbg_queueMicrotask_4488407636f5bf24 = function(arg0) {
+    imports.wbg.__wbg_queueMicrotask_9b549dfce8865860 = function(arg0) {
         const ret = arg0.queueMicrotask;
         return ret;
+    };
+    imports.wbg.__wbg_queueMicrotask_fca69f5bfad613a5 = function(arg0) {
+        queueMicrotask(arg0);
     };
     imports.wbg.__wbg_randomFillSync_ac0988aba3254290 = function() { return handleError(function (arg0, arg1) {
         arg0.randomFillSync(arg1);
     }, arguments) };
-    imports.wbg.__wbg_readAsArrayBuffer_a9f65e0c524f16a0 = function() { return handleError(function (arg0, arg1) {
+    imports.wbg.__wbg_readAsArrayBuffer_0aca937439be3197 = function() { return handleError(function (arg0, arg1) {
         arg0.readAsArrayBuffer(arg1);
     }, arguments) };
-    imports.wbg.__wbg_read_bc925c758aa4d897 = function(arg0) {
+    imports.wbg.__wbg_read_39c4b35efcd03c25 = function(arg0) {
         const ret = arg0.read();
         return ret;
     };
-    imports.wbg.__wbg_readyState_b0d20ca4531d3797 = function(arg0) {
+    imports.wbg.__wbg_readyState_9d0976dcad561aa9 = function(arg0) {
         const ret = arg0.readyState;
         return ret;
     };
-    imports.wbg.__wbg_releaseLock_ff29b586502a8221 = function(arg0) {
+    imports.wbg.__wbg_releaseLock_a5912f590b185180 = function(arg0) {
         arg0.releaseLock();
     };
     imports.wbg.__wbg_requestConnection_0d19af49631c5be4 = function() { return handleError(function (arg0) {
@@ -14338,58 +14129,58 @@ function __wbg_get_imports() {
         const ret = module.require;
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_resolve_4055c623acdd6a1b = function(arg0) {
+    imports.wbg.__wbg_resolve_fd5bfbaa4ce36e1e = function(arg0) {
         const ret = Promise.resolve(arg0);
         return ret;
     };
-    imports.wbg.__wbg_respond_6c2c4e20ef85138e = function() { return handleError(function (arg0, arg1) {
+    imports.wbg.__wbg_respond_9f7fc54636c4a3af = function() { return handleError(function (arg0, arg1) {
         arg0.respond(arg1 >>> 0);
     }, arguments) };
-    imports.wbg.__wbg_result_f3b8657ddb4b49e7 = function() { return handleError(function (arg0) {
+    imports.wbg.__wbg_result_893437a1eaacc4df = function() { return handleError(function (arg0) {
         const ret = arg0.result;
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_setTimeout_7bb3429662ab1e70 = function(arg0, arg1) {
+    imports.wbg.__wbg_setTimeout_4ec014681668a581 = function(arg0, arg1) {
         const ret = setTimeout(arg0, arg1);
         return ret;
     };
-    imports.wbg.__wbg_set_1353b2a5e96bc48c = function(arg0, arg1, arg2) {
+    imports.wbg.__wbg_set_169e13b608078b7b = function(arg0, arg1, arg2) {
         arg0.set(getArrayU8FromWasm0(arg1, arg2));
     };
-    imports.wbg.__wbg_setbody_c8460bdf44147df8 = function(arg0, arg1) {
+    imports.wbg.__wbg_set_body_8e743242d6076a4f = function(arg0, arg1) {
         arg0.body = arg1;
     };
-    imports.wbg.__wbg_setcache_90ca4ad8a8ad40d3 = function(arg0, arg1) {
+    imports.wbg.__wbg_set_cache_0e437c7c8e838b9b = function(arg0, arg1) {
         arg0.cache = __wbindgen_enum_RequestCache[arg1];
     };
-    imports.wbg.__wbg_setcredentials_9cd60d632c9d5dfc = function(arg0, arg1) {
+    imports.wbg.__wbg_set_credentials_55ae7c3c106fd5be = function(arg0, arg1) {
         arg0.credentials = __wbindgen_enum_RequestCredentials[arg1];
     };
-    imports.wbg.__wbg_setheaders_0052283e2f3503d1 = function(arg0, arg1) {
+    imports.wbg.__wbg_set_headers_5671cf088e114d2b = function(arg0, arg1) {
         arg0.headers = arg1;
     };
-    imports.wbg.__wbg_setmethod_9b504d5b855b329c = function(arg0, arg1, arg2) {
+    imports.wbg.__wbg_set_method_76c69e41b3570627 = function(arg0, arg1, arg2) {
         arg0.method = getStringFromWasm0(arg1, arg2);
     };
-    imports.wbg.__wbg_setmode_a23e1a2ad8b512f8 = function(arg0, arg1) {
+    imports.wbg.__wbg_set_mode_611016a6818fc690 = function(arg0, arg1) {
         arg0.mode = __wbindgen_enum_RequestMode[arg1];
     };
-    imports.wbg.__wbg_setonclose_159c0332c2d91b09 = function(arg0, arg1) {
+    imports.wbg.__wbg_set_onclose_032729b3d7ed7a9e = function(arg0, arg1) {
         arg0.onclose = arg1;
     };
-    imports.wbg.__wbg_setonerror_5d9bff045f909e89 = function(arg0, arg1) {
+    imports.wbg.__wbg_set_onerror_7819daa6af176ddb = function(arg0, arg1) {
         arg0.onerror = arg1;
     };
-    imports.wbg.__wbg_setonload_d46edf64d5803ccb = function(arg0, arg1) {
+    imports.wbg.__wbg_set_onload_3ff2f72af5cc911d = function(arg0, arg1) {
         arg0.onload = arg1;
     };
-    imports.wbg.__wbg_setonmessage_5e486f326638a9da = function(arg0, arg1) {
+    imports.wbg.__wbg_set_onmessage_71321d0bed69856c = function(arg0, arg1) {
         arg0.onmessage = arg1;
     };
-    imports.wbg.__wbg_setonopen_3e43af381c2901f8 = function(arg0, arg1) {
+    imports.wbg.__wbg_set_onopen_6d4abedb27ba5656 = function(arg0, arg1) {
         arg0.onopen = arg1;
     };
-    imports.wbg.__wbg_setsignal_8c45ad1247a74809 = function(arg0, arg1) {
+    imports.wbg.__wbg_set_signal_e89be862d0091009 = function(arg0, arg1) {
         arg0.signal = arg1;
     };
     imports.wbg.__wbg_signMessage_ece9041053a46ba4 = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
@@ -14400,7 +14191,7 @@ function __wbg_get_imports() {
         const ret = arg0.sign(getStringFromWasm0(arg1, arg2), getStringFromWasm0(arg3, arg4));
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_signal_da4d466ce86118b5 = function(arg0) {
+    imports.wbg.__wbg_signal_3c14fbdc89694b39 = function(arg0) {
         const ret = arg0.signal;
         return ret;
     };
@@ -14412,31 +14203,31 @@ function __wbg_get_imports() {
         const ret = SpeculativeExecTxnResult.__wrap(arg0);
         return ret;
     };
-    imports.wbg.__wbg_static_accessor_GLOBAL_8921f820c2ce3f12 = function() {
+    imports.wbg.__wbg_static_accessor_GLOBAL_769e6b65d6557335 = function() {
         const ret = typeof global === 'undefined' ? null : global;
         return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
     };
-    imports.wbg.__wbg_static_accessor_GLOBAL_THIS_f0a4409105898184 = function() {
+    imports.wbg.__wbg_static_accessor_GLOBAL_THIS_60cf02db4de8e1c1 = function() {
         const ret = typeof globalThis === 'undefined' ? null : globalThis;
         return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
     };
-    imports.wbg.__wbg_static_accessor_SELF_995b214ae681ff99 = function() {
+    imports.wbg.__wbg_static_accessor_SELF_08f5a74c69739274 = function() {
         const ret = typeof self === 'undefined' ? null : self;
         return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
     };
-    imports.wbg.__wbg_static_accessor_WINDOW_cde3890479c675ea = function() {
+    imports.wbg.__wbg_static_accessor_WINDOW_a8924b26aa92d024 = function() {
         const ret = typeof window === 'undefined' ? null : window;
         return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
     };
-    imports.wbg.__wbg_status_3fea3036088621d6 = function(arg0) {
+    imports.wbg.__wbg_status_9bfc680efca4bdfd = function(arg0) {
         const ret = arg0.status;
         return ret;
     };
-    imports.wbg.__wbg_stringify_b98c93d0a190446a = function() { return handleError(function (arg0) {
+    imports.wbg.__wbg_stringify_655a6390e1f5eb6b = function() { return handleError(function (arg0) {
         const ret = JSON.stringify(arg0);
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_subarray_70fd07feefe14294 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbg_subarray_845f2f5bce7d061a = function(arg0, arg1, arg2) {
         const ret = arg0.subarray(arg1 >>> 0, arg2 >>> 0);
         return ret;
     };
@@ -14444,11 +14235,11 @@ function __wbg_get_imports() {
         const ret = Subscription.__unwrap(arg0);
         return ret;
     };
-    imports.wbg.__wbg_then_b33a773d723afa3e = function(arg0, arg1, arg2) {
+    imports.wbg.__wbg_then_429f7caf1026411d = function(arg0, arg1, arg2) {
         const ret = arg0.then(arg1, arg2);
         return ret;
     };
-    imports.wbg.__wbg_then_e22500defe16819f = function(arg0, arg1) {
+    imports.wbg.__wbg_then_4f95312d68691235 = function(arg0, arg1) {
         const ret = arg0.then(arg1);
         return ret;
     };
@@ -14456,21 +14247,21 @@ function __wbg_get_imports() {
         const ret = Transaction.__wrap(arg0);
         return ret;
     };
-    imports.wbg.__wbg_url_18b0690200329f32 = function(arg0, arg1) {
+    imports.wbg.__wbg_url_b6d11838a4f95198 = function(arg0, arg1) {
         const ret = arg1.url;
         const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
         getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
         getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
     };
-    imports.wbg.__wbg_url_e5720dfacf77b05e = function(arg0, arg1) {
+    imports.wbg.__wbg_url_df28eef824b04410 = function(arg0, arg1) {
         const ret = arg1.url;
         const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
         getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
         getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
     };
-    imports.wbg.__wbg_value_dd9372230531eade = function(arg0) {
+    imports.wbg.__wbg_value_57b7b035e117f7ee = function(arg0) {
         const ret = arg0.value;
         return ret;
     };
@@ -14478,96 +14269,33 @@ function __wbg_get_imports() {
         const ret = arg0.versions;
         return ret;
     };
-    imports.wbg.__wbg_view_91cc97d57ab30530 = function(arg0) {
+    imports.wbg.__wbg_view_788aaf149deefd2f = function(arg0) {
         const ret = arg0.view;
         return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
-    };
-    imports.wbg.__wbg_wbindgenbooleanget_3fe6f642c7d97746 = function(arg0) {
-        const v = arg0;
-        const ret = typeof(v) === 'boolean' ? v : undefined;
-        return isLikeNone(ret) ? 0xFFFFFF : ret ? 1 : 0;
-    };
-    imports.wbg.__wbg_wbindgencbdrop_eb10308566512b88 = function(arg0) {
-        const obj = arg0.original;
-        if (obj.cnt-- == 1) {
-            obj.a = 0;
-            return true;
-        }
-        const ret = false;
-        return ret;
-    };
-    imports.wbg.__wbg_wbindgendebugstring_99ef257a3ddda34d = function(arg0, arg1) {
-        const ret = debugString(arg1);
-        const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
-        getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
-    };
-    imports.wbg.__wbg_wbindgenisfunction_8cee7dce3725ae74 = function(arg0) {
-        const ret = typeof(arg0) === 'function';
-        return ret;
-    };
-    imports.wbg.__wbg_wbindgenisnull_f3037694abe4d97a = function(arg0) {
-        const ret = arg0 === null;
-        return ret;
-    };
-    imports.wbg.__wbg_wbindgenisobject_307a53c6bd97fbf8 = function(arg0) {
-        const val = arg0;
-        const ret = typeof(val) === 'object' && val !== null;
-        return ret;
-    };
-    imports.wbg.__wbg_wbindgenisstring_d4fa939789f003b0 = function(arg0) {
-        const ret = typeof(arg0) === 'string';
-        return ret;
-    };
-    imports.wbg.__wbg_wbindgenisundefined_c4b71d073b92f3c5 = function(arg0) {
-        const ret = arg0 === undefined;
-        return ret;
-    };
-    imports.wbg.__wbg_wbindgenjsvaleq_e6f2ad59ccae1b58 = function(arg0, arg1) {
-        const ret = arg0 === arg1;
-        return ret;
-    };
-    imports.wbg.__wbg_wbindgennumberget_f74b4c7525ac05cb = function(arg0, arg1) {
-        const obj = arg1;
-        const ret = typeof(obj) === 'number' ? obj : undefined;
-        getDataViewMemory0().setFloat64(arg0 + 8 * 1, isLikeNone(ret) ? 0 : ret, true);
-        getDataViewMemory0().setInt32(arg0 + 4 * 0, !isLikeNone(ret), true);
-    };
-    imports.wbg.__wbg_wbindgenstringget_0f16a6ddddef376f = function(arg0, arg1) {
-        const obj = arg1;
-        const ret = typeof(obj) === 'string' ? obj : undefined;
-        var ptr1 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len1 = WASM_VECTOR_LEN;
-        getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
-        getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
-    };
-    imports.wbg.__wbg_wbindgenthrow_451ec1a8469d7eb6 = function(arg0, arg1) {
-        throw new Error(getStringFromWasm0(arg0, arg1));
     };
     imports.wbg.__wbindgen_cast_2241b6af4c4b2941 = function(arg0, arg1) {
         // Cast intrinsic for `Ref(String) -> Externref`.
         const ret = getStringFromWasm0(arg0, arg1);
         return ret;
     };
-    imports.wbg.__wbindgen_cast_29917e0ace97935c = function(arg0, arg1) {
-        // Cast intrinsic for `Closure(Closure { dtor_idx: 1156, function: Function { arguments: [], shim_idx: 1157, ret: Unit, inner_ret: Some(Unit) }, mutable: true }) -> Externref`.
-        const ret = makeMutClosure(arg0, arg1, 1156, __wbg_adapter_9);
+    imports.wbg.__wbindgen_cast_3031707770302296 = function(arg0, arg1) {
+        // Cast intrinsic for `Closure(Closure { dtor_idx: 1201, function: Function { arguments: [Externref], shim_idx: 1202, ret: Unit, inner_ret: Some(Unit) }, mutable: true }) -> Externref`.
+        const ret = makeMutClosure(arg0, arg1, wasm.wasm_bindgen_941e259a0a2594c3___closure__destroy___dyn_core_f4e37bc59eeea00a___ops__function__FnMut__wasm_bindgen_941e259a0a2594c3___JsValue____Output_______, wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___wasm_bindgen_941e259a0a2594c3___JsValue_____);
         return ret;
     };
-    imports.wbg.__wbindgen_cast_392a9ce3fc705c1b = function(arg0, arg1) {
-        // Cast intrinsic for `Closure(Closure { dtor_idx: 1197, function: Function { arguments: [Externref], shim_idx: 1198, ret: Unit, inner_ret: Some(Unit) }, mutable: true }) -> Externref`.
-        const ret = makeMutClosure(arg0, arg1, 1197, __wbg_adapter_18);
+    imports.wbg.__wbindgen_cast_522553e075475075 = function(arg0, arg1) {
+        // Cast intrinsic for `Closure(Closure { dtor_idx: 982, function: Function { arguments: [NamedExternref("ProgressEvent")], shim_idx: 983, ret: Unit, inner_ret: Some(Unit) }, mutable: true }) -> Externref`.
+        const ret = makeMutClosure(arg0, arg1, wasm.wasm_bindgen_941e259a0a2594c3___closure__destroy___dyn_core_f4e37bc59eeea00a___ops__function__FnMut__web_sys_3db17fd0f0264d19___features__gen_MessageEvent__MessageEvent____Output_______, wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___web_sys_3db17fd0f0264d19___features__gen_MessageEvent__MessageEvent_____);
         return ret;
     };
-    imports.wbg.__wbindgen_cast_964528eb3bbd775e = function(arg0, arg1) {
-        // Cast intrinsic for `Closure(Closure { dtor_idx: 984, function: Function { arguments: [NamedExternref("ProgressEvent")], shim_idx: 985, ret: Unit, inner_ret: Some(Unit) }, mutable: true }) -> Externref`.
-        const ret = makeMutClosure(arg0, arg1, 984, __wbg_adapter_6);
+    imports.wbg.__wbindgen_cast_5eb91b8ebd61de94 = function(arg0, arg1) {
+        // Cast intrinsic for `Closure(Closure { dtor_idx: 982, function: Function { arguments: [NamedExternref("MessageEvent")], shim_idx: 983, ret: Unit, inner_ret: Some(Unit) }, mutable: true }) -> Externref`.
+        const ret = makeMutClosure(arg0, arg1, wasm.wasm_bindgen_941e259a0a2594c3___closure__destroy___dyn_core_f4e37bc59eeea00a___ops__function__FnMut__web_sys_3db17fd0f0264d19___features__gen_MessageEvent__MessageEvent____Output_______, wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke___web_sys_3db17fd0f0264d19___features__gen_MessageEvent__MessageEvent_____);
         return ret;
     };
-    imports.wbg.__wbindgen_cast_cb015d57dcfdd55b = function(arg0, arg1) {
-        // Cast intrinsic for `Closure(Closure { dtor_idx: 984, function: Function { arguments: [NamedExternref("MessageEvent")], shim_idx: 985, ret: Unit, inner_ret: Some(Unit) }, mutable: true }) -> Externref`.
-        const ret = makeMutClosure(arg0, arg1, 984, __wbg_adapter_6);
+    imports.wbg.__wbindgen_cast_975c24d23182c074 = function(arg0, arg1) {
+        // Cast intrinsic for `Closure(Closure { dtor_idx: 1150, function: Function { arguments: [], shim_idx: 1151, ret: Unit, inner_ret: Some(Unit) }, mutable: true }) -> Externref`.
+        const ret = makeMutClosure(arg0, arg1, wasm.wasm_bindgen_941e259a0a2594c3___closure__destroy___dyn_core_f4e37bc59eeea00a___ops__function__FnMut_____Output_______, wasm_bindgen_941e259a0a2594c3___convert__closures_____invoke______);
         return ret;
     };
     imports.wbg.__wbindgen_cast_cb9088102bce6b30 = function(arg0, arg1) {
@@ -14576,21 +14304,16 @@ function __wbg_get_imports() {
         return ret;
     };
     imports.wbg.__wbindgen_init_externref_table = function() {
-        const table = wasm.__wbindgen_export_2;
+        const table = wasm.__wbindgen_externrefs;
         const offset = table.grow(4);
         table.set(0, undefined);
         table.set(offset + 0, undefined);
         table.set(offset + 1, null);
         table.set(offset + 2, true);
         table.set(offset + 3, false);
-        ;
     };
 
     return imports;
-}
-
-function __wbg_init_memory(imports, memory) {
-
 }
 
 function __wbg_finalize_init(instance, module) {
@@ -14617,15 +14340,10 @@ function initSync(module) {
     }
 
     const imports = __wbg_get_imports();
-
-    __wbg_init_memory(imports);
-
     if (!(module instanceof WebAssembly.Module)) {
         module = new WebAssembly.Module(module);
     }
-
     const instance = new WebAssembly.Instance(module, imports);
-
     return __wbg_finalize_init(instance, module);
 }
 
@@ -14649,8 +14367,6 @@ async function __wbg_init(module_or_path) {
     if (typeof module_or_path === 'string' || (typeof Request === 'function' && module_or_path instanceof Request) || (typeof URL === 'function' && module_or_path instanceof URL)) {
         module_or_path = fetch(module_or_path);
     }
-
-    __wbg_init_memory(imports);
 
     const { instance, module } = await __wbg_load(await module_or_path, imports);
 
