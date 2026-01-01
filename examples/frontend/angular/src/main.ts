@@ -1,8 +1,4 @@
 import {
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
-import {
   enableProdMode,
   EnvironmentProviders,
   importProvidersFrom,
@@ -53,13 +49,7 @@ const providers: Array<Provider | EnvironmentProviders> = [
     useValue: (config['network'] as Network)?.node_address,
   },
   { provide: VERBOSITY, useValue: Verbosity[config['verbosity'] as Verbosity] },
-  importProvidersFrom([
-    provideHttpClient(
-      withInterceptorsFromDi(),
-    ) as unknown as ImportProvidersSource,
-    WasmModule,
-    ResultModule,
-  ]),
+  importProvidersFrom([WasmModule, ResultModule]),
 ];
 
 bootstrapApplication(AppComponent, { providers })
