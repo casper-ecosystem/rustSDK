@@ -10,6 +10,7 @@ import {
   Provider,
 } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
+import { provideRouter, Routes } from '@angular/router';
 import {
   NODE_ADDRESS,
   RPC_ADDRESS,
@@ -20,6 +21,8 @@ import {
 import { config, CONFIG, ENV, Network } from '@util/config';
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
+import { HealthComponent } from './app/health/health.component';
+import { HomeComponent } from './app/home/home.component';
 import { Verbosity } from 'casper-rust-wasm-sdk';
 import { ResultModule } from '@util/result';
 
@@ -40,7 +43,14 @@ config['network'] = networks.find(
   (x) => x.name == environment['default_network'].toString(),
 ) as object;
 
+const routes: Routes = [
+  { path: 'health', component: HealthComponent },
+  { path: '', component: HomeComponent },
+  { path: '**', redirectTo: '' },
+];
+
 const providers: Array<Provider | EnvironmentProviders> = [
+  provideRouter(routes),
   { provide: ENV, useValue: environment },
   { provide: CONFIG, useValue: config },
   { provide: WASM_ASSET_PATH, useValue: config['wasm_asset_path'] as string },
