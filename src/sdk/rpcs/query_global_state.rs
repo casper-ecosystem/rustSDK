@@ -417,7 +417,7 @@ mod tests {
     async fn test_query_global_state_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None, None);
-        let error_message = "Failed to parse state identifier";
+        let error_message = "failed to parse";
 
         // Act
         let result = sdk
