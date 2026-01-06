@@ -6,7 +6,11 @@ services:
       dockerfile: ./docker/Dockerfile.cicd
       context: ../
     ports:
-      - '8080:8080'
+      - "8080:8080"
+    environment:
+      # Set BASE_HREF for subpath deployments (e.g., /webclient/)
+      # Defaults to / if not set
+      - BASE_HREF=${BASE_HREF:-/}
     networks:
       - casper-network
 

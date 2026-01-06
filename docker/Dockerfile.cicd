@@ -34,7 +34,12 @@ RUN npm install -g serve
 
 COPY --from=build --chown=node:node /app/dist/casper ./dist/
 
+# Copy and set up entrypoint script
+COPY --chown=node:node docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 EXPOSE 8080
 
-# Use serve with SPA mode which automatically serves index.html for all routes
+# Use entrypoint to set BASE_HREF dynamically, then serve
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["serve", "-s", "/app/dist", "-l", "8080"]
