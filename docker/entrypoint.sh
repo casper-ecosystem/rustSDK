@@ -7,6 +7,7 @@ BASE_HREF=${BASE_HREF:-/}
 echo "Entrypoint running. BASE_HREF=$BASE_HREF"
 
 INDEX_FILE="/app/dist/index.html"
+CONFIG_FILE="/app/dist/config.js"
 
 # Ensure BASE_HREF ends with a slash if it's not just "/"
 case "$BASE_HREF" in
@@ -19,6 +20,23 @@ esac
 if [ ! -f "$INDEX_FILE" ]; then
   echo "Warning: $INDEX_FILE not found!"
   exit 1
+fi
+
+# Generate runtime config.js file
+cat > "$CONFIG_FILE" <<EOF
+window.__APP_CONFIG__ = {
+  cors_anywhere_url: '${CORS_ANYWHERE_URL:-}',
+  network_rpc_url: '${NETWORK_RPC_URL:-}',
+  network_node_url: '${NETWORK_NODE_URL:-}'
+};
+EOF
+echo "Generated runtime config.js"
+
+# Inject config.js script tag into index.html if not already present
+if ! grep -q '<script src="config.js">' "$INDEX_FILE"; then
+  sed -i '/<\/head>/i\
+    <script src="config.js"><\/script>' "$INDEX_FILE"
+  echo "Added config.js script tag to index.html"
 fi
 
 # Check if <base href> tag already exists

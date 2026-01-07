@@ -22,6 +22,17 @@ import { HomeComponent } from './app/home/home.component';
 import { Verbosity } from 'casper-rust-wasm-sdk';
 import { ResultModule } from '@util/result';
 
+// Declare global window interface for runtime config
+declare global {
+  interface Window {
+    __APP_CONFIG__?: {
+      cors_anywhere_url?: string;
+      network_rpc_url?: string;
+      network_node_url?: string;
+    };
+  }
+}
+
 let networks: Network[] = Object.entries(config['networks']).map(
   ([name, network]) => ({
     name,
@@ -38,6 +49,20 @@ config['networks'] = networks;
 config['network'] = networks.find(
   (x) => x.name == environment['default_network'].toString(),
 ) as object;
+
+// Read runtime configuration from window.__APP_CONFIG__ if available
+if (typeof window !== 'undefined' && window.__APP_CONFIG__) {
+  const runtimeConfig = window.__APP_CONFIG__;
+  if (runtimeConfig.cors_anywhere_url) {
+    config['cors_anywhere_url'] = runtimeConfig.cors_anywhere_url;
+  }
+  if (runtimeConfig.network_rpc_url) {
+    config['network_rpc_url'] = runtimeConfig.network_rpc_url;
+  }
+  if (runtimeConfig.network_node_url) {
+    config['network_node_url'] = runtimeConfig.network_node_url;
+  }
+}
 
 const routes: Routes = [
   { path: 'health', component: HealthComponent },

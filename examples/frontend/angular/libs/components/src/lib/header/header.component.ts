@@ -214,38 +214,72 @@ export class HeaderComponent implements AfterViewInit {
 
   private setRPCAndNodeAddress() {
     try {
+      // Use runtime config network_rpc_url if provided (overrides network selection)
+      const networkRpcUrl = this.config['network_rpc_url'] as
+        | string
+        | undefined;
+      const corsAnywhereUrl = this.config['cors_anywhere_url'] as
+        | string
+        | undefined;
+      const networkNodeUrl = this.config['network_node_url'] as
+        | string
+        | undefined;
+
       if (this.is_electron) {
-        this.sdk.setRPCAddress(this.rpc_address);
+        this.sdk.setRPCAddress(networkRpcUrl || this.rpc_address);
       } else if (this.is_docker && this.is_production) {
-        // Use Apache proxy for HTTPS, direct access for HTTP
-        const protocol = this.window?.location?.protocol;
-        if (protocol === 'https:') {
-          // HTTPS: use Apache proxy
+        // Use runtime config if provided
+        if (networkRpcUrl) {
+          // If network_rpc_url is provided, use it
+          if (corsAnywhereUrl) {
+            // If cors_anywhere_url is also provided, prepend it to the full network_rpc_url
+            // Example: https://cors-anywhere.casper-box/http://nctl.casper-box:11101/rpc
+            this.sdk.setRPCAddress(
+              corsAnywhereUrl.replace(/\/$/, '') + '/' + networkRpcUrl,
+            );
+          } else {
+            this.sdk.setRPCAddress(networkRpcUrl);
+          }
+        } else if (corsAnywhereUrl) {
+          // Use runtime config cors_anywhere_url if provided (with existing rpc_address)
+          const rpcAddress = this.rpc_address.replace(
+            /localhost/g,
+            this.config['docker_gateway'] as string,
+          );
           this.sdk.setRPCAddress(
-            [
-              this.window?.location?.origin,
-              '/cors-anywhere/',
-              this.rpc_address.replace(
-                /localhost/g,
-                this.config['docker_gateway'] as string,
-              ),
-            ].join(''),
+            corsAnywhereUrl.replace(/\/$/, '') + '/' + rpcAddress,
           );
         } else {
-          // HTTP: direct access
-          this.sdk.setRPCAddress(
-            [
-              'http://',
-              this.config['docker_gateway'],
-              ':',
-              this.config['cors_anywhere_port'],
-              '/',
-              this.rpc_address.replace(
-                /localhost/g,
-                this.config['docker_gateway'] as string,
-              ),
-            ].join(''),
-          );
+          // Fall back to existing logic
+          const protocol = this.window?.location?.protocol;
+          if (protocol === 'https:') {
+            // HTTPS: use Apache proxy
+            this.sdk.setRPCAddress(
+              [
+                this.window?.location?.origin,
+                '/cors-anywhere/',
+                this.rpc_address.replace(
+                  /localhost/g,
+                  this.config['docker_gateway'] as string,
+                ),
+              ].join(''),
+            );
+          } else {
+            // HTTP: direct access
+            this.sdk.setRPCAddress(
+              [
+                'http://',
+                this.config['docker_gateway'],
+                ':',
+                this.config['cors_anywhere_port'],
+                '/',
+                this.rpc_address.replace(
+                  /localhost/g,
+                  this.config['docker_gateway'] as string,
+                ),
+              ].join(''),
+            );
+          }
         }
       } else {
         const network = this.networks.find(
@@ -257,7 +291,12 @@ export class HeaderComponent implements AfterViewInit {
           );
       }
 
-      if (this.is_docker) {
+      // Set node address
+      if (networkNodeUrl) {
+        // Use runtime config network_node_url if provided
+        this.sdk.setNodeAddress(networkNodeUrl);
+      } else if (this.is_docker) {
+        // Fall back to existing docker logic
         this.sdk.setNodeAddress(
           this.node_address.replace(
             /localhost/g,

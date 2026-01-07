@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  default_network: 'testnet',
+  default_network: 'ntcl',
   is_docker: true
 };
