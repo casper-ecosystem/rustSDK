@@ -2,7 +2,6 @@ import {
   enableProdMode,
   EnvironmentProviders,
   importProvidersFrom,
-  ImportProvidersSource,
   Provider,
 } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
