@@ -86,4 +86,8 @@ export const config: EnvironmentConfig = {
   docker_gateway: '172.18.0.1',
   cors_anywhere_port: '11100',
   enable_addressable_entity: false,
+  // Runtime config properties (populated from window.__APP_CONFIG__ in Docker builds):
+  // cors_anywhere_url: optional, overrides docker_gateway/cors_anywhere_port construction
+  // network_rpc_url: optional, overrides selected network's rpc_address
+  // network_node_url: optional, overrides selected network's node_address
 };

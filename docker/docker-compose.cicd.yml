@@ -11,6 +11,16 @@ services:
       # Set BASE_HREF for subpath deployments (e.g., /webclient/)
       # Defaults to / if not set
       - BASE_HREF=${BASE_HREF:-/}
+      # Runtime configuration for CORS and network URLs
+      # CORS_ANYWHERE_URL: Optional, overrides docker_gateway/cors_anywhere_port construction
+      # Example: http://cors-anywhere.casper-box:11100
+      - CORS_ANYWHERE_URL=${CORS_ANYWHERE_URL:-}
+      # NETWORK_RPC_URL: Optional, overrides selected network's rpc_address
+      # Example: http://casper-nctl.casper-box:11101/rpc
+      - NETWORK_RPC_URL=${NETWORK_RPC_URL:-}
+      # NETWORK_NODE_URL: Optional, overrides selected network's node_address
+      # Example: ws://casper-nctl.casper-box:4300/?targetPort=28101&targetHost=...
+      - NETWORK_NODE_URL=${NETWORK_NODE_URL:-}
     networks:
       - casper-network
 
