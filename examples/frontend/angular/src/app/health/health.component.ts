@@ -7,7 +7,7 @@ export interface HealthResult {
   version: string;
 }
 
-const VERSION = '2.0.0';
+const VERSION = '2.1.1';
 
 export function buildHealthResult(): HealthResult {
   return {
