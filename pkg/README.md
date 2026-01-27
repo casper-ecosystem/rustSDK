@@ -23,7 +23,7 @@ Add the SDK as a dependency of your project:
 > Cargo.toml
 
 ```toml
-casper-rust-wasm-sdk = { version = "2.0.0", git = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk.git" }
+casper-rust-wasm-sdk = { version = "2.1.1", git = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk.git" }
 ```
 
 ## Usage
@@ -525,7 +525,7 @@ const transaction_params = new TransactionStrParams(
   public_key,
   secret_key,
   timestamp,
-  ttl
+  ttl,
 );
 
 transaction_params.payment_amount = payment_amount;
@@ -534,7 +534,7 @@ const make_transfer_transaction = sdk.make_transfer_transaction(
   undefined, // Optional maybe_source
   target_account,
   transfer_amount,
-  transaction_params
+  transaction_params,
 );
 const make_transfer_transaction_as_json = make_transfer_transaction.toJson();
 console.log(make_transfer_transaction_as_json);
@@ -606,7 +606,7 @@ const transaction_params = new TransactionStrParams(
   public_key,
   secret_key,
   timestamp,
-  ttl
+  ttl,
 );
 
 transaction_params.payment_amount = payment_amount;
@@ -615,7 +615,7 @@ const transfer_transaction_result = await sdk.transfer_transaction(
   undefined, // Optional maybe_source
   target_account,
   transfer_amount,
-  transaction_params
+  transaction_params,
 );
 const transfer_transaction_result_as_json =
   transfer_transaction_result.toJson();
@@ -689,7 +689,7 @@ transaction_params.payment_amount = payment_amount;
 let entity_hash = new AddressableEntityHash(entity_hash_formatted_string);
 let builder_params = TransactionBuilderParams.newInvocableEntity(
   entity_hash,
-  entry_point
+  entry_point,
 );
 
 const transaction = sdk.make_transaction(builder_params, transaction_params);
@@ -771,19 +771,19 @@ const entry_point = 'set_variables';
 const transaction_params = new TransactionStrParams(
   chain_name,
   public_key,
-  secret_key
+  secret_key,
 );
 transaction_params.payment_amount = payment_amount;
 
 let entity_hash = new AddressableEntityHash(entity_hash_hex_string);
 let builder_params = TransactionBuilderParams.newInvocableEntity(
   entity_hash,
-  entry_point
+  entry_point,
 );
 
 const transaction_result = await sdk.transaction(
   builder_params,
-  transaction_params
+  transaction_params,
 );
 const transaction_result_as_json = transaction_result.toJson();
 console.log(transaction_result_as_json);
@@ -898,16 +898,16 @@ const entry_point = 'set_variables';
 const transaction_params = new TransactionStrParams(
   chain_name,
   public_key,
-  secret_key
+  secret_key,
 );
 transaction_params.payment_amount = payment_amount;
 
 let entity_hash = AddressableEntityHash.fromFormattedStr(
-  entity_hash_formatted_string
+  entity_hash_formatted_string,
 );
 let builder_params = TransactionBuilderParams.newInvocableEntity(
   entity_hash,
-  entry_point
+  entry_point,
 );
 
 const transaction = Transaction.newSession(builder_params, transaction_params);
@@ -934,7 +934,7 @@ const target_account =
 const transfer_params = new TransactionStrParams(
   chain_name,
   public_key,
-  secret_key
+  secret_key,
 );
 
 transfer_params.payment_amount = payment_amount;
@@ -943,7 +943,7 @@ const transfer_transaction = Transaction.newTransfer(
   undefined, // optional maybe_source
   target_account,
   transfer_amount,
-  transfer_params
+  transfer_params,
 );
 
 const put_transaction_result = await sdk.put_transaction(transfer_transaction);
@@ -1015,7 +1015,7 @@ const timeout_duration = undefined; // 30000 for 30s instead of default timeout 
 const eventParseResult: EventParseResult = await sdk.waitTransaction(
   events_address,
   transaction_hash,
-  timeout_duration
+  timeout_duration,
 );
 console.log(eventParseResult.body.transaction_processed);
 const cost =
@@ -1087,12 +1087,12 @@ const getEventHandlerFn = (transactionHash: string) => {
       eventParseResult.body?.transaction_processed?.execution_result.Success
     ) {
       console.log(
-        eventParseResult.body?.transaction_processed?.execution_result.Success
+        eventParseResult.body?.transaction_processed?.execution_result.Success,
       );
       return true;
     } else {
       console.error(
-        eventParseResult.body?.transaction_processed?.execution_result.Failure
+        eventParseResult.body?.transaction_processed?.execution_result.Failure,
       );
       return false;
     }
@@ -1104,7 +1104,7 @@ const eventHandlerFn = getEventHandlerFn(transaction_hash);
 
 const subscription: Subscription = new Subscription(
   transaction_hash,
-  eventHandlerFn
+  eventHandlerFn,
 );
 const subscriptions: Subscription[] = [subscription];
 
@@ -1449,7 +1449,7 @@ const deploy_params = new DeployStrParams(
   public_key,
   secret_key,
   timestamp,
-  ttl
+  ttl,
 );
 
 const payment_params = new PaymentStrParams(payment_amount);
@@ -1459,7 +1459,7 @@ const transfer_deploy = sdk.make_transfer(
   target_account,
   undefined, // transfer_id
   deploy_params,
-  payment_params
+  payment_params,
 );
 const transfer_deploy_as_json = transfer_deploy.toJson();
 console.log(transfer_deploy_as_json);
@@ -1542,7 +1542,7 @@ const deploy_params = new DeployStrParams(
   public_key,
   secret_key,
   timestamp,
-  ttl
+  ttl,
 );
 
 const payment_params = new PaymentStrParams(payment_amount);
@@ -1552,7 +1552,7 @@ const transfer_result = await sdk.transfer(
   target_account,
   undefined, // transfer_id
   deploy_params,
-  payment_params
+  payment_params,
 );
 const transfer_result_as_json = transfer_result.toJson();
 console.log(transfer_result_as_json);
@@ -1713,7 +1713,7 @@ const payment_params = new PaymentStrParams(payment_amount);
 const deploy_result = await sdk.deploy(
   deploy_params,
   session_params,
-  payment_params
+  payment_params,
 );
 const deploy_result_as_json = deploy_result.toJson();
 console.log(deploy_result_as_json);
@@ -1846,7 +1846,7 @@ const payment_params = new PaymentStrParams(payment_amount);
 const deploy = Deploy.withPaymentAndSession(
   deploy_params,
   session_params,
-  payment_params
+  payment_params,
 );
 
 const put_deploy_result = await sdk.put_deploy(deploy);
@@ -1883,7 +1883,7 @@ const transfer_deploy = Deploy.withTransfer(
   target_account,
   undefined, // transfer_id
   deploy_params,
-  payment_params
+  payment_params,
 );
 
 const put_deploy_result = await sdk.put_deploy(transfer_deploy);
@@ -1955,7 +1955,7 @@ const timeout_duration = undefined; // 30000 for 30s instead of default timeout 
 const eventParseResult: EventParseResult = await sdk.waitDeploy(
   events_address,
   install_result_as_json.deploy_hash,
-  timeout_duration
+  timeout_duration,
 );
 console.log(eventParseResult.body.DeployProcessed);
 const cost =
@@ -2027,12 +2027,12 @@ const getEventHandlerFn = (deployHash: string) => {
       eventParseResult.body?.DeployProcessed?.execution_result.Success
     ) {
       console.log(
-        eventParseResult.body?.DeployProcessed?.execution_result.Success
+        eventParseResult.body?.DeployProcessed?.execution_result.Success,
       );
       return true;
     } else {
       console.error(
-        eventParseResult.body?.DeployProcessed?.execution_result.Failure
+        eventParseResult.body?.DeployProcessed?.execution_result.Failure,
       );
       return false;
     }
@@ -2044,7 +2044,7 @@ const eventHandlerFn = getEventHandlerFn(deploy_hash);
 
 const subscription: Subscription = new Subscription(
   deploy_hash,
-  eventHandlerFn
+  eventHandlerFn,
 );
 const subscriptions: Subscription[] = [subscription];
 
@@ -2460,7 +2460,7 @@ or signTransactionHash and adding signature to the transaction
 const public_key = await wallet.getActivePublicKey();
 const signature = await wallet.signTransactionHash(
   transaction.hash.toString(),
-  public_key
+  public_key,
 );
 signature && (transaction = transaction.addSignature(public_key, signature));
 ```
