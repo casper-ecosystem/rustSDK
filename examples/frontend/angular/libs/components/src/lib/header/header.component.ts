@@ -212,6 +212,11 @@ export class HeaderComponent implements AfterViewInit {
     );
   }
 
+  private isLocalhostNetwork(): boolean {
+    const localhostNetworks = ['ntcl', 'dev'];
+    return localhostNetworks.includes(this.network.name);
+  }
+
   private setRPCAndNodeAddress() {
     try {
       // Use runtime config network_rpc_url if provided (overrides network selection)
@@ -228,9 +233,10 @@ export class HeaderComponent implements AfterViewInit {
       if (this.is_electron) {
         this.sdk.setRPCAddress(networkRpcUrl || this.rpc_address);
       } else if (this.is_docker && this.is_production) {
-        // Use runtime config if provided
-        if (networkRpcUrl) {
-          // If network_rpc_url is provided, use it
+        // Use runtime config if provided, but only for localhost networks (ntcl, dev)
+        // Public networks (testnet, mainnet) should use their default RPC addresses
+        if (networkRpcUrl && this.isLocalhostNetwork()) {
+          // If network_rpc_url is provided and current network is localhost, use it
           if (corsAnywhereUrl) {
             // If cors_anywhere_url is also provided, prepend it to the full network_rpc_url
             // Example: https://cors-anywhere.casper-box/http://nctl.casper-box:11101/rpc
@@ -241,7 +247,7 @@ export class HeaderComponent implements AfterViewInit {
             this.sdk.setRPCAddress(networkRpcUrl);
           }
         } else if (corsAnywhereUrl) {
-          // Use runtime config cors_anywhere_url if provided (with existing rpc_address)
+          // Use runtime config cors_anywhere_url if provided (for all networks)
           const rpcAddress = this.rpc_address.replace(
             /localhost/g,
             this.config['docker_gateway'] as string,
@@ -250,7 +256,7 @@ export class HeaderComponent implements AfterViewInit {
             corsAnywhereUrl.replace(/\/$/, '') + '/' + rpcAddress,
           );
         } else {
-          // Fall back to existing logic
+          // Fall back to existing logic - apply CORS proxy for all networks
           const protocol = this.window?.location?.protocol;
           if (protocol === 'https:') {
             // HTTPS: use Apache proxy

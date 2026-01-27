@@ -1,6 +1,6 @@
 {
   "name": "casper-webclient",
-  "version": "2.0.0",
+  "version": "2.1.1",
   "description": "Casper Client Demo app",
   "main": "index.js",
   "scripts": {
