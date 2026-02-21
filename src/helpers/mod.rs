@@ -436,7 +436,7 @@ pub fn insert_js_value_arg(
     args: &mut RuntimeArgs,
     js_value_arg: JsValue,
 ) -> Result<&RuntimeArgs, SdkError> {
-    if js_sys::Object::instanceof(&js_value_arg) {
+    if js_value_arg.is_instance_of::<js_sys::Object>() {
         let json_arg: JsonArg = js_value_arg
             .into_serde()
             .map_err(|err| SdkError::CustomError {
