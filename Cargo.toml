@@ -75,6 +75,6 @@ dotenvy = "0.15.7"
 
 [patch.crates-io]
 casper-client = { version = "5", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "dev" }
-casper-types = { git = "https://github.com/casper-network/casper-node", branch = "dev" }
-casper-binary-port = { git = "https://github.com/casper-network/casper-node", branch = "dev" }
+# casper-types = { git = "https://github.com/casper-network/casper-node", branch = "dev" }
+# casper-binary-port = { git = "https://github.com/casper-network/casper-node", branch = "dev" }
 casper-binary-port-access = { git = "https://github.com/gRoussac/casper-binary-port-client", branch = "casper_1.1.1" }
