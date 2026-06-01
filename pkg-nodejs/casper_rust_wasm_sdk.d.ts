@@ -6,7 +6,7 @@
  * *This API requires the following crate features to be activated: `ReadableStreamType`*
  */
 
-type ReadableStreamType = "bytes";
+export type ReadableStreamType = "bytes";
 
 export class AccessRights {
     free(): void;
