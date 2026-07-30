@@ -1,6 +1,6 @@
 {
   "name": "casper-webclient",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "license": "MIT",
   "scripts": {
     "build-proxy-conf": "node build-proxy-conf.js",
