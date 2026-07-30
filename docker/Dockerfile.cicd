@@ -1,5 +1,5 @@
 ARG TARGETPLATFORM=linux/amd64
-FROM --platform=${TARGETPLATFORM} node:22.13-alpine AS build
+FROM --platform=${TARGETPLATFORM} node:22.22-alpine AS build
 
 ENV NODE_ENV=development
 ARG BUILD_CONFIGURATION=docker
@@ -23,7 +23,7 @@ RUN npm install --ignore-scripts --verbose && npm update
 RUN npm run build -- --configuration=$BUILD_CONFIGURATION --verbose
 
 ARG TARGETPLATFORM=linux/amd64
-FROM --platform=${TARGETPLATFORM} node:22.13-alpine
+FROM --platform=${TARGETPLATFORM} node:22.22-alpine
 
 ENV PORT=8080
 
