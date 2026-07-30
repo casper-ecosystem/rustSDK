@@ -46,7 +46,7 @@ doc:
 build: pack
 	cd examples/frontend/angular/ && npm install && npm run build && cd .
 	cd examples/frontend/react/ && npm install && npm run build && cd .
-	cd examples/desktop/node/ && npm install && npx tsc index.ts && cd .
+	cd examples/desktop/node/ && npm install && npx tsc && cd .
 	cd examples/desktop/electron && npm install && npm run build && cd .
 
 format:
