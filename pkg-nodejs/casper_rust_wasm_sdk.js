@@ -12920,7 +12920,7 @@ exports.uint8ArrayToBytes = uint8ArrayToBytes;
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
-        __wbg_CasperWalletProvider_f530469ddf0d38f5: function() {
+        __wbg_CasperWalletProvider_8b0faf22edfd4f50: function() {
             const ret = CasperWalletProvider();
             return ret;
         },
@@ -13063,7 +13063,7 @@ function __wbg_get_imports() {
             const ret = Deploy.__wrap(arg0);
             return ret;
         },
-        __wbg_disconnectFromSite_b5c78e940e76ce4a: function() { return handleError(function (arg0) {
+        __wbg_disconnectFromSite_605f74afd0a47191: function() { return handleError(function (arg0) {
             const ret = arg0.disconnectFromSite();
             return ret;
         }, arguments); },
@@ -13074,7 +13074,7 @@ function __wbg_get_imports() {
         __wbg_enqueue_6d83b4c6281bafd6: function() { return handleError(function (arg0, arg1) {
             arg0.enqueue(arg1);
         }, arguments); },
-        __wbg_error_b1ac7bd2c338af0f: function(arg0, arg1) {
+        __wbg_error_b46f585a54944ede: function(arg0, arg1) {
             console.error(getStringFromWasm0(arg0, arg1));
         },
         __wbg_eval_832ed6e42a9be51c: function() { return handleError(function (arg0, arg1) {
@@ -13089,7 +13089,7 @@ function __wbg_get_imports() {
             const ret = arg0.fetch(arg1);
             return ret;
         },
-        __wbg_getActivePublicKey_ffe368ffda41af08: function() { return handleError(function (arg0) {
+        __wbg_getActivePublicKey_d037a709254dc9b3: function() { return handleError(function (arg0) {
             const ret = arg0.getActivePublicKey();
             return ret;
         }, arguments); },
@@ -13107,7 +13107,7 @@ function __wbg_get_imports() {
             const ret = arg0.getTime();
             return ret;
         },
-        __wbg_getVersion_c3d69646cb59f15a: function() { return handleError(function (arg0) {
+        __wbg_getVersion_629faa8c88fdba13: function() { return handleError(function (arg0) {
             const ret = arg0.getVersion();
             return ret;
         }, arguments); },
@@ -13265,7 +13265,7 @@ function __wbg_get_imports() {
             const ret = Array.isArray(arg0);
             return ret;
         },
-        __wbg_isConnected_af6af3e723449e09: function() { return handleError(function (arg0) {
+        __wbg_isConnected_cbfc80fab78531a7: function() { return handleError(function (arg0) {
             const ret = arg0.isConnected();
             return ret;
         }, arguments); },
@@ -13285,7 +13285,7 @@ function __wbg_get_imports() {
             const ret = ListRpcsResult.__wrap(arg0);
             return ret;
         },
-        __wbg_log_1acadced1cea2119: function(arg0, arg1) {
+        __wbg_log_88cba9ed7596fcb5: function(arg0, arg1) {
             console.log(getStringFromWasm0(arg0, arg1));
         },
         __wbg_log_fae8bdb68293977f: function(arg0, arg1) {
@@ -13462,11 +13462,11 @@ function __wbg_get_imports() {
         __wbg_releaseLock_5b92874cad775644: function(arg0) {
             arg0.releaseLock();
         },
-        __wbg_requestConnection_caca08804ac756d6: function() { return handleError(function (arg0) {
+        __wbg_requestConnection_1e27b6fcf506788d: function() { return handleError(function (arg0) {
             const ret = arg0.requestConnection();
             return ret;
         }, arguments); },
-        __wbg_requestSwitchAccount_0ed59402fd15e03a: function() { return handleError(function (arg0) {
+        __wbg_requestSwitchAccount_6b9fabb399b49dc6: function() { return handleError(function (arg0) {
             const ret = arg0.requestSwitchAccount();
             return ret;
         }, arguments); },
@@ -13528,11 +13528,11 @@ function __wbg_get_imports() {
         __wbg_set_signal_c4ef8faddb4c1446: function(arg0, arg1) {
             arg0.signal = arg1;
         },
-        __wbg_signMessage_507965b3c6eb409d: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
+        __wbg_signMessage_0652af7ba09ff5c2: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
             const ret = arg0.signMessage(getStringFromWasm0(arg1, arg2), getStringFromWasm0(arg3, arg4));
             return ret;
         }, arguments); },
-        __wbg_sign_fb99fc956d85b206: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
+        __wbg_sign_abbe289e68484fac: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
             const ret = arg0.sign(getStringFromWasm0(arg1, arg2), getStringFromWasm0(arg3, arg4));
             return ret;
         }, arguments); },
