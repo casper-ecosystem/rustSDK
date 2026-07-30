@@ -1,12 +1,12 @@
 [package]
 name = "sdk_tests"
-version = "2.1.1"
+version = "2.2.2"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-casper-rust-wasm-sdk = { path = "../../../", version = "2.1.1" }
+casper-rust-wasm-sdk = { path = "../../../", version = "2.2.2" }
 tokio = { version = "1", features = ["full"] }
 once_cell = "*"
 chrono = "0.4"
@@ -24,6 +24,6 @@ path = "src/lib.rs"
 
 [patch.crates-io]
 casper-client = { version = "5", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "dev" }
-casper-types = { git = "https://github.com/casper-network/casper-node", branch = "dev" }
-casper-binary-port = { git = "https://github.com/casper-network/casper-node", branch = "dev" }
-casper-binary-port-access = { git = "https://github.com/gRoussac/casper-binary-port-client", branch = "casper_2.2.0" }
+casper-types = { git = "https://github.com/casper-network/casper-node", tag = "v2.2.2" }
+casper-binary-port = { git = "https://github.com/casper-network/casper-node", tag = "v2.2.2" }
+casper-binary-port-access = { git = "https://github.com/gRoussac/casper-binary-port-client", branch = "casper_2.2.2" }
