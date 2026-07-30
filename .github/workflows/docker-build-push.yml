@@ -43,11 +43,3 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/casper-webclient:latest
           docker push ${{ secrets.DOCKER_USERNAME_ITC }}/casper-webclient:latest
-
-      # Step 7: Sync Hub short/full description + categories to both namespaces
-      - name: Sync Docker Hub description
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          HUB_DESC_REPOS: ${{ secrets.DOCKER_USERNAME }}/casper-webclient ${{ secrets.DOCKER_USERNAME_ITC }}/casper-webclient
-        run: make docker-hub-description
