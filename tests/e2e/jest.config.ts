@@ -178,7 +178,7 @@ const config: Config = {
 
   // A map from regular expressions to paths to transformers
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { useESM: true }],
+    '^.+\\.[tj]sx?$': ['ts-jest', { useESM: true }],
   },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
@@ -200,7 +200,9 @@ const config: Config = {
   // watchman: true,
 
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
-  transformIgnorePatterns: ['/node_modules/(?!casper-rust-wasm-sdk)/'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!casper-rust-wasm-sdk|puppeteer(?:-core)?|@puppeteer)/',
+  ],
 };
 
 export default config;

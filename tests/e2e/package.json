@@ -20,5 +20,8 @@
     "puppeteer": "^25.4.0",
     "casper-rust-wasm-sdk": "file:../../pkg-nodejs",
     "dotenv": "^17.4.2"
+  },
+  "overrides": {
+    "jest-environment-node": "30.4.1"
   }
 }
