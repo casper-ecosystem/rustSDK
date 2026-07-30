@@ -19,7 +19,7 @@ describe('HealthComponent', () => {
     const component = fixture.componentInstance;
     expect(component.healthResult.status).toBe('healthy');
     expect(component.healthResult.service).toBe('Casper Webclient');
-    expect(component.healthResult.version).toBe('2.1.1');
+    expect(component.healthResult.version).toBe('2.2.2');
   });
 });
 
@@ -28,6 +28,6 @@ describe('buildHealthResult', () => {
     const result = buildHealthResult();
     expect(result.status).toBe('healthy');
     expect(result.service).toBe('Casper Webclient');
-    expect(result.version).toBe('2.1.1');
+    expect(result.version).toBe('2.2.2');
   });
 });

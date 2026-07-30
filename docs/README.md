@@ -23,7 +23,7 @@ Add the SDK as a dependency of your project:
 > Cargo.toml
 
 ```toml
-casper-rust-wasm-sdk = { version = "2.1.1", git = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk.git" }
+casper-rust-wasm-sdk = { version = "2.2.2", git = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk.git" }
 ```
 
 ## Usage
