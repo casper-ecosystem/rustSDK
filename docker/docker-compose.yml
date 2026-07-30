@@ -1,6 +1,6 @@
 services:
   casper-webclient:
-    image: gregoshop/casper-webclient:latest # Pulls the image from Docker Hub
+    image: interchouette/casper-webclient:latest # Pulls the image from Docker Hub
     container_name: casper-webclient
     ports:
       - "8080:8080"

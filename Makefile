@@ -103,7 +103,4 @@ docker-deploy-prod:
 	ssh ubuntu@casper-box "sudo docker image rm -f casper-webclient:old"
 	ssh ubuntu@casper-box "sudo docker compose -f /home/ubuntu/webclient/docker-compose.yml up -d --force-recreate"
 
-docker-hub-description:
-	python3 docker/sync-hub-description.py
-
-.PHONY: docker-build docker-start docker-stop docker-start-prod docker-stop-prod docker-hub-description
+.PHONY: docker-build docker-start docker-stop docker-start-prod docker-stop-prod
