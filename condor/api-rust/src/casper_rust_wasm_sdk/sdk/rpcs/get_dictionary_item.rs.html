@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_dictionary_item.rs`."><title>get_dictionary_item.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/rpcs/</div>get_dictionary_item.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
-<a href=#2 id=2 data-nosnippet>2</a><span class="kw">use </span>crate::{
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_dictionary_item.rs`."><title>get_dictionary_item.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.97.1 (8bab26f4f 2026-07-14)" data-channel="1.97.1" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/sdk/rpcs/</div>get_dictionary_item.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
+<a href=#2 id=2 data-nosnippet>2</a><span class="kw">use crate</span>::{
 <a href=#3 id=3 data-nosnippet>3</a>    types::{
 <a href=#4 id=4 data-nosnippet>4</a>        deploy_params::dictionary_item_str_params::{
 <a href=#5 id=5 data-nosnippet>5</a>            dictionary_item_str_params_to_casper_client, DictionaryItemStrParams,
@@ -154,7 +154,7 @@
 <a href=#154 id=154 data-nosnippet>154</a>            <span class="self">self</span>.get_dictionary_item(dictionary_item, <span class="prelude-val">Some</span>(hash.as_str()), verbosity, rpc_address)
 <a href=#155 id=155 data-nosnippet>155</a>                .<span class="kw">await
 <a href=#156 id=156 data-nosnippet>156</a>        </span>} <span class="kw">else </span>{
-<a href=#157 id=157 data-nosnippet>157</a>            <span class="self">self</span>.get_dictionary_item(dictionary_item, None::&lt;<span class="kw-2">&amp;</span>str&gt;, verbosity, rpc_address)
+<a href=#157 id=157 data-nosnippet>157</a>            <span class="self">self</span>.get_dictionary_item(dictionary_item, <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>str&gt;, verbosity, rpc_address)
 <a href=#158 id=158 data-nosnippet>158</a>                .<span class="kw">await
 <a href=#159 id=159 data-nosnippet>159</a>        </span>};
 <a href=#160 id=160 data-nosnippet>160</a>
@@ -270,7 +270,7 @@
 <a href=#270 id=270 data-nosnippet>270</a>
 <a href=#271 id=271 data-nosnippet>271</a><span class="attr">#[cfg(test)]
 <a href=#272 id=272 data-nosnippet>272</a></span><span class="kw">mod </span>tests {
-<a href=#273 id=273 data-nosnippet>273</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#273 id=273 data-nosnippet>273</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#274 id=274 data-nosnippet>274</a>    <span class="kw">use </span><span class="kw">crate</span>::get_dictionary_item;
 <a href=#275 id=275 data-nosnippet>275</a>    <span class="kw">use </span>sdk_tests::tests::helpers::get_network_constants;
 <a href=#276 id=276 data-nosnippet>276</a>
@@ -337,7 +337,7 @@
 <a href=#337 id=337 data-nosnippet>337</a>        </span><span class="kw">let </span>result = sdk
 <a href=#338 id=338 data-nosnippet>338</a>            .get_dictionary_item(
 <a href=#339 id=339 data-nosnippet>339</a>                get_dictionary_item(<span class="bool-val">false</span>).<span class="kw">await</span>,
-<a href=#340 id=340 data-nosnippet>340</a>                None::&lt;<span class="kw-2">&amp;</span>str&gt;,
+<a href=#340 id=340 data-nosnippet>340</a>                <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>str&gt;,
 <a href=#341 id=341 data-nosnippet>341</a>                verbosity,
 <a href=#342 id=342 data-nosnippet>342</a>                <span class="prelude-val">Some</span>(rpc_address),
 <a href=#343 id=343 data-nosnippet>343</a>            )
@@ -358,7 +358,7 @@
 <a href=#358 id=358 data-nosnippet>358</a>        </span><span class="kw">let </span>result = sdk
 <a href=#359 id=359 data-nosnippet>359</a>            .get_dictionary_item(
 <a href=#360 id=360 data-nosnippet>360</a>                get_dictionary_item(<span class="bool-val">false</span>).<span class="kw">await</span>,
-<a href=#361 id=361 data-nosnippet>361</a>                None::&lt;<span class="kw-2">&amp;</span>str&gt;,
+<a href=#361 id=361 data-nosnippet>361</a>                <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>str&gt;,
 <a href=#362 id=362 data-nosnippet>362</a>                verbosity,
 <a href=#363 id=363 data-nosnippet>363</a>                <span class="prelude-val">Some</span>(rpc_address),
 <a href=#364 id=364 data-nosnippet>364</a>            )
@@ -379,7 +379,7 @@
 <a href=#379 id=379 data-nosnippet>379</a>        </span><span class="kw">let </span>result = sdk
 <a href=#380 id=380 data-nosnippet>380</a>            .get_dictionary_item(
 <a href=#381 id=381 data-nosnippet>381</a>                get_dictionary_item(<span class="bool-val">true</span>).<span class="kw">await</span>,
-<a href=#382 id=382 data-nosnippet>382</a>                None::&lt;<span class="kw-2">&amp;</span>str&gt;,
+<a href=#382 id=382 data-nosnippet>382</a>                <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>str&gt;,
 <a href=#383 id=383 data-nosnippet>383</a>                verbosity,
 <a href=#384 id=384 data-nosnippet>384</a>                <span class="prelude-val">Some</span>(rpc_address),
 <a href=#385 id=385 data-nosnippet>385</a>            )
