@@ -8,7 +8,7 @@ services:
       - casper-network
 
   cors-anywhere:
-    image: gregoshop/cors-anywhere:latest # Pulls the image from Docker Hub
+    image: interchouette/cors-anywhere:latest # Pulls the image from Docker Hub
     container_name: cors-anywhere
     environment:
       PORT: 11100
@@ -23,7 +23,7 @@ services:
       - casper-network
 
   ws-proxy:
-    image: gregoshop/ws-proxy:latest # Pulls the image from Docker Hub
+    image: interchouette/ws-proxy:latest # Pulls the image from Docker Hub
     container_name: ws-proxy
     environment:
       PORT: 4300
