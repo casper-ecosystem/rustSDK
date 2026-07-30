@@ -1,6 +1,6 @@
 [package]
 name = "casper-rust-wasm-sdk"
-version = "2.1.1"
+version = "2.1.2"
 edition = "2021"
 description = "Casper Rust Wasm Web SDK"
 repository = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk"
@@ -75,6 +75,6 @@ dotenvy = "0.15.7"
 
 [patch.crates-io]
 casper-client = { version = "5", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "release-5.0.0" }
-casper-types = { git = "https://github.com/casper-network/casper-node", tag = "v2.1.1" }
-casper-binary-port = { git = "https://github.com/casper-network/casper-node", tag = "v2.1.1" }
+casper-types = { git = "https://github.com/casper-network/casper-node", tag = "v2.1.2" }
+casper-binary-port = { git = "https://github.com/casper-network/casper-node", tag = "v2.1.2" }
 casper-binary-port-access = { git = "https://github.com/gRoussac/casper-binary-port-client", branch = "casper_1.1.1" }
