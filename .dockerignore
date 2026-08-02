@@ -1,19 +1,15 @@
-# Keep MCP image builds lean (context = repo root).
-# `tests/integration/rust` is required: root Cargo.toml has a path dep on `sdk_tests`.
+# Shared repo-root dockerignore (webclient CI + MCP image).
+# Do NOT exclude examples/, pkg/, or docker/ — CI/CD Image needs them.
 .git
 .github
 target
 **/target
-examples
-pkg
-pkg-nodejs
-docs
-docker
-*.md
-!mcp/README.md
-.env
-.cursor
 node_modules
 **/*.wasm
+.env
+.cursor
 tests/e2e
 tests/integration/rust/target
+docs/api-rust
+docs/api-wasm
+docs/images
