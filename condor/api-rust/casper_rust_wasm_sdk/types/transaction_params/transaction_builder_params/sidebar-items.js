@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["TransactionKind","TransferTargetKind"],"fn":["transaction_builder_params_to_casper_client"],"struct":["TransactionBuilderParams","TransferTarget"]};
