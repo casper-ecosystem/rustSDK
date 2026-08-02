@@ -1,12 +1,12 @@
 //! Feature-gated tool modules.
 
-pub mod helpers;
-pub mod rpc;
 pub mod binary_port;
-pub mod params;
-pub mod transaction;
-pub mod deploy;
 pub mod contract;
+pub mod deploy;
+pub mod helpers;
+pub mod params;
+pub mod rpc;
+pub mod transaction;
 pub mod write;
 
 /// Human-readable list of tool groups enabled in this build.

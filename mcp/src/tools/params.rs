@@ -74,7 +74,8 @@ fn bytes_from_hex(hex: &str) -> Result<Bytes, String> {
 
 /// Parse `TransactionStrParams` from a JSON object string.
 pub fn parse_transaction_str_params(json: &str) -> Result<TransactionStrParams, String> {
-    let obj: Value = serde_json::from_str(json).map_err(|e| format!("transaction_params JSON: {e}"))?;
+    let obj: Value =
+        serde_json::from_str(json).map_err(|e| format!("transaction_params JSON: {e}"))?;
     let obj = obj
         .as_object()
         .ok_or_else(|| "transaction_params must be a JSON object".to_string())?;
@@ -182,8 +183,7 @@ fn parse_transfer_target(obj: &Value) -> Result<TransferTarget, String> {
 
 /// Parse `TransactionBuilderParams` from JSON (`kind` discriminant).
 pub fn parse_transaction_builder_params(json: &str) -> Result<TransactionBuilderParams, String> {
-    let obj: Value =
-        serde_json::from_str(json).map_err(|e| format!("builder_params JSON: {e}"))?;
+    let obj: Value = serde_json::from_str(json).map_err(|e| format!("builder_params JSON: {e}"))?;
     let kind = req_str(&obj, "kind")?;
     match kind.to_lowercase().as_str() {
         "session" => {
@@ -237,11 +237,7 @@ pub fn parse_transaction_builder_params(json: &str) -> Result<TransactionBuilder
                 .map_err(|e| e.to_string())?;
             let entry = req_str(&obj, "entry_point")?;
             let version = opt_str(&obj, "maybe_entity_version");
-            Ok(TransactionBuilderParams::new_package(
-                hash,
-                &entry,
-                version,
-            ))
+            Ok(TransactionBuilderParams::new_package(hash, &entry, version))
         }
         "packagealias" | "package_alias" => {
             let alias = req_str(&obj, "package_alias")?;
@@ -421,19 +417,17 @@ mod tests {
 
     #[test]
     fn parse_session_builder() {
-        let b = parse_transaction_builder_params(
-            r#"{"kind":"Session","is_install_upgrade":false}"#,
-        )
-        .unwrap();
+        let b =
+            parse_transaction_builder_params(r#"{"kind":"Session","is_install_upgrade":false}"#)
+                .unwrap();
         let _ = b;
     }
 
     #[test]
     fn parse_deploy_params() {
-        let d = parse_deploy_str_params(
-            r#"{"chain_name":"casper-net-1","session_account":"01aa"}"#,
-        )
-        .unwrap();
+        let d =
+            parse_deploy_str_params(r#"{"chain_name":"casper-net-1","session_account":"01aa"}"#)
+                .unwrap();
         let _ = d;
     }
 }
