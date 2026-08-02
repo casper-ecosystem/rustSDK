@@ -109,16 +109,5 @@ jobs:
             fi
           done
 
-          # Stable names so README can use /releases/latest/download/... forever.
-          cp "$EXE" "$RELEASE_DIR/casper-webclient-windows.exe"
-          cp "$APPIMAGE" "$RELEASE_DIR/casper-webclient-linux.AppImage"
-          cp "$SNAP" "$RELEASE_DIR/casper-webclient-linux.snap"
-
-          gh release upload "$TAG" \
-            "$EXE" \
-            "$APPIMAGE" \
-            "$SNAP" \
-            "$RELEASE_DIR/casper-webclient-windows.exe" \
-            "$RELEASE_DIR/casper-webclient-linux.AppImage" \
-            "$RELEASE_DIR/casper-webclient-linux.snap" \
-            --clobber
+          # Upload versioned electron-builder names only (docs link to the Releases page).
+          gh release upload "$TAG" "$EXE" "$APPIMAGE" "$SNAP" --clobber
