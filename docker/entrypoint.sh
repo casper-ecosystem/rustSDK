@@ -3,8 +3,12 @@ set -e
 
 # Default to / if BASE_HREF is not set
 BASE_HREF=${BASE_HREF:-/}
+APP_VERSION=${APP_VERSION:-unknown}
+GIT_SHA=${GIT_SHA:-unknown}
+# Short sha for footer display
+GIT_SHA_SHORT=$(echo "$GIT_SHA" | cut -c1-7)
 
-echo "Entrypoint running. BASE_HREF=$BASE_HREF"
+echo "Entrypoint running. BASE_HREF=$BASE_HREF APP_VERSION=$APP_VERSION GIT_SHA=$GIT_SHA_SHORT"
 
 INDEX_FILE="/app/dist/index.html"
 CONFIG_FILE="/app/dist/config.js"
@@ -27,7 +31,9 @@ cat > "$CONFIG_FILE" <<EOF
 window.__APP_CONFIG__ = {
   cors_anywhere_url: '${CORS_ANYWHERE_URL:-}',
   network_rpc_url: '${NETWORK_RPC_URL:-}',
-  network_node_url: '${NETWORK_NODE_URL:-}'
+  network_node_url: '${NETWORK_NODE_URL:-}',
+  app_version: '${APP_VERSION}',
+  git_sha: '${GIT_SHA_SHORT}'
 };
 EOF
 echo "Generated runtime config.js"

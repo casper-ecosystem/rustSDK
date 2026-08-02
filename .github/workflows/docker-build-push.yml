@@ -34,7 +34,10 @@ jobs:
       # Step 5: Build the Docker image using 'make build dev'
       - name: Build Docker image for dev
         run: |
-          make docker-build-prod
+          APP_VERSION=$(jq -r .version examples/frontend/angular/package.json)
+          docker compose -f docker/docker-compose.cicd.yml build \
+            --build-arg APP_VERSION="$APP_VERSION" \
+            --build-arg GIT_SHA="${{ github.sha }}"
           docker tag casper-webclient:latest ${{ secrets.DOCKER_USERNAME }}/casper-webclient:latest
           docker tag casper-webclient:latest ${{ secrets.DOCKER_USERNAME_ITC }}/casper-webclient:latest
 

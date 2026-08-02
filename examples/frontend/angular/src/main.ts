@@ -29,6 +29,8 @@ declare global {
       cors_anywhere_url?: string;
       network_rpc_url?: string;
       network_node_url?: string;
+      app_version?: string;
+      git_sha?: string;
     };
   }
 }
@@ -87,6 +89,12 @@ if (typeof window !== 'undefined' && window.__APP_CONFIG__) {
   }
   if (runtimeConfig.network_node_url) {
     config['network_node_url'] = runtimeConfig.network_node_url;
+  }
+  if (runtimeConfig.app_version) {
+    config['app_version'] = runtimeConfig.app_version;
+  }
+  if (runtimeConfig.git_sha) {
+    config['git_sha'] = runtimeConfig.git_sha;
   }
 }
 

@@ -11,6 +11,16 @@ This page covers different examples of using the SDK.
 
 ⚠ WARNING: This application is for testing and development purposes. Do NOT use private keys or perform real transactions on the testnet/mainnet unless you fully understand the security risks.
 
+## Try the Wasm webclient
+
+A hosted build of the Angular example — **[Casper WebClient](https://casper-webclient.interchouette.net/)** — lets you exercise the Wasm SDK in the browser against public networks (testnet / mainnet).
+
+- Live demo: https://casper-webclient.interchouette.net/
+- Source: [`examples/frontend/angular`](../examples/frontend/angular)
+- Same UI is also packaged as the [Desktop Electron demo](#desktop-electron-demo-app)
+
+Demo / development only — same warning as above.
+
 ## MCP sidecar
 
 The workspace package [`mcp/`](../mcp/) (`casper-rust-wasm-sdk-mcp`) exposes the native Rust SDK as [MCP](https://modelcontextprotocol.io/) tools for Cursor and other agents (stdio or Streamable HTTP on **8790**).
@@ -162,6 +172,8 @@ $ npm start
 
 ## Web Angular
 
+The full in-repo Angular example is the **Casper WebClient**. Try the hosted build at **[https://casper-webclient.interchouette.net/](https://casper-webclient.interchouette.net/)**, or run it locally from [`examples/frontend/angular`](../examples/frontend/angular).
+
 > package.json
 
 ```json
@@ -234,7 +246,7 @@ Add the SDK Wasm file to the assets of your project with the path parameter bein
 
 #### Frontend Angular example
 
-You can look at a more advanced example of usage in the [Angular example app](examples/frontend/angular/src/app/app.component.ts).
+Try the hosted **[Casper WebClient](https://casper-webclient.interchouette.net/)**, or look at a more advanced example of usage in the [Angular example app](examples/frontend/angular/src/app/app.component.ts).
 
 ```shell
 $ cd ./examples/frontend/angular
@@ -472,7 +484,7 @@ let block_hash = block.hash;
 console.log(block_hash);
 ```
 
-You can find more examples in [NodeJs examples](../examples/desktop/node/index.ts) or in the [Angular example app](../examples/frontend/angular/src/app/app.component.ts) or in the [React example app](../examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](../tests/e2e/puppeteer/tests.spec.ts).
+You can find more examples in [NodeJs examples](../examples/desktop/node/index.ts), the [Angular example app](../examples/frontend/angular/src/app/app.component.ts) (live at [casper-webclient.interchouette.net](https://casper-webclient.interchouette.net/)), the [React example app](../examples/frontend/react/src/App.tsx), or by reading [Puppeteer e2e tests](../tests/e2e/puppeteer/tests.spec.ts).
 
 </details>
 
@@ -2340,7 +2352,7 @@ console.log(deploy_hash);
 
 ![Casper Electron App](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/blob/dev/docs/images/get_status-electron.png)
 
-The Electron based demo app loads the Angular example build. You can use this app on your computer to test every action the SDK can take.
+The Electron based demo app loads the Angular webclient build (the same UI hosted at [casper-webclient.interchouette.net](https://casper-webclient.interchouette.net/)). You can use this app on your computer to test every action the SDK can take.
 
 ```shell
 $ cd ./examples/desktop/electron
