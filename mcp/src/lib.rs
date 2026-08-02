@@ -1,6 +1,11 @@
 //! MCP sidecar library for `casper-rust-wasm-sdk`.
-//!
-//! Phase 1 stub: path-depends on the SDK and compiles. Tool surface lands in later phases.
+
+pub mod format;
+pub mod sdk_handle;
+pub mod server;
+pub mod tools;
+
+pub use server::{run, run_http, DEFAULT_HTTP_LISTEN};
 
 /// Crate version (kept in sync with `Cargo.toml`).
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -28,13 +33,6 @@ pub fn enabled_features() -> Vec<&'static str> {
     features
 }
 
-/// Ensure the SDK path dependency stays linked in Phase 1 (no tools yet).
-pub fn sdk_crate_name() -> &'static str {
-    // Touch a public SDK root item so the dep is not dead-code eliminated in checks.
-    let _ = std::any::type_name::<casper_rust_wasm_sdk::SDK>();
-    "casper-rust-wasm-sdk"
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -51,10 +49,5 @@ mod tests {
         assert!(features.contains(&"rpc"));
         assert!(features.contains(&"helpers"));
         assert!(features.contains(&"write"));
-    }
-
-    #[test]
-    fn sdk_path_dep_resolves() {
-        assert_eq!(sdk_crate_name(), "casper-rust-wasm-sdk");
     }
 }
