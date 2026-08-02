@@ -157,3 +157,8 @@ mcp-test-live:
 		cargo test -p casper-rust-wasm-sdk-mcp --lib -- --ignored --nocapture
 
 .PHONY: mcp-build mcp-docker-build mcp-http mcp-http-stop run-mcp run-mcp-http mcp-test mcp-test-live
+# HTTP (compose) + Docker stdio against live NCTL. Requires: make mcp-http, NCTL up.
+mcp-smoke:
+	bash mcp/scripts/smoke_transports.sh
+
+.PHONY: mcp-smoke
