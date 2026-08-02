@@ -485,10 +485,7 @@ impl CasperSdkMcp {
     }
 
     #[tool(description = "Binary port: latest block header")]
-    async fn sdk_get_binary_latest_block_header(
-        &self,
-        node_address: Option<String>,
-    ) -> ToolOutput {
+    async fn sdk_get_binary_latest_block_header(&self, node_address: Option<String>) -> ToolOutput {
         tools::binary_port::get_binary_latest_block_header(node_address).await
     }
 
@@ -611,10 +608,7 @@ impl CasperSdkMcp {
     }
 
     #[tool(description = "Binary port: chainspec raw bytes")]
-    async fn sdk_get_binary_chainspec_raw_bytes(
-        &self,
-        node_address: Option<String>,
-    ) -> ToolOutput {
+    async fn sdk_get_binary_chainspec_raw_bytes(&self, node_address: Option<String>) -> ToolOutput {
         tools::binary_port::get_binary_chainspec_raw_bytes(node_address).await
     }
 
@@ -725,7 +719,9 @@ impl CasperSdkMcp {
         tools::binary_port::get_binary_read_record(record_id, key_hex, node_address).await
     }
 
-    #[tool(description = "Binary port: global state item (formatted key; path as a/b or JSON array)")]
+    #[tool(
+        description = "Binary port: global state item (formatted key; path as a/b or JSON array)"
+    )]
     async fn sdk_get_binary_global_state_item(
         &self,
         key: String,
@@ -803,7 +799,9 @@ impl CasperSdkMcp {
 
     // --- transaction (feature = "transaction") ---
 
-    #[tool(description = "Build unsigned transaction from builder_params_json + transaction_params_json")]
+    #[tool(
+        description = "Build unsigned transaction from builder_params_json + transaction_params_json"
+    )]
     async fn sdk_make_transaction(
         &self,
         builder_params_json: String,

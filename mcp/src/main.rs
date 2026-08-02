@@ -1,8 +1,8 @@
 //! `casper-rust-wasm-sdk-mcp` — MCP server (stdio by default, optional Streamable HTTP).
 
 use anyhow::Result;
-use clap::Parser;
 use casper_rust_wasm_sdk_mcp::server::{run, run_http, DEFAULT_HTTP_LISTEN};
+use clap::Parser;
 
 #[derive(Debug, Parser)]
 #[command(

@@ -17,7 +17,10 @@ fn verb(verbosity: Option<&str>) -> Option<casper_rust_wasm_sdk::types::verbosit
     sdk_handle::verbosity_override(verbosity)
 }
 
-fn parse_dictionary_item(kind: &str, fields: &serde_json::Value) -> Result<DictionaryItemInput, String> {
+fn parse_dictionary_item(
+    kind: &str,
+    fields: &serde_json::Value,
+) -> Result<DictionaryItemInput, String> {
     let mut params = DictionaryItemStrParams::new();
     match kind {
         "uref" => {

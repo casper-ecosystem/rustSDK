@@ -238,10 +238,7 @@ pub async fn install(
         return format::err("wasm_hex decoded empty");
     }
     let sdk = sdk_handle::sdk_snapshot();
-    match sdk
-        .install(params, Bytes::from(bytes), rpc_address)
-        .await
-    {
+    match sdk.install(params, Bytes::from(bytes), rpc_address).await {
         Ok(resp) => format::serialize_ok(&resp.result),
         Err(err) => format::err(err),
     }
@@ -285,10 +282,7 @@ pub async fn call_entrypoint(
         Err(err) => return format::err(err),
     };
     let sdk = sdk_handle::sdk_snapshot();
-    match sdk
-        .call_entrypoint(builder, params, rpc_address)
-        .await
-    {
+    match sdk.call_entrypoint(builder, params, rpc_address).await {
         Ok(resp) => format::serialize_ok(&resp.result),
         Err(err) => format::err(err),
     }
