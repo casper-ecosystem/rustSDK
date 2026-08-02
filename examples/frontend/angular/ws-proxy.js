@@ -9,6 +9,11 @@ let currentConnections = 0;
 
 const wsServer = new WebSocket.Server({ port: 4300 });
 
+wsServer.on('error', (err) => {
+  // Prevent unhandled 'error' crash (e.g. EADDRINUSE when another instance holds 4300).
+  console.error('WebSocket server error:', err.message);
+});
+
 const allowedHosts = process.env.ALLOWED_HOSTS
   ? process.env.ALLOWED_HOSTS.split(',').map((host) => host.trim())
   : ['localhost', '127.0.0.1'];
