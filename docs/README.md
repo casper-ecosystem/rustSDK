@@ -16,9 +16,10 @@ This page covers different examples of using the SDK.
 The workspace package [`mcp/`](../mcp/) (`casper-rust-wasm-sdk-mcp`) exposes the native Rust SDK as [MCP](https://modelcontextprotocol.io/) tools for Cursor and other agents (stdio or Streamable HTTP on **8790**).
 
 ```bash
-make run-mcp      # stdio
-make mcp-http     # http://127.0.0.1:8790/mcp
+make run-mcp      # stdio (host)
+make mcp-http     # Docker → http://127.0.0.1:8790/mcp
 make mcp-test
+make mcp-test-live  # against live NCTL
 ```
 
 See [`mcp/README.md`](../mcp/README.md), tool inventory [`mcp/TOOLS.md`](../mcp/TOOLS.md), and Cursor sample [`mcp/mcp.json.example`](../mcp/mcp.json.example).
