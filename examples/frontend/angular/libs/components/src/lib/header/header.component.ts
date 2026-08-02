@@ -36,6 +36,8 @@ export class HeaderComponent implements AfterViewInit {
   node_address: string = this.network.node_address;
   customNetwork!: string;
   is_network_tab_open!: boolean;
+  /** Resolved against index.html under Electron file:// (avoids file:///assets/...). */
+  logo_src = 'assets/logo.svg';
 
   private window!: (Window & typeof globalThis) | null;
   private is_electron!: boolean;
@@ -53,6 +55,7 @@ export class HeaderComponent implements AfterViewInit {
   ) {
     this.window = this.document.defaultView;
     this.is_electron = this.isElectron();
+    this.logo_src = this.resolveBundledAssetUrl('assets/logo.svg');
   }
 
   async ngAfterViewInit() {
@@ -208,8 +211,23 @@ export class HeaderComponent implements AfterViewInit {
   private isElectron(): boolean {
     return (
       typeof this.window !== 'undefined' &&
-      window.location?.origin?.startsWith('file://')
+      (window.location?.protocol === 'file:' ||
+        window.location?.origin?.startsWith('file://') === true)
     );
+  }
+
+  private resolveBundledAssetUrl(assetPath: string): string {
+    const normalized = assetPath.replace(/^\//, '');
+    if (!this.is_electron || !this.window) {
+      return normalized;
+    }
+    const withoutHash = this.window.location.href.split('#')[0];
+    const base = withoutHash.endsWith('.html')
+      ? withoutHash.slice(0, withoutHash.lastIndexOf('/') + 1)
+      : withoutHash.endsWith('/')
+        ? withoutHash
+        : `${withoutHash}/`;
+    return new URL(normalized, base).href;
   }
 
   private isLocalhostNetwork(): boolean {
@@ -221,14 +239,11 @@ export class HeaderComponent implements AfterViewInit {
     try {
       // Use runtime config network_rpc_url if provided (overrides network selection)
       const networkRpcUrl = this.config['network_rpc_url'] as
-        | string
-        | undefined;
+        string | undefined;
       const corsAnywhereUrl = this.config['cors_anywhere_url'] as
-        | string
-        | undefined;
+        string | undefined;
       const networkNodeUrl = this.config['network_node_url'] as
-        | string
-        | undefined;
+        string | undefined;
 
       if (this.is_electron) {
         this.sdk.setRPCAddress(networkRpcUrl || this.rpc_address);

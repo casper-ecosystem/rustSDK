@@ -4,8 +4,9 @@ import {
   importProvidersFrom,
   Provider,
 } from '@angular/core';
+import { APP_BASE_HREF } from '@angular/common';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideRouter, Routes } from '@angular/router';
+import { provideRouter, Routes, withHashLocation } from '@angular/router';
 import {
   NODE_ADDRESS,
   RPC_ADDRESS,
@@ -31,6 +32,32 @@ declare global {
     };
   }
 }
+
+/** Electron loads the UI via file://; PathLocationStrategy breaks asset URLs there. */
+function isElectronShell(): boolean {
+  if (typeof globalThis === 'undefined' || !('location' in globalThis)) {
+    return false;
+  }
+  const loc = (globalThis as Window & typeof globalThis).location;
+  return loc.protocol === 'file:' || loc.origin?.startsWith('file://') === true;
+}
+
+/** Resolve bundled assets against index.html for Electron file:// loads. */
+function resolveBundledAssetUrl(assetPath: string): string {
+  const normalized = assetPath.replace(/^\//, '');
+  if (!isElectronShell() || typeof window === 'undefined') {
+    return normalized;
+  }
+  const withoutHash = window.location.href.split('#')[0];
+  const base = withoutHash.endsWith('.html')
+    ? withoutHash.slice(0, withoutHash.lastIndexOf('/') + 1)
+    : withoutHash.endsWith('/')
+      ? withoutHash
+      : `${withoutHash}/`;
+  return new URL(normalized, base).href;
+}
+
+const electronShell = isElectronShell();
 
 let networks: Network[] = Object.entries(config['networks']).map(
   ([name, network]) => ({
@@ -70,10 +97,14 @@ const routes: Routes = [
 ];
 
 const providers: Array<Provider | EnvironmentProviders> = [
-  provideRouter(routes),
+  provideRouter(routes, ...(electronShell ? [withHashLocation()] : [])),
+  ...(electronShell ? [{ provide: APP_BASE_HREF, useValue: './' }] : []),
   { provide: ENV, useValue: environment },
   { provide: CONFIG, useValue: config },
-  { provide: WASM_ASSET_PATH, useValue: config['wasm_asset_path'] as string },
+  {
+    provide: WASM_ASSET_PATH,
+    useValue: resolveBundledAssetUrl(config['wasm_asset_path'] as string),
+  },
   {
     provide: RPC_ADDRESS,
     useValue: (config['network'] as Network)?.rpc_address,

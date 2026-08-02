@@ -7,6 +7,7 @@
     "start-ws-proxy": "node ws-proxy.js",
     "start": "concurrently \"nx serve --host 0.0.0.0\" \"node ws-proxy.js\"",
     "build": "nx build",
+    "build:electron": "nx build --configuration=electron",
     "test": "nx test",
     "serve": "nx serve --host 0.0.0.0",
     "serve:prod": "nx serve --configuration=production --host 0.0.0.0",
