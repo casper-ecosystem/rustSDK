@@ -1,3 +1,7 @@
+[workspace]
+members = [".", "mcp"]
+resolver = "2"
+
 [package]
 name = "casper-rust-wasm-sdk"
 version = "2.2.2"

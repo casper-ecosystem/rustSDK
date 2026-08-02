@@ -1,0 +1,19 @@
+---
+description: Prefer MCP tools to talk to NCTL / Casper nodes — no ad-hoc curl or docker exec for chain queries
+alwaysApply: true
+---
+
+# Use MCP for NCTL / chain access
+
+When this workspace needs a live Casper / NCTL node:
+
+1. **Chain / SDK calls** — use **casper-rust-wasm-sdk** MCP (`:8790`, tools `sdk_*`). Prefer `sdk_help`, `sdk_get_node_status`, `sdk_get_block`, `sdk_query_balance`, etc. Start with `make mcp-http` or host `make run-mcp-http`.
+2. **NCTL lifecycle** (start/stop/assets/logs) — use **casper-nctl-2-docker** MCP (`:8788`) when that server is configured; do not reinvent `docker compose` / `make start` via shell unless MCP is unavailable.
+3. **Do not** probe NCTL with raw `curl` to `:11101`, `docker exec` into `casper-nctl-*`, or one-off SDK binaries for agent work when the SDK MCP is up.
+
+```text
+❌ curl -d '{"method":"info_get_status"...}' http://127.0.0.1:11101/rpc
+✅ CallMcpTool → sdk_get_node_status (casper-rust-wasm-sdk MCP)
+```
+
+Defaults: `CASPER_RPC_URL=http://127.0.0.1:11101`, `CASPER_NODE_URL=127.0.0.1:28101`. Config: `mcp/mcp.json.example` → `.cursor/mcp.json`.
