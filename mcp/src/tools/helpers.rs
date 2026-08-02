@@ -176,9 +176,7 @@ pub fn cl_value_to_json(cl_value_json: String) -> ToolOutput {
     let cl_value: casper_types::CLValue = match serde_json::from_str(&cl_value_json) {
         Ok(v) => v,
         Err(err) => {
-            return format::err(format!(
-                "cl_value_json must deserialize as CLValue: {err}"
-            ))
+            return format::err(format!("cl_value_json must deserialize as CLValue: {err}"))
         }
     };
     match helpers::cl_value_to_json(&cl_value) {
