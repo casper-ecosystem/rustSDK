@@ -2348,12 +2348,14 @@ $ npm start
 $ npm build
 ```
 
-You can download a pre-built desktop alpha from the **`dev`** branch (these binaries are not shipped on `2.2.2` / `2.2.2-mcp`):
+You can download a pre-built desktop alpha from the **`dev`** branch (Git LFS — use `media.githubusercontent.com`, not `raw.githubusercontent.com`, or you only get the LFS pointer text). These binaries are not shipped on `2.2.2` / `2.2.2-mcp`:
 
-- [Microsoft Windows](https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/Casper%20Webclient%202.2.0.exe)
-- [GNU/Linux AppImage](https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/Casper%20Webclient-2.2.0.AppImage)
-- [GNU/Linux Snap](https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/casper-webclient_2.2.0_amd64.snap)
+- [Microsoft Windows](https://media.githubusercontent.com/media/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/Casper%20Webclient%202.2.0.exe)
+- [GNU/Linux AppImage](https://media.githubusercontent.com/media/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/Casper%20Webclient-2.2.0.AppImage)
+- [GNU/Linux Snap](https://media.githubusercontent.com/media/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/casper-webclient_2.2.0_amd64.snap)
 - [Mac][TODO]
+
+Release builds are also attached to [GitHub Release v2.2.2](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/tag/v2.2.2).
 
 </details>
 
