@@ -104,3 +104,84 @@ docker-deploy-prod:
 	ssh ubuntu@casper-box "sudo docker compose -f /home/ubuntu/webclient/docker-compose.yml up -d --force-recreate"
 
 .PHONY: docker-build docker-start docker-stop docker-start-prod docker-stop-prod
+
+# --- MCP sidecar (mcp/ — path-depends on casper-rust-wasm-sdk) ---
+
+MCP_NAME ?= casper-rust-wasm-sdk-mcp
+MCP_VERSION ?= 2.2.2-mcp
+MCP_IMAGE ?= $(MCP_NAME):$(MCP_VERSION)
+MCP_HUB_IMAGE ?= interchouette/$(MCP_NAME)
+MCP_GHCR_PERSONAL_IMAGE ?= ghcr.io/groussac/$(MCP_NAME)
+MCP_GHCR_ORG_IMAGE ?= ghcr.io/interchouette-itc/$(MCP_NAME)
+COMPOSE_MCP ?= docker/docker-compose.mcp.yml
+DOCKER_BUILDKIT ?= 1
+
+mcp-build:
+	cargo build -p casper-rust-wasm-sdk-mcp --release
+
+mcp-docker-build:
+	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build --network=host \
+		-t $(MCP_IMAGE) \
+		-t $(MCP_NAME):latest \
+		-t $(MCP_HUB_IMAGE):$(MCP_VERSION) \
+		-t $(MCP_HUB_IMAGE):latest \
+		-f mcp/Dockerfile \
+		.
+
+mcp-docker-push-hub:
+	docker push $(MCP_HUB_IMAGE):$(MCP_VERSION)
+	docker push $(MCP_HUB_IMAGE):latest
+
+mcp-docker-push-ghcr-personal:
+	docker tag $(MCP_HUB_IMAGE):$(MCP_VERSION) $(MCP_GHCR_PERSONAL_IMAGE):$(MCP_VERSION)
+	docker tag $(MCP_HUB_IMAGE):latest $(MCP_GHCR_PERSONAL_IMAGE):latest
+	docker push $(MCP_GHCR_PERSONAL_IMAGE):$(MCP_VERSION)
+	docker push $(MCP_GHCR_PERSONAL_IMAGE):latest
+
+mcp-docker-push-ghcr-itc:
+	docker tag $(MCP_HUB_IMAGE):$(MCP_VERSION) $(MCP_GHCR_ORG_IMAGE):$(MCP_VERSION)
+	docker tag $(MCP_HUB_IMAGE):latest $(MCP_GHCR_ORG_IMAGE):latest
+	docker push $(MCP_GHCR_ORG_IMAGE):$(MCP_VERSION)
+	docker push $(MCP_GHCR_ORG_IMAGE):latest
+
+mcp-docker-push: mcp-docker-push-hub mcp-docker-push-ghcr-personal mcp-docker-push-ghcr-itc
+
+# Prefer local/Hub image; build if missing.
+mcp-http:
+	-docker pull $(MCP_HUB_IMAGE):$(MCP_VERSION)
+	@if ! docker image inspect $(MCP_HUB_IMAGE):$(MCP_VERSION) >/dev/null 2>&1 \
+		&& ! docker image inspect $(MCP_IMAGE) >/dev/null 2>&1; then \
+		echo "MCP image missing; building locally…"; \
+		$(MAKE) mcp-docker-build; \
+	fi
+	CASPER_SDK_MCP_IMAGE=$$(docker image inspect $(MCP_HUB_IMAGE):$(MCP_VERSION) >/dev/null 2>&1 \
+		&& echo $(MCP_HUB_IMAGE):$(MCP_VERSION) \
+		|| echo $(MCP_IMAGE)) \
+		docker compose -f $(COMPOSE_MCP) up -d --force-recreate
+
+mcp-http-stop:
+	-docker compose -f $(COMPOSE_MCP) down --remove-orphans
+	-docker stop casper-rust-wasm-sdk-mcp 2>/dev/null
+	-docker rm casper-rust-wasm-sdk-mcp 2>/dev/null
+
+run-mcp:
+	cargo run -p casper-rust-wasm-sdk-mcp --quiet --
+
+run-mcp-http:
+	cargo run -p casper-rust-wasm-sdk-mcp --quiet -- --http --listen 127.0.0.1:8790
+
+mcp-test:
+	cargo test -p casper-rust-wasm-sdk-mcp
+
+mcp-test-live:
+	CASPER_RPC_URL=$${CASPER_RPC_URL:-http://127.0.0.1:11101} \
+	CASPER_NODE_URL=$${CASPER_NODE_URL:-127.0.0.1:28101} \
+		cargo test -p casper-rust-wasm-sdk-mcp --lib -- --ignored --nocapture
+
+# HTTP (compose) + Docker stdio against live NCTL. Requires: make mcp-http, NCTL up.
+mcp-smoke:
+	bash mcp/scripts/smoke_transports.sh
+
+.PHONY: mcp-build mcp-docker-build mcp-docker-push-hub mcp-docker-push-ghcr-personal \
+	mcp-docker-push-ghcr-itc mcp-docker-push mcp-http mcp-http-stop \
+	run-mcp run-mcp-http mcp-test mcp-test-live mcp-smoke

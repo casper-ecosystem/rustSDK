@@ -1,0 +1,21 @@
+# Slim MCP sidecar (Streamable HTTP on :8790).
+# Use: make mcp-http / make mcp-http-stop
+# Build context is the repo root (SDK path dep + [patch.crates-io]).
+services:
+  sdk-mcp:
+    image: ${CASPER_SDK_MCP_IMAGE:-interchouette/casper-rust-wasm-sdk-mcp:2.2.2-mcp}
+    container_name: casper-rust-wasm-sdk-mcp
+    build:
+      context: ..
+      dockerfile: mcp/Dockerfile
+    ports:
+      - "8790:8790"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      CASPER_SDK_MCP_HTTP: "1"
+      CASPER_SDK_MCP_ADDR: "0.0.0.0:8790"
+      CASPER_RPC_URL: ${CASPER_RPC_URL:-http://host.docker.internal:11101}
+      CASPER_NODE_URL: ${CASPER_NODE_URL:-host.docker.internal:28101}
+      CASPER_VERBOSITY: ${CASPER_VERBOSITY:-low}
+      RUST_LOG: ${RUST_LOG:-warn}

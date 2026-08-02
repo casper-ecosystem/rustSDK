@@ -1,0 +1,53 @@
+[package]
+name = "casper-rust-wasm-sdk-mcp"
+version = "2.2.2"
+edition = "2021"
+rust-version = "1.85"
+license = "Apache-2.0"
+description = "MCP server for casper-rust-wasm-sdk (stdio + Streamable HTTP)"
+readme = "README.md"
+repository = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk"
+authors = ["gRoussac"]
+
+[[bin]]
+name = "casper-rust-wasm-sdk-mcp"
+path = "src/main.rs"
+
+[lib]
+name = "casper_rust_wasm_sdk_mcp"
+path = "src/lib.rs"
+
+[features]
+default = ["full"]
+full = [
+  "rpc",
+  "binary-port",
+  "transaction",
+  "deploy",
+  "contract",
+  "helpers",
+  "write",
+]
+rpc = []
+binary-port = []
+transaction = []
+deploy = []
+contract = []
+helpers = []
+write = []
+
+[dependencies]
+anyhow = "1"
+casper-rust-wasm-sdk = { path = ".." }
+casper-types = { version = "7.0.0", default-features = false, features = [
+  "datasize",
+] }
+clap = { version = "4", features = ["derive", "env"] }
+hex = "0.4"
+mcpkit = "0.7"
+mcpkit-axum = "0.7"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }

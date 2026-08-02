@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "casper-rust-wasm-sdk": {
+      "url": "http://127.0.0.1:8790/mcp"
+    },
+    "casper-rust-wasm-sdk-stdio-docker": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "--add-host",
+        "host.docker.internal:host-gateway",
+        "-e",
+        "CASPER_RPC_URL=http://host.docker.internal:11101",
+        "-e",
+        "CASPER_NODE_URL=host.docker.internal:28101",
+        "-e",
+        "RUST_LOG=warn",
+        "--entrypoint",
+        "casper-rust-wasm-sdk-mcp",
+        "interchouette/casper-rust-wasm-sdk-mcp:2.2.2-mcp"
+      ]
+    }
+  }
+}

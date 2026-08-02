@@ -1,0 +1,19 @@
+# Keep MCP image builds lean (context = repo root).
+# `tests/integration/rust` is required: root Cargo.toml has a path dep on `sdk_tests`.
+.git
+.github
+target
+**/target
+examples
+pkg
+pkg-nodejs
+docs
+docker
+*.md
+!mcp/README.md
+.env
+.cursor
+node_modules
+**/*.wasm
+tests/e2e
+tests/integration/rust/target
