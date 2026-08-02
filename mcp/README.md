@@ -35,7 +35,14 @@ Slim feature set:
 cargo build -p casper-rust-wasm-sdk-mcp --no-default-features --features "rpc,helpers"
 ```
 
-## Tools (Phase 2)
+## Tools (Phase 3)
 
-Always on: `sdk_help`, `sdk_get_endpoints`, `sdk_set_endpoints`.  
-Feature groups (`helpers`, `rpc`, …) land in Phases 3–5 — see TOOLS.md.
+Always on: `sdk_help`, `sdk_get_endpoints`, `sdk_set_endpoints`.
+
+**helpers** (18): timestamp, blake2b, dictionary key, CEP-18 base64 keys, TTL/gas, keygen, hex, motes, JSON/CLValue helpers.
+
+**rpc** (22): node status, peers, chainspec, blocks, balances, entity/account, transaction/deploy lookups, dictionary/global state, speculative exec, `list_rpcs`.
+
+Later phases: binary-port, transaction builders, deploy, contract, write.
+
+> Note: mcpkit registers helper/rpc tools in the binary even when those Cargo features are off; `sdk_help` lists only enabled feature groups. Domain modules for Phase 3 are always compiled so feature splits stay buildable.

@@ -39,9 +39,11 @@ write = []
 [dependencies]
 anyhow = "1"
 casper-rust-wasm-sdk = { path = ".." }
+casper-types = { version = "7.1.1", default-features = false, features = ["datasize"] }
 clap = { version = "4", features = ["derive", "env"] }
 mcpkit = "0.7"
 mcpkit-axum = "0.7"
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 tracing = "0.1"
