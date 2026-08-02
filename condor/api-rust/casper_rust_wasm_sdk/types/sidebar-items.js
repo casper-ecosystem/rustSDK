@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["access_rights","addr","cl","deploy","deploy_params","digest","era_id","hash","identifier","key","path","peer_entry","pricing_mode","public_key","record_id","sdk_error","transaction","transaction_params","uref","verbosity","wallet"]};
