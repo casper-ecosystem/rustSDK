@@ -1,8 +1,12 @@
 name: publish-rust-sdk-ts
 
+# Disabled: Wasm packages are not published to npm.
+# on:
+#   release:
+#     types: [created]
+
 on:
-  release:
-    types: [created]
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -28,11 +32,11 @@ jobs:
           target: wasm32-unknown-unknown
       - run: make build
 
-      - name: Publish pkg to NPM
-        run: npm publish pkg/ --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Publish pkg-nodejs to NPM
-        run: npm publish pkg-nodejs/ --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # - name: Publish pkg to NPM
+      #   run: npm publish pkg/ --access public
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # - name: Publish pkg-nodejs to NPM
+      #   run: npm publish pkg-nodejs/ --access public
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
