@@ -38,6 +38,8 @@ jobs:
           folder: docs # The folder the action should deploy.
 
   desktop-assets:
+    # Electron demos belong on product releases, not MCP sidecar tags.
+    if: ${{ !contains(github.event.release.tag_name, 'mcp') }}
     runs-on: ubuntu-latest
 
     steps:
@@ -91,11 +93,13 @@ jobs:
           set -euo pipefail
           RELEASE_DIR="examples/desktop/electron/release"
           TAG="${{ github.event.release.tag_name }}"
-          VERSION="${TAG#v}"
+          # electron-builder names files from package.json version, not the git tag
+          # (e.g. tag v2.2.2-mcp still builds Casper Webclient 2.2.2.exe).
+          PKG_VERSION=$(jq -r .version examples/desktop/electron/package.json)
 
-          EXE="$RELEASE_DIR/Casper Webclient ${VERSION}.exe"
-          APPIMAGE="$RELEASE_DIR/Casper Webclient-${VERSION}.AppImage"
-          SNAP="$RELEASE_DIR/casper-webclient_${VERSION}_amd64.snap"
+          EXE="$RELEASE_DIR/Casper Webclient ${PKG_VERSION}.exe"
+          APPIMAGE="$RELEASE_DIR/Casper Webclient-${PKG_VERSION}.AppImage"
+          SNAP="$RELEASE_DIR/casper-webclient_${PKG_VERSION}_amd64.snap"
 
           for f in "$EXE" "$APPIMAGE" "$SNAP"; do
             if [[ ! -f "$f" ]]; then
@@ -105,4 +109,16 @@ jobs:
             fi
           done
 
-          gh release upload "$TAG" "$EXE" "$APPIMAGE" "$SNAP" --clobber
+          # Stable names so README can use /releases/latest/download/... forever.
+          cp "$EXE" "$RELEASE_DIR/casper-webclient-windows.exe"
+          cp "$APPIMAGE" "$RELEASE_DIR/casper-webclient-linux.AppImage"
+          cp "$SNAP" "$RELEASE_DIR/casper-webclient-linux.snap"
+
+          gh release upload "$TAG" \
+            "$EXE" \
+            "$APPIMAGE" \
+            "$SNAP" \
+            "$RELEASE_DIR/casper-webclient-windows.exe" \
+            "$RELEASE_DIR/casper-webclient-linux.AppImage" \
+            "$RELEASE_DIR/casper-webclient-linux.snap" \
+            --clobber

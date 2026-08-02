@@ -2361,11 +2361,11 @@ $ npm start
 $ npm build
 ```
 
-You can download a pre-built desktop alpha from the **`dev`** branch (these binaries are not shipped on `2.2.2` / `2.2.2-mcp`):
+Download pre-built desktop demos from the **[latest GitHub Release](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/latest)** (CI artifacts — not Git LFS / raw links):
 
-- [Microsoft Windows](https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/Casper%20Webclient%202.2.0.exe)
-- [GNU/Linux AppImage](https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/Casper%20Webclient-2.2.0.AppImage)
-- [GNU/Linux Snap](https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/casper-webclient_2.2.0_amd64.snap)
+- [Microsoft Windows](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/latest/download/casper-webclient-windows.exe)
+- [GNU/Linux AppImage](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/latest/download/casper-webclient-linux.AppImage)
+- [GNU/Linux Snap](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/latest/download/casper-webclient-linux.snap)
 - [Mac][TODO]
 
 </details>
