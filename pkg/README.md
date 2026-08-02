@@ -1,4 +1,4 @@
-# Casper Rust/Wasm SDK 2.0
+# Casper Rust/Wasm SDK 2.2.2
 
 The Rust/Wasm SDK allows developers and users to interact with the Casper Blockchain using Rust or TypeScript. It provides a way to embed the [casper-client-rs](https://github.com/casper-ecosystem/casper-client-rs) into another application without the CLI interface. The SDK exposes a list of types and methods from a subset of the Casper client.
 
@@ -2336,11 +2336,8 @@ $ npm start
 $ npm build
 ```
 
-You can download an alpha version of the app illustrating the SDK here:
+Pre-built desktop binaries (Windows / AppImage / Snap) are published on the [`dev` branch](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/tree/dev/examples/desktop/electron/release) only — they are not included on `2.2.2`. See the [`dev` README](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/blob/dev/docs/README.md#desktop-electron-demo-app) for download links.
 
-- [Microsoft Windows](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/raw/dev/examples/desktop/electron/release/Casper%20Webclient%202.0.0.exe)
-- [GNU/Linux AppImage](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/raw/dev/examples/desktop/electron/release/Casper%20Webclient-2.0.0.AppImage)
-- [GNU/Linux Snap](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/raw/dev/examples/desktop/electron/release/casper-webclient_2.0.0_amd64.snap)
 - [Mac][TODO]
 
 </details>
