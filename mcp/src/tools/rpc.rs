@@ -475,3 +475,40 @@ pub async fn speculative_exec_deploy(
             .await
     )
 }
+
+#[cfg(test)]
+mod live_tests {
+    use super::*;
+
+    /// Requires a reachable JSON-RPC node (`CASPER_RPC_URL`, default NCTL `:11101`).
+    #[tokio::test]
+    #[ignore = "requires live NCTL / RPC"]
+    async fn live_sdk_get_node_status() {
+        let rpc = std::env::var("CASPER_RPC_URL")
+            .unwrap_or_else(|_| "http://127.0.0.1:11101".to_string());
+        let out = get_node_status(Some("low".into()), Some(rpc)).await;
+        let text = format!("{out:?}");
+        assert!(
+            text.contains("api_version") || text.contains("peers") || text.contains("protocol"),
+            "unexpected ToolOutput (is NCTL up?): {text}"
+        );
+        assert!(
+            !text.to_lowercase().contains("connection refused")
+                && !text.to_lowercase().contains("error(\"http"),
+            "RPC failed: {text}"
+        );
+    }
+
+    #[tokio::test]
+    #[ignore = "requires live NCTL / RPC"]
+    async fn live_sdk_get_peers() {
+        let rpc = std::env::var("CASPER_RPC_URL")
+            .unwrap_or_else(|_| "http://127.0.0.1:11101".to_string());
+        let out = get_peers(None, Some(rpc)).await;
+        let text = format!("{out:?}");
+        assert!(
+            text.contains("peer") || text.contains("address") || text.contains("[]"),
+            "unexpected peers ToolOutput: {text}"
+        );
+    }
+}

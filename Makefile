@@ -107,8 +107,40 @@ docker-deploy-prod:
 
 # --- MCP sidecar (mcp/ — path-depends on casper-rust-wasm-sdk) ---
 
+MCP_NAME ?= casper-rust-wasm-sdk-mcp
+MCP_VERSION ?= 2.2.2
+MCP_IMAGE ?= $(MCP_NAME):$(MCP_VERSION)
+MCP_HUB_IMAGE ?= interchouette/$(MCP_NAME)
+COMPOSE_MCP ?= docker/docker-compose.mcp.yml
+DOCKER_BUILDKIT ?= 1
+
 mcp-build:
 	cargo build -p casper-rust-wasm-sdk-mcp --release
+
+mcp-docker-build:
+	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build --network=host \
+		-t $(MCP_IMAGE) \
+		-t $(MCP_NAME):latest \
+		-t $(MCP_HUB_IMAGE):$(MCP_VERSION) \
+		-f mcp/Dockerfile \
+		.
+
+# Prefer local/Hub image; build if missing.
+mcp-http:
+	@if ! docker image inspect $(MCP_IMAGE) >/dev/null 2>&1 \
+		&& ! docker image inspect $(MCP_HUB_IMAGE):$(MCP_VERSION) >/dev/null 2>&1; then \
+		echo "MCP image missing; building locally…"; \
+		$(MAKE) mcp-docker-build; \
+	fi
+	CASPER_SDK_MCP_IMAGE=$$(docker image inspect $(MCP_HUB_IMAGE):$(MCP_VERSION) >/dev/null 2>&1 \
+		&& echo $(MCP_HUB_IMAGE):$(MCP_VERSION) \
+		|| echo $(MCP_IMAGE)) \
+		docker compose -f $(COMPOSE_MCP) up -d --force-recreate
+
+mcp-http-stop:
+	-docker compose -f $(COMPOSE_MCP) down --remove-orphans
+	-docker stop casper-rust-wasm-sdk-mcp 2>/dev/null
+	-docker rm casper-rust-wasm-sdk-mcp 2>/dev/null
 
 run-mcp:
 	cargo run -p casper-rust-wasm-sdk-mcp --quiet --
@@ -116,10 +148,12 @@ run-mcp:
 run-mcp-http:
 	cargo run -p casper-rust-wasm-sdk-mcp --quiet -- --http --listen 127.0.0.1:8790
 
-# Alias for family parity (host HTTP; no Docker image in this phase).
-mcp-http: run-mcp-http
-
 mcp-test:
 	cargo test -p casper-rust-wasm-sdk-mcp
 
-.PHONY: mcp-build run-mcp run-mcp-http mcp-http mcp-test
+mcp-test-live:
+	CASPER_RPC_URL=$${CASPER_RPC_URL:-http://127.0.0.1:11101} \
+	CASPER_NODE_URL=$${CASPER_NODE_URL:-127.0.0.1:28101} \
+		cargo test -p casper-rust-wasm-sdk-mcp --lib -- --ignored --nocapture
+
+.PHONY: mcp-build mcp-docker-build mcp-http mcp-http-stop run-mcp run-mcp-http mcp-test mcp-test-live

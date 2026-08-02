@@ -6,44 +6,51 @@ Inventory: [TOOLS.md](TOOLS.md). Patterns: [PATTERNS.md](PATTERNS.md). Cursor co
 
 ## Transports
 
-| Mode      | Command                               | Use                                                       |
-| --------- | ------------------------------------- | --------------------------------------------------------- |
-| **stdio** | `make run-mcp`                        | Local Cursor spawn                                        |
-| **HTTP**  | `make mcp-http` / `make run-mcp-http` | Streamable HTTP on **8790** → `http://127.0.0.1:8790/mcp` |
+| Mode | Command | Use |
+| --- | --- | --- |
+| **stdio (Docker)** | see [mcp.json.example](mcp.json.example) `…-stdio` | Cursor spawn via image |
+| **stdio (host)** | `make run-mcp` | Local Cursor spawn |
+| **HTTP (Docker)** | `make mcp-http` | Streamable HTTP on **8790** |
+| **HTTP (host)** | `make run-mcp-http` | Same URL without Docker |
 
 ```bash
-make mcp-build          # release binary → target/release/casper-rust-wasm-sdk-mcp
-make run-mcp            # stdio
-make mcp-http           # HTTP :8790
+make mcp-docker-build   # image casper-rust-wasm-sdk-mcp:2.2.2
+make mcp-http           # docker compose → http://127.0.0.1:8790/mcp
+make mcp-http-stop
+make run-mcp            # stdio (host)
+make run-mcp-http       # HTTP host
 make mcp-test
+make mcp-test-live      # ignored tests vs live NCTL (CASPER_RPC_URL)
 ```
 
 Family ports: 8787 tvs / 8788 nctl / 8789 kms / **8790 sdk**.
 
 ## Env
 
-| Variable              | Role                             | Default                  |
-| --------------------- | -------------------------------- | ------------------------ |
-| `CASPER_SDK_MCP_HTTP` | Use HTTP transport               | off                      |
-| `CASPER_SDK_MCP_ADDR` | HTTP bind                        | `0.0.0.0:8790`           |
-| `CASPER_RPC_URL`      | JSON-RPC                         | `http://127.0.0.1:11101` |
-| `CASPER_NODE_URL`     | Binary port                      | `127.0.0.1:28101`        |
-| `CASPER_VERBOSITY`    | `low` / `medium` / `high`        | `low`                    |
-| `RUST_LOG`            | tracing filter (stderr, no ANSI) | `warn`                   |
+| Variable | Role | Default |
+| --- | --- | --- |
+| `CASPER_SDK_MCP_HTTP` | Use HTTP transport | off (host) / on (image) |
+| `CASPER_SDK_MCP_ADDR` | HTTP bind | `0.0.0.0:8790` |
+| `CASPER_RPC_URL` | JSON-RPC | `http://127.0.0.1:11101` |
+| `CASPER_NODE_URL` | Binary port | `127.0.0.1:28101` |
+| `CASPER_VERBOSITY` | `low` / `medium` / `high` | `low` |
+| `RUST_LOG` | tracing filter (stderr, no ANSI) | `warn` |
+
+Docker containers reach host NCTL via `host.docker.internal` (compose sets `extra_hosts`).
 
 ## Features
 
-| Feature          | Tools                                                   |
-| ---------------- | ------------------------------------------------------- |
-| _(always)_       | `sdk_help`, `sdk_get_endpoints`, `sdk_set_endpoints`    |
-| `helpers`        | utilities (keys, blake2b, motes, …)                     |
-| `rpc`            | JSON-RPC reads + speculative RPC                        |
-| `binary-port`    | binary-port queries (needs `CASPER_NODE_URL`)           |
-| `transaction`    | make / speculative transaction builders                 |
-| `deploy`         | legacy make / speculative deploy builders               |
-| `contract`       | `query_contract_dict`, `query_contract_key`             |
-| `write`          | sign/put/submit, install, call_entrypoint, `try_accept` |
-| `full` (default) | all of the above                                        |
+| Feature | Tools |
+| --- | --- |
+| *(always)* | `sdk_help`, `sdk_get_endpoints`, `sdk_set_endpoints` |
+| `helpers` | utilities (keys, blake2b, motes, …) |
+| `rpc` | JSON-RPC reads + speculative RPC |
+| `binary-port` | binary-port queries (needs `CASPER_NODE_URL`) |
+| `transaction` | make / speculative transaction builders |
+| `deploy` | legacy make / speculative deploy builders |
+| `contract` | `query_contract_dict`, `query_contract_key` |
+| `write` | sign/put/submit, install, call_entrypoint, `try_accept` |
+| `full` (default) | all of the above |
 
 ```bash
 cargo build -p casper-rust-wasm-sdk-mcp
@@ -56,28 +63,21 @@ cargo build -p casper-rust-wasm-sdk-mcp --no-default-features --features "rpc,he
 
 **helpers** (18) · **rpc** (22) · **binary-port** (33) · **transaction** (4) · **deploy** (4) · **contract** (2) · **write** (13).
 
-Complex inputs use JSON strings — see [TOOLS.md](TOOLS.md) and `tools/params.rs` (`transaction_params_json`, `builder_params_json`, …).
+Complex inputs use JSON strings — see [TOOLS.md](TOOLS.md) and `tools/params.rs`.
 
 ## Cursor
 
-Copy an entry from [mcp.json.example](mcp.json.example) into `.cursor/mcp.json`:
+Copy an entry from [mcp.json.example](mcp.json.example) into [`.cursor/mcp.json`](../.cursor/mcp.json) (a starter file is committed). Prefer HTTP after `make mcp-http`, or stdio-cargo while developing.
 
-1. Start HTTP with `make mcp-http`, then use the `…-http` URL entry; **or**
-2. Use `…-stdio-cargo` for spawn-from-source; **or**
-3. `make mcp-build` then `…-stdio-host` for the release binary.
+Agents in this repo must use MCP tools for NCTL/chain access (see `.cursor/rules/sdk-use-mcp-nctl.mdc`).
 
-Point `CASPER_RPC_URL` / `CASPER_NODE_URL` at NCTL (or another node). Compose with **casper-nctl-2-docker** MCP (:8788) for network lifecycle and **kms-secp256k1-api** MCP (:8789) for KMS signing if needed — this sidecar owns SDK calls only.
+Compose with **casper-nctl-2-docker** MCP (:8788) for network lifecycle and **kms-secp256k1-api** MCP (:8789) for KMS signing — this sidecar owns SDK calls only.
 
-## Smoke (Phase 7)
-
-Verified on `feat/mcp-sidecar`:
+## Smoke
 
 | Check | Result |
 | --- | --- |
-| `cargo build -p casper-rust-wasm-sdk-mcp` (full) | pass |
-| `--no-default-features --features "rpc,helpers"` | pass |
-| `--no-default-features --features "binary-port"` | pass |
-| `--no-default-features --features "transaction,write"` | pass |
-| `make mcp-test` / `cargo test -p casper-rust-wasm-sdk-mcp` | pass (14 unit tests) |
-| HTTP bind `127.0.0.1:8790/mcp` initialize | pass (HTTP 200) |
-| Live NCTL / RPC (`11101` / `7777`) | **skipped** (no local node) |
+| Feature-matrix builds + unit tests | pass (Phase 7) |
+| HTTP `initialize` on `:8790/mcp` | pass |
+| Live NCTL `sdk_get_node_status` / `sdk_get_peers` | **pass** (NCTL 2.2 on `:11101`) |
+| Docker image / `make mcp-http` + `tools/call` | **pass** (`casper-rust-wasm-sdk-mcp:2.2.2` → NCTL via `host.docker.internal`) |
