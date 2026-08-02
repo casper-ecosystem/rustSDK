@@ -1,4 +1,4 @@
-# Casper Rust/Wasm SDK 2.0
+# Casper Rust/Wasm SDK 2.2.0
 
 The Rust/Wasm SDK allows developers and users to interact with the Casper Blockchain using Rust or TypeScript. It provides a way to embed the [casper-client-rs](https://github.com/casper-ecosystem/casper-client-rs) into another application without the CLI interface. The SDK exposes a list of types and methods from a subset of the Casper client.
 
@@ -33,7 +33,7 @@ Add the SDK as a dependency of your project:
 > Cargo.toml
 
 ```toml
-casper-rust-wasm-sdk = { version = "2.1.1", git = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk.git" }
+casper-rust-wasm-sdk = { version = "2.2.0", git = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk.git", branch = "dev" }
 ```
 
 ## Usage
@@ -201,9 +201,9 @@ export const fetchWasmFactory = async (params: Params): Promise<SDK> => {
 > wasm.module.ts
 
 ```ts
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { SDK_TOKEN, fetchWasmFactory, provideSafeAsync } from './wasm.factory';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { SDK_TOKEN, fetchWasmFactory, provideSafeAsync } from "./wasm.factory";
 
 const providers = provideSafeAsync(SDK_TOKEN, fetchWasmFactory);
 
@@ -268,13 +268,13 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
 
 ```ts
 // with require
-const casper_sdk = require('casper-rust-wasm-sdk');
+const casper_sdk = require("casper-rust-wasm-sdk");
 const { SDK } = casper_sdk;
 
 // or with import
-import { SDK } from 'casper-rust-wasm-sdk';
+import { SDK } from "casper-rust-wasm-sdk";
 
-const rpc_address = 'https://node.testnet.casper.network';
+const rpc_address = "https://node.testnet.casper.network";
 const sdk = new SDK(rpc_address);
 console.log(sdk);
 ```
@@ -399,10 +399,10 @@ You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io
 #### Get transaction by transaction hash
 
 ```ts
-import { Transaction } from 'casper-rust-wasm-sdk';
+import { Transaction } from "casper-rust-wasm-sdk";
 
 const transaction_hash_as_string =
-  '94b3e6253a4448138fb8b637bd0ca0604270d2f5664f7c221d67eae568fcd668';
+  "94b3e6253a4448138fb8b637bd0ca0604270d2f5664f7c221d67eae568fcd668";
 const finalized_approvals = true;
 
 const get_transaction_options = sdk.get_transaction_options({
@@ -422,7 +422,7 @@ console.log(timestamp, hash);
 
 ```ts
 const deploy_hash_as_string =
-  'a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9';
+  "a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9";
 const finalized_approvals = true;
 
 const get_deploy_options = sdk.get_deploy_options({
@@ -519,18 +519,18 @@ println!("{:?}", make_transfer_transaction.timestamp());
 #### Typescript
 
 ```ts
-import { TransactionStrParams } from 'casper-rust-wasm-sdk';
+import { TransactionStrParams } from "casper-rust-wasm-sdk";
 
-const chain_name = 'integration-test';
+const chain_name = "integration-test";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = undefined;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
-const ttl = '1h'; // or undefined
-const payment_amount = '100000000';
-const transfer_amount = '2500000000';
+const ttl = "1h"; // or undefined
+const payment_amount = "100000000";
+const transfer_amount = "2500000000";
 const target_account =
-  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+  "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
 
 const transaction_params = new TransactionStrParams(
   chain_name,
@@ -599,19 +599,19 @@ println!("{:?}", transfer.as_ref().unwrap().result.transaction_hash.to_hex_strin
 #### Typescript
 
 ```ts
-import { TransactionStrParams, getTimestamp } from 'casper-rust-wasm-sdk';
+import { TransactionStrParams, getTimestamp } from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
-const ttl = '1h'; // or undefined
-const payment_amount = '100000000';
-const transfer_amount = '2500000000';
+const ttl = "1h"; // or undefined
+const payment_amount = "100000000";
+const transfer_amount = "2500000000";
 const target_account =
-  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+  "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
 
 const transaction_params = new TransactionStrParams(
   chain_name,
@@ -685,15 +685,15 @@ import {
   TransactionStrParams,
   TransactionBuilderParams,
   AddressableEntityHash,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'integration-test';
+const chain_name = "integration-test";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const payment_amount = '5000000000';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+const payment_amount = "5000000000";
 const entity_hash_hex_string =
-  '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-const entry_point = 'set_variables';
+  "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+const entry_point = "set_variables";
 
 const transaction_params = new TransactionStrParams(chain_name, public_key);
 transaction_params.payment_amount = payment_amount;
@@ -768,17 +768,17 @@ import {
   TransactionStrParams,
   TransactionBuilderParams,
   AddressableEntityHash,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const payment_amount = '5000000000';
+const payment_amount = "5000000000";
 const entity_hash_hex_string =
-  '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-const entry_point = 'set_variables';
+  "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+const entry_point = "set_variables";
 
 const transaction_params = new TransactionStrParams(
   chain_name,
@@ -895,17 +895,17 @@ import {
   TransactionStrParams,
   TransactionBuilderParams,
   AddressableEntityHash,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const payment_amount = '5000000000';
+const payment_amount = "5000000000";
 const entity_hash_formatted_string =
-  'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-const entry_point = 'set_variables';
+  "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+const entry_point = "set_variables";
 
 const transaction_params = new TransactionStrParams(
   chain_name,
@@ -931,17 +931,17 @@ console.log(put_transaction_result_as_json);
 Puts a [`Transfer Transaction`] to the network for execution.
 
 ```ts
-import { Transaction, TransactionStrParams } from 'casper-rust-wasm-sdk';
+import { Transaction, TransactionStrParams } from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const payment_amount = '100000000';
-const transfer_amount = '2500000000';
+const payment_amount = "100000000";
+const transfer_amount = "2500000000";
 const target_account =
-  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+  "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
 
 const transfer_params = new TransactionStrParams(
   chain_name,
@@ -1016,10 +1016,10 @@ println!("{:?}", transaction_processed);
 In TypeScript, the waitTransaction function provides a similar capability to wait for a specific transaction event. Developers can leverage this function by specifying the event address, transaction hash, and an optional timeout duration. The received EventParseResult object can then be processed to extract valuable information, such as the cost of the transaction.
 
 ```ts
-const events_address = 'http://127.0.0.1:18101/events';
+const events_address = "http://127.0.0.1:18101/events";
 
 const transaction_hash =
-  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+  "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 const timeout_duration = undefined; // 30000 for 30s instead of default timeout duration of 60s
 
@@ -1079,12 +1079,12 @@ println!("{:?}", results);
 Similarly, TypeScript developers can utilize the watchTransaction function to actively watch for transaction events on the Casper blockchain. By creating a transaction watcher and defining callback functions, developers can subscribe to specific transaction hashes and respond dynamically as events unfold.
 
 ```ts
-import { EventParseResult, Subscription } from 'casper-rust-wasm-sdk';
+import { EventParseResult, Subscription } from "casper-rust-wasm-sdk";
 
-const events_address = 'http://127.0.0.1:18101/events';
+const events_address = "http://127.0.0.1:18101/events";
 
 const transaction_hash =
-  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+  "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 // Creates a watcher instance
 const watcher = sdk.watchTransaction(events_address);
@@ -1289,10 +1289,10 @@ with
 ```ts
 async function loadFile() {
   try {
-    const fileBuffer = await fs.readFile('cep78.wasm');
+    const fileBuffer = await fs.readFile("cep78.wasm");
     return fileBuffer.buffer; // Returns an ArrayBuffer
   } catch (error) {
-    throw new Error('Error reading file: ' + error.message);
+    throw new Error("Error reading file: " + error.message);
   }
 }
 ```
@@ -1443,18 +1443,18 @@ import {
   DeployStrParams,
   PaymentStrParams,
   getTimestamp,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'integration-test';
+const chain_name = "integration-test";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = undefined;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
-const ttl = '1h'; // or undefined
-const payment_amount = '100000000';
-const transfer_amount = '2500000000';
+const ttl = "1h"; // or undefined
+const payment_amount = "100000000";
+const transfer_amount = "2500000000";
 const target_account =
-  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+  "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
 
 const deploy_params = new DeployStrParams(
   chain_name,
@@ -1535,19 +1535,19 @@ import {
   DeployStrParams,
   PaymentStrParams,
   getTimestamp,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
-const ttl = '1h'; // or undefined
-const payment_amount = '100000000';
-const transfer_amount = '2500000000';
+const ttl = "1h"; // or undefined
+const payment_amount = "100000000";
+const transfer_amount = "2500000000";
 const target_account =
-  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+  "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
 
 const deploy_params = new DeployStrParams(
   chain_name,
@@ -1621,20 +1621,20 @@ import {
   DeployStrParams,
   PaymentStrParams,
   SessionStrParams,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'integration-test';
+const chain_name = "integration-test";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const payment_amount = '5000000000';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+const payment_amount = "5000000000";
 const contract_hash =
-  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+  "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
 
 const deploy_params = new DeployStrParams(chain_name, public_key);
 
 const session_params = new SessionStrParams();
 session_params.session_hash = contract_hash;
-session_params.session_entry_point = 'set_variables';
+session_params.session_entry_point = "set_variables";
 
 const payment_params = new PaymentStrParams(payment_amount);
 
@@ -1703,22 +1703,22 @@ import {
   DeployStrParams,
   PaymentStrParams,
   SessionStrParams,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const payment_amount = '5000000000';
+const payment_amount = "5000000000";
 const contract_hash =
-  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+  "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
 
 const deploy_params = new DeployStrParams(chain_name, public_key, secret_key);
 
 const session_params = new SessionStrParams();
 session_params.session_hash = contract_hash;
-session_params.session_entry_point = 'set_variables';
+session_params.session_entry_point = "set_variables";
 
 const payment_params = new PaymentStrParams(payment_amount);
 
@@ -1835,17 +1835,17 @@ import {
   DeployStrParams,
   PaymentStrParams,
   SessionStrParams,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const payment_amount = '5000000000';
+const payment_amount = "5000000000";
 const contract_hash =
-  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-const entry_point = 'set_variables';
+  "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+const entry_point = "set_variables";
 
 const deploy_params = new DeployStrParams(chain_name, public_key, secret_key);
 
@@ -1874,17 +1874,17 @@ import {
   DeployStrParams,
   PaymentStrParams,
   SessionStrParams,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const payment_amount = '100000000';
-const transfer_amount = '2500000000';
+const payment_amount = "100000000";
+const transfer_amount = "2500000000";
 const target_account =
-  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+  "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
 
 const deploy_params = new DeployStrParams(chain_name, public_key, secret_key);
 
@@ -1956,10 +1956,10 @@ println!("{:?}", deploy_processed);
 In TypeScript, the waitDeploy function provides a similar capability to wait for a specific deploy event. Developers can leverage this function by specifying the event address, deploy hash, and an optional timeout duration. The received EventParseResult object can then be processed to extract valuable information, such as the cost of the deploy.
 
 ```ts
-const events_address = 'http://127.0.0.1:18101/events/main';
+const events_address = "http://127.0.0.1:18101/events/main";
 
 const deploy_hash =
-  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+  "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 const timeout_duration = undefined; // 30000 for 30s instead of default timeout duration of 60s
 
@@ -2019,12 +2019,12 @@ println!("{:?}", results);
 Similarly, TypeScript developers can utilize the watchDeploy function to actively watch for deploy events on the Casper blockchain. By creating a deploy watcher and defining callback functions, developers can subscribe to specific deploy hashes and respond dynamically as events unfold.
 
 ```ts
-import { EventParseResult, Subscription } from 'casper-rust-wasm-sdk';
+import { EventParseResult, Subscription } from "casper-rust-wasm-sdk";
 
-const events_address = 'http://127.0.0.1:18101/events/main';
+const events_address = "http://127.0.0.1:18101/events/main";
 
 const deploy_hash =
-  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+  "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 // Creates a watcher instance
 const watcher = sdk.watchDeploy(events_address);
@@ -2231,10 +2231,10 @@ with
 ```ts
 async function loadFile() {
   try {
-    const fileBuffer = await fs.readFile('cep78.wasm');
+    const fileBuffer = await fs.readFile("cep78.wasm");
     return fileBuffer.buffer; // Returns an ArrayBuffer
   } catch (error) {
-    throw new Error('Error reading file: ' + error.message);
+    throw new Error("Error reading file: " + error.message);
   }
 }
 ```
@@ -2348,11 +2348,11 @@ $ npm start
 $ npm build
 ```
 
-You can download an alpha version of the app illustrating the SDK here:
+You can download a pre-built desktop alpha from the **`dev`** branch (these binaries are not shipped on `2.2.2` / `2.2.2-mcp`):
 
-- [Microsoft Windows](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/raw/dev/examples/desktop/electron/release/Casper%20Webclient%202.0.0.exe)
-- [GNU/Linux AppImage](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/raw/dev/examples/desktop/electron/release/Casper%20Webclient-2.0.0.AppImage)
-- [GNU/Linux Snap](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/raw/dev/examples/desktop/electron/release/casper-webclient_2.0.0_amd64.snap)
+- [Microsoft Windows](https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/Casper%20Webclient%202.2.0.exe)
+- [GNU/Linux AppImage](https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/Casper%20Webclient-2.2.0.AppImage)
+- [GNU/Linux Snap](https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/casper-webclient_2.2.0_amd64.snap)
 - [Mac][TODO]
 
 </details>
