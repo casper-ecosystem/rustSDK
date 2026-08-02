@@ -1,0 +1,1 @@
+rd_("Adcasper_rust_wasm_sdk")
