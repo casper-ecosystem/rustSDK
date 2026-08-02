@@ -2349,8 +2349,11 @@ $ npm start
 $ npm build
 ```
 
-Pre-built desktop binaries (Windows / AppImage / Snap) are published on the [`dev` branch](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/tree/dev/examples/desktop/electron/release) only — they are not included on `2.2.2`. See the [`dev` README](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/blob/dev/docs/README.md#desktop-electron-demo-app) for download links.
+Download pre-built desktop demos from the **[latest GitHub Release](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/latest)** (CI artifacts — not Git LFS / raw links):
 
+- [Microsoft Windows](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/latest/download/casper-webclient-windows.exe)
+- [GNU/Linux AppImage](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/latest/download/casper-webclient-linux.AppImage)
+- [GNU/Linux Snap](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/latest/download/casper-webclient-linux.snap)
 - [Mac][TODO]
 
 </details>
