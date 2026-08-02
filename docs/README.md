@@ -2361,14 +2361,7 @@ $ npm start
 $ npm build
 ```
 
-Download pre-built desktop demos from the **[GitHub Releases](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases)** page (CI artifacts — Windows portable, Linux AppImage, Snap).
-
-- [Mac][TODO](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/latest)** (CI artifacts — not Git LFS / raw links):
-
-- [Microsoft Windows](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/latest/download/casper-webclient-windows.exe)
-- [GNU/Linux AppImage](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/latest/download/casper-webclient-linux.AppImage)
-- [GNU/Linux Snap](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases/latest/download/casper-webclient-linux.snap)
-- [Mac][TODO]
+Download pre-built desktop demos from the **[GitHub Releases](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases)** page (CI artifacts — Windows portable, Linux AppImage, Snap). Mac build is TODO.
 
 </details>
 
