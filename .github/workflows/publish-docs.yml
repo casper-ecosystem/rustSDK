@@ -23,6 +23,8 @@ jobs:
           profile: minimal
           components: rustfmt, clippy
           target: wasm32-unknown-unknown
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
       - name: Build packages and apps
         run: make build

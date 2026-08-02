@@ -20,7 +20,8 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y pkg-config libssl-dev
+          sudo apt-get install -y pkg-config libssl-dev fuse libfuse2
+          sudo snap install snapcraft --classic
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -49,9 +50,11 @@ jobs:
 
       - name: Build Electron desktop assets
         working-directory: examples/desktop/electron
+        env:
+          SNAPCRAFT_BUILD_ENVIRONMENT: host
         run: |
           npm install
-          npx electron-builder --win portable --linux AppImage
+          npx electron-builder --win portable --linux AppImage snap
 
       - name: Upload desktop assets to release
         env:
@@ -64,16 +67,14 @@ jobs:
 
           EXE="$RELEASE_DIR/Casper Webclient ${VERSION}.exe"
           APPIMAGE="$RELEASE_DIR/Casper Webclient-${VERSION}.AppImage"
+          SNAP="$RELEASE_DIR/casper-webclient_${VERSION}_amd64.snap"
 
-          if [[ ! -f "$EXE" ]]; then
-            echo "Missing Windows portable: $EXE"
-            ls -la "$RELEASE_DIR" || true
-            exit 1
-          fi
-          if [[ ! -f "$APPIMAGE" ]]; then
-            echo "Missing Linux AppImage: $APPIMAGE"
-            ls -la "$RELEASE_DIR" || true
-            exit 1
-          fi
+          for f in "$EXE" "$APPIMAGE" "$SNAP"; do
+            if [[ ! -f "$f" ]]; then
+              echo "Missing asset: $f"
+              ls -la "$RELEASE_DIR" || true
+              exit 1
+            fi
+          done
 
-          gh release upload "$TAG" "$EXE" "$APPIMAGE" --clobber
+          gh release upload "$TAG" "$EXE" "$APPIMAGE" "$SNAP" --clobber
