@@ -235,6 +235,37 @@ export class HeaderComponent implements AfterViewInit {
     return localhostNetworks.includes(this.network.name);
   }
 
+  /**
+   * True when the page itself is on a local / private Docker-compose host.
+   * Public hosts (Render, custom domains, etc.) must never rewrite RPC targets
+   * to docker_gateway (172.18.0.1) — that only works on the local bridge.
+   */
+  private isPageOnLocalDockerNetwork(): boolean {
+    const host = this.window?.location?.hostname ?? '';
+    if (!host || host === 'localhost' || host === '127.0.0.1') {
+      return true;
+    }
+    if (host.endsWith('.local')) {
+      return true;
+    }
+    return /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host);
+  }
+
+  /** Rewrite localhost → docker_gateway only for local compose hosts. */
+  private resolveLocalDockerHost(address: string): string {
+    if (!this.isPageOnLocalDockerNetwork()) {
+      return address;
+    }
+    return address.replace(
+      /localhost/g,
+      this.config['docker_gateway'] as string,
+    );
+  }
+
+  private withCorsProxy(rpcAddress: string, corsAnywhereUrl: string): string {
+    return corsAnywhereUrl.replace(/\/$/, '') + '/' + rpcAddress;
+  }
+
   private setRPCAndNodeAddress() {
     try {
       // Use runtime config network_rpc_url if provided (overrides network selection)
@@ -248,45 +279,33 @@ export class HeaderComponent implements AfterViewInit {
       if (this.is_electron) {
         this.sdk.setRPCAddress(networkRpcUrl || this.rpc_address);
       } else if (this.is_docker && this.is_production) {
-        // Use runtime config if provided, but only for localhost networks (ntcl, dev)
-        // Public networks (testnet, mainnet) should use their default RPC addresses
+        // Localhost networks (ntcl, dev): prefer NETWORK_RPC_URL override.
+        // Public networks keep their configured RPC addresses.
+        // Never rewrite localhost → docker_gateway on public HTTPS hosts
+        // (e.g. Render); that IP is only valid on a local Docker bridge.
+        let rpcTarget: string;
         if (networkRpcUrl && this.isLocalhostNetwork()) {
-          // If network_rpc_url is provided and current network is localhost, use it
-          if (corsAnywhereUrl) {
-            // If cors_anywhere_url is also provided, prepend it to the full network_rpc_url
-            // Example: https://cors-anywhere.casper-box/http://nctl.casper-box:11101/rpc
-            this.sdk.setRPCAddress(
-              corsAnywhereUrl.replace(/\/$/, '') + '/' + networkRpcUrl,
-            );
-          } else {
-            this.sdk.setRPCAddress(networkRpcUrl);
-          }
-        } else if (corsAnywhereUrl) {
-          // Use runtime config cors_anywhere_url if provided (for all networks)
-          const rpcAddress = this.rpc_address.replace(
-            /localhost/g,
-            this.config['docker_gateway'] as string,
-          );
-          this.sdk.setRPCAddress(
-            corsAnywhereUrl.replace(/\/$/, '') + '/' + rpcAddress,
-          );
+          rpcTarget = networkRpcUrl;
         } else {
-          // Fall back to existing logic - apply CORS proxy for all networks
+          rpcTarget = this.resolveLocalDockerHost(this.rpc_address);
+        }
+
+        if (corsAnywhereUrl) {
+          // Example: https://cors…/https://node.testnet.casper.network
+          this.sdk.setRPCAddress(
+            this.withCorsProxy(rpcTarget, corsAnywhereUrl),
+          );
+        } else if (this.isPageOnLocalDockerNetwork()) {
           const protocol = this.window?.location?.protocol;
           if (protocol === 'https:') {
-            // HTTPS: use Apache proxy
             this.sdk.setRPCAddress(
               [
                 this.window?.location?.origin,
                 '/cors-anywhere/',
-                this.rpc_address.replace(
-                  /localhost/g,
-                  this.config['docker_gateway'] as string,
-                ),
+                rpcTarget,
               ].join(''),
             );
           } else {
-            // HTTP: direct access
             this.sdk.setRPCAddress(
               [
                 'http://',
@@ -294,13 +313,13 @@ export class HeaderComponent implements AfterViewInit {
                 ':',
                 this.config['cors_anywhere_port'],
                 '/',
-                this.rpc_address.replace(
-                  /localhost/g,
-                  this.config['docker_gateway'] as string,
-                ),
+                rpcTarget,
               ].join(''),
             );
           }
+        } else {
+          // Public host without CORS_ANYWHERE_URL: call RPC directly.
+          this.sdk.setRPCAddress(rpcTarget);
         }
       } else {
         const network = this.networks.find(
@@ -314,16 +333,9 @@ export class HeaderComponent implements AfterViewInit {
 
       // Set node address
       if (networkNodeUrl) {
-        // Use runtime config network_node_url if provided
         this.sdk.setNodeAddress(networkNodeUrl);
       } else if (this.is_docker) {
-        // Fall back to existing docker logic
-        this.sdk.setNodeAddress(
-          this.node_address.replace(
-            /localhost/g,
-            this.config['docker_gateway'] as string,
-          ),
-        );
+        this.sdk.setNodeAddress(this.resolveLocalDockerHost(this.node_address));
       } else {
         this.sdk.setNodeAddress(this.node_address);
       }
