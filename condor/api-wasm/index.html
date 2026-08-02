@@ -17,6 +17,14 @@
 </ul>
 <p>This page covers different examples of using the SDK.</p>
 <p>⚠ WARNING: This application is for testing and development purposes. Do NOT use private keys or perform real transactions on the testnet/mainnet unless you fully understand the security risks.</p>
+<h2 id="try-the-wasm-webclient" class="tsd-anchor-link">Try the Wasm webclient<a href="#try-the-wasm-webclient" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>A hosted build of the Angular example — <strong><a href="https://casper-webclient.interchouette.net/">Casper WebClient</a></strong> — lets you exercise the Wasm SDK in the browser against public networks (testnet / mainnet).</p>
+<ul>
+<li>Live demo: <a href="https://casper-webclient.interchouette.net/">https://casper-webclient.interchouette.net/</a></li>
+<li>Source: <a href="media/angular"><code>examples/frontend/angular</code></a></li>
+<li>Same UI is also packaged as the <a href="#desktop-electron-demo-app">Desktop Electron demo</a></li>
+</ul>
+<p>Demo / development only — same warning as above.</p>
 <h2 id="install" class="tsd-anchor-link">Install<a href="#install" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <details>
   <summary><strong><code>Rust Project</code></strong></summary>
@@ -80,6 +88,7 @@
 <details>
   <summary><strong><code>Angular</code></strong></summary>
 <h2 id="web-angular" class="tsd-anchor-link">Web Angular<a href="#web-angular" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>The full in-repo Angular example is the <strong>Casper WebClient</strong>. Try the hosted build at <strong><a href="https://casper-webclient.interchouette.net/">https://casper-webclient.interchouette.net/</a></strong>, or run it locally from <a href="media/angular"><code>examples/frontend/angular</code></a>.</p>
 <blockquote>
 <p>package.json</p>
 </blockquote>
@@ -108,7 +117,7 @@
 </code><button type="button">Copy</button></pre>
 
 <h4 id="frontend-angular-example" class="tsd-anchor-link">Frontend Angular example<a href="#frontend-angular-example" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
-<p>You can look at a more advanced example of usage in the <a href="examples/frontend/angular/src/app/app.component.ts">Angular example app</a>.</p>
+<p>Try the hosted <strong><a href="https://casper-webclient.interchouette.net/">Casper WebClient</a></strong>, or look at a more advanced example of usage in the <a href="examples/frontend/angular/src/app/app.component.ts">Angular example app</a>.</p>
 <pre><code class="shell"><span class="hl-5">$</span><span class="hl-1"> </span><span class="hl-2">cd</span><span class="hl-1"> </span><span class="hl-2">./examples/frontend/angular</span><br/><span class="hl-5">$</span><span class="hl-1"> </span><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><br/><span class="hl-5">$</span><span class="hl-1"> </span><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-2">start</span><br/><span class="hl-5">$</span><span class="hl-1"> </span><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-2">build</span>
 </code><button type="button">Copy</button></pre>
 
@@ -189,7 +198,7 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
 <pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-10">get_block</span><span class="hl-1"> = </span><span class="hl-9">await</span><span class="hl-1"> </span><span class="hl-0">sdk</span><span class="hl-1">.</span><span class="hl-5">get_block</span><span class="hl-1">();</span><br/><br/><span class="hl-3">let</span><span class="hl-1"> </span><span class="hl-0">block</span><span class="hl-1"> = </span><span class="hl-0">get_block</span><span class="hl-1">.</span><span class="hl-0">block</span><span class="hl-1">;</span><br/><span class="hl-3">let</span><span class="hl-1"> </span><span class="hl-0">block_hash</span><span class="hl-1"> = </span><span class="hl-0">block</span><span class="hl-1">.</span><span class="hl-0">hash</span><span class="hl-1">;</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-5">log</span><span class="hl-1">(</span><span class="hl-0">block_hash</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>You can find more examples in <a href="media/index.ts">NodeJs examples</a> or in the <a href="media/app.component.ts">Angular example app</a> or in the <a href="media/App.tsx">React example app</a> or by reading <a href="media/tests.spec.ts">Puppeteer e2e tests</a>.</p>
+<p>You can find more examples in <a href="media/index.ts">NodeJs examples</a>, the <a href="media/app.component.ts">Angular example app</a> (live at <a href="https://casper-webclient.interchouette.net/">casper-webclient.interchouette.net</a>), the <a href="media/App.tsx">React example app</a>, or by reading <a href="media/tests.spec.ts">Puppeteer e2e tests</a>.</p>
 </details>
 <h3 id="more-examples" class="tsd-anchor-link">More examples<a href="#more-examples" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <details>
@@ -492,7 +501,7 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
   <summary><strong><code>Example of usage of the SDK in a Desktop application</code></strong></summary>
 <br>
 <p><img src="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/blob/dev/docs/images/get_status-electron.png" alt="Casper Electron App"></p>
-<p>The Electron based demo app loads the Angular example build. You can use this app on your computer to test every action the SDK can take.</p>
+<p>The Electron based demo app loads the Angular webclient build (the same UI hosted at <a href="https://casper-webclient.interchouette.net/">casper-webclient.interchouette.net</a>). You can use this app on your computer to test every action the SDK can take.</p>
 <pre><code class="shell"><span class="hl-5">$</span><span class="hl-1"> </span><span class="hl-2">cd</span><span class="hl-1"> </span><span class="hl-2">./examples/desktop/electron</span><br/><span class="hl-5">$</span><span class="hl-1"> </span><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><br/><span class="hl-5">$</span><span class="hl-1"> </span><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-2">start</span><br/><span class="hl-5">$</span><span class="hl-1"> </span><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-2">build</span>
 </code><button type="button">Copy</button></pre>
 
@@ -671,6 +680,7 @@ Two ways to sign a transaction, either signTransaction</p>
 <h3>On This Page</h3></summary>
 <div class="tsd-accordion-details"><a href="#casper-rustwasm-sdk-20"><span>Casper <wbr/>Rust/<wbr/>Wasm <wbr/>SDK 2.0</span></a>
 <ul>
+<li><a href="#try-the-wasm-webclient"><span>Try the <wbr/>Wasm webclient</span></a></li>
 <li><a href="#install"><span>Install</span></a></li>
 <li><a href="#rust-project"><span>Rust <wbr/>Project</span></a></li>
 <li><a href="#usage"><span>Usage</span></a></li>
