@@ -63,10 +63,7 @@ macro_rules! rpc_ok {
     };
 }
 
-pub async fn get_node_status(
-    verbosity: Option<String>,
-    rpc_address: Option<String>,
-) -> ToolOutput {
+pub async fn get_node_status(verbosity: Option<String>, rpc_address: Option<String>) -> ToolOutput {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_node_status(verb(verbosity.as_deref()), rpc_address)

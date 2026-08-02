@@ -17,14 +17,14 @@ pub const DEFAULT_HTTP_LISTEN: &str = "0.0.0.0:8790";
 // Keep in sync with Cargo.toml `version` (enforced by unit test below).
 #[mcp_server(name = "casper-rust-wasm-sdk", version = "2.2.2")]
 impl CasperSdkMcp {
-    #[tool(
-        description = "Help: feature matrix, env vars, endpoints, and available sdk_* tools"
-    )]
+    #[tool(description = "Help: feature matrix, env vars, endpoints, and available sdk_* tools")]
     async fn sdk_help(&self) -> ToolOutput {
         format::text_ok(help_text())
     }
 
-    #[tool(description = "Show current CASPER_RPC_URL / CASPER_NODE_URL / verbosity on the shared SDK")]
+    #[tool(
+        description = "Show current CASPER_RPC_URL / CASPER_NODE_URL / verbosity on the shared SDK"
+    )]
     async fn sdk_get_endpoints(&self) -> ToolOutput {
         let snap = sdk_handle::endpoint_snapshot();
         format::json_ok(&serde_json::json!({
@@ -171,11 +171,7 @@ impl CasperSdkMcp {
     }
 
     #[tool(description = "Pretty-print a JSON string at optional verbosity (low|medium|high)")]
-    async fn sdk_json_pretty_print(
-        &self,
-        value: String,
-        verbosity: Option<String>,
-    ) -> ToolOutput {
+    async fn sdk_json_pretty_print(&self, value: String, verbosity: Option<String>) -> ToolOutput {
         tools::helpers::json_pretty_print(value, verbosity)
     }
 
@@ -271,7 +267,9 @@ impl CasperSdkMcp {
         tools::rpc::get_era_summary(maybe_block_identifier, verbosity, rpc_address).await
     }
 
-    #[tool(description = "JSON-RPC chain_get_era_info_by_switch_block (deprecated; prefer era_summary)")]
+    #[tool(
+        description = "JSON-RPC chain_get_era_info_by_switch_block (deprecated; prefer era_summary)"
+    )]
     async fn sdk_get_era_info(
         &self,
         maybe_block_identifier: Option<String>,
@@ -364,7 +362,9 @@ impl CasperSdkMcp {
         tools::rpc::get_balance(purse_uref, state_root_hash, verbosity, rpc_address).await
     }
 
-    #[tool(description = "JSON-RPC query_balance (purse identifier string: pubkey / account-hash / uref)")]
+    #[tool(
+        description = "JSON-RPC query_balance (purse identifier string: pubkey / account-hash / uref)"
+    )]
     async fn sdk_query_balance(
         &self,
         purse_identifier: String,
@@ -431,7 +431,9 @@ impl CasperSdkMcp {
         .await
     }
 
-    #[tool(description = "JSON-RPC query_global_state (formatted key; optional path / state root / block)")]
+    #[tool(
+        description = "JSON-RPC query_global_state (formatted key; optional path / state root / block)"
+    )]
     async fn sdk_query_global_state(
         &self,
         key: String,
@@ -470,6 +472,333 @@ impl CasperSdkMcp {
         rpc_address: Option<String>,
     ) -> ToolOutput {
         tools::rpc::speculative_exec_deploy(deploy_json, verbosity, rpc_address).await
+    }
+
+    // --- binary-port (feature = "binary-port") ---
+
+    #[tool(description = "Binary port: latest switch block header (needs CASPER_NODE_URL)")]
+    async fn sdk_get_binary_latest_switch_block_header(
+        &self,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_latest_switch_block_header(node_address).await
+    }
+
+    #[tool(description = "Binary port: latest block header")]
+    async fn sdk_get_binary_latest_block_header(
+        &self,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_latest_block_header(node_address).await
+    }
+
+    #[tool(description = "Binary port: block header by height")]
+    async fn sdk_get_binary_block_header_by_height(
+        &self,
+        height: u64,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_block_header_by_height(height, node_address).await
+    }
+
+    #[tool(description = "Binary port: block header by hash hex")]
+    async fn sdk_get_binary_block_header_by_hash(
+        &self,
+        block_hash: String,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_block_header_by_hash(block_hash, node_address).await
+    }
+
+    #[tool(description = "Binary port: latest block with signatures")]
+    async fn sdk_get_binary_latest_block_with_signatures(
+        &self,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_latest_block_with_signatures(node_address).await
+    }
+
+    #[tool(description = "Binary port: block with signatures by height")]
+    async fn sdk_get_binary_block_with_signatures_by_height(
+        &self,
+        height: u64,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_block_with_signatures_by_height(height, node_address).await
+    }
+
+    #[tool(description = "Binary port: block with signatures by hash hex")]
+    async fn sdk_get_binary_block_with_signatures_by_hash(
+        &self,
+        block_hash: String,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_block_with_signatures_by_hash(block_hash, node_address).await
+    }
+
+    #[tool(description = "Binary port: transaction by hash hex")]
+    async fn sdk_get_binary_transaction_by_hash(
+        &self,
+        hash: String,
+        with_finalized_approvals: Option<bool>,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_transaction_by_hash(
+            hash,
+            with_finalized_approvals,
+            node_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Binary port: peers")]
+    async fn sdk_get_binary_peers(&self, node_address: Option<String>) -> ToolOutput {
+        tools::binary_port::get_binary_peers(node_address).await
+    }
+
+    #[tool(description = "Binary port: node uptime")]
+    async fn sdk_get_binary_uptime(&self, node_address: Option<String>) -> ToolOutput {
+        tools::binary_port::get_binary_uptime(node_address).await
+    }
+
+    #[tool(description = "Binary port: last progress")]
+    async fn sdk_get_binary_last_progress(&self, node_address: Option<String>) -> ToolOutput {
+        tools::binary_port::get_binary_last_progress(node_address).await
+    }
+
+    #[tool(description = "Binary port: reactor state")]
+    async fn sdk_get_binary_reactor_state(&self, node_address: Option<String>) -> ToolOutput {
+        tools::binary_port::get_binary_reactor_state(node_address).await
+    }
+
+    #[tool(description = "Binary port: network name")]
+    async fn sdk_get_binary_network_name(&self, node_address: Option<String>) -> ToolOutput {
+        tools::binary_port::get_binary_network_name(node_address).await
+    }
+
+    #[tool(description = "Binary port: consensus validator changes")]
+    async fn sdk_get_binary_consensus_validator_changes(
+        &self,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_consensus_validator_changes(node_address).await
+    }
+
+    #[tool(description = "Binary port: block synchronizer status")]
+    async fn sdk_get_binary_block_synchronizer_status(
+        &self,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_block_synchronizer_status(node_address).await
+    }
+
+    #[tool(description = "Binary port: available block range")]
+    async fn sdk_get_binary_available_block_range(
+        &self,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_available_block_range(node_address).await
+    }
+
+    #[tool(description = "Binary port: next upgrade")]
+    async fn sdk_get_binary_next_upgrade(&self, node_address: Option<String>) -> ToolOutput {
+        tools::binary_port::get_binary_next_upgrade(node_address).await
+    }
+
+    #[tool(description = "Binary port: consensus status")]
+    async fn sdk_get_binary_consensus_status(&self, node_address: Option<String>) -> ToolOutput {
+        tools::binary_port::get_binary_consensus_status(node_address).await
+    }
+
+    #[tool(description = "Binary port: chainspec raw bytes")]
+    async fn sdk_get_binary_chainspec_raw_bytes(
+        &self,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_chainspec_raw_bytes(node_address).await
+    }
+
+    #[tool(description = "Binary port: node status")]
+    async fn sdk_get_binary_node_status(&self, node_address: Option<String>) -> ToolOutput {
+        tools::binary_port::get_binary_node_status(node_address).await
+    }
+
+    #[tool(description = "Binary port: validator reward by era")]
+    async fn sdk_get_binary_validator_reward_by_era(
+        &self,
+        validator_key: String,
+        era: u64,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_validator_reward_by_era(validator_key, era, node_address)
+            .await
+    }
+
+    #[tool(description = "Binary port: validator reward by block height")]
+    async fn sdk_get_binary_validator_reward_by_block_height(
+        &self,
+        validator_key: String,
+        block_height: u64,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_validator_reward_by_block_height(
+            validator_key,
+            block_height,
+            node_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Binary port: validator reward by block hash hex")]
+    async fn sdk_get_binary_validator_reward_by_block_hash(
+        &self,
+        validator_key: String,
+        block_hash: String,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_validator_reward_by_block_hash(
+            validator_key,
+            block_hash,
+            node_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Binary port: delegator reward by era")]
+    async fn sdk_get_binary_delegator_reward_by_era(
+        &self,
+        validator_key: String,
+        delegator_key: String,
+        era: u64,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_delegator_reward_by_era(
+            validator_key,
+            delegator_key,
+            era,
+            node_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Binary port: delegator reward by block height")]
+    async fn sdk_get_binary_delegator_reward_by_block_height(
+        &self,
+        validator_key: String,
+        delegator_key: String,
+        block_height: u64,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_delegator_reward_by_block_height(
+            validator_key,
+            delegator_key,
+            block_height,
+            node_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Binary port: delegator reward by block hash hex")]
+    async fn sdk_get_binary_delegator_reward_by_block_hash(
+        &self,
+        validator_key: String,
+        delegator_key: String,
+        block_hash: String,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_delegator_reward_by_block_hash(
+            validator_key,
+            delegator_key,
+            block_hash,
+            node_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Binary port: read record (record_id 0-7, key_hex)")]
+    async fn sdk_get_binary_read_record(
+        &self,
+        record_id: u16,
+        key_hex: String,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_read_record(record_id, key_hex, node_address).await
+    }
+
+    #[tool(description = "Binary port: global state item (formatted key; path as a/b or JSON array)")]
+    async fn sdk_get_binary_global_state_item(
+        &self,
+        key: String,
+        path: Option<String>,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_global_state_item(key, path, node_address).await
+    }
+
+    #[tool(description = "Binary port: global state item by state root hash")]
+    async fn sdk_get_binary_global_state_item_by_state_root_hash(
+        &self,
+        state_root_hash: String,
+        key: String,
+        path: Option<String>,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_global_state_item_by_state_root_hash(
+            state_root_hash,
+            key,
+            path,
+            node_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Binary port: global state item by block hash")]
+    async fn sdk_get_binary_global_state_item_by_block_hash(
+        &self,
+        block_hash: String,
+        key: String,
+        path: Option<String>,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_global_state_item_by_block_hash(
+            block_hash,
+            key,
+            path,
+            node_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Binary port: global state item by block height")]
+    async fn sdk_get_binary_global_state_item_by_block_height(
+        &self,
+        block_height: u64,
+        key: String,
+        path: Option<String>,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_global_state_item_by_block_height(
+            block_height,
+            key,
+            path,
+            node_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Binary port: speculative execution of transaction JSON")]
+    async fn sdk_get_binary_try_speculative_execution(
+        &self,
+        transaction_json: String,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::binary_port::get_binary_try_speculative_execution(transaction_json, node_address)
+            .await
+    }
+
+    #[tool(description = "Binary port: protocol version")]
+    async fn sdk_get_binary_protocol_version(&self, node_address: Option<String>) -> ToolOutput {
+        tools::binary_port::get_binary_protocol_version(node_address).await
     }
 }
 

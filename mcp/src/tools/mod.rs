@@ -6,7 +6,7 @@ pub mod helpers;
 /// JSON-RPC domain (always compiled; enable via Cargo feature `rpc`).
 pub mod rpc;
 
-#[cfg(feature = "binary-port")]
+/// Binary-port domain (always compiled; enable via Cargo feature `binary-port`).
 pub mod binary_port;
 
 #[cfg(feature = "transaction")]
@@ -42,8 +42,6 @@ pub fn enabled_tool_groups() -> Vec<&'static str> {
 pub fn pending_tool_placeholders() -> Vec<&'static str> {
     #[allow(unused_mut)]
     let mut pending = Vec::new();
-    #[cfg(feature = "binary-port")]
-    pending.push("binary-port (Phase 4)");
     #[cfg(feature = "transaction")]
     pending.push("transaction (Phase 5)");
     #[cfg(feature = "deploy")]
@@ -62,6 +60,8 @@ pub fn registered_tool_names() -> Vec<&'static str> {
     names.extend_from_slice(helpers::tool_names());
     #[cfg(feature = "rpc")]
     names.extend_from_slice(rpc::tool_names());
+    #[cfg(feature = "binary-port")]
+    names.extend_from_slice(binary_port::tool_names());
     names
 }
 
