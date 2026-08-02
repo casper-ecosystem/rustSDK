@@ -1,6 +1,7 @@
-# Phase 0 — Native Rust API → MCP tool checklist
+# Native Rust API → MCP tool checklist
 
-**Branch:** `feat/mcp-sidecar`
+**Status:** Implemented on `feat/mcp-sidecar` (Phases 0–5). Meta + feature groups below map to `sdk_*` tools; see `mcp/README.md`.
+
 **Scope:** `casper-rust-wasm-sdk` native-callable methods under `src/sdk` and `src/helpers`.
 
 **Include:** `impl SDK` + public helpers that compile on non-`wasm32`.

@@ -104,3 +104,22 @@ docker-deploy-prod:
 	ssh ubuntu@casper-box "sudo docker compose -f /home/ubuntu/webclient/docker-compose.yml up -d --force-recreate"
 
 .PHONY: docker-build docker-start docker-stop docker-start-prod docker-stop-prod
+
+# --- MCP sidecar (mcp/ — path-depends on casper-rust-wasm-sdk) ---
+
+mcp-build:
+	cargo build -p casper-rust-wasm-sdk-mcp --release
+
+run-mcp:
+	cargo run -p casper-rust-wasm-sdk-mcp --quiet --
+
+run-mcp-http:
+	cargo run -p casper-rust-wasm-sdk-mcp --quiet -- --http --listen 127.0.0.1:8790
+
+# Alias for family parity (host HTTP; no Docker image in this phase).
+mcp-http: run-mcp-http
+
+mcp-test:
+	cargo test -p casper-rust-wasm-sdk-mcp
+
+.PHONY: mcp-build run-mcp run-mcp-http mcp-http mcp-test
