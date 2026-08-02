@@ -39,7 +39,7 @@ write = []
 [dependencies]
 anyhow = "1"
 casper-rust-wasm-sdk = { path = ".." }
-casper-types = { version = "7.1.1", default-features = false, features = [
+casper-types = { version = "7.0.0", default-features = false, features = [
   "datasize",
 ] }
 clap = { version = "4", features = ["derive", "env"] }
