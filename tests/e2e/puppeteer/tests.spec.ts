@@ -1129,7 +1129,6 @@ describe('Angular App Tests', () => {
       call = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="error"]')?.textContent;
       });
-      console.log(call);
       await test.page.waitForSelector('[e2e-id="result"]');
       call = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;

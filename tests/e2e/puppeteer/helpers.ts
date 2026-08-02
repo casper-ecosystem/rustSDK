@@ -216,9 +216,6 @@ export function deleteFile(filePathToDelete: string) {
   try {
     if (fs.existsSync(filePathToDelete)) {
       fs.unlinkSync(filePathToDelete);
-      console.info(`Deleted file: ${filePathToDelete}`);
-    } else {
-      console.info(`File not found: ${filePathToDelete}`);
     }
   } catch (error) {
     console.error(`Error deleting file: ${filePathToDelete}`, error);
@@ -261,7 +258,6 @@ function readPEMFile(key_path?: string, copy?: boolean): string {
 function copyFile(src: string, dest: string) {
   try {
     fs.copyFileSync(src, dest);
-    console.info(`Copied ${src} to ${dest}`);
   } catch (error) {
     console.error(`Error copying ${src} to ${dest}:`, error);
   }
@@ -270,7 +266,6 @@ function copyFile(src: string, dest: string) {
 function writeFile(content: string, dest: string) {
   try {
     fs.writeFileSync(dest, content);
-    console.info(`Written content to ${dest}`);
   } catch (error) {
     console.error(`Error writing content to ${dest}:`, error);
   }
