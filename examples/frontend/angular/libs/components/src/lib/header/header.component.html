@@ -40,7 +40,7 @@
               [value]="network?.name"
               [selected]="network.rpc_address === rpc_address"
               *ngFor="let network of networks; index as i"
-              [hidden]="network.name === 'custom' && !isCustomNetworkAllowed()"
+              [hidden]="!isNetworkOptionVisible(network)"
             >
               {{ network?.name }} ({{ network.rpc_address }})
             </option>
