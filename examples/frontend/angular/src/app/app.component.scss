@@ -1,0 +1,26 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.app-main {
+  flex: 1 1 auto;
+}
+
+.app-footer {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  color: #6c757d;
+  text-align: right;
+  border-top: 1px solid #e9ecef;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  user-select: all;
+}

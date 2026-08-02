@@ -8,6 +8,8 @@ Browser demo of the Casper Rust/Wasm SDK — call RPC methods, build transaction
 
 Hosted build of this example (Wasm in the browser). Demo / development only — do not use real mainnet keys.
 
+The page footer shows `Casper WebClient vX.Y.Z (gitsha)` from the Docker image build so you can confirm which revision is deployed.
+
 ## Run locally
 
 ```shell

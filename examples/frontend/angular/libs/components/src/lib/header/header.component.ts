@@ -68,15 +68,28 @@ export class HeaderComponent implements AfterViewInit {
       this.storageService.get('chain_name') &&
       this.storageService.get('rpc_address')
     ) {
-      this.chain_name =
-        this.storageService.get('chain_name') || this.chain_name;
-      this.rpc_address =
+      const storedRpc =
         this.storageService.get('rpc_address') || this.rpc_address;
-      this.node_address =
-        this.storageService.get('node_address') || this.node_address;
-      this.network =
-        this.networks.find((x) => x.rpc_address == this.rpc_address) ||
-        this.network;
+      // Public hosts must not restore a localhost/ntcl selection from localStorage
+      // (leftover from older defaults or local testing).
+      const storedIsLocal =
+        /localhost|127\.0\.0\.1|172\.(1[6-9]|2\d|3[01])\./.test(storedRpc);
+      if (!(storedIsLocal && !this.isPageOnLocalDockerNetwork())) {
+        this.chain_name =
+          this.storageService.get('chain_name') || this.chain_name;
+        this.rpc_address = storedRpc;
+        this.node_address =
+          this.storageService.get('node_address') || this.node_address;
+        this.network =
+          this.networks.find((x) => x.rpc_address == this.rpc_address) ||
+          this.network;
+      } else {
+        this.storageService.setState({
+          chain_name: this.chain_name,
+          rpc_address: this.rpc_address,
+          node_address: this.node_address,
+        });
+      }
     }
 
     this.stateService.setState({

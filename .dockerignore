@@ -1,11 +1,13 @@
 # Shared repo-root dockerignore (webclient CI + MCP image).
 # Do NOT exclude examples/, pkg/, or docker/ — CI/CD Image needs them.
+# **/*.wasm shrinks MCP context, but the webclient must ship pkg's Wasm asset.
 .git
 .github
 target
 **/target
 node_modules
 **/*.wasm
+!pkg/casper_rust_wasm_sdk_bg.wasm
 .env
 .cursor
 tests/e2e

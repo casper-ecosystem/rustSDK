@@ -1,1 +1,8 @@
-<router-outlet></router-outlet>
+<div class="app-shell">
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+  <footer class="app-footer" data-e2e="app-version-footer">
+    {{ footerLabel }}
+  </footer>
+</div>
