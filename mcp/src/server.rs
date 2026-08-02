@@ -18,7 +18,7 @@ pub const DEFAULT_HTTP_LISTEN: &str = "0.0.0.0:8790";
 #[mcp_server(name = "casper-rust-wasm-sdk", version = "2.2.2")]
 impl CasperSdkMcp {
     #[tool(
-        description = "Help: feature matrix, env vars, endpoints, and planned/available sdk_* tools"
+        description = "Help: feature matrix, env vars, endpoints, and available sdk_* tools"
     )]
     async fn sdk_help(&self) -> ToolOutput {
         format::text_ok(help_text())
@@ -80,12 +80,413 @@ impl CasperSdkMcp {
             "verbosity": snap.verbosity,
         }))
     }
+
+    // --- helpers (feature = "helpers") ---
+
+    #[tool(description = "Current RFC3339 timestamp (optional unix-ms timestamp override)")]
+    async fn sdk_get_current_timestamp(&self, timestamp: Option<String>) -> ToolOutput {
+        tools::helpers::get_current_timestamp(timestamp)
+    }
+
+    #[tool(description = "Blake2b-256 hex digest of a UTF-8 string")]
+    async fn sdk_get_blake2b_hash(&self, meta_data: String) -> ToolOutput {
+        tools::helpers::get_blake2b_hash(meta_data)
+    }
+
+    #[tool(
+        description = "Dictionary item key from formatted key + exactly one of value_key (formatted Key) or value_u256"
+    )]
+    async fn sdk_make_dictionary_item_key(
+        &self,
+        key: String,
+        value_key: Option<String>,
+        value_u256: Option<String>,
+    ) -> ToolOutput {
+        tools::helpers::make_dictionary_item_key(key, value_key, value_u256)
+    }
+
+    #[tool(description = "CEP-18 base64 key from account-hash-… string")]
+    async fn sdk_get_base64_key_from_account_hash(&self, account_hash: String) -> ToolOutput {
+        tools::helpers::get_base64_key_from_account_hash(account_hash)
+    }
+
+    #[tool(description = "CEP-18 base64 key from hash-… formatted key")]
+    async fn sdk_get_base64_key_from_key_hash(&self, formatted_hash: String) -> ToolOutput {
+        tools::helpers::get_base64_key_from_key_hash(formatted_hash)
+    }
+
+    #[tool(description = "TTL string or SDK default")]
+    async fn sdk_get_ttl_or_default(&self, ttl: Option<String>) -> ToolOutput {
+        tools::helpers::get_ttl_or_default(ttl)
+    }
+
+    #[tool(description = "Parse a timestamp string")]
+    async fn sdk_parse_timestamp(&self, value: String) -> ToolOutput {
+        tools::helpers::parse_timestamp(value)
+    }
+
+    #[tool(description = "Parse a TTL / TimeDiff string")]
+    async fn sdk_parse_ttl(&self, value: String) -> ToolOutput {
+        tools::helpers::parse_ttl(value)
+    }
+
+    #[tool(description = "Gas price or SDK default")]
+    async fn sdk_get_gas_price_or_default(&self, gas_price: Option<u64>) -> ToolOutput {
+        tools::helpers::get_gas_price_or_default(gas_price)
+    }
+
+    #[tool(description = "Generate Ed25519 secret key PEM (local; treat as secret)")]
+    async fn sdk_secret_key_generate(&self) -> ToolOutput {
+        tools::helpers::secret_key_generate()
+    }
+
+    #[tool(description = "Generate secp256k1 secret key PEM (local; treat as secret)")]
+    async fn sdk_secret_key_secp256k1_generate(&self) -> ToolOutput {
+        tools::helpers::secret_key_secp256k1_generate()
+    }
+
+    #[tool(description = "Validate a secret key PEM (does not echo the secret)")]
+    async fn sdk_secret_key_from_pem(&self, secret_key: String) -> ToolOutput {
+        tools::helpers::secret_key_from_pem(secret_key)
+    }
+
+    #[tool(description = "Derive public key hex from secret key PEM")]
+    async fn sdk_public_key_from_secret_key(&self, secret_key: String) -> ToolOutput {
+        tools::helpers::public_key_from_secret_key(secret_key)
+    }
+
+    #[tool(description = "Decode hex string to byte array JSON")]
+    async fn sdk_hex_to_uint8_vec(&self, hex_string: String) -> ToolOutput {
+        tools::helpers::hex_to_uint8_vec(hex_string)
+    }
+
+    #[tool(description = "Decode hex string to UTF-8 (lossy) text")]
+    async fn sdk_hex_to_string(&self, hex_string: String) -> ToolOutput {
+        tools::helpers::hex_to_string(hex_string)
+    }
+
+    #[tool(description = "Convert motes string to CSPR")]
+    async fn sdk_motes_to_cspr(&self, motes: String) -> ToolOutput {
+        tools::helpers::motes_to_cspr(motes)
+    }
+
+    #[tool(description = "Pretty-print a JSON string at optional verbosity (low|medium|high)")]
+    async fn sdk_json_pretty_print(
+        &self,
+        value: String,
+        verbosity: Option<String>,
+    ) -> ToolOutput {
+        tools::helpers::json_pretty_print(value, verbosity)
+    }
+
+    #[tool(description = "Convert a CLValue JSON document to JSON Value")]
+    async fn sdk_cl_value_to_json(&self, cl_value_json: String) -> ToolOutput {
+        tools::helpers::cl_value_to_json(cl_value_json)
+    }
+
+    // --- rpc (feature = "rpc") ---
+
+    #[tool(description = "JSON-RPC info_get_status / get_node_status")]
+    async fn sdk_get_node_status(
+        &self,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_node_status(verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC info_get_peers")]
+    async fn sdk_get_peers(
+        &self,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_peers(verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC info_get_chainspec")]
+    async fn sdk_get_chainspec(
+        &self,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_chainspec(verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC info_get_validator_changes")]
+    async fn sdk_get_validator_changes(
+        &self,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_validator_changes(verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC list_rpcs")]
+    async fn sdk_list_rpcs(
+        &self,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::list_rpcs(verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC chain_get_block (optional block height or hash string)")]
+    async fn sdk_get_block(
+        &self,
+        maybe_block_identifier: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_block(maybe_block_identifier, verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC chain_get_block_transfers")]
+    async fn sdk_get_block_transfers(
+        &self,
+        maybe_block_identifier: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_block_transfers(maybe_block_identifier, verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC state_get_auction_info")]
+    async fn sdk_get_auction_info(
+        &self,
+        maybe_block_identifier: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_auction_info(maybe_block_identifier, verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC chain_get_era_summary")]
+    async fn sdk_get_era_summary(
+        &self,
+        maybe_block_identifier: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_era_summary(maybe_block_identifier, verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC chain_get_era_info_by_switch_block (deprecated; prefer era_summary)")]
+    async fn sdk_get_era_info(
+        &self,
+        maybe_block_identifier: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_era_info(maybe_block_identifier, verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC chain_get_state_root_hash")]
+    async fn sdk_get_state_root_hash(
+        &self,
+        maybe_block_identifier: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_state_root_hash(maybe_block_identifier, verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC state_get_account_info (deprecated; prefer get_entity)")]
+    async fn sdk_get_account(
+        &self,
+        account_identifier: Option<String>,
+        maybe_block_identifier: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_account(
+            account_identifier,
+            maybe_block_identifier,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "JSON-RPC state_get_entity / get_entity")]
+    async fn sdk_get_entity(
+        &self,
+        entity_identifier: Option<String>,
+        maybe_block_identifier: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_entity(
+            entity_identifier,
+            maybe_block_identifier,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "JSON-RPC info_get_deploy")]
+    async fn sdk_get_deploy(
+        &self,
+        deploy_hash: String,
+        finalized_approvals: Option<bool>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_deploy(deploy_hash, finalized_approvals, verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC info_get_transaction")]
+    async fn sdk_get_transaction(
+        &self,
+        transaction_hash: String,
+        finalized_approvals: Option<bool>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_transaction(
+            transaction_hash,
+            finalized_approvals,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "JSON-RPC state_get_balance (purse uref string)")]
+    async fn sdk_get_balance(
+        &self,
+        purse_uref: String,
+        state_root_hash: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_balance(purse_uref, state_root_hash, verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC query_balance (purse identifier string: pubkey / account-hash / uref)")]
+    async fn sdk_query_balance(
+        &self,
+        purse_identifier: String,
+        state_root_hash: Option<String>,
+        maybe_block_id: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::query_balance(
+            purse_identifier,
+            state_root_hash,
+            maybe_block_id,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "JSON-RPC query_balance_details")]
+    async fn sdk_query_balance_details(
+        &self,
+        purse_identifier: String,
+        state_root_hash: Option<String>,
+        maybe_block_id: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::query_balance_details(
+            purse_identifier,
+            state_root_hash,
+            maybe_block_id,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(
+        description = "JSON-RPC state_get_dictionary_item; kind=uref|dictionary|account_named_key|contract_named_key|entity_named_key"
+    )]
+    async fn sdk_get_dictionary_item(
+        &self,
+        kind: String,
+        key: Option<String>,
+        dictionary_name: Option<String>,
+        dictionary_item_key: Option<String>,
+        seed_uref: Option<String>,
+        dictionary_value: Option<String>,
+        state_root_hash: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_dictionary_item(
+            kind,
+            key,
+            dictionary_name,
+            dictionary_item_key,
+            seed_uref,
+            dictionary_value,
+            state_root_hash,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "JSON-RPC query_global_state (formatted key; optional path / state root / block)")]
+    async fn sdk_query_global_state(
+        &self,
+        key: String,
+        path: Option<String>,
+        state_root_hash: Option<String>,
+        maybe_block_id: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::query_global_state(
+            key,
+            path,
+            state_root_hash,
+            maybe_block_id,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "JSON-RPC speculative_exec with full transaction JSON")]
+    async fn sdk_speculative_exec(
+        &self,
+        transaction_json: String,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::speculative_exec(transaction_json, verbosity, rpc_address).await
+    }
+
+    #[tool(description = "JSON-RPC speculative_exec_deploy with full deploy JSON")]
+    async fn sdk_speculative_exec_deploy(
+        &self,
+        deploy_json: String,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::speculative_exec_deploy(deploy_json, verbosity, rpc_address).await
+    }
 }
 
 fn help_text() -> String {
     let snap = sdk_handle::endpoint_snapshot();
     let groups = tools::enabled_tool_groups().join(", ");
-    let pending = tools::pending_tool_placeholders().join("\n  - ");
+    let pending = tools::pending_tool_placeholders();
+    let pending_block = if pending.is_empty() {
+        "  (none)".to_string()
+    } else {
+        format!("  - {}", pending.join("\n  - "))
+    };
+    let registered = tools::registered_tool_names()
+        .into_iter()
+        .map(|n| format!("  - {n}"))
+        .collect::<Vec<_>>()
+        .join("\n");
     format!(
         r#"casper-rust-wasm-sdk-mcp {version}
 
@@ -105,13 +506,11 @@ Current endpoints
 Enabled feature groups
   {groups}
 
-Always-on tools
-  - sdk_help
-  - sdk_get_endpoints
-  - sdk_set_endpoints
+Registered tools
+{registered}
 
-Pending tool groups (see mcp/TOOLS.md)
-  - {pending}
+Pending tool groups
+{pending_block}
 
 Compose with sibling MCPs: casper-nctl-2-docker (:8788), kms-secp256k1-api (:8789).
 "#,
@@ -126,7 +525,8 @@ Compose with sibling MCPs: casper-nctl-2-docker (:8788), kms-secp256k1-api (:878
         node = snap.node_address,
         verbosity = snap.verbosity,
         groups = groups,
-        pending = pending,
+        registered = registered,
+        pending_block = pending_block,
     )
 }
 

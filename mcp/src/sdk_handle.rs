@@ -62,6 +62,25 @@ pub fn endpoint_snapshot() -> EndpointSnapshot {
     }
 }
 
+/// Clone endpoint config into a fresh `SDK` (safe to hold across `.await`).
+pub fn sdk_snapshot() -> SDK {
+    let sdk = shared();
+    let guard = sdk.lock().expect("sdk mutex poisoned");
+    let rpc = guard.get_rpc_address(None);
+    let node = guard.get_node_address(None);
+    let verbosity = guard.get_verbosity(None);
+    SDK::new(
+        if rpc.is_empty() { None } else { Some(rpc) },
+        if node.is_empty() { None } else { Some(node) },
+        Some(verbosity),
+    )
+}
+
+/// Optional tool verbosity override (`None` → use SDK default).
+pub fn verbosity_override(raw: Option<&str>) -> Option<Verbosity> {
+    raw.map(parse_verbosity)
+}
+
 #[derive(Debug, Clone)]
 pub struct EndpointSnapshot {
     pub rpc_address: String,

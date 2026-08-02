@@ -1,9 +1,9 @@
-//! Feature-gated tool modules (bodies land in Phases 3–5).
+//! Feature-gated tool modules.
 
-#[cfg(feature = "helpers")]
+/// Helpers domain (always compiled; enable via Cargo feature `helpers`).
 pub mod helpers;
 
-#[cfg(feature = "rpc")]
+/// JSON-RPC domain (always compiled; enable via Cargo feature `rpc`).
 pub mod rpc;
 
 #[cfg(feature = "binary-port")]
@@ -40,11 +40,8 @@ pub fn enabled_tool_groups() -> Vec<&'static str> {
 
 /// Placeholder summary for groups that are compiled but not yet wired as MCP tools.
 pub fn pending_tool_placeholders() -> Vec<&'static str> {
+    #[allow(unused_mut)]
     let mut pending = Vec::new();
-    #[cfg(feature = "helpers")]
-    pending.push("helpers (Phase 3)");
-    #[cfg(feature = "rpc")]
-    pending.push("rpc (Phase 3)");
     #[cfg(feature = "binary-port")]
     pending.push("binary-port (Phase 4)");
     #[cfg(feature = "transaction")]
@@ -56,4 +53,21 @@ pub fn pending_tool_placeholders() -> Vec<&'static str> {
     #[cfg(feature = "write")]
     pending.push("write (Phase 5)");
     pending
+}
+
+/// Flat list of registered tool names for the current feature set.
+pub fn registered_tool_names() -> Vec<&'static str> {
+    let mut names = vec!["sdk_help", "sdk_get_endpoints", "sdk_set_endpoints"];
+    #[cfg(feature = "helpers")]
+    names.extend_from_slice(helpers::tool_names());
+    #[cfg(feature = "rpc")]
+    names.extend_from_slice(rpc::tool_names());
+    names
+}
+
+/// Error when a Cargo feature is disabled (mcpkit still lists the tool).
+pub fn feature_disabled(feature: &str) -> mcpkit::prelude::ToolOutput {
+    crate::format::err(format!(
+        "Cargo feature `{feature}` is disabled; rebuild with --features {feature} (or full)"
+    ))
 }
