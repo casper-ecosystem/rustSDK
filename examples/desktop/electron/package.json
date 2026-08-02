@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win --linux",
+    "build": "electron-builder --win --linux --publish never",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

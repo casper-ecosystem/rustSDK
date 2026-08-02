@@ -82,7 +82,7 @@ jobs:
           SNAPCRAFT_BUILD_ENVIRONMENT: host
         run: |
           npm install
-          npx electron-builder --win portable --linux AppImage snap
+          npx electron-builder --win portable --linux AppImage snap --publish never
 
       - name: Upload desktop assets to release
         env:
