@@ -1,22 +1,13 @@
 //! Feature-gated tool modules.
 
-/// Helpers domain (always compiled; enable via Cargo feature `helpers`).
 pub mod helpers;
-
-/// JSON-RPC domain (always compiled; enable via Cargo feature `rpc`).
 pub mod rpc;
-
-/// Binary-port domain (always compiled; enable via Cargo feature `binary-port`).
 pub mod binary_port;
-
-#[cfg(feature = "transaction")]
+pub mod params;
 pub mod transaction;
-
-#[cfg(feature = "deploy")]
 pub mod deploy;
-
-#[cfg(feature = "contract")]
 pub mod contract;
+pub mod write;
 
 /// Human-readable list of tool groups enabled in this build.
 pub fn enabled_tool_groups() -> Vec<&'static str> {
@@ -38,19 +29,9 @@ pub fn enabled_tool_groups() -> Vec<&'static str> {
     groups
 }
 
-/// Placeholder summary for groups that are compiled but not yet wired as MCP tools.
+/// Placeholder summary for groups not yet wired (none after Phase 5).
 pub fn pending_tool_placeholders() -> Vec<&'static str> {
-    #[allow(unused_mut)]
-    let mut pending = Vec::new();
-    #[cfg(feature = "transaction")]
-    pending.push("transaction (Phase 5)");
-    #[cfg(feature = "deploy")]
-    pending.push("deploy (Phase 5)");
-    #[cfg(feature = "contract")]
-    pending.push("contract (Phase 5)");
-    #[cfg(feature = "write")]
-    pending.push("write (Phase 5)");
-    pending
+    Vec::new()
 }
 
 /// Flat list of registered tool names for the current feature set.
@@ -62,6 +43,14 @@ pub fn registered_tool_names() -> Vec<&'static str> {
     names.extend_from_slice(rpc::tool_names());
     #[cfg(feature = "binary-port")]
     names.extend_from_slice(binary_port::tool_names());
+    #[cfg(feature = "transaction")]
+    names.extend_from_slice(transaction::tool_names());
+    #[cfg(feature = "deploy")]
+    names.extend_from_slice(deploy::tool_names());
+    #[cfg(feature = "contract")]
+    names.extend_from_slice(contract::tool_names());
+    #[cfg(feature = "write")]
+    names.extend_from_slice(write::tool_names());
     names
 }
 

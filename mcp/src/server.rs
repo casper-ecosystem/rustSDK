@@ -800,6 +800,369 @@ impl CasperSdkMcp {
     async fn sdk_get_binary_protocol_version(&self, node_address: Option<String>) -> ToolOutput {
         tools::binary_port::get_binary_protocol_version(node_address).await
     }
+
+    // --- transaction (feature = "transaction") ---
+
+    #[tool(description = "Build unsigned transaction from builder_params_json + transaction_params_json")]
+    async fn sdk_make_transaction(
+        &self,
+        builder_params_json: String,
+        transaction_params_json: String,
+    ) -> ToolOutput {
+        tools::transaction::make_transaction(builder_params_json, transaction_params_json)
+    }
+
+    #[tool(description = "Build unsigned transfer transaction")]
+    async fn sdk_make_transfer_transaction(
+        &self,
+        target: String,
+        amount: String,
+        transaction_params_json: String,
+        maybe_source: Option<String>,
+        maybe_id: Option<String>,
+    ) -> ToolOutput {
+        tools::transaction::make_transfer_transaction(
+            target,
+            amount,
+            transaction_params_json,
+            maybe_source,
+            maybe_id,
+        )
+    }
+
+    #[tool(description = "Speculative exec of a built transaction (no submit)")]
+    async fn sdk_speculative_transaction(
+        &self,
+        builder_params_json: String,
+        transaction_params_json: String,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::transaction::speculative_transaction(
+            builder_params_json,
+            transaction_params_json,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Speculative transfer transaction (no submit)")]
+    async fn sdk_speculative_transfer_transaction(
+        &self,
+        target_account: String,
+        amount: String,
+        transaction_params_json: String,
+        maybe_source: Option<String>,
+        maybe_id: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::transaction::speculative_transfer_transaction(
+            target_account,
+            amount,
+            transaction_params_json,
+            maybe_source,
+            maybe_id,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    // --- deploy (feature = "deploy", legacy) ---
+
+    #[tool(description = "Build unsigned legacy deploy")]
+    async fn sdk_make_deploy(
+        &self,
+        deploy_params_json: String,
+        session_params_json: String,
+        payment_params_json: String,
+    ) -> ToolOutput {
+        tools::deploy::make_deploy(deploy_params_json, session_params_json, payment_params_json)
+    }
+
+    #[tool(description = "Build unsigned legacy transfer deploy")]
+    async fn sdk_make_transfer(
+        &self,
+        amount: String,
+        target_account: String,
+        deploy_params_json: String,
+        payment_params_json: String,
+        transfer_id: Option<String>,
+    ) -> ToolOutput {
+        tools::deploy::make_transfer(
+            amount,
+            target_account,
+            deploy_params_json,
+            payment_params_json,
+            transfer_id,
+        )
+    }
+
+    #[tool(description = "Speculative legacy deploy (no submit)")]
+    async fn sdk_speculative_deploy(
+        &self,
+        deploy_params_json: String,
+        session_params_json: String,
+        payment_params_json: String,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::deploy::speculative_deploy(
+            deploy_params_json,
+            session_params_json,
+            payment_params_json,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Speculative legacy transfer (no submit)")]
+    async fn sdk_speculative_transfer(
+        &self,
+        amount: String,
+        target_account: String,
+        deploy_params_json: String,
+        payment_params_json: String,
+        transfer_id: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::deploy::speculative_transfer(
+            amount,
+            target_account,
+            deploy_params_json,
+            payment_params_json,
+            transfer_id,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    // --- contract queries (feature = "contract") ---
+
+    #[tool(description = "Query contract dictionary; kind + dictionary_item_json fields")]
+    async fn sdk_query_contract_dict(
+        &self,
+        kind: String,
+        dictionary_item_json: String,
+        state_root_hash: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::contract::query_contract_dict(
+            kind,
+            dictionary_item_json,
+            state_root_hash,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Query contract named key path under an entity")]
+    async fn sdk_query_contract_key(
+        &self,
+        entity_identifier: String,
+        path: String,
+        maybe_block_identifier: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::contract::query_contract_key(
+            entity_identifier,
+            path,
+            maybe_block_identifier,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    // --- write (feature = "write") ---
+
+    #[tool(description = "Sign transaction JSON with secret key PEM (mutates approvals)")]
+    async fn sdk_sign_transaction(
+        &self,
+        transaction_json: String,
+        secret_key: String,
+    ) -> ToolOutput {
+        tools::write::sign_transaction(transaction_json, secret_key)
+    }
+
+    #[tool(description = "Submit signed transaction JSON via put_transaction")]
+    async fn sdk_put_transaction(
+        &self,
+        transaction_json: String,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::write::put_transaction(transaction_json, verbosity, rpc_address).await
+    }
+
+    #[tool(description = "Build + submit transaction (make + put)")]
+    async fn sdk_transaction(
+        &self,
+        builder_params_json: String,
+        transaction_params_json: String,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::write::transaction(
+            builder_params_json,
+            transaction_params_json,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Build + submit transfer transaction")]
+    async fn sdk_transfer_transaction(
+        &self,
+        target_account: String,
+        amount: String,
+        transaction_params_json: String,
+        maybe_source: Option<String>,
+        maybe_id: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::write::transfer_transaction(
+            target_account,
+            amount,
+            transaction_params_json,
+            maybe_source,
+            maybe_id,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Sign deploy JSON with secret key PEM")]
+    async fn sdk_sign_deploy(&self, deploy_json: String, secret_key: String) -> ToolOutput {
+        tools::write::sign_deploy(deploy_json, secret_key)
+    }
+
+    #[tool(description = "Submit signed deploy JSON")]
+    async fn sdk_put_deploy(
+        &self,
+        deploy_json: String,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::write::put_deploy(deploy_json, verbosity, rpc_address).await
+    }
+
+    #[tool(description = "Build + submit legacy deploy")]
+    async fn sdk_deploy(
+        &self,
+        deploy_params_json: String,
+        session_params_json: String,
+        payment_params_json: String,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::write::deploy(
+            deploy_params_json,
+            session_params_json,
+            payment_params_json,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Build + submit legacy transfer")]
+    async fn sdk_transfer(
+        &self,
+        amount: String,
+        target_account: String,
+        deploy_params_json: String,
+        payment_params_json: String,
+        transfer_id: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::write::transfer(
+            amount,
+            target_account,
+            deploy_params_json,
+            payment_params_json,
+            transfer_id,
+            verbosity,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Install wasm (hex) as transaction session with is_install_upgrade")]
+    async fn sdk_install(
+        &self,
+        transaction_params_json: String,
+        wasm_hex: String,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::write::install(transaction_params_json, wasm_hex, rpc_address).await
+    }
+
+    #[tool(description = "Install via legacy deploy (deprecated; prefer sdk_install)")]
+    async fn sdk_install_deploy(
+        &self,
+        deploy_params_json: String,
+        session_params_json: String,
+        payment_amount: String,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::write::install_deploy(
+            deploy_params_json,
+            session_params_json,
+            payment_amount,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Call contract entrypoint via transaction submit")]
+    async fn sdk_call_entrypoint(
+        &self,
+        builder_params_json: String,
+        transaction_params_json: String,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::write::call_entrypoint(builder_params_json, transaction_params_json, rpc_address)
+            .await
+    }
+
+    #[tool(description = "Call entrypoint via legacy deploy (deprecated)")]
+    async fn sdk_call_entrypoint_deploy(
+        &self,
+        deploy_params_json: String,
+        session_params_json: String,
+        payment_params_json: String,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::write::call_entrypoint_deploy(
+            deploy_params_json,
+            session_params_json,
+            payment_params_json,
+            rpc_address,
+        )
+        .await
+    }
+
+    #[tool(description = "Binary port: try_accept_transaction (submit via binary port)")]
+    async fn sdk_get_binary_try_accept_transaction(
+        &self,
+        transaction_json: String,
+        node_address: Option<String>,
+    ) -> ToolOutput {
+        tools::write::get_binary_try_accept_transaction(transaction_json, node_address).await
+    }
 }
 
 fn help_text() -> String {
