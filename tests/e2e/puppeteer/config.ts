@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config({ path: '../../.env' });
+dotenv.config({ path: '../../.env', quiet: true });
 
 export const key_name_default = 'secret_key.pem';
 export const key_path_default =

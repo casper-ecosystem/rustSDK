@@ -178,7 +178,8 @@ const config: Config = {
 
   // A map from regular expressions to paths to transformers
   transform: {
-    '^.+\\.[tj]sx?$': ['ts-jest', { useESM: true }],
+    // Only TypeScript — avoid ts-jest compiling pkg-nodejs/*.js (allowJs noise).
+    '^.+\\.tsx?$': ['ts-jest', { useESM: true }],
   },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
