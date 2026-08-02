@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["session_str_params_to_casper_client"],"struct":["SessionStrParams"]};
