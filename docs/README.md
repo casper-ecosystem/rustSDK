@@ -2363,9 +2363,9 @@ $ npm build
 
 You can download an alpha version of the app illustrating the SDK here:
 
-- [Microsoft Windows](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/raw/dev/examples/desktop/electron/release/Casper%20Webclient%202.0.0.exe)
-- [GNU/Linux AppImage](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/raw/dev/examples/desktop/electron/release/Casper%20Webclient-2.0.0.AppImage)
-- [GNU/Linux Snap](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/raw/dev/examples/desktop/electron/release/casper-webclient_2.0.0_amd64.snap)
+- [Microsoft Windows](https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/Casper%20Webclient%202.2.0.exe)
+- [GNU/Linux AppImage](https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/Casper%20Webclient-2.2.0.AppImage)
+- [GNU/Linux Snap](https://raw.githubusercontent.com/casper-ecosystem/casper-rust-wasm-sdk/dev/examples/desktop/electron/release/casper-webclient_2.2.0_amd64.snap)
 - [Mac][TODO]
 
 </details>
