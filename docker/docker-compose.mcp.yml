@@ -3,7 +3,7 @@
 # Build context is the repo root (SDK path dep + [patch.crates-io]).
 services:
   sdk-mcp:
-    image: ${CASPER_SDK_MCP_IMAGE:-casper-rust-wasm-sdk-mcp:2.2.2}
+    image: ${CASPER_SDK_MCP_IMAGE:-interchouette/casper-rust-wasm-sdk-mcp:2.2.2-mcp}
     container_name: casper-rust-wasm-sdk-mcp
     build:
       context: ..

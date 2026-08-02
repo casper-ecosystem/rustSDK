@@ -14,7 +14,8 @@ Inventory: [TOOLS.md](TOOLS.md). Patterns: [PATTERNS.md](PATTERNS.md). Cursor co
 | **HTTP (host)**    | `make run-mcp-http`                                | Same URL without Docker     |
 
 ```bash
-make mcp-docker-build   # image casper-rust-wasm-sdk-mcp:2.2.2
+make mcp-docker-build   # image …:2.2.2-mcp (+ Hub tags)
+make mcp-docker-push    # Hub + GHCR
 make mcp-http           # docker compose → http://127.0.0.1:8790/mcp
 make mcp-http-stop
 make run-mcp            # stdio (host)
@@ -74,7 +75,7 @@ Complex inputs use JSON strings — see [TOOLS.md](TOOLS.md) and `tools/params.r
 | `casper-rust-wasm-sdk`              | HTTP `:8790/mcp` | Docker image via `make mcp-http` |
 | `casper-rust-wasm-sdk-stdio-docker` | stdio            | Same image (`docker run -i …`)   |
 
-Both use image `casper-rust-wasm-sdk-mcp:2.2.2`. Cargo stdio is optional in [mcp.json.example](mcp.json.example) only (slow cold start).
+Both use image `interchouette/casper-rust-wasm-sdk-mcp:2.2.2-mcp`. Cargo stdio is optional in [mcp.json.example](mcp.json.example) only (slow cold start).
 
 Prerequisite: `make mcp-docker-build` once; keep HTTP up with `make mcp-http`.
 

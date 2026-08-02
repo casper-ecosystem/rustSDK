@@ -5,7 +5,7 @@ set -euo pipefail
 
 RPC_URL="${CASPER_RPC_URL:-http://127.0.0.1:11101}"
 HTTP_URL="${CASPER_SDK_MCP_HTTP_URL:-http://127.0.0.1:8790/mcp}"
-IMAGE="${CASPER_SDK_MCP_IMAGE:-casper-rust-wasm-sdk-mcp:2.2.2}"
+IMAGE="${CASPER_SDK_MCP_IMAGE:-interchouette/casper-rust-wasm-sdk-mcp:2.2.2-mcp}"
 PASS=0
 FAIL=0
 TMP=$(mktemp -d)
