@@ -35,7 +35,7 @@ Slim feature set:
 cargo build -p casper-rust-wasm-sdk-mcp --no-default-features --features "rpc,helpers"
 ```
 
-## Tools (Phase 3–4)
+## Tools (Phase 3–5)
 
 Always on: `sdk_help`, `sdk_get_endpoints`, `sdk_set_endpoints`.
 
@@ -43,8 +43,14 @@ Always on: `sdk_help`, `sdk_get_endpoints`, `sdk_set_endpoints`.
 
 **rpc** (22): node status, peers, chainspec, blocks, balances, entity/account, transaction/deploy lookups, dictionary/global state, speculative exec, `list_rpcs`.
 
-**binary-port** (33): headers/blocks, peers/status/uptime, rewards, global state, speculative execution, protocol version (needs `CASPER_NODE_URL`). `try_accept` is Phase 5 (`write`).
+**binary-port** (33): headers/blocks, peers/status/uptime, rewards, global state, speculative execution, protocol version (needs `CASPER_NODE_URL`).
 
-Later phases: transaction builders, deploy, contract, write.
+**transaction** (4): make / make_transfer / speculative builders.
 
-> Note: mcpkit registers helper/rpc tools in the binary even when those Cargo features are off; `sdk_help` lists only enabled feature groups. Domain modules for Phase 3 are always compiled so feature splits stay buildable.
+**deploy** (4): legacy make / speculative builders.
+
+**contract** (2): `query_contract_dict`, `query_contract_key`.
+
+**write** (13): sign/put/submit transaction & deploy, install, call_entrypoint, binary `try_accept`.
+
+Complex inputs use JSON strings — see `mcp/TOOLS.md` and `tools/params.rs` (`transaction_params_json`, `builder_params_json`, …).

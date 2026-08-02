@@ -86,9 +86,7 @@ fn parse_key(formatted: &str) -> Result<casper_types::Key, String> {
 }
 
 fn parse_digest(hex: &str) -> Result<casper_types::Digest, String> {
-    Digest::new(hex)
-        .map(Into::into)
-        .map_err(|e| e.to_string())
+    Digest::new(hex).map(Into::into).map_err(|e| e.to_string())
 }
 
 fn parse_path(path: Option<String>) -> Result<Vec<String>, String> {
@@ -447,7 +445,12 @@ pub async fn get_binary_global_state_item_by_block_height(
         Err(err) => return format::err(err),
     };
     let sdk = sdk_handle::sdk_snapshot();
-    bin_call!(sdk.get_binary_global_state_item_by_block_height(node_address, block_height, key, path))
+    bin_call!(sdk.get_binary_global_state_item_by_block_height(
+        node_address,
+        block_height,
+        key,
+        path
+    ))
 }
 
 pub async fn get_binary_try_speculative_execution(
