@@ -72,8 +72,7 @@ export class HeaderComponent implements AfterViewInit {
         this.storageService.get('rpc_address') || this.rpc_address;
       // Public hosts must not restore a localhost/ntcl selection from localStorage
       // (leftover from older defaults or local testing).
-      const storedIsLocal =
-        /localhost|127\.0\.0\.1|172\.(1[6-9]|2\d|3[01])\./.test(storedRpc);
+      const storedIsLocal = this.isLocalRpcAddress(storedRpc);
       if (!(storedIsLocal && !this.isPageOnLocalDockerNetwork())) {
         this.chain_name =
           this.storageService.get('chain_name') || this.chain_name;
@@ -90,6 +89,26 @@ export class HeaderComponent implements AfterViewInit {
           node_address: this.node_address,
         });
       }
+    }
+
+    // Public hosts must never keep a localhost network selected (even without
+    // localStorage), e.g. older images that defaulted to ntcl.
+    if (
+      !this.isPageOnLocalDockerNetwork() &&
+      this.isLocalRpcAddress(this.rpc_address)
+    ) {
+      this.network =
+        this.networks.find((x) => x.name === this.env['default_network']) ||
+        this.networks.find((x) => !this.isLocalRpcAddress(x.rpc_address)) ||
+        this.network;
+      this.chain_name = this.network.chain_name;
+      this.rpc_address = this.network.rpc_address;
+      this.node_address = this.network.node_address;
+      this.storageService.setState({
+        chain_name: this.chain_name,
+        rpc_address: this.rpc_address,
+        node_address: this.node_address,
+      });
     }
 
     this.stateService.setState({
@@ -189,6 +208,23 @@ export class HeaderComponent implements AfterViewInit {
   isCustomNetworkAllowed() {
     // Allow custom networks only in dev and electron (not in production/docker for security)
     return !this.is_docker && (!this.is_production || this.is_electron);
+  }
+
+  /** Hide localhost/ntcl options on public hosts; keep them for local compose. */
+  isNetworkOptionVisible(network: Network): boolean {
+    if (network.name === 'custom' && !this.isCustomNetworkAllowed()) {
+      return false;
+    }
+    if (this.isPageOnLocalDockerNetwork()) {
+      return true;
+    }
+    return !this.isLocalRpcAddress(network.rpc_address);
+  }
+
+  private isLocalRpcAddress(rpcAddress: string): boolean {
+    return /localhost|127\.0\.0\.1|172\.(1[6-9]|2\d|3[01])\./.test(
+      rpcAddress || '',
+    );
   }
 
   onCcustomChainChange($event: Event) {
