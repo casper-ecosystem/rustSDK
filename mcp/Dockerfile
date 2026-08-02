@@ -34,8 +34,7 @@ RUN apt-get update \
 
 COPY --from=builder /casper-rust-wasm-sdk-mcp /usr/local/bin/casper-rust-wasm-sdk-mcp
 
-ENV CASPER_SDK_MCP_HTTP=1 \
-    CASPER_SDK_MCP_ADDR=0.0.0.0:8790 \
+ENV CASPER_SDK_MCP_ADDR=0.0.0.0:8790 \
     CASPER_RPC_URL=http://host.docker.internal:11101 \
     CASPER_NODE_URL=host.docker.internal:28101 \
     RUST_LOG=warn \
@@ -43,5 +42,7 @@ ENV CASPER_SDK_MCP_HTTP=1 \
 
 EXPOSE 8790
 
+# Default CMD is HTTP (compose). For Cursor stdio, override command to just the binary
+# and do NOT set CASPER_SDK_MCP_HTTP (clap would force HTTP and break stdio).
 ENTRYPOINT ["casper-rust-wasm-sdk-mcp"]
 CMD ["--http", "--listen", "0.0.0.0:8790"]

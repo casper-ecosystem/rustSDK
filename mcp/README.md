@@ -67,11 +67,18 @@ Complex inputs use JSON strings — see [TOOLS.md](TOOLS.md) and `tools/params.r
 
 ## Cursor
 
-Copy an entry from [mcp.json.example](mcp.json.example) into [`.cursor/mcp.json`](../.cursor/mcp.json) (a starter file is committed). Prefer HTTP after `make mcp-http`, or stdio-cargo while developing.
+**Active** [`.cursor/mcp.json`](../.cursor/mcp.json):
 
-Agents in this repo must use MCP tools for NCTL/chain access (see `.cursor/rules/sdk-use-mcp-nctl.mdc`).
+| Server | Transport | Backing |
+| --- | --- | --- |
+| `casper-rust-wasm-sdk` | HTTP `:8790/mcp` | Docker image via `make mcp-http` |
+| `casper-rust-wasm-sdk-stdio-docker` | stdio | Same image (`docker run -i …`) |
 
-Compose with **casper-nctl-2-docker** MCP (:8788) for network lifecycle and **kms-secp256k1-api** MCP (:8789) for KMS signing — this sidecar owns SDK calls only.
+Both use image `casper-rust-wasm-sdk-mcp:2.2.2`. Cargo stdio is optional in [mcp.json.example](mcp.json.example) only (slow cold start).
+
+Prerequisite: `make mcp-docker-build` once; keep HTTP up with `make mcp-http`.
+
+Agents must use MCP for NCTL/chain access (`.cursor/rules/sdk-use-mcp-nctl.mdc`).
 
 ## Smoke
 
@@ -80,4 +87,6 @@ Compose with **casper-nctl-2-docker** MCP (:8788) for network lifecycle and **km
 | Feature-matrix builds + unit tests | pass (Phase 7) |
 | HTTP `initialize` on `:8790/mcp` | pass |
 | Live NCTL `sdk_get_node_status` / `sdk_get_peers` | **pass** (NCTL 2.2 on `:11101`) |
-| Docker image / `make mcp-http` + `tools/call` | **pass** (`casper-rust-wasm-sdk-mcp:2.2.2` → NCTL via `host.docker.internal`) |
+| Docker HTTP `make mcp-http` + `tools/call` | **pass** |
+| Docker stdio `docker run -i` initialize | **pass** |
+| Host / cargo stdio initialize | **pass** |
