@@ -28,14 +28,12 @@ full = [
   "helpers",
   "write",
 ]
-# Pass through to the SDK path-dep so modules compile in/out for real.
 rpc = []
 binary-port = ["casper-rust-wasm-sdk/binary-port"]
 transaction = ["casper-rust-wasm-sdk/transaction"]
 deploy = ["casper-rust-wasm-sdk/deploy"]
 contract = ["casper-rust-wasm-sdk/contract"]
 helpers = ["casper-rust-wasm-sdk/helpers"]
-# Mutating tools; requires construction features on the SDK.
 write = ["transaction", "deploy", "contract"]
 
 [dependencies]

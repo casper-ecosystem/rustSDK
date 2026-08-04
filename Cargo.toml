@@ -25,7 +25,6 @@ exclude = [
 
 [features]
 default = ["full"]
-# Today's full surface (default). Slim / read-only: `--no-default-features`.
 full = [
   "transaction",
   "deploy",
@@ -34,17 +33,11 @@ full = [
   "watcher",
   "helpers",
 ]
-# Transaction builders, put/speculative transaction RPCs, transaction utils.
 transaction = []
-# Deploy builders, put/speculative deploy RPCs, deploy utils.
 deploy = []
-# Convenience install / call_entrypoint / query_contract_* helpers.
 contract = []
-# Binary-port client (optional deps for real size savings).
 binary-port = ["dep:casper-binary-port", "dep:casper-binary-port-access"]
-# Single-hash wait/watch helpers (not a full event stream).
 watcher = []
-# Extra wasm helper exports (src/js/interns); Rust helpers stay for internal use.
 helpers = []
 
 [dependencies]
@@ -99,7 +92,7 @@ opt-level = "s"
 strip = true
 panic = "abort"
 
-# Binaryen >= 131; --all-features accepts rustc bulk-memory / saturating-float ops.
+# Needs Binaryen/wasm-opt that accepts rustc's bulk-memory ops (--all-features).
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = ["-O", "--all-features"]
 

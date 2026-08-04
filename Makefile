@@ -7,9 +7,6 @@ CURRENT_DIR = .
 WEB_OUT_DIR = pkg
 NODEJS_OUT_DIR = pkg-nodejs
 
-# Cargo feature profiles for wasm-pack (default crate features = full).
-# read-only / slim: core RPC only (--no-default-features)
-# transaction: builders + put/speculative transaction, no deploy
 WASM_FEATURES_FULL =
 WASM_FEATURES_READ_ONLY = --no-default-features
 WASM_FEATURES_TRANSACTION = --no-default-features --features transaction,helpers,watcher

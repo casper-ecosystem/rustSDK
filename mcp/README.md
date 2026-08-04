@@ -41,7 +41,7 @@ Docker containers reach host NCTL via `host.docker.internal` (compose sets `extr
 
 ## Features
 
-Cargo features pass through to the SDK path-dep (`default-features = false` on the SDK), so enabling `binary-port` / `transaction` / … actually compiles those SDK modules. Default is `full`.
+MCP features enable the matching SDK features (`casper-rust-wasm-sdk` is `default-features = false`). Default is `full`.
 
 | Feature          | Tools                                                   | SDK feature                    |
 | ---------------- | ------------------------------------------------------- | ------------------------------ |
@@ -52,16 +52,12 @@ Cargo features pass through to the SDK path-dep (`default-features = false` on t
 | `transaction`    | make / speculative transaction builders                 | `transaction`                  |
 | `deploy`         | legacy make / speculative deploy builders               | `deploy`                       |
 | `contract`       | `query_contract_dict`, `query_contract_key`             | `contract`                     |
-| `write`          | sign/put/submit, install, call_entrypoint, `try_accept` | pulls `transaction`+`deploy`+`contract` |
+| `write`          | sign/put/submit, install, call_entrypoint, `try_accept` | `transaction`+`deploy`+`contract` |
 | `full` (default) | all of the above                                        | all SDK optional features      |
 
 ```bash
 cargo build -p casper-rust-wasm-sdk-mcp
-# Slim help-text listing (tool handlers still present via mcpkit until further cfg):
-cargo build -p casper-rust-wasm-sdk-mcp --no-default-features --features "rpc,helpers,transaction,deploy,contract,binary-port,write"
 ```
-
-> Prefer `full` (default) for the MCP binary. A true slim MCP server still needs matching SDK features for any tool module that remains compiled.
 
 ## Tools
 
