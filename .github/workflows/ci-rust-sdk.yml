@@ -3,14 +3,14 @@ name: ci-rust-sdk
 
 on:
   push:
-    branches: [dev, cid_cd_tests, 'feat*', 'release-*']
+    branches: [dev, cid_cd_tests, "feat*", "release-*"]
     paths-ignore:
-      - '**.md'
+      - "**.md"
 
   pull_request:
-    branches: [dev, cid_cd_tests, 'feat*', 'release-*']
+    branches: [dev, cid_cd_tests, "feat*", "release-*"]
     paths-ignore:
-      - '**.md'
+      - "**.md"
 
 jobs:
   build_and_test:
@@ -63,7 +63,7 @@ jobs:
             -p 28101-28105:28101-28105 \
             -v $PWD/assets/users:/app/casper-nctl/assets/net-1/users/ \
             -v $PWD/assets/faucet:/app/casper-nctl/assets/net-1/faucet/ \
-            gregoshop/casper-nctl:2.0
+            interchouette/casper-nctl-2-docker:2.2
 
       - name: Wait for the service to be ready
         run: |
@@ -141,7 +141,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
 
       - name: Disable AppArmor
         run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
@@ -164,7 +164,7 @@ jobs:
         with:
           folder: docs # The folder the action should deploy.
           target-folder: condor
-          commit-message: 'Deploy documentation for ${{ github.ref_name }}'
+          commit-message: "Deploy documentation for ${{ github.ref_name }}"
 
       # - name: Install Electron
       #   run: |
