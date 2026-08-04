@@ -4,21 +4,15 @@ name: publish-rust-sdk-rs
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 jobs:
   publish:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
 
       - name: Crate Publish
-        uses: actions-rs/cargo@v1
-        with:
-          command: publish
-          args: --token ${{ secrets.crates_io_token }}
+        run: cargo publish --token ${{ secrets.crates_io_token }}

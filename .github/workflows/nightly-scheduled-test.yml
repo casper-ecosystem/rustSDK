@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node-version: [22.x]
+        node-version: [24.x]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -20,7 +20,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y pkg-config libssl-dev
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Free up disk space
         run: |
@@ -35,15 +35,10 @@ jobs:
       - name: Swatinem cache
         uses: Swatinem/rust-cache@v2
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          profile: minimal
           components: rustfmt, clippy
-          target: wasm32-unknown-unknown
-
-      - name: Add wasm32 target
-        run: rustup target add wasm32-unknown-unknown
+          targets: wasm32-unknown-unknown
 
       - name: Install cargo-audit
         run: cargo install cargo-audit
@@ -132,19 +127,17 @@ jobs:
         run: make integration-test
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
 
       - name: Disable AppArmor
         run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
 
       - name: Build lib for all targets
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --lib --all-targets
+        run: cargo build --lib --all-targets
 
       # - name: Slack Notification
       #   uses: ravsamhq/notify-slack-action@4ed28566c2bdcdaee6dca2b46b9666d01b4ed8a4 #v1.10.0

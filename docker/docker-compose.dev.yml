@@ -6,7 +6,7 @@ services:
       dockerfile: ./docker/Dockerfile.dev
       context: ../
     ports:
-      - '4200:4200'
+      - "4200:4200"
     networks:
       - casper-network
 
@@ -15,6 +15,7 @@ services:
   # docker container run -t -i --rm -h casper-webclient -p 4200:4200 casper-webclient
 
   ws-proxy:
+    image: ws-proxy:latest
     container_name: ws-proxy
     build:
       context: ../

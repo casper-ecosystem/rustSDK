@@ -51,6 +51,7 @@ services:
       - casper-network
 
   ws-proxy:
+    image: ws-proxy:latest
     container_name: ws-proxy
     build:
       context: ../

@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:22.22-alpine as build
+FROM --platform=linux/amd64 node:24-alpine AS build
 
 ENV NODE_ENV "development"
 ARG BUILD_CONFIGURATION=docker-dev
