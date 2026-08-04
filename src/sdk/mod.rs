@@ -1,21 +1,36 @@
+#[cfg(feature = "binary-port")]
 pub mod binary_port;
+
+#[cfg(feature = "deploy")]
 #[allow(hidden_glob_reexports)]
 pub(crate) mod deploy;
+#[cfg(feature = "deploy")]
+pub use deploy::*;
+
 pub mod rpcs;
+
+#[cfg(feature = "transaction")]
 #[allow(hidden_glob_reexports)]
 pub(crate) mod transaction;
-pub use deploy::*;
+#[cfg(feature = "transaction")]
 pub use transaction::*;
 
+#[cfg(feature = "deploy")]
 pub(crate) mod deploy_utils;
+#[cfg(feature = "deploy")]
 pub(crate) use deploy_utils::*;
 
+#[cfg(feature = "transaction")]
 pub(crate) mod transaction_utils;
+#[cfg(feature = "transaction")]
 pub(crate) use transaction_utils::*;
 
+#[cfg(feature = "watcher")]
 pub mod watcher;
 
+#[cfg(feature = "contract")]
 pub(crate) mod contract;
+#[cfg(feature = "contract")]
 pub use contract::*;
 
 use wasm_bindgen::prelude::*;

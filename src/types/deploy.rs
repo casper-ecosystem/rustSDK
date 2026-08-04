@@ -1,11 +1,12 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::insert_js_value_arg;
+#[cfg(feature = "deploy")]
+use crate::types::deploy_params::{
+    deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+    session_str_params::SessionStrParams,
+};
 use crate::types::{
     cl::bytes::Bytes,
-    deploy_params::{
-        deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-        session_str_params::SessionStrParams,
-    },
     hash::{
         contract_hash::ContractHash, contract_package_hash::ContractPackageHash,
         deploy_hash::DeployHash,
@@ -20,6 +21,7 @@ use crate::{
         secret_key_from_pem,
     },
 };
+#[cfg(feature = "deploy")]
 #[allow(deprecated)]
 use crate::{make_deploy, make_transfer};
 use casper_client::{cli::DeployBuilder, MAX_SERIALIZED_SIZE_OF_DEPLOY};
@@ -85,6 +87,7 @@ impl Deploy {
     }
 
     // static context
+    #[cfg(feature = "deploy")]
     #[wasm_bindgen(js_name = "withPaymentAndSession")]
     pub fn with_payment_and_session(
         deploy_params: DeployStrParams,
@@ -98,6 +101,7 @@ impl Deploy {
     }
 
     // static context
+    #[cfg(feature = "deploy")]
     #[wasm_bindgen(js_name = "withTransfer")]
     pub fn with_transfer(
         amount: &str,

@@ -12,6 +12,7 @@ pub mod path;
 pub mod peer_entry;
 pub mod pricing_mode;
 pub mod public_key;
+#[cfg(feature = "binary-port")]
 pub mod record_id;
 pub mod sdk_error;
 pub mod transaction;

@@ -88,6 +88,18 @@ $ make pack
 
 This will create a `pkg` and `pkg-nodejs` containing the Typescript interfaces. You can find more details about building the SDK for Javascript with `wasm-pack` in the [wasm-pack documention](https://rustwasm.github.io/docs/wasm-pack/commands/build.html).
 
+### Cargo features (wasm size)
+
+Default features (`full`) keep today's API. Slim / read-only builds drop construction and optional surfaces:
+
+| Profile | Make target | Cargo flags |
+| --- | --- | --- |
+| full (default) | `make web` / `make web-full` | default features |
+| read-only | `make web-read-only` | `--no-default-features` |
+| transaction (no deploy) | `make web-transaction` | `--no-default-features --features transaction,helpers,watcher` |
+
+Optional features: `transaction`, `deploy`, `contract`, `binary-port`, `watcher`, `helpers`. Core JSON-RPC reads (`get_block`, `query_global_state`, `get_transaction`, …) stay available without them. `binary-port` pulls optional `casper-binary-port*` crates.
+
 This folder contains a Wasm binary, a JS wrapper file, Typescript types definitions, and a package.json file that you can load in your project.
 
 ```shell

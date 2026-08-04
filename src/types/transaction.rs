@@ -1,42 +1,42 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(target_arch = "wasm32", feature = "transaction"))]
 use crate::helpers::insert_js_value_arg;
+use crate::helpers::secret_key_from_pem;
+#[cfg(feature = "transaction")]
+use crate::helpers::{
+    get_current_timestamp, get_ttl_or_default, insert_arg, parse_timestamp, parse_ttl,
+};
+#[cfg(feature = "transaction")]
+use crate::types::transaction_params::transaction_builder_params::{
+    TransferTarget, TransferTargetKind,
+};
+#[cfg(feature = "transaction")]
 use crate::types::{
     cl::bytes::Bytes,
-    hash::{
-        account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
-        package_hash::PackageHash,
-    },
+    hash::{addressable_entity_hash::AddressableEntityHash, package_hash::PackageHash},
     public_key::PublicKey,
-    sdk_error::SdkError,
     transaction_params::{
         transaction_builder_params::TransactionBuilderParams,
         transaction_str_params::TransactionStrParams,
     },
     uref::URef,
 };
+use crate::types::{hash::account_hash::AccountHash, sdk_error::SdkError};
 use crate::{
     debug::{error, log},
-    helpers::{
-        get_current_timestamp, get_ttl_or_default, insert_arg, parse_timestamp, parse_ttl,
-        secret_key_from_pem,
-    },
-    make_transaction,
-    make_transfer_transaction::make_transfer_transaction,
-    types::{
-        digest::Digest,
-        hash::transaction_hash::TransactionHash,
-        pricing_mode::PricingMode,
-        transaction_params::transaction_builder_params::{TransferTarget, TransferTargetKind},
-    },
+    types::{digest::Digest, hash::transaction_hash::TransactionHash, pricing_mode::PricingMode},
 };
+#[cfg(feature = "transaction")]
+use crate::{make_transaction, make_transfer_transaction::make_transfer_transaction};
 use casper_types::PricingMode as _PricingMode;
+#[cfg(feature = "transaction")]
 use casper_types::{
-    account::AccountHash as _AccountHash,
-    bytesrepr::{self, Bytes as _Bytes, ToBytes},
-    Approval, ApprovalsHash, AsymmetricType, Deploy, GasLimited, InitiatorAddr,
-    PublicKey as _PublicKey, RuntimeArgs, Timestamp, Transaction as _Transaction, TransactionArgs,
-    TransactionEntryPoint, TransactionInvocationTarget, TransactionTarget, TransactionV1,
-    URef as _URef, U512,
+    account::AccountHash as _AccountHash, bytesrepr::Bytes as _Bytes, bytesrepr::ToBytes,
+    PublicKey as _PublicKey, TransactionInvocationTarget, URef as _URef, U512,
+};
+use casper_types::{
+    bytesrepr, Approval, ApprovalsHash, AsymmetricType, Deploy, GasLimited, InitiatorAddr,
+    RuntimeArgs, Timestamp, Transaction as _Transaction, TransactionArgs, TransactionEntryPoint,
+    TransactionTarget, TransactionV1,
 };
 use chrono::{DateTime, Utc};
 #[cfg(target_arch = "wasm32")]
@@ -78,6 +78,7 @@ impl Transaction {
         }
     }
 
+    #[cfg(feature = "transaction")]
     // static context
     #[wasm_bindgen(js_name = "newSession")]
     pub fn new_session(
@@ -90,6 +91,7 @@ impl Transaction {
         })
     }
 
+    #[cfg(feature = "transaction")]
     // static context
     #[wasm_bindgen(js_name = "newTransfer")]
     pub fn new_transfer(
@@ -109,6 +111,7 @@ impl Transaction {
         .map_err(|err| format!("Error creating transfer transaction: {err}"))
     }
 
+    #[cfg(feature = "transaction")]
     #[wasm_bindgen(js_name = "withTTL")]
     pub fn with_ttl(&self, ttl: &str, secret_key: Option<String>) -> Transaction {
         let mut ttl = parse_ttl(ttl);
@@ -126,6 +129,7 @@ impl Transaction {
         self.rebuild(transaction_params, NewBuilderParams::default())
     }
 
+    #[cfg(feature = "transaction")]
     #[wasm_bindgen(js_name = "withTimestamp")]
     pub fn with_timestamp(&self, timestamp: &str, secret_key: Option<String>) -> Transaction {
         let mut timestamp = parse_timestamp(timestamp);
@@ -143,6 +147,7 @@ impl Transaction {
         self.rebuild(transaction_params, NewBuilderParams::default())
     }
 
+    #[cfg(feature = "transaction")]
     #[wasm_bindgen(js_name = "withChainName")]
     pub fn with_chain_name(&self, chain_name: &str, secret_key: Option<String>) -> Transaction {
         let transaction_params = TransactionStrParams::default();
@@ -153,6 +158,7 @@ impl Transaction {
         self.rebuild(transaction_params, NewBuilderParams::default())
     }
 
+    #[cfg(feature = "transaction")]
     #[wasm_bindgen(js_name = "withPublicKey")]
     pub fn with_public_key(
         &self,
@@ -167,6 +173,7 @@ impl Transaction {
         self.rebuild(transaction_params, NewBuilderParams::default())
     }
 
+    #[cfg(feature = "transaction")]
     #[wasm_bindgen(js_name = "withAccountHash")]
     pub fn with_account_hash(
         &self,
@@ -181,6 +188,7 @@ impl Transaction {
         self.rebuild(transaction_params, NewBuilderParams::default())
     }
 
+    #[cfg(feature = "transaction")]
     #[wasm_bindgen(js_name = "withEntryPoint")]
     pub fn with_entry_point(&self, entry_point: &str, secret_key: Option<String>) -> Transaction {
         let transaction_params = TransactionStrParams::default();
@@ -194,6 +202,7 @@ impl Transaction {
         self.rebuild(transaction_params, new_builder_params)
     }
 
+    #[cfg(feature = "transaction")]
     #[wasm_bindgen(js_name = "withEntityHash")]
     pub fn with_entity_hash(
         &self,
@@ -211,6 +220,7 @@ impl Transaction {
         self.rebuild(transaction_params, new_builder_params)
     }
 
+    #[cfg(feature = "transaction")]
     #[wasm_bindgen(js_name = "withPackageHash")]
     pub fn with_package_hash(
         &self,
@@ -228,6 +238,7 @@ impl Transaction {
         self.rebuild(transaction_params, new_builder_params)
     }
 
+    #[cfg(feature = "transaction")]
     #[wasm_bindgen(js_name = "withTransactionBytes")]
     pub fn with_transaction_bytes(
         &self,
@@ -247,6 +258,7 @@ impl Transaction {
         self.rebuild(transaction_params, new_builder_params)
     }
 
+    #[cfg(feature = "transaction")]
     #[wasm_bindgen(js_name = "withSecretKey")]
     pub fn with_secret_key(&self, secret_key: Option<String>) -> Transaction {
         let transaction_params = TransactionStrParams::default();
@@ -529,7 +541,7 @@ impl Transaction {
         initiator_addr.account_hash().into()
     }
 
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(all(target_arch = "wasm32", feature = "transaction"))]
     #[wasm_bindgen(js_name = "addArg")]
     pub fn add_arg_js_alias(
         &mut self,
@@ -578,12 +590,14 @@ impl Transaction {
         }
     }
 
+    #[cfg(feature = "transaction")]
     pub fn add_arg(&mut self, new_value_arg: String, secret_key: Option<String>) -> Transaction {
         let mut session_args = self.session_args().clone();
         let new_args = insert_arg(&mut session_args, new_value_arg);
         self.add_arg_common(new_args, secret_key)
     }
 
+    #[cfg(feature = "transaction")]
     fn add_arg_common(
         &mut self,
         new_args: &RuntimeArgs,
@@ -680,6 +694,7 @@ impl Transaction {
         updated_transaction
     }
 
+    #[cfg(feature = "transaction")]
     fn args_to_json_array(&self, new_args: &RuntimeArgs) -> Vec<serde_json::Value> {
         new_args
             .named_args()
@@ -714,6 +729,7 @@ impl Transaction {
             .collect()
     }
 
+    #[cfg(feature = "transaction")]
     fn rebuild(
         &self,
         transaction_params: TransactionStrParams,
@@ -837,6 +853,7 @@ impl Transaction {
         transaction
     }
 
+    #[cfg(feature = "transaction")]
     fn make_transaction_builder_params(
         &self,
         NewBuilderParams {
@@ -1005,6 +1022,7 @@ impl Transaction {
 }
 
 #[derive(Default)]
+#[cfg(feature = "transaction")]
 struct NewBuilderParams<'a> {
     new_hash: Option<AddressableEntityHash>,
     new_package_hash: Option<PackageHash>,
@@ -1039,7 +1057,7 @@ impl From<TransactionV1> for Transaction {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transaction"))]
 mod tests {
     use super::*;
     use crate::helpers::public_key_from_secret_key;

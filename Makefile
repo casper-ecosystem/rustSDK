@@ -7,15 +7,35 @@ CURRENT_DIR = .
 WEB_OUT_DIR = pkg
 NODEJS_OUT_DIR = pkg-nodejs
 
-.PHONY: all web nodejs clean build doc
+# Cargo feature profiles for wasm-pack (default crate features = full).
+# read-only / slim: core RPC only (--no-default-features)
+# transaction: builders + put/speculative transaction, no deploy
+WASM_FEATURES_FULL =
+WASM_FEATURES_READ_ONLY = --no-default-features
+WASM_FEATURES_TRANSACTION = --no-default-features --features transaction,helpers,watcher
+
+.PHONY: all web nodejs clean build doc web-full web-read-only web-transaction nodejs-full nodejs-read-only
 
 pack: web nodejs
 
-web:
-	wasm-pack build --target web --release --out-dir $(WEB_OUT_DIR) $(CURRENT_DIR)
+web: web-full
 
-nodejs:
-	wasm-pack build --target nodejs --release --out-dir $(NODEJS_OUT_DIR) $(CURRENT_DIR)
+nodejs: nodejs-full
+
+web-full:
+	wasm-pack build --target web --release --out-dir $(WEB_OUT_DIR) $(CURRENT_DIR) $(WASM_FEATURES_FULL)
+
+web-read-only:
+	wasm-pack build --target web --release --out-dir $(WEB_OUT_DIR) $(CURRENT_DIR) $(WASM_FEATURES_READ_ONLY)
+
+web-transaction:
+	wasm-pack build --target web --release --out-dir $(WEB_OUT_DIR) $(CURRENT_DIR) $(WASM_FEATURES_TRANSACTION)
+
+nodejs-full:
+	wasm-pack build --target nodejs --release --out-dir $(NODEJS_OUT_DIR) $(CURRENT_DIR) $(WASM_FEATURES_FULL)
+
+nodejs-read-only:
+	wasm-pack build --target nodejs --release --out-dir $(NODEJS_OUT_DIR) $(CURRENT_DIR) $(WASM_FEATURES_READ_ONLY)
 
 clean:
 	rm -rf $(WEB_OUT_DIR) $(NODEJS_OUT_DIR)
@@ -58,6 +78,7 @@ clippy:
 	cargo clippy --target wasm32-unknown-unknown --bins --fix --allow-dirty --allow-staged -- -D warnings
 	cargo clippy --lib -- -D warnings
 	cargo clippy --no-default-features --lib -- -D warnings
+	cargo clippy --no-default-features --features transaction,helpers --lib -- -D warnings
 
 check-lint: clippy
 	cargo fmt -- --check

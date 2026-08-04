@@ -41,24 +41,27 @@ Docker containers reach host NCTL via `host.docker.internal` (compose sets `extr
 
 ## Features
 
-| Feature          | Tools                                                   |
-| ---------------- | ------------------------------------------------------- |
-| _(always)_       | `sdk_help`, `sdk_get_endpoints`, `sdk_set_endpoints`    |
-| `helpers`        | utilities (keys, blake2b, motes, …)                     |
-| `rpc`            | JSON-RPC reads + speculative RPC                        |
-| `binary-port`    | binary-port queries (needs `CASPER_NODE_URL`)           |
-| `transaction`    | make / speculative transaction builders                 |
-| `deploy`         | legacy make / speculative deploy builders               |
-| `contract`       | `query_contract_dict`, `query_contract_key`             |
-| `write`          | sign/put/submit, install, call_entrypoint, `try_accept` |
-| `full` (default) | all of the above                                        |
+Cargo features pass through to the SDK path-dep (`default-features = false` on the SDK), so enabling `binary-port` / `transaction` / … actually compiles those SDK modules. Default is `full`.
+
+| Feature          | Tools                                                   | SDK feature                    |
+| ---------------- | ------------------------------------------------------- | ------------------------------ |
+| _(always)_       | `sdk_help`, `sdk_get_endpoints`, `sdk_set_endpoints`    | core RPC                       |
+| `helpers`        | utilities (keys, blake2b, motes, …)                     | `helpers`                      |
+| `rpc`            | JSON-RPC reads + speculative RPC                        | (always on in SDK)             |
+| `binary-port`    | binary-port queries (needs `CASPER_NODE_URL`)           | `binary-port`                  |
+| `transaction`    | make / speculative transaction builders                 | `transaction`                  |
+| `deploy`         | legacy make / speculative deploy builders               | `deploy`                       |
+| `contract`       | `query_contract_dict`, `query_contract_key`             | `contract`                     |
+| `write`          | sign/put/submit, install, call_entrypoint, `try_accept` | pulls `transaction`+`deploy`+`contract` |
+| `full` (default) | all of the above                                        | all SDK optional features      |
 
 ```bash
 cargo build -p casper-rust-wasm-sdk-mcp
-cargo build -p casper-rust-wasm-sdk-mcp --no-default-features --features "rpc,helpers"
+# Slim help-text listing (tool handlers still present via mcpkit until further cfg):
+cargo build -p casper-rust-wasm-sdk-mcp --no-default-features --features "rpc,helpers,transaction,deploy,contract,binary-port,write"
 ```
 
-> mcpkit may still compile tool handlers when a feature is off; `sdk_help` lists only enabled groups.
+> Prefer `full` (default) for the MCP binary. A true slim MCP server still needs matching SDK features for any tool module that remains compiled.
 
 ## Tools
 

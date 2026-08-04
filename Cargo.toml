@@ -23,13 +23,37 @@ exclude = [
   "tests/**",
 ]
 
+[features]
+default = ["full"]
+# Today's full surface (default). Slim / read-only: `--no-default-features`.
+full = [
+  "transaction",
+  "deploy",
+  "contract",
+  "binary-port",
+  "watcher",
+  "helpers",
+]
+# Transaction builders, put/speculative transaction RPCs, transaction utils.
+transaction = []
+# Deploy builders, put/speculative deploy RPCs, deploy utils.
+deploy = []
+# Convenience install / call_entrypoint / query_contract_* helpers.
+contract = []
+# Binary-port client (optional deps for real size savings).
+binary-port = ["dep:casper-binary-port", "dep:casper-binary-port-access"]
+# Single-hash wait/watch helpers (not a full event stream).
+watcher = []
+# Extra wasm helper exports (src/js/interns); Rust helpers stay for internal use.
+helpers = []
+
 [dependencies]
 casper-types = { version = "7.1.1", default-features = false, features = [
   "datasize",
 ] }
 casper-client = { version = "5", default-features = false }
-casper-binary-port = { version = "1.2.1" }
-casper-binary-port-access = { version = "0.1.0" }
+casper-binary-port = { version = "1.2.1", optional = true }
+casper-binary-port-access = { version = "0.1.0", optional = true }
 rand = { version = "0.9.2", default-features = false, features = [
   "thread_rng",
 ] }
@@ -70,6 +94,16 @@ doc = false
 
 [profile.release]
 lto = true
+codegen-units = 1
+opt-level = "s"
+strip = true
+panic = "abort"
+
+# Newer rustc emits bulk-memory / saturating-float ops that binaryen 124
+# rejects without a long flag list; skip wasm-opt so `wasm-pack` stays green.
+# Release LTO + opt-level="s" already shrink the module substantially.
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
 
 [dev-dependencies]
 sdk_tests = { path = "tests/integration/rust" }

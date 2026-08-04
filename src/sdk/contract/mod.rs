@@ -1,6 +1,10 @@
+#[cfg(feature = "transaction")]
 pub mod call_entrypoint;
+#[cfg(feature = "deploy")]
 pub mod call_entrypoint_deploy;
+#[cfg(feature = "transaction")]
 pub mod install;
+#[cfg(feature = "deploy")]
 pub mod install_deploy;
 pub mod query_contract_dict;
 pub mod query_contract_key;
