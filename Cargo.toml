@@ -4,7 +4,7 @@ resolver = "2"
 
 [package]
 name = "casper-rust-wasm-sdk"
-version = "2.2.0"
+version = "2.2.2"
 edition = "2021"
 description = "Casper Rust Wasm Web SDK"
 repository = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk"
@@ -24,11 +24,11 @@ exclude = [
 ]
 
 [dependencies]
-casper-types = { version = "7.0.0", default-features = false, features = [
+casper-types = { version = "7.1.1", default-features = false, features = [
   "datasize",
 ] }
 casper-client = { version = "5", default-features = false }
-casper-binary-port = { version = "1.1.1" }
+casper-binary-port = { version = "1.2.1" }
 casper-binary-port-access = { version = "0.1.0" }
 rand = { version = "0.9.2", default-features = false, features = [
   "thread_rng",
@@ -79,6 +79,10 @@ dotenvy = "0.15.7"
 
 [patch.crates-io]
 casper-client = { version = "5", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "dev" }
-casper-types = { git = "https://github.com/casper-network/casper-node", branch = "dev" }
-casper-binary-port = { git = "https://github.com/casper-network/casper-node", branch = "dev" }
-casper-binary-port-access = { git = "https://github.com/gRoussac/casper-binary-port-client", branch = "casper_2.2.0" }
+# NOT a normal `dev` pin: casper-node's own `dev` branch still declares version
+# "2.2.0" (https://github.com/casper-network/casper-node/blob/dev/node/Cargo.toml#L3),
+# so we track release tag v2.2.2 until that line (and crates) move forward. Then
+# switch these back to `branch = "dev"` (and casper_2.2.2 → matching access branch).
+casper-types = { git = "https://github.com/casper-network/casper-node", tag = "v2.2.2" }
+casper-binary-port = { git = "https://github.com/casper-network/casper-node", tag = "v2.2.2" }
+casper-binary-port-access = { git = "https://github.com/gRoussac/casper-binary-port-client", branch = "casper_2.2.2" }
