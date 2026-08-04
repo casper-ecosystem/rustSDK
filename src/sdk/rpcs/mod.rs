@@ -24,7 +24,7 @@ use dotenvy::dotenv;
 #[cfg(test)]
 mod setup {
     use super::*;
-    #[ctor::ctor]
+    #[ctor::ctor(unsafe)]
     fn setup() {
         dotenv().ok();
     }
