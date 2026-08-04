@@ -85,7 +85,7 @@ pub(crate) mod intern {
     ) -> String {
         let mut params = DictionaryItemStrParams::new();
         params.set_contract_named_key(contract_hash, dictionary_name, dictionary_item_key);
-        let dictionary_item = DictionaryItemInput::Params(params);
+        let dictionary_item = DictionaryItemInput::Params(Box::new(params));
         let get_dictionary_item = create_test_sdk(None)
             .get_dictionary_item(
                 dictionary_item,

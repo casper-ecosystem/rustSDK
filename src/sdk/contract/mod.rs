@@ -102,5 +102,5 @@ async fn get_dictionary_item_params_input(key: &str) -> DictionaryItemInput {
 
     let mut params = DictionaryItemStrParams::new();
     params.set_contract_named_key(key, DICTIONARY_NAME, DICTIONARY_ITEM_KEY);
-    DictionaryItemInput::Params(params)
+    DictionaryItemInput::Params(Box::new(params))
 }

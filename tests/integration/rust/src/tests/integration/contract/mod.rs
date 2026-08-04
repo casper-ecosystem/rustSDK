@@ -101,7 +101,7 @@ pub mod test_module {
 
         let mut params = DictionaryItemStrParams::new();
         params.set_dictionary(&config.dictionary_key);
-        let dictionary_item = DictionaryItemInput::Params(params);
+        let dictionary_item = DictionaryItemInput::Params(Box::new(params));
         let query_contract_dict = create_test_sdk(Some(config))
             .query_contract_dict(dictionary_item, Some(state_root_hash), None, None)
             .await;
@@ -140,7 +140,7 @@ pub mod test_module {
 
         let mut params = DictionaryItemStrParams::new();
         params.set_uref(&config.dictionary_uref, DICTIONARY_ITEM_KEY);
-        let dictionary_item = DictionaryItemInput::Params(params);
+        let dictionary_item = DictionaryItemInput::Params(Box::new(params));
 
         let query_contract_dict = create_test_sdk(Some(config))
             .query_contract_dict(dictionary_item, Some(state_root_hash), None, None)

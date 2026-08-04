@@ -198,7 +198,7 @@ pub mod test_module {
             DICTIONARY_NAME,
             DICTIONARY_ITEM_KEY,
         );
-        let dictionary_item = DictionaryItemInput::Params(params);
+        let dictionary_item = DictionaryItemInput::Params(Box::new(params));
         let get_dictionary_item = create_test_sdk(Some(config))
             .get_dictionary_item(dictionary_item, Some(state_root_hash), None, None)
             .await;
@@ -231,7 +231,7 @@ pub mod test_module {
             DICTIONARY_NAME,
             DICTIONARY_ITEM_KEY,
         );
-        let dictionary_item = DictionaryItemInput::Params(params);
+        let dictionary_item = DictionaryItemInput::Params(Box::new(params));
         let get_dictionary_item = create_test_sdk(Some(config))
             .get_dictionary_item(dictionary_item, None::<&str>, None, None)
             .await;
