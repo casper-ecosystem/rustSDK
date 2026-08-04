@@ -99,11 +99,9 @@ opt-level = "s"
 strip = true
 panic = "abort"
 
-# Newer rustc emits bulk-memory / saturating-float ops that binaryen 124
-# rejects without a long flag list; skip wasm-opt so `wasm-pack` stays green.
-# Release LTO + opt-level="s" already shrink the module substantially.
+# Binaryen >= 131; --all-features accepts rustc bulk-memory / saturating-float ops.
 [package.metadata.wasm-pack.profile.release]
-wasm-opt = false
+wasm-opt = ["-O", "--all-features"]
 
 [dev-dependencies]
 sdk_tests = { path = "tests/integration/rust" }

@@ -159,7 +159,10 @@ jobs:
       - name: Doc
         run: make doc
 
+      # PRs must not push gh-pages (GITHUB_TOKEN cannot force-push to base repo).
+      # Releases use publish-docs.yml; pushes to protected branches still publish condor docs.
       - name: Github pages 🚀
+        if: github.event_name == 'push'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: docs # The folder the action should deploy.
