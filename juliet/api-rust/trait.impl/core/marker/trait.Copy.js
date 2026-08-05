@@ -1,9 +1,0 @@
-(function() {
-    const implementors = Object.fromEntries([["casper_rust_wasm_sdk",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.97.1/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"casper_rust_wasm_sdk/types/verbosity/enum.Verbosity.html\" title=\"enum casper_rust_wasm_sdk::types::verbosity::Verbosity\">Verbosity</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.97.1/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"struct\" href=\"casper_rust_wasm_sdk/types/block_identifier/struct.BlockIdentifier.html\" title=\"struct casper_rust_wasm_sdk::types::block_identifier::BlockIdentifier\">BlockIdentifier</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.97.1/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"struct\" href=\"casper_rust_wasm_sdk/types/contract_hash/struct.ContractHash.html\" title=\"struct casper_rust_wasm_sdk::types::contract_hash::ContractHash\">ContractHash</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.97.1/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"struct\" href=\"casper_rust_wasm_sdk/types/contract_package_hash/struct.ContractPackageHash.html\" title=\"struct casper_rust_wasm_sdk::types::contract_package_hash::ContractPackageHash\">ContractPackageHash</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.97.1/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"struct\" href=\"casper_rust_wasm_sdk/types/era_id/struct.EraId.html\" title=\"struct casper_rust_wasm_sdk::types::era_id::EraId\">EraId</a>",0]]]]);
-    if (window.register_implementors) {
-        window.register_implementors(implementors);
-    } else {
-        window.pending_implementors = implementors;
-    }
-})()
-//{"start":59,"fragment_lengths":[1690]}

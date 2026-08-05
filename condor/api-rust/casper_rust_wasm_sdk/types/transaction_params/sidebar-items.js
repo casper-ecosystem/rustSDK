@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["transaction_builder_params","transaction_str_params"]};
