@@ -52,14 +52,15 @@ impl SDK {
         SSEClient::new(events_url.to_string())
     }
 
-    /// Fetch CES schemas for `contract_hashes` and return a ready [`CesParser`].
-    pub async fn ces_parser(
+    /// Fetch CES schemas for `contract_hashes` and return a ready [`super::CESParser`].
+    #[allow(non_snake_case)]
+    pub async fn CES_parser(
         &self,
         contract_hashes: &[String],
         state_root_hash: Option<&str>,
         rpc_address: Option<String>,
-    ) -> Result<crate::sdk::SSE::CesParser, String> {
-        crate::sdk::SSE::CesParser::create(self, contract_hashes, state_root_hash, rpc_address)
+    ) -> Result<crate::sdk::SSE::CESParser, String> {
+        crate::sdk::SSE::CESParser::create(self, contract_hashes, state_root_hash, rpc_address)
             .await
     }
 }

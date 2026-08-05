@@ -1,6 +1,6 @@
 //! CES parser: load contract metadata and decode execution-result transforms.
 
-use super::event::{CesEvent, CesParseResult, EVENT_PREFIX};
+use super::event::{CESEvent, CESParseResult, EVENT_PREFIX};
 use super::schema::{parse_schemas_from_bytes, schemas_to_json, Schemas};
 use crate::rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams};
 use crate::types::digest::Digest;
@@ -35,12 +35,12 @@ pub struct ContractMetadata {
 /// CES consume parser (ces-js-parser `Parser` parity).
 #[derive(Debug, Clone, Default)]
 #[wasm_bindgen]
-pub struct CesParser {
+pub struct CESParser {
     contracts_metadata: HashMap<String, ContractMetadata>,
 }
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
-impl CesParser {
+impl CESParser {
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen(constructor))]
     pub fn new() -> Self {
         Self {
@@ -75,7 +75,7 @@ impl CesParser {
     }
 }
 
-impl CesParser {
+impl CESParser {
     /// Register metadata built offline (tests / MCP with pre-fetched schema).
     pub fn insert_metadata(&mut self, meta: ContractMetadata) {
         self.contracts_metadata
@@ -141,7 +141,7 @@ impl CesParser {
     pub fn parse_execution_result(
         &self,
         execution_result: &Value,
-    ) -> Result<Vec<CesParseResult>, String> {
+    ) -> Result<Vec<CESParseResult>, String> {
         let effects = find_effects(execution_result)
             .ok_or_else(|| "execution result has no effects/transforms".to_string())?;
 
@@ -158,7 +158,7 @@ impl CesParser {
     pub fn parse_execution_result_json(
         &self,
         execution_result_json: &str,
-    ) -> Result<Vec<CesParseResult>, String> {
+    ) -> Result<Vec<CESParseResult>, String> {
         let v: Value = serde_json::from_str(execution_result_json)
             .map_err(|e| format!("invalid execution result JSON: {e}"))?;
         self.parse_execution_result(&v)
@@ -168,7 +168,7 @@ impl CesParser {
     pub fn parse_transaction_processed_json(
         &self,
         transaction_processed_json: &str,
-    ) -> Result<Vec<CesParseResult>, String> {
+    ) -> Result<Vec<CESParseResult>, String> {
         let v: Value = serde_json::from_str(transaction_processed_json)
             .map_err(|e| format!("invalid TransactionProcessed JSON: {e}"))?;
         let er = v
@@ -183,7 +183,7 @@ impl CesParser {
         &self,
         transform: &Value,
         transform_idx: usize,
-    ) -> Option<CesParseResult> {
+    ) -> Option<CESParseResult> {
         let key = transform.get("key")?.as_str()?;
         if !key.starts_with("dictionary-") {
             return None;
@@ -193,7 +193,7 @@ impl CesParser {
         let dict = new_dictionary_from_bytes(&write_bytes).ok()?;
         let (event_name, remainder) = parse_event_name_with_remainder(&dict.value).ok()?;
 
-        let mut event = CesEvent {
+        let mut event = CESEvent {
             name: event_name.clone(),
             contract_hash: None,
             contract_package_hash: None,
@@ -203,7 +203,7 @@ impl CesParser {
         };
 
         let Some(meta) = self.contracts_metadata.get(&dict.uref) else {
-            return Some(CesParseResult {
+            return Some(CESParseResult {
                 event,
                 error: Some("invalid event uref".to_string()),
             });
@@ -213,7 +213,7 @@ impl CesParser {
         event.contract_package_hash = meta.contract_package_hash.clone();
 
         let Some(schema) = meta.schemas.get(&event_name) else {
-            return Some(CesParseResult {
+            return Some(CESParseResult {
                 event,
                 error: Some("event name not in schema".to_string()),
             });
@@ -222,9 +222,9 @@ impl CesParser {
         match parse_event_data_from_bytes(schema, remainder) {
             Ok(data) => {
                 event.set_data(data);
-                Some(CesParseResult { event, error: None })
+                Some(CESParseResult { event, error: None })
             }
-            Err(err) => Some(CesParseResult {
+            Err(err) => Some(CESParseResult {
                 event,
                 error: Some(format!("failed to parse event data bytes: {err}")),
             }),
@@ -504,7 +504,7 @@ async fn query_stored_value_json(
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
-impl CesParser {
+impl CESParser {
     #[wasm_bindgen(js_name = "parseExecutionResultJson")]
     pub fn parse_execution_result_json_js(
         &self,
@@ -520,7 +520,7 @@ impl CesParser {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::sdk::SSE::ces::schema::{Schema, Schemas};
+    use crate::sdk::sse::ces::schema::{Schema, Schemas};
     use casper_types::CLType;
     use std::collections::BTreeMap;
 

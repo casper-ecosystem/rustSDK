@@ -33,6 +33,7 @@ pub fn extract_frames(chunk: &str) -> Vec<SSEFrame> {
 }
 
 /// Append `start_from` query param to an events URL.
+#[cfg(feature = "SSE")]
 pub fn url_with_start_from(events_url: &str, start_from: Option<u64>) -> String {
     match start_from {
         None => events_url.to_string(),
@@ -71,6 +72,7 @@ mod tests {
         assert_eq!(frames[2].data, "segment3");
     }
 
+    #[cfg(feature = "SSE")]
     #[test]
     fn start_from_query() {
         assert_eq!(

@@ -27,7 +27,7 @@ full = [
   "contract",
   "helpers",
   "write",
-  "SSE",
+  "watcher",
 ]
 rpc = []
 binary-port = ["casper-rust-wasm-sdk/binary-port"]
@@ -36,8 +36,8 @@ deploy = ["casper-rust-wasm-sdk/deploy"]
 contract = ["casper-rust-wasm-sdk/contract"]
 helpers = ["casper-rust-wasm-sdk/helpers"]
 write = ["transaction", "deploy", "contract"]
-SSE = ["casper-rust-wasm-sdk/SSE"]
-sse = ["SSE"]
+watcher = ["casper-rust-wasm-sdk/watcher"]
+SSE = ["watcher", "casper-rust-wasm-sdk/SSE"]
 
 [dependencies]
 anyhow = "1"

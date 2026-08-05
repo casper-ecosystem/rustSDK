@@ -1,5 +1,5 @@
 /**
- * SSEClient + CesParser demo (feature `SSE` / `full`).
+ * SSEClient + CESParser demo (feature `SSE`).
  *
  * Build wasm first: `make nodejs` (or `make nodejs-full`).
  * Run against a live node events URL, e.g. NCTL `:18101/events`.
@@ -26,8 +26,8 @@ async function main() {
   client.subscribe("TransactionProcessed", (raw: { data: string }) => {
     const body = JSON.parse(raw.data).TransactionProcessed;
     console.log("TransactionProcessed", body?.transaction_hash ?? body?.hash);
-    // Optional: feed execution_result into CesParser once schemas are loaded:
-    // const parser = /* CesParser.create via native/MCP */;
+    // Optional: feed execution_result into CESParser once schemas are loaded:
+    // const parser = /* CESParser.create via native/MCP */;
     // parser.parseExecutionResultJson(JSON.stringify(body.execution_result));
   });
 

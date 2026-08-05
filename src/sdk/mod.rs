@@ -25,14 +25,24 @@ pub(crate) mod transaction_utils;
 #[cfg(feature = "transaction")]
 pub(crate) use transaction_utils::*;
 
+/// On-disk `sse/` tree: framing + watcher always; client/CES only with `SSE`.
+#[cfg(feature = "watcher")]
+#[path = "sse/mod.rs"]
+pub(crate) mod sse;
+
+#[cfg(feature = "watcher")]
+pub mod watcher {
+    pub use crate::sdk::sse::watcher::*;
+}
+
+/// Full node SSE client + CES (feature `SSE`; pulls in `watcher`).
 #[cfg(feature = "SSE")]
 #[allow(non_snake_case)]
-#[path = "sse/mod.rs"]
-pub mod SSE;
-
-#[cfg(feature = "SSE")]
-pub mod watcher {
-    pub use crate::sdk::SSE::watcher::*;
+pub mod SSE {
+    pub use crate::sdk::sse::ces::*;
+    pub use crate::sdk::sse::client::*;
+    pub use crate::sdk::sse::event::*;
+    pub use crate::sdk::sse::framing::*;
 }
 
 #[cfg(feature = "contract")]

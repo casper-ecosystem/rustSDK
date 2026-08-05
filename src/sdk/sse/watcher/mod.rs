@@ -3,7 +3,7 @@ pub(crate) mod deploy_mock;
 #[cfg(test)]
 pub(crate) mod transaction_mock;
 
-use crate::sdk::SSE::framing::extract_frames;
+use crate::sdk::sse::framing::extract_frames;
 use crate::SDK;
 use chrono::{Duration, Utc};
 use futures_util::StreamExt;
@@ -868,8 +868,8 @@ pub struct EventParseResult {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::sdk::SSE::watcher::deploy_mock::DEPLOY_MOCK;
-    use crate::sdk::SSE::watcher::transaction_mock::TRANSACTION_MOCK;
+    use crate::sdk::sse::watcher::deploy_mock::DEPLOY_MOCK;
+    use crate::sdk::sse::watcher::transaction_mock::TRANSACTION_MOCK;
     use sdk_tests::tests::helpers::get_network_constants;
     use tokio;
 

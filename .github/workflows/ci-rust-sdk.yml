@@ -129,9 +129,8 @@ jobs:
       - name: Feature matrix (read-only + transaction-without-deploy)
         run: |
           cargo check --lib --no-default-features
-          cargo check --lib --no-default-features --features transaction,helpers,SSE
-          cargo check --lib --no-default-features --features transaction,helpers,sse
           cargo check --lib --no-default-features --features transaction,helpers,watcher
+          cargo check --lib --no-default-features --features transaction,helpers,SSE
           cargo check --lib --target wasm32-unknown-unknown --no-default-features
           cargo check --lib --target wasm32-unknown-unknown
 

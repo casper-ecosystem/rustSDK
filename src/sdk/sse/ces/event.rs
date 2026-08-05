@@ -10,7 +10,7 @@ pub const EVENT_PREFIX: &str = "event_";
 /// One CES event decoded from an execution transform.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
-pub struct CesEvent {
+pub struct CESEvent {
     pub name: String,
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "contractHash"))]
     pub contract_hash: Option<String>,
@@ -26,7 +26,7 @@ pub struct CesEvent {
     pub data_json: String,
 }
 
-impl CesEvent {
+impl CESEvent {
     pub fn set_data(&mut self, data: Value) {
         self.data_json = serde_json::to_string(&data).unwrap_or_else(|_| "{}".to_string());
     }
@@ -38,7 +38,7 @@ impl CesEvent {
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
-impl CesEvent {
+impl CESEvent {
     #[wasm_bindgen(js_name = "data")]
     pub fn data_js(&self) -> String {
         self.data_json.clone()
@@ -48,21 +48,21 @@ impl CesEvent {
 /// Parse result for one transform (error soft-fails like ces-js-parser).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
-pub struct CesParseResult {
-    pub event: CesEvent,
+pub struct CESParseResult {
+    pub event: CESEvent,
     pub error: Option<String>,
 }
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
-impl CesParseResult {
+impl CESParseResult {
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> Result<String, String> {
         serde_json::to_string(self).map_err(|e| e.to_string())
     }
 }
 
-impl CesParseResult {
+impl CESParseResult {
     pub fn to_json_native(&self) -> Result<String, String> {
         serde_json::to_string(self).map_err(|e| e.to_string())
     }

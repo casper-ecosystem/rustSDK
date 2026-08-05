@@ -1,8 +1,8 @@
-//! SSE / CES / wait tools (feature `SSE`).
+//! SSE client + CES tools (feature `SSE`; includes `watcher`).
 
 use casper_rust_wasm_sdk::types::hash::transaction_hash::TransactionHash;
 use casper_rust_wasm_sdk::SSE::{
-    parse_schemas_from_hex, CesParser, ContractMetadata, EventName, SSEClient,
+    parse_schemas_from_hex, CESParser, ContractMetadata, EventName, SSEClient,
 };
 use mcpkit::prelude::ToolOutput;
 use serde_json::Value;
@@ -12,31 +12,15 @@ use crate::sdk_handle;
 
 pub fn tool_names() -> &'static [&'static str] {
     &[
-        "sdk_wait_transaction",
         "sdk_SSE_collect",
-        "sdk_ces_parser_create",
-        "sdk_ces_parse_execution_result",
-        "sdk_ces_parse_transaction",
+        "sdk_CES_parser_create",
+        "sdk_CES_parse_execution_result",
+        "sdk_CES_parse_transaction",
     ]
 }
 
 fn verb(verbosity: Option<&str>) -> Option<casper_rust_wasm_sdk::types::verbosity::Verbosity> {
     sdk_handle::verbosity_override(verbosity)
-}
-
-pub async fn wait_transaction(
-    events_url: String,
-    transaction_hash: String,
-    timeout_ms: Option<u64>,
-) -> ToolOutput {
-    let sdk = sdk_handle::sdk_snapshot();
-    match sdk
-        .wait_transaction(&events_url, &transaction_hash, timeout_ms)
-        .await
-    {
-        Ok(result) => format::serialize_ok(&result),
-        Err(err) => format::err(err),
-    }
 }
 
 #[allow(non_snake_case)]
@@ -63,7 +47,8 @@ pub async fn SSE_collect(
     }
 }
 
-pub async fn ces_parser_create(
+#[allow(non_snake_case)]
+pub async fn CES_parser_create(
     contract_hashes_json: String,
     state_root_hash: Option<String>,
     rpc_address: Option<String>,
@@ -88,7 +73,7 @@ pub async fn ces_parser_create(
             Some(snap.rpc_address)
         }
     });
-    match CesParser::create(&sdk, &hashes, state_root_hash.as_deref(), rpc).await {
+    match CESParser::create(&sdk, &hashes, state_root_hash.as_deref(), rpc).await {
         Ok(parser) => match parser.schemas_json() {
             Ok(json) => format::text_ok(json),
             Err(err) => format::err(err),
@@ -97,7 +82,8 @@ pub async fn ces_parser_create(
     }
 }
 
-pub fn ces_parse_execution_result(
+#[allow(non_snake_case)]
+pub fn CES_parse_execution_result(
     schemas_metadata_json: String,
     execution_result_json: String,
 ) -> ToolOutput {
@@ -111,7 +97,8 @@ pub fn ces_parse_execution_result(
     }
 }
 
-pub async fn ces_parse_transaction(
+#[allow(non_snake_case)]
+pub async fn CES_parse_transaction(
     contract_hashes_json: String,
     transaction_hash: String,
     finalized_approvals: Option<bool>,
@@ -132,7 +119,7 @@ pub async fn ces_parse_transaction(
         Err(err) => return format::err(err.to_string()),
     };
     let sdk = sdk_handle::sdk_snapshot();
-    let parser = match CesParser::create(
+    let parser = match CESParser::create(
         &sdk,
         &hashes,
         state_root_hash.as_deref(),
@@ -209,11 +196,11 @@ fn parse_event_names(event_names: &str) -> Result<Vec<EventName>, String> {
     }
 }
 
-fn parser_from_metadata_json(schemas_metadata_json: &str) -> Result<CesParser, String> {
+fn parser_from_metadata_json(schemas_metadata_json: &str) -> Result<CESParser, String> {
     let root: Value = serde_json::from_str(schemas_metadata_json)
         .map_err(|e| format!("invalid schemas_metadata_json: {e}"))?;
 
-    let mut parser = CesParser::new();
+    let mut parser = CESParser::new();
     let Some(obj) = root.as_object() else {
         return Err("schemas_metadata_json must be a JSON object".into());
     };
@@ -237,7 +224,7 @@ fn parser_from_metadata_json(schemas_metadata_json: &str) -> Result<CesParser, S
 }
 
 fn insert_from_entry(
-    parser: &mut CesParser,
+    parser: &mut CESParser,
     uref: &str,
     meta: &serde_json::Map<String, Value>,
 ) -> Result<(), String> {
@@ -246,7 +233,7 @@ fn insert_from_entry(
         .and_then(|v| v.as_str())
         .ok_or_else(|| {
             format!(
-                "metadata for uref {uref} missing schemaHex (pass sdk_ces_parser_create output)"
+                "metadata for uref {uref} missing schemaHex (pass sdk_CES_parser_create output)"
             )
         })?;
     let schemas = parse_schemas_from_hex(schema_hex)?;

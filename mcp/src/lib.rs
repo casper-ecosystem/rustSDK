@@ -30,6 +30,8 @@ pub fn enabled_features() -> Vec<&'static str> {
     features.push("helpers");
     #[cfg(feature = "write")]
     features.push("write");
+    #[cfg(feature = "watcher")]
+    features.push("watcher");
     #[cfg(feature = "SSE")]
     features.push("SSE");
     features

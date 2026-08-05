@@ -25,16 +25,23 @@ exclude = [
 
 [features]
 default = ["full"]
-full = ["transaction", "deploy", "contract", "binary-port", "SSE", "helpers"]
+# Convenience bundle (not a product gate). Includes `watcher`, not full `SSE`.
+full = [
+  "transaction",
+  "deploy",
+  "contract",
+  "binary-port",
+  "watcher",
+  "helpers",
+]
 transaction = []
 deploy = []
 contract = []
 binary-port = ["dep:casper-binary-port", "dep:casper-binary-port-access"]
-# Node SSE client, CES parser, and wait/watch helpers (acronym).
-SSE = []
-# Spelling aliases → SSE.
-sse = ["SSE"]
-watcher = ["SSE"]
+# Wait/watch helpers only.
+watcher = []
+# Node SSE client + CES parser; includes wait/watch.
+SSE = ["watcher"]
 helpers = []
 
 [dependencies]

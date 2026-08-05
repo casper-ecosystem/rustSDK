@@ -98,13 +98,13 @@ This will create a `pkg` and `pkg-nodejs` containing the Typescript interfaces. 
 
 Default is `full` (today's API) for both the wasm package and the Rust `rlib`. Slim builds drop optional surfaces:
 
-| Profile                 | Make target                  | Cargo flags                                                |
-| ----------------------- | ---------------------------- | ---------------------------------------------------------- |
-| full (default)          | `make web` / `make web-full` | default features                                           |
-| read-only               | `make web-read-only`         | `--no-default-features`                                    |
-| transaction (no deploy) | `make web-transaction`       | `--no-default-features --features transaction,helpers,SSE` |
+| Profile                 | Make target                  | Cargo flags                                                    |
+| ----------------------- | ---------------------------- | -------------------------------------------------------------- |
+| full (default)          | `make web` / `make web-full` | default features                                               |
+| read-only               | `make web-read-only`         | `--no-default-features`                                        |
+| transaction (no deploy) | `make web-transaction`       | `--no-default-features --features transaction,helpers,watcher` |
 
-Optional features: `transaction`, `deploy`, `contract`, `binary-port`, `SSE` (node SSE + CES + wait/watch; aliases `sse`, `watcher`), `helpers`. Core JSON-RPC reads stay available without them. `binary-port` pulls optional `casper-binary-port*` crates.
+Optional features: `transaction`, `deploy`, `contract`, `binary-port`, `watcher` (wait/watch), `SSE` (node SSE client + CES; enables `watcher`), `helpers`. Core JSON-RPC reads stay available without them. `binary-port` pulls optional `casper-binary-port*` crates.
 
 This folder contains a Wasm binary, a JS wrapper file, Typescript types definitions, and a package.json file that you can load in your project.
 
@@ -1020,9 +1020,9 @@ const signed_transaction = unsigned_transaction.sign(secret_key);
 </details>
 
 <details>
-    <summary><strong>SSEClient</strong> (full event stream) and <strong>CesParser</strong></summary>
+    <summary><strong>SSEClient</strong> (full event stream) and <strong>CESParser</strong></summary>
 
-Feature `SSE` (included in `full`; aliases `sse`, `watcher`) exposes a JS-SDK-style node SSE client plus CES contract-event decode. Prefer `SSEClient` for continuous streams; keep `wait_transaction` / `watch_transaction` for single-hash helpers.
+Feature `SSE` (opt-in; enables `watcher`) exposes a JS-SDK-style node SSE client plus CES contract-event decode. Default/`full` includes `watcher` only (`wait_transaction` / `watch_transaction`). Prefer `SSEClient` when you need continuous streams.
 
 #### Rust — SSEClient
 
@@ -1072,12 +1072,12 @@ client.subscribe("TransactionProcessed", (raw) => {
 // await client.start(); // until client.stop()
 ```
 
-#### Rust — CesParser
+#### Rust — CESParser
 
 ```rust
-use casper_rust_wasm_sdk::SSE::CesParser;
+use casper_rust_wasm_sdk::SSE::CESParser;
 
-let parser = CesParser::create(&sdk, &["<contract-hash-hex>".into()], None, None)
+let parser = CESParser::create(&sdk, &["<contract-hash-hex>".into()], None, None)
     .await
     .unwrap();
 let results = parser

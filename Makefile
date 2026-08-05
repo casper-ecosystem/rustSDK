@@ -9,7 +9,7 @@ NODEJS_OUT_DIR = pkg-nodejs
 
 WASM_FEATURES_FULL =
 WASM_FEATURES_READ_ONLY = --no-default-features
-WASM_FEATURES_TRANSACTION = --no-default-features --features transaction,helpers,SSE
+WASM_FEATURES_TRANSACTION = --no-default-features --features transaction,helpers,watcher
 
 .PHONY: all web nodejs clean build doc web-full web-read-only web-transaction nodejs-full nodejs-read-only
 
