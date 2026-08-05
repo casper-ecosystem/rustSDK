@@ -23,7 +23,10 @@
       class="col-12 col-md-6 col-lg-7 my-1 my-md-0 d-flex justify-content-end ps-md-0"
     >
       <comp-public-key class="input-group"></comp-public-key>
-      <div class="d-flex justify-content-end ms-1 ms-sm-2 ms-xl-3">
+      <div
+        class="d-flex justify-content-end ms-1 ms-sm-2 ms-xl-3"
+        *ngIf="config['allow_secret_key_load']"
+      >
         <comp-secret-key></comp-secret-key>
       </div>
     </div>
@@ -31,7 +34,10 @@
   <comp-error></comp-error>
   <comp-form [form]="form" (wasm_selected)="onWasmSelected($event)"></comp-form>
   <comp-submit-action
-    *ngIf="['sign_deploy', 'sign_transaction'].includes(action)"
+    *ngIf="
+      config['allow_secret_key_load'] &&
+      ['sign_deploy', 'sign_transaction'].includes(action)
+    "
     (submit_action)="submitAction($event)"
     [class]="'btn-warning mt-3'"
     [e2e]="'sign'"

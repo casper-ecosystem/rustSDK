@@ -135,8 +135,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  async walletSign(_$event: Event, _action: string) {
-    this.clientService.wallet_sign_deploy();
+  async walletSign(_$event: Event, action: string) {
+    if (action === 'sign_transaction') {
+      await this.clientService.wallet_sign_transaction();
+      return;
+    }
+    await this.clientService.wallet_sign_deploy();
   }
 
   private async handleAction(action: string, exec = false) {

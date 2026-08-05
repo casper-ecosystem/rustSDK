@@ -87,8 +87,11 @@ export const config: EnvironmentConfig = {
   docker_gateway: '172.18.0.1',
   cors_anywhere_port: '11100',
   enable_addressable_entity: false,
+  // Allow PEM "Load Secret Key" in local/dev; main.ts turns this off for prod/docker.
+  allow_secret_key_load: true,
   // Runtime config properties (populated from window.__APP_CONFIG__ in Docker builds):
   // cors_anywhere_url: optional public CORS proxy base URL
   // network_rpc_url: optional, overrides selected network's rpc_address (ntcl/dev)
   // network_node_url: optional, overrides selected network's node_address
+  // allow_secret_key_load: optional boolean override
 };

@@ -31,6 +31,7 @@ declare global {
       network_node_url?: string;
       app_version?: string;
       git_sha?: string;
+      allow_secret_key_load?: boolean;
     };
   }
 }
@@ -78,6 +79,11 @@ config['network'] = networks.find(
   (x) => x.name == environment['default_network'].toString(),
 ) as object;
 
+// Public prod/docker demos: force wallet signing (no PEM load) unless overridden.
+if (environment.production || environment.is_docker) {
+  config['allow_secret_key_load'] = false;
+}
+
 // Read runtime configuration from window.__APP_CONFIG__ if available
 if (typeof window !== 'undefined' && window.__APP_CONFIG__) {
   const runtimeConfig = window.__APP_CONFIG__;
@@ -95,6 +101,9 @@ if (typeof window !== 'undefined' && window.__APP_CONFIG__) {
   }
   if (runtimeConfig.git_sha) {
     config['git_sha'] = runtimeConfig.git_sha;
+  }
+  if (typeof runtimeConfig.allow_secret_key_load === 'boolean') {
+    config['allow_secret_key_load'] = runtimeConfig.allow_secret_key_load;
   }
 }
 
