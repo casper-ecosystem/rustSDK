@@ -4,6 +4,7 @@ use crate::helpers::get_ttl_or_default;
 use crate::types::cl::bytes::Bytes;
 use crate::types::deploy_params::args_simple::ArgsSimple;
 use crate::types::pricing_mode::PricingMode;
+use crate::types::runtime_args::RuntimeArgs;
 use casper_client::cli::TransactionStrParams as _TransactionStrParams;
 use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
@@ -246,6 +247,14 @@ impl TransactionStrParams {
         self.session_args_json
             .set(session_args_json.to_string())
             .unwrap();
+    }
+
+    /// Set session args from typed [`RuntimeArgs`] (fills `session_args_json`).
+    pub fn set_session_args(&self, args: &RuntimeArgs) {
+        let json = args
+            .to_session_args_json_string()
+            .expect("RuntimeArgs to session args JSON");
+        self.set_session_args_json(&json);
     }
 
     #[wasm_bindgen(getter)]
@@ -595,5 +604,25 @@ mod tests {
         assert_eq!(result.session_entry_point, None);
         assert_eq!(result.chunked_args, None);
         assert!(!result.min_bid_override);
+    }
+
+    #[test]
+    fn test_set_session_args_from_runtime_args() {
+        use crate::types::cl::cl_value::CLValue;
+
+        let transaction_params = TransactionStrParams::default();
+        let mut args = RuntimeArgs::new();
+        args.insert_cl_value("message", CLValue::from_t("hi".to_string()).unwrap());
+        args.insert_cl_value("count", CLValue::from_t(7u64).unwrap());
+        transaction_params.set_session_args(&args);
+
+        let json = transaction_params.session_args_json().unwrap();
+        let parsed: Vec<serde_json::Value> = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.len(), 2);
+        assert_eq!(parsed[0]["name"], "message");
+        assert!(parsed[0]["type"].get("ByteArray").is_some());
+
+        let client = transaction_str_params_to_casper_client(&transaction_params);
+        assert_eq!(client.session_args_json, json);
     }
 }

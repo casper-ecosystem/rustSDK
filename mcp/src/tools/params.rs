@@ -343,7 +343,7 @@ pub fn parse_session_str_params(json: &str) -> Result<SessionStrParams, String> 
         params.set_session_bytes(bytes_from_hex(&v)?);
     }
     if let Some(args) = opt_string_vec(&obj, "session_args_simple") {
-        params.set_session_args(args);
+        params.set_session_args_simple_vec(args);
     }
     if let Some(v) = opt_str(&obj, "session_args_json") {
         params.set_session_args_json(&v);

@@ -30,8 +30,8 @@ use crate::{make_transaction, make_transfer_transaction::make_transfer_transacti
 use casper_types::PricingMode as _PricingMode;
 #[cfg(feature = "transaction")]
 use casper_types::{
-    account::AccountHash as _AccountHash, bytesrepr::Bytes as _Bytes, bytesrepr::ToBytes,
-    PublicKey as _PublicKey, TransactionInvocationTarget, URef as _URef, U512,
+    account::AccountHash as _AccountHash, bytesrepr::Bytes as _Bytes, PublicKey as _PublicKey,
+    TransactionInvocationTarget, URef as _URef, U512,
 };
 use casper_types::{
     bytesrepr, Approval, ApprovalsHash, AsymmetricType, Deploy, GasLimited, InitiatorAddr,
@@ -696,37 +696,7 @@ impl Transaction {
 
     #[cfg(feature = "transaction")]
     fn args_to_json_array(&self, new_args: &RuntimeArgs) -> Vec<serde_json::Value> {
-        new_args
-            .named_args()
-            .map(|named_arg| {
-                let name = named_arg.name().to_string();
-                let cl_value = named_arg.cl_value();
-                // let cl_type = cl_value.cl_type().to_string();
-                // let capitalized_type = cl_type
-                //     .chars()
-                //     .next()
-                //     .map(|c| c.to_uppercase().collect::<String>() + &cl_type[1..])
-                //     .unwrap_or_default();
-
-                // let value_json: serde_json::Value =
-                //     serde_json::to_value(cl_value).unwrap_or(serde_json::Value::Null);
-
-                // let value = value_json
-                //     .get("parsed")
-                //     .cloned()
-                //     .unwrap_or(serde_json::Value::Null);
-
-                let bytes = cl_value.to_bytes().unwrap_or_default();
-                let size = bytes.len();
-
-                let json_value = json!({
-                    "name": name,
-                    "type": json!({ "ByteArray": size }),
-                    "value": bytes,
-                });
-                json_value
-            })
-            .collect()
+        crate::types::runtime_args::runtime_args_to_json_array(new_args)
     }
 
     #[cfg(feature = "transaction")]

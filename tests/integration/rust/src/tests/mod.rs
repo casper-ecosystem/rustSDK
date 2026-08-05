@@ -1105,7 +1105,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         "token_meta_data:String='test_meta_data'".to_string(),
         format!("token_owner:Key='{TOKEN_OWNER}'").to_string(),
     ]);
-    session_params.set_session_args(args);
+    session_params.set_session_args_simple_vec(args);
 
     let payment_params = PaymentStrParams::default();
     payment_params.set_payment_amount(PAYMENT_AMOUNT);

@@ -49,7 +49,7 @@ pub mod test_module {
         };
         session_params.set_session_bytes(module_bytes.into());
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-        session_params.set_session_args(args_simple);
+        session_params.set_session_args_simple_vec(args_simple);
 
         let install = create_test_sdk(Some(config))
             .install_deploy(deploy_params, session_params, PAYMENT_AMOUNT, None)

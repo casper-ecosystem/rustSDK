@@ -157,7 +157,7 @@ mod tests {
         };
         session_params.set_session_bytes(module_bytes.into());
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-        session_params.set_session_args(args_simple);
+        session_params.set_session_args_simple_vec(args_simple);
 
         // Act
         let result = sdk
@@ -206,7 +206,7 @@ mod tests {
         };
         session_params.set_session_bytes(module_bytes.into());
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-        session_params.set_session_args(args_simple);
+        session_params.set_session_args_simple_vec(args_simple);
 
         // Act
         let result = sdk
@@ -253,7 +253,7 @@ mod tests {
         };
         session_params.set_session_bytes(module_bytes.into());
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-        session_params.set_session_args(args_simple);
+        session_params.set_session_args_simple_vec(args_simple);
 
         // Act
         let result = sdk
@@ -301,7 +301,7 @@ mod tests {
         };
         session_params.set_session_bytes(module_bytes.into());
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-        session_params.set_session_args(args_simple);
+        session_params.set_session_args_simple_vec(args_simple);
 
         // Act
         let result = sdk

@@ -14,6 +14,7 @@ pub mod pricing_mode;
 pub mod public_key;
 #[cfg(feature = "binary-port")]
 pub mod record_id;
+pub mod runtime_args;
 pub mod sdk_error;
 pub mod transaction;
 pub mod transaction_params;
