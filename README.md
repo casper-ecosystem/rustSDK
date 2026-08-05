@@ -27,15 +27,15 @@ The workspace package [`mcp/`](../mcp/) (`casper-rust-wasm-sdk-mcp`) exposes the
 
 - **Hosted:** https://casper-webclient.interchouette.net/mcp (`ENABLE_MCP=1`, `/mcp` proxy on the SPA)
 - **Local Docker:** `make mcp-http` → http://127.0.0.1:8080/mcp
+- **Host HTTP:** `make run-mcp-http` → http://127.0.0.1:5790/mcp
 - **stdio:** `interchouette/casper-webclient:dev` with `--entrypoint casper-rust-wasm-sdk-mcp` (see [`mcp/mcp.json.example`](../mcp/mcp.json.example))
-
-Do not bind host `:8790` for this product — that port is used by the local NCTL MCP sidecar.
 
 ```bash
 make run-mcp      # stdio (host cargo)
+make run-mcp-http # HTTP on 127.0.0.1:5790
 make mcp-http     # webclient → http://127.0.0.1:8080/mcp
 make mcp-test
-make mcp-test-live  # against live NCTL
+make mcp-test-live  # against a live local node
 ```
 
 See [`mcp/README.md`](../mcp/README.md), tool inventory [`mcp/TOOLS.md`](../mcp/TOOLS.md), and Cursor sample [`mcp/mcp.json.example`](../mcp/mcp.json.example).
