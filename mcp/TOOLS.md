@@ -1,6 +1,6 @@
 # Native Rust API → MCP tool checklist
 
-**Status:** Implemented on `feat/mcp-sidecar` (Phases 0–5). Meta + feature groups below map to `sdk_*` tools; see `mcp/README.md`.
+**Status:** Implemented. Meta + feature groups below map to `sdk_*` tools; see `mcp/README.md`.
 
 **Scope:** `casper-rust-wasm-sdk` native-callable methods under `src/sdk` and `src/helpers`.
 
@@ -210,10 +210,10 @@ Prefer dual-gate with domain feature where applicable (e.g. `transaction` + `wri
 
 ---
 
-## Implementation notes (Phase 1+)
+## Implementation notes
 
 1. Prefer transaction-path tools over deprecated deploy/contract aliases.
-2. Gate `write` and secret-key tools behind explicit agent approval UX.
+2. Gate `write` and secret-key tools behind explicit approval UX.
 3. Complex structs (`TransactionStrParams`, `DeployStrParams`, `QueryGlobalStateParams`, …) accept JSON strings.
 4. Responses: pretty JSON via `format.rs`; map `SdkError` → `ToolOutput::error`.
 5. Binary-port tools need `CASPER_NODE_URL`, not only RPC.

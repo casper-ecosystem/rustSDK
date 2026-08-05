@@ -1,4 +1,4 @@
-# Phase 0 — MCP patterns to copy
+# MCP patterns
 
 Primary templates: **kms-secp256k1-api/mcp** (best overall) + **casper-nctl-2-docker/mcp**.
 tvscreener-rs = in-crate MCP; use it only for path-dep-on-lib style of tool bodies.
@@ -12,7 +12,7 @@ mcp/
   Cargo.toml
   README.md
   mcp.json.example
-  TOOLS.md              # Phase 0 checklist
+  TOOLS.md              # tool inventory checklist
   PATTERNS.md           # this file
   src/
     main.rs             # clap + init_logging + run/run_http
@@ -116,7 +116,7 @@ assert!(include_str!("server.rs").contains(&needle));
 | `run-mcp-http` | host cargo HTTP on `127.0.0.1:8081` (not NCTL `:8790`) |
 | `mcp-test` | `cargo test -p casper-rust-wasm-sdk-mcp` |
 
-Runtime image: `interchouette/casper-webclient:{dev,latest}`. See [mcp.json.example](mcp.json.example).
+Runtime image: `interchouette/casper-webclient:{dev,latest,$APP_VERSION}`. See [mcp.json.example](mcp.json.example).
 
 ---
 

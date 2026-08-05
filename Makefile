@@ -124,7 +124,7 @@ docker-deploy-prod:
 .PHONY: docker-build docker-start docker-stop docker-start-prod docker-stop-prod
 
 # --- MCP (mcp/ crate; runtime via casper-webclient image) ---
-# Hub: interchouette/casper-webclient:{dev,latest}. Slim casper-rust-wasm-sdk-mcp Hub image is deprecated.
+# Hub: interchouette/casper-webclient:{dev,latest,$APP_VERSION}. Slim casper-rust-wasm-sdk-mcp Hub image is deprecated.
 
 WEBCLIENT_HUB_IMAGE ?= interchouette/casper-webclient
 CASPER_SDK_MCP_IMAGE ?= $(WEBCLIENT_HUB_IMAGE):dev

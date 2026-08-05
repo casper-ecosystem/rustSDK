@@ -1,4 +1,4 @@
-# DEPRECATED for Hub / Cursor. Prefer interchouette/casper-webclient:{dev,latest}
+# DEPRECATED for Hub / Cursor. Prefer interchouette/casper-webclient:{dev,latest,$APP_VERSION}
 # which embeds the same binary (see docker/Dockerfile.cicd). Kept for local experiments only.
 #   docker build -f mcp/Dockerfile -t casper-rust-wasm-sdk-mcp:local .
 

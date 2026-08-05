@@ -34,16 +34,20 @@ jobs:
 
           # MCP binary is embedded in casper-webclient (ENABLE_MCP / entrypoint mcp).
           # Do not build or push the deprecated slim casper-rust-wasm-sdk-mcp Hub image.
+          # Tags: :latest, :dev, and :$APP_VERSION (from package.json, e.g. 2.2.2). No :stable.
           for image in casper-webclient cors-anywhere ws-proxy; do
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:latest"
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
+            docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:${APP_VERSION}"
           done
 
       - name: Push Docker images to Docker Hub
         run: |
+          APP_VERSION=$(jq -r .version examples/frontend/angular/package.json)
           for image in casper-webclient cors-anywhere ws-proxy; do
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:latest"
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
+            docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:${APP_VERSION}"
           done
 
       # Render does not watch Hub for new digests — call the service Deploy Hook

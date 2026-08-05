@@ -29,7 +29,7 @@ pub fn enabled_tool_groups() -> Vec<&'static str> {
     groups
 }
 
-/// Placeholder summary for groups not yet wired (none after Phase 5).
+/// Placeholder summary for groups not yet wired.
 pub fn pending_tool_placeholders() -> Vec<&'static str> {
     Vec::new()
 }

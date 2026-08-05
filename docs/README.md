@@ -23,13 +23,13 @@ Demo / development only — same warning as above.
 
 ## MCP
 
-The workspace package [`mcp/`](../mcp/) (`casper-rust-wasm-sdk-mcp`) exposes the native Rust SDK as [MCP](https://modelcontextprotocol.io/) tools for Cursor and other agents. The binary ships inside **`interchouette/casper-webclient`** (`:dev` / `:latest`).
+The workspace package [`mcp/`](../mcp/) (`casper-rust-wasm-sdk-mcp`) exposes the native Rust SDK as [MCP](https://modelcontextprotocol.io/) tools for Cursor and other agents. The binary ships inside **`interchouette/casper-webclient`** (`:dev` / `:latest` / `:$APP_VERSION`).
 
 - **Hosted:** https://casper-webclient.interchouette.net/mcp (`ENABLE_MCP=1`, `/mcp` proxy on the SPA)
 - **Local Docker:** `make mcp-http` → http://127.0.0.1:8080/mcp
-- **Cursor stdio:** `interchouette/casper-webclient:dev` (see [`.cursor/mcp.json`](../.cursor/mcp.json))
+- **stdio:** `interchouette/casper-webclient:dev` with `--entrypoint casper-rust-wasm-sdk-mcp` (see [`mcp/mcp.json.example`](../mcp/mcp.json.example))
 
-Do not bind host `:8790` for this product — that port is owned by casper-nctl-2-docker.
+Do not bind host `:8790` for this product — that port is used by the local NCTL MCP sidecar.
 
 ```bash
 make run-mcp      # stdio (host cargo)

@@ -2,9 +2,9 @@
 
 Rust **mcpkit** crate (`casper-rust-wasm-sdk-mcp`) exposing the native SDK API as MCP tools (in-process path dependency — not an HTTP proxy of the SDK).
 
-**Runtime image:** MCP ships inside **`interchouette/casper-webclient`** (`:dev` / `:latest`). There is no separate Hub image for Cursor anymore; the slim `casper-rust-wasm-sdk-mcp` Hub repo is deprecated.
+**Runtime image:** the binary ships inside **`interchouette/casper-webclient`** (`:dev`, `:latest`, and the app version tag such as `:2.2.2`). The slim Hub image `casper-rust-wasm-sdk-mcp` is deprecated.
 
-Inventory: [TOOLS.md](TOOLS.md). Patterns: [PATTERNS.md](PATTERNS.md). Cursor sample: [mcp.json.example](mcp.json.example). Active Cursor config: [`.cursor/mcp.json`](../.cursor/mcp.json) (itc-cursor product branch).
+Inventory: [TOOLS.md](TOOLS.md). Patterns: [PATTERNS.md](PATTERNS.md). MCP client sample: [mcp.json.example](mcp.json.example).
 
 ## Transports
 
@@ -12,20 +12,18 @@ Inventory: [TOOLS.md](TOOLS.md). Patterns: [PATTERNS.md](PATTERNS.md). Cursor sa
 | --- | --- | --- |
 | **Hosted** | Render webclient | `https://casper-webclient.interchouette.net/mcp` |
 | **HTTP (Docker)** | `make mcp-http` → webclient SPA | `http://127.0.0.1:8080/mcp` (`ENABLE_MCP=1`) |
-| **stdio (Docker)** | Cursor / `docker run -i … --entrypoint casper-rust-wasm-sdk-mcp` | `interchouette/casper-webclient:dev` |
+| **stdio (Docker)** | `docker run -i … --entrypoint casper-rust-wasm-sdk-mcp` | `interchouette/casper-webclient:dev` |
 | **stdio (host)** | `make run-mcp` | cargo; for local debug |
-| **HTTP (host)** | `make run-mcp-http` | cargo; **do not bind host `:8790`** (NCTL owns it) |
+| **HTTP (host)** | `make run-mcp-http` | cargo on `127.0.0.1:8081` (do not use host `:8790`) |
 
 ```bash
 make mcp-http           # webclient → http://127.0.0.1:8080/mcp
 make mcp-http-stop
 make run-mcp            # stdio (host cargo)
-make run-mcp-http       # HTTP host on 127.0.0.1:8081 (avoids NCTL :8790)
+make run-mcp-http       # HTTP host on 127.0.0.1:8081
 make mcp-test
 make mcp-test-live      # ignored tests vs live NCTL (CASPER_RPC_URL)
 ```
-
-Shared host MCP HTTP ports: tvscreener `6790`, KMS `7790`, **NCTL `8790`**, evaluator `9790`. This product does **not** own a host MCP port; use webclient `:8080/mcp` or cargo `:8081`.
 
 ## Env
 
@@ -67,14 +65,16 @@ cargo build -p casper-rust-wasm-sdk-mcp
 
 Complex inputs use JSON strings — see [TOOLS.md](TOOLS.md) and `tools/params.rs`.
 
-## Cursor
+## MCP client config
 
-| Server | Transport | Backing |
+Hub tags for `interchouette/casper-webclient`: **`dev`**, **`latest`**, and the app version (e.g. **`2.2.2`**).
+
+| Server name (example) | Transport | Backing |
 | --- | --- | --- |
-| `casper-rust-wasm-sdk` | stdio | `interchouette/casper-webclient:dev` via `.cursor/scripts/sdk-mcp.sh` |
-| `casper-rust-wasm-sdk-http` | HTTP (mcp-remote) | same image; `http://127.0.0.1:8080/mcp` |
+| `casper-rust-wasm-sdk` | stdio | `interchouette/casper-webclient:dev` (`--entrypoint casper-rust-wasm-sdk-mcp`) |
+| `casper-rust-wasm-sdk-http` | HTTP | `http://127.0.0.1:8080/mcp` (or the hosted URL above) |
 
-Hub webclient tags: **`dev`**, **`latest`** only. See [mcp.json.example](mcp.json.example). Agents must use `CallMcpTool` (`.cursor/rules/casper-sdk-use-mcp.mdc`).
+Full sample: [mcp.json.example](mcp.json.example).
 
 ## Smoke
 
