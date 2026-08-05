@@ -96,10 +96,6 @@ opt-level = "s"
 strip = true
 panic = "abort"
 
-# Needs Binaryen/wasm-opt that accepts rustc's bulk-memory ops (--all-features).
-[package.metadata.wasm-pack.profile.release]
-wasm-opt = ["-O", "--all-features"]
-
 [dev-dependencies]
 sdk_tests = { path = "tests/integration/rust" }
 tokio = { version = "1", features = ["full"] }
