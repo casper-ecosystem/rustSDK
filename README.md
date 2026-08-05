@@ -21,9 +21,12 @@ A hosted build of the Angular example — **[Casper WebClient](https://casper-we
 
 Demo / development only — same warning as above.
 
-## MCP sidecar
+## MCP
 
-The workspace package [`mcp/`](../mcp/) (`casper-rust-wasm-sdk-mcp`) exposes the native Rust SDK as [MCP](https://modelcontextprotocol.io/) tools for Cursor and other agents (stdio or Streamable HTTP on **8790**).
+The workspace package [`mcp/`](../mcp/) (`casper-rust-wasm-sdk-mcp`) exposes the native Rust SDK as [MCP](https://modelcontextprotocol.io/) tools for Cursor and other agents.
+
+- **Hosted (with webclient):** https://casper-webclient.interchouette.net/mcp — same image as the SPA (`ENABLE_MCP=1`, evaluator-style `/mcp` proxy)
+- **Local slim image:** Streamable HTTP on **8790**, or stdio via Docker
 
 ```bash
 make run-mcp      # stdio (host)
