@@ -4,10 +4,10 @@
  * Serves /app/dist on PORT (default 8080).
  * When ENABLE_MCP_PROXY=1, proxies /mcp → http://127.0.0.1:8790/mcp
  */
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const { URL } = require('url');
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { URL } from 'url';
 
 const PORT = Number(process.env.PORT || 8080);
 const DIST = process.env.DIST_DIR || '/app/dist';
