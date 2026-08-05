@@ -1181,7 +1181,7 @@ fn help_text() -> String {
         r#"casper-rust-wasm-sdk-mcp {version}
 
 Transports
-  stdio (default)  |  --http / CASPER_SDK_MCP_HTTP  listen CASPER_SDK_MCP_ADDR (default {listen})
+  stdio (default)  |  --http / MCP_HTTP  listen CASPER_SDK_MCP_ADDR (default {listen})
 
 Env (SDK)
   {rpc_env}   JSON-RPC URL   (default {rpc_default})

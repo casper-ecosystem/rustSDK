@@ -42,7 +42,5 @@ ENV CASPER_SDK_MCP_ADDR=0.0.0.0:5790 \
 
 EXPOSE 5790
 
-# Default CMD is HTTP (compose). For Cursor stdio, override command to just the binary
-# and do NOT set CASPER_SDK_MCP_HTTP (clap would force HTTP and break stdio).
 ENTRYPOINT ["casper-rust-wasm-sdk-mcp"]
 CMD ["--http", "--listen", "0.0.0.0:5790"]

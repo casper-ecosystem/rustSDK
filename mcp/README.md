@@ -30,7 +30,7 @@ make mcp-test-live      # ignored tests vs live local node (CASPER_RPC_URL)
 | Variable              | Role                                    | Default                          |
 | --------------------- | --------------------------------------- | -------------------------------- |
 | `ENABLE_MCP`          | Start MCP inside webclient (`web` mode) | `1`                              |
-| `CASPER_SDK_MCP_HTTP` | Use HTTP transport (binary)             | off (stdio) / on (web loopback)  |
+| `MCP_HTTP` | Use HTTP transport (binary)             | off (stdio) / on (web loopback)  |
 | `CASPER_SDK_MCP_ADDR` | HTTP bind                               | `0.0.0.0:5790` (host) / `127.0.0.1:5790` (webclient loopback) |
 | `CASPER_RPC_URL`      | JSON-RPC                                | `http://127.0.0.1:11101`         |
 | `CASPER_NODE_URL`     | Binary port                             | `127.0.0.1:28101`                |

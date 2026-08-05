@@ -56,7 +56,7 @@ Release profile (family): `lto`, `codegen-units=1`, `panic=abort`, `strip=symbol
 
 | Flag       | Env                   | Default        |
 | ---------- | --------------------- | -------------- |
-| `--http`   | `CASPER_SDK_MCP_HTTP` | false (stdio)  |
+| `--http`   | `MCP_HTTP` | false (stdio)  |
 | `--listen` | `CASPER_SDK_MCP_ADDR` | `0.0.0.0:5790` |
 
 SDK env: `CASPER_RPC_URL`, `CASPER_NODE_URL`, `CASPER_VERBOSITY`, `RUST_LOG`.

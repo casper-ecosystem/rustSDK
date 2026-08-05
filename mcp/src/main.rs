@@ -11,8 +11,12 @@ use clap::Parser;
     version
 )]
 struct Cli {
-    /// Serve Streamable HTTP instead of stdio (also: `CASPER_SDK_MCP_HTTP=1`).
-    #[arg(long, env = "CASPER_SDK_MCP_HTTP")]
+    /// Serve Streamable HTTP instead of stdio.
+    #[arg(
+        long,
+        env = "MCP_HTTP",
+        value_parser = clap::builder::BoolishValueParser::new()
+    )]
     http: bool,
 
     /// HTTP bind address when `--http` is set (also: `CASPER_SDK_MCP_ADDR`).
