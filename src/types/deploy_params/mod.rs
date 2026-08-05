@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 pub mod args_simple;
 pub mod deploy_str_params;
 pub mod dictionary_item_str_params;

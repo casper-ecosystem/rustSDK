@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 #[cfg(target_arch = "wasm32")]
 use crate::deploy::deploy::PutDeployResult;
 use crate::types::deploy_params::{
@@ -157,7 +159,7 @@ mod tests {
             .set_session_hash(&get_contract_hash().await.replace("entity-contract", "hash"));
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-        session_params.set_session_args_simple_vec(args_simple);
+        session_params.set_session_args_simple(args_simple);
 
         // Act
         let result = sdk
@@ -204,7 +206,7 @@ mod tests {
         );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-        session_params.set_session_args_simple_vec(args_simple);
+        session_params.set_session_args_simple(args_simple);
 
         // Act
         let result = sdk
@@ -249,7 +251,7 @@ mod tests {
         );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-        session_params.set_session_args_simple_vec(args_simple);
+        session_params.set_session_args_simple(args_simple);
 
         // Act
         let result = sdk
@@ -295,7 +297,7 @@ mod tests {
         );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-        session_params.set_session_args_simple_vec(args_simple);
+        session_params.set_session_args_simple(args_simple);
 
         // Act
         let result = sdk

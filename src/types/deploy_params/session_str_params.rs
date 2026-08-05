@@ -5,10 +5,17 @@ use crate::{
     },
 };
 use casper_client::cli::SessionStrParams as _SessionStrParams;
-use js_sys::Array;
 use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
 
+/// Legacy deploy session params. Prefer [`crate::types::transaction_params::transaction_str_params::TransactionStrParams`].
+///
+/// Session args setters (same idea as transaction params):
+/// - [`Self::set_session_args_simple`] — CLI-style string bag
+/// - [`Self::set_session_args_json`] — JSON string
+/// - [`Self::set_session_args`] — typed [`RuntimeArgs`]
+#[deprecated(note = "prefer TransactionStrParams")]
+#[allow(deprecated)]
 #[wasm_bindgen]
 #[derive(Default, Debug, Clone)]
 pub struct SessionStrParams {
@@ -26,6 +33,7 @@ pub struct SessionStrParams {
 }
 
 #[wasm_bindgen]
+#[allow(deprecated)]
 impl SessionStrParams {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::too_many_arguments)]
@@ -36,7 +44,7 @@ impl SessionStrParams {
         session_package_name: Option<String>,
         session_path: Option<String>,
         session_bytes: Option<Bytes>,
-        session_args_simple: Option<Array>,
+        session_args_simple: Option<Vec<String>>,
         session_args_json: Option<String>,
         session_version: Option<String>,
         session_entry_point: Option<String>,
@@ -156,13 +164,11 @@ impl SessionStrParams {
         self.session_args_simple.get().cloned()
     }
 
+    /// CLI-style simple args (`name:Type='value'`).
     #[wasm_bindgen(setter)]
-    pub fn set_session_args_simple(&mut self, session_args_simple: Array) {
-        let args: Vec<String> = session_args_simple
-            .iter()
-            .map(|value| value.as_string().unwrap_or_default())
-            .collect();
-        self.set_session_args_simple_vec(args);
+    pub fn set_session_args_simple(&mut self, session_args_simple: Vec<String>) {
+        let args_simple = ArgsSimple::from(session_args_simple);
+        self.session_args_simple.set(args_simple).unwrap();
     }
 
     // Getter and setter for session_args_json field
@@ -171,6 +177,7 @@ impl SessionStrParams {
         self.session_args_json.get().cloned()
     }
 
+    /// JSON session args string (human-typed or ByteArray bridge encoding).
     #[wasm_bindgen(setter)]
     pub fn set_session_args_json(&self, session_args_json: &str) {
         self.session_args_json
@@ -178,7 +185,7 @@ impl SessionStrParams {
             .unwrap();
     }
 
-    /// Set session args from typed [`RuntimeArgs`] (fills `session_args_json`).
+    /// Typed session args. Parameter type is [`RuntimeArgs`]; string setters stay separate.
     pub fn set_session_args(&self, args: &RuntimeArgs) {
         let json = args
             .to_session_args_json_string()
@@ -224,15 +231,8 @@ impl SessionStrParams {
     }
 }
 
-impl SessionStrParams {
-    /// Sets session args from CLI-style simple strings (`name:Type='value'`).
-    pub fn set_session_args_simple_vec(&mut self, session_args_simple: Vec<String>) {
-        let args_simple = ArgsSimple::from(session_args_simple);
-        self.session_args_simple.set(args_simple).unwrap();
-    }
-}
-
 // Convert SessionStrParams to casper_client::cli::SessionStrParam
+#[allow(deprecated)]
 pub fn session_str_params_to_casper_client(
     session_params: &SessionStrParams,
 ) -> _SessionStrParams<'_> {
@@ -305,6 +305,7 @@ pub fn session_str_params_to_casper_client(
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod tests {
     use super::*;
 

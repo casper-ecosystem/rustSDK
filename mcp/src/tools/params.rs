@@ -1,5 +1,7 @@
 //! JSON → SDK *StrParams / TransactionBuilderParams parsers for MCP tools.
 
+#![allow(deprecated)]
+
 use casper_rust_wasm_sdk::helpers;
 use casper_rust_wasm_sdk::types::cl::bytes::Bytes;
 use casper_rust_wasm_sdk::types::deploy_params::deploy_str_params::DeployStrParams;
@@ -343,7 +345,7 @@ pub fn parse_session_str_params(json: &str) -> Result<SessionStrParams, String> 
         params.set_session_bytes(bytes_from_hex(&v)?);
     }
     if let Some(args) = opt_string_vec(&obj, "session_args_simple") {
-        params.set_session_args_simple_vec(args);
+        params.set_session_args_simple(args);
     }
     if let Some(v) = opt_str(&obj, "session_args_json") {
         params.set_session_args_json(&v);

@@ -534,7 +534,7 @@ pub mod test_module_deploy {
             "foo:Bool='true'".to_string(),
             "bar:String='value'".to_string(),
         ]);
-        session_params.set_session_args_simple_vec(args.clone());
+        session_params.set_session_args_simple(args.clone());
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let deploy =

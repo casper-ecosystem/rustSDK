@@ -1,6 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::insert_js_value_arg;
 #[cfg(feature = "deploy")]
+#[allow(deprecated)]
 use crate::types::deploy_params::{
     deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
     session_str_params::SessionStrParams,

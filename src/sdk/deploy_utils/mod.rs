@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 pub(crate) mod make_deploy;
 #[allow(deprecated)]
 pub(crate) use make_deploy::make_deploy;

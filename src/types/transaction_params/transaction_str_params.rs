@@ -249,7 +249,7 @@ impl TransactionStrParams {
             .unwrap();
     }
 
-    /// Set session args from typed [`RuntimeArgs`] (fills `session_args_json`).
+    /// Typed session args. Parameter type is [`RuntimeArgs`]; string setters stay separate.
     pub fn set_session_args(&self, args: &RuntimeArgs) {
         let json = args
             .to_session_args_json_string()

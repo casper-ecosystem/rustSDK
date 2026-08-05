@@ -7,8 +7,8 @@ use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::RuntimeArgs`].
 ///
-/// Use with `TransactionStrParams::set_session_args` /
-/// `SessionStrParams::set_session_args` (#43). String / JSON setters remain.
+/// Pass to `set_session_args` on transaction (or legacy deploy) session params (#43).
+/// `set_session_args_simple` / `set_session_args_json` remain for string bags.
 #[wasm_bindgen]
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct RuntimeArgs(_RuntimeArgs);
