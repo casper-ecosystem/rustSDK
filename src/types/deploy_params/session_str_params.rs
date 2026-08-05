@@ -1,8 +1,6 @@
 use crate::{
     helpers::get_str_or_default,
-    types::{
-        cl::bytes::Bytes, deploy_params::args_simple::ArgsSimple, runtime_args::RuntimeArgs,
-    },
+    types::{cl::bytes::Bytes, deploy_params::args_simple::ArgsSimple, runtime_args::RuntimeArgs},
 };
 use casper_client::cli::SessionStrParams as _SessionStrParams;
 use once_cell::sync::OnceCell;
