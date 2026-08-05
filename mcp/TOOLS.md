@@ -83,6 +83,7 @@ Env defaults: `CASPER_RPC_URL`, `CASPER_NODE_URL`, `CASPER_VERBOSITY`.
 | `get_entity`                                    | `sdk/rpcs/get_entity.rs`              | `sdk_get_entity`              | no     |
 | `get_era_info` (deprecated → `get_era_summary`) | `sdk/rpcs/get_era_info.rs`            | `sdk_get_era_info`            | no     |
 | `get_era_summary`                               | `sdk/rpcs/get_era_summary.rs`         | `sdk_get_era_summary`         | no     |
+| `get_reward`                                    | `sdk/rpcs/get_reward.rs`              | `sdk_get_reward`              | no     |
 | `get_node_status`                               | `sdk/rpcs/get_node_status.rs`         | `sdk_get_node_status`         | no     |
 | `get_peers`                                     | `sdk/rpcs/get_peers.rs`               | `sdk_get_peers`               | no     |
 | `get_state_root_hash`                           | `sdk/rpcs/get_state_root_hash.rs`     | `sdk_get_state_root_hash`     | no     |

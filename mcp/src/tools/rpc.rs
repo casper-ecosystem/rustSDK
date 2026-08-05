@@ -34,6 +34,7 @@ pub fn tool_names() -> &'static [&'static str] {
         "sdk_get_era_summary",
         "sdk_get_node_status",
         "sdk_get_peers",
+        "sdk_get_reward",
         "sdk_get_state_root_hash",
         "sdk_get_transaction",
         "sdk_get_validator_changes",
@@ -157,6 +158,26 @@ pub async fn get_era_summary(
     rpc_ok!(
         sdk.get_era_summary(
             block_id(maybe_block_identifier),
+            verb(verbosity.as_deref()),
+            rpc_address
+        )
+        .await
+    )
+}
+
+pub async fn get_reward(
+    validator: String,
+    delegator: Option<String>,
+    maybe_era_id: Option<String>,
+    verbosity: Option<String>,
+    rpc_address: Option<String>,
+) -> ToolOutput {
+    let sdk = sdk_handle::sdk_snapshot();
+    rpc_ok!(
+        sdk.get_reward_as_string(
+            &validator,
+            delegator.as_deref(),
+            maybe_era_id.as_deref(),
             verb(verbosity.as_deref()),
             rpc_address
         )

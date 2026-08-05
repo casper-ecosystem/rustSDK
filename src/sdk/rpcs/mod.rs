@@ -11,6 +11,7 @@ pub mod get_era_info;
 pub mod get_era_summary;
 pub mod get_node_status;
 pub mod get_peers;
+pub mod get_reward;
 pub mod get_state_root_hash;
 pub mod get_transaction;
 pub mod get_validator_changes;

@@ -268,6 +268,20 @@ impl CasperSdkMcp {
     }
 
     #[tool(
+        description = "JSON-RPC info_get_reward (validator hex; optional delegator hex and era id)"
+    )]
+    async fn sdk_get_reward(
+        &self,
+        validator: String,
+        delegator: Option<String>,
+        maybe_era_id: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        tools::rpc::get_reward(validator, delegator, maybe_era_id, verbosity, rpc_address).await
+    }
+
+    #[tool(
         description = "JSON-RPC chain_get_era_info_by_switch_block (deprecated; prefer era_summary)"
     )]
     async fn sdk_get_era_info(
