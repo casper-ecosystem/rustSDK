@@ -1,26 +1,20 @@
 {
   "mcpServers": {
     "casper-rust-wasm-sdk": {
-      "url": "http://127.0.0.1:8790/mcp"
+      "command": "bash",
+      "args": [".cursor/scripts/sdk-mcp.sh"],
+      "env": {
+        "CASPER_SDK_MCP_IMAGE": "interchouette/casper-webclient:dev",
+        "RUST_LOG": "warn"
+      }
     },
-    "casper-rust-wasm-sdk-stdio-docker": {
-      "command": "docker",
-      "args": [
-        "run",
-        "--rm",
-        "-i",
-        "--add-host",
-        "host.docker.internal:host-gateway",
-        "-e",
-        "CASPER_RPC_URL=http://host.docker.internal:11101",
-        "-e",
-        "CASPER_NODE_URL=host.docker.internal:28101",
-        "-e",
-        "RUST_LOG=warn",
-        "--entrypoint",
-        "casper-rust-wasm-sdk-mcp",
-        "interchouette/casper-rust-wasm-sdk-mcp:2.2.2"
-      ]
+    "casper-rust-wasm-sdk-http": {
+      "command": "bash",
+      "args": [".cursor/scripts/sdk-mcp-http.sh"],
+      "env": {
+        "CASPER_SDK_MCP_IMAGE": "interchouette/casper-webclient:dev",
+        "CASPER_SDK_MCP_URL": "http://127.0.0.1:8080/mcp"
+      }
     },
     "casper-rust-wasm-sdk-stdio-cargo": {
       "command": "cargo",

@@ -1,61 +1,61 @@
 # MCP server for casper-rust-wasm-sdk
 
-Rust **mcpkit** sidecar (`casper-rust-wasm-sdk-mcp`) exposing the native SDK API as MCP tools (in-process path dependency — not an HTTP proxy of the SDK).
+Rust **mcpkit** crate (`casper-rust-wasm-sdk-mcp`) exposing the native SDK API as MCP tools (in-process path dependency — not an HTTP proxy of the SDK).
 
-Inventory: [TOOLS.md](TOOLS.md). Patterns: [PATTERNS.md](PATTERNS.md). Cursor config sample: [mcp.json.example](mcp.json.example).
+**Runtime image:** MCP ships inside **`interchouette/casper-webclient`** (`:dev` / `:latest`). There is no separate Hub image for Cursor anymore; the slim `casper-rust-wasm-sdk-mcp` Hub repo is deprecated.
+
+Inventory: [TOOLS.md](TOOLS.md). Patterns: [PATTERNS.md](PATTERNS.md). Cursor sample: [mcp.json.example](mcp.json.example). Active Cursor config: [`.cursor/mcp.json`](../.cursor/mcp.json) (itc-cursor product branch).
 
 ## Transports
 
-| Mode               | Command                                            | Use                         |
-| ------------------ | -------------------------------------------------- | --------------------------- |
-| **stdio (Docker)** | see [mcp.json.example](mcp.json.example) `…-stdio` | Cursor spawn via image      |
-| **stdio (host)**   | `make run-mcp`                                     | Local Cursor spawn          |
-| **HTTP (Docker)**  | `make mcp-http`                                    | Streamable HTTP on **8790** |
-| **HTTP (host)**    | `make run-mcp-http`                                | Same URL without Docker     |
+| Mode | How | URL / notes |
+| --- | --- | --- |
+| **Hosted** | Render webclient | `https://casper-webclient.interchouette.net/mcp` |
+| **HTTP (Docker)** | `make mcp-http` → webclient SPA | `http://127.0.0.1:8080/mcp` (`ENABLE_MCP=1`) |
+| **stdio (Docker)** | Cursor / `docker run -i … --entrypoint casper-rust-wasm-sdk-mcp` | `interchouette/casper-webclient:dev` |
+| **stdio (host)** | `make run-mcp` | cargo; for local debug |
+| **HTTP (host)** | `make run-mcp-http` | cargo; **do not bind host `:8790`** (NCTL owns it) |
 
 ```bash
-make mcp-docker-build   # image …:2.2.2 + :latest + :dev
-make mcp-docker-push    # Hub + GHCR
-make mcp-http           # docker compose → http://127.0.0.1:8790/mcp
+make mcp-http           # webclient → http://127.0.0.1:8080/mcp
 make mcp-http-stop
-make run-mcp            # stdio (host)
-make run-mcp-http       # HTTP host
+make run-mcp            # stdio (host cargo)
+make run-mcp-http       # HTTP host on 127.0.0.1:8081 (avoids NCTL :8790)
 make mcp-test
 make mcp-test-live      # ignored tests vs live NCTL (CASPER_RPC_URL)
 ```
 
-Family ports: 8787 tvs / 8788 nctl / 8789 kms / **8790 sdk**.
-
-**Hosted webclient** embeds MCP (same image): `https://casper-webclient.interchouette.net/mcp` (`ENABLE_MCP=1`). Slim `:2.2.2` image remains for Cursor stdio / dedicated `:8790`. Legacy `:2.2.2-mcp` is archived — use `:2.2.2`.
+Shared host MCP HTTP ports: tvscreener `6790`, KMS `7790`, **NCTL `8790`**, evaluator `9790`. This product does **not** own a host MCP port; use webclient `:8080/mcp` or cargo `:8081`.
 
 ## Env
 
-| Variable              | Role                             | Default                  |
-| --------------------- | -------------------------------- | ------------------------ |
-| `CASPER_SDK_MCP_HTTP` | Use HTTP transport               | off (host) / on (image)  |
-| `CASPER_SDK_MCP_ADDR` | HTTP bind                        | `0.0.0.0:8790`           |
-| `CASPER_RPC_URL`      | JSON-RPC                         | `http://127.0.0.1:11101` |
-| `CASPER_NODE_URL`     | Binary port                      | `127.0.0.1:28101`        |
-| `CASPER_VERBOSITY`    | `low` / `medium` / `high`        | `low`                    |
-| `RUST_LOG`            | tracing filter (stderr, no ANSI) | `warn`                   |
+| Variable | Role | Default |
+| --- | --- | --- |
+| `ENABLE_MCP` | Start MCP inside webclient (`web` mode) | `1` |
+| `CASPER_SDK_MCP_HTTP` | Use HTTP transport (binary) | off (stdio) / on (web loopback) |
+| `CASPER_SDK_MCP_ADDR` | HTTP bind inside container | `127.0.0.1:8790` (loopback only) |
+| `CASPER_RPC_URL` | JSON-RPC | `http://127.0.0.1:11101` |
+| `CASPER_NODE_URL` | Binary port | `127.0.0.1:28101` |
+| `CASPER_VERBOSITY` | `low` / `medium` / `high` | `low` |
+| `RUST_LOG` | tracing filter (stderr, no ANSI) | `warn` |
 
-Docker containers reach host NCTL via `host.docker.internal` (compose sets `extra_hosts`).
+Docker containers reach host NCTL via `host.docker.internal`.
 
 ## Features
 
 MCP features enable the matching SDK features (`casper-rust-wasm-sdk` is `default-features = false`). Default is `full`.
 
-| Feature          | Tools                                                   | SDK feature                    |
-| ---------------- | ------------------------------------------------------- | ------------------------------ |
-| _(always)_       | `sdk_help`, `sdk_get_endpoints`, `sdk_set_endpoints`    | core RPC                       |
-| `helpers`        | utilities (keys, blake2b, motes, …)                     | `helpers`                      |
-| `rpc`            | JSON-RPC reads + speculative RPC                        | (always on in SDK)             |
-| `binary-port`    | binary-port queries (needs `CASPER_NODE_URL`)           | `binary-port`                  |
-| `transaction`    | make / speculative transaction builders                 | `transaction`                  |
-| `deploy`         | legacy make / speculative deploy builders               | `deploy`                       |
-| `contract`       | `query_contract_dict`, `query_contract_key`             | `contract`                     |
-| `write`          | sign/put/submit, install, call_entrypoint, `try_accept` | `transaction`+`deploy`+`contract` |
-| `full` (default) | all of the above                                        | all SDK optional features      |
+| Feature | Tools | SDK feature |
+| --- | --- | --- |
+| _(always)_ | `sdk_help`, `sdk_get_endpoints`, `sdk_set_endpoints` | core RPC |
+| `helpers` | utilities (keys, blake2b, motes, …) | `helpers` |
+| `rpc` | JSON-RPC reads + speculative RPC | (always on in SDK) |
+| `binary-port` | binary-port queries (needs `CASPER_NODE_URL`) | `binary-port` |
+| `transaction` | make / speculative transaction builders | `transaction` |
+| `deploy` | legacy make / speculative deploy builders | `deploy` |
+| `contract` | `query_contract_dict`, `query_contract_key` | `contract` |
+| `write` | sign/put/submit, install, call_entrypoint, `try_accept` | `transaction`+`deploy`+`contract` |
+| `full` (default) | all of the above | all SDK optional features |
 
 ```bash
 cargo build -p casper-rust-wasm-sdk-mcp
@@ -69,26 +69,15 @@ Complex inputs use JSON strings — see [TOOLS.md](TOOLS.md) and `tools/params.r
 
 ## Cursor
 
-**Active** [`.cursor/mcp.json`](../.cursor/mcp.json):
+| Server | Transport | Backing |
+| --- | --- | --- |
+| `casper-rust-wasm-sdk` | stdio | `interchouette/casper-webclient:dev` via `.cursor/scripts/sdk-mcp.sh` |
+| `casper-rust-wasm-sdk-http` | HTTP (mcp-remote) | same image; `http://127.0.0.1:8080/mcp` |
 
-| Server                              | Transport        | Backing                          |
-| ----------------------------------- | ---------------- | -------------------------------- |
-| `casper-rust-wasm-sdk`              | HTTP `:8790/mcp` | Docker image via `make mcp-http` |
-| `casper-rust-wasm-sdk-stdio-docker` | stdio            | Same image (`docker run -i …`)   |
-
-Both use image `interchouette/casper-rust-wasm-sdk-mcp:2.2.2`. Cargo stdio is optional in [mcp.json.example](mcp.json.example) only (slow cold start). Hosted: `https://casper-webclient.interchouette.net/mcp`.
-
-Prerequisite: `make mcp-docker-build` once; keep HTTP up with `make mcp-http`.
-
-Agents must use MCP for NCTL/chain access (`.cursor/rules/sdk-use-mcp-nctl.mdc`).
+Hub webclient tags: **`dev`**, **`latest`** only. See [mcp.json.example](mcp.json.example). Agents must use `CallMcpTool` (`.cursor/rules/casper-sdk-use-mcp.mdc`).
 
 ## Smoke
 
-| Check                                             | Result                          |
-| ------------------------------------------------- | ------------------------------- |
-| Feature-matrix builds + unit tests                | pass (Phase 7)                  |
-| HTTP `initialize` on `:8790/mcp`                  | pass                            |
-| Live NCTL `sdk_get_node_status` / `sdk_get_peers` | **pass** (NCTL 2.2 on `:11101`) |
-| Docker HTTP `make mcp-http` + `tools/call`        | **pass**                        |
-| Docker stdio `docker run -i` initialize           | **pass**                        |
-| Host / cargo stdio initialize                     | **pass**                        |
+```bash
+make mcp-smoke   # needs NCTL up + webclient image (make mcp-http)
+```

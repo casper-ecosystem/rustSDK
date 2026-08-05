@@ -123,78 +123,33 @@ docker-deploy-prod:
 
 .PHONY: docker-build docker-start docker-stop docker-start-prod docker-stop-prod
 
-# --- MCP sidecar (mcp/ — path-depends on casper-rust-wasm-sdk) ---
-# Image tags match the crate version (2.2.2). Legacy :2.2.2-mcp is archived.
+# --- MCP (mcp/ crate; runtime via casper-webclient image) ---
+# Hub: interchouette/casper-webclient:{dev,latest}. Slim casper-rust-wasm-sdk-mcp Hub image is deprecated.
 
-MCP_NAME ?= casper-rust-wasm-sdk-mcp
-MCP_VERSION ?= 2.2.2
-MCP_IMAGE ?= $(MCP_NAME):$(MCP_VERSION)
-MCP_HUB_IMAGE ?= interchouette/$(MCP_NAME)
-MCP_GHCR_PERSONAL_IMAGE ?= ghcr.io/groussac/$(MCP_NAME)
-MCP_GHCR_ORG_IMAGE ?= ghcr.io/interchouette-itc/$(MCP_NAME)
+WEBCLIENT_HUB_IMAGE ?= interchouette/casper-webclient
+CASPER_SDK_MCP_IMAGE ?= $(WEBCLIENT_HUB_IMAGE):dev
 COMPOSE_MCP ?= docker/docker-compose.mcp.yml
-DOCKER_BUILDKIT ?= 1
 
 mcp-build:
 	cargo build -p casper-rust-wasm-sdk-mcp --release
 
-mcp-docker-build:
-	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build --network=host \
-		-t $(MCP_IMAGE) \
-		-t $(MCP_NAME):latest \
-		-t $(MCP_NAME):dev \
-		-t $(MCP_HUB_IMAGE):$(MCP_VERSION) \
-		-t $(MCP_HUB_IMAGE):latest \
-		-t $(MCP_HUB_IMAGE):dev \
-		-f mcp/Dockerfile \
-		.
-
-mcp-docker-push-hub:
-	docker push $(MCP_HUB_IMAGE):$(MCP_VERSION)
-	docker push $(MCP_HUB_IMAGE):latest
-	docker push $(MCP_HUB_IMAGE):dev
-
-mcp-docker-push-ghcr-personal:
-	docker tag $(MCP_HUB_IMAGE):$(MCP_VERSION) $(MCP_GHCR_PERSONAL_IMAGE):$(MCP_VERSION)
-	docker tag $(MCP_HUB_IMAGE):latest $(MCP_GHCR_PERSONAL_IMAGE):latest
-	docker tag $(MCP_HUB_IMAGE):dev $(MCP_GHCR_PERSONAL_IMAGE):dev
-	docker push $(MCP_GHCR_PERSONAL_IMAGE):$(MCP_VERSION)
-	docker push $(MCP_GHCR_PERSONAL_IMAGE):latest
-	docker push $(MCP_GHCR_PERSONAL_IMAGE):dev
-
-mcp-docker-push-ghcr-itc:
-	docker tag $(MCP_HUB_IMAGE):$(MCP_VERSION) $(MCP_GHCR_ORG_IMAGE):$(MCP_VERSION)
-	docker tag $(MCP_HUB_IMAGE):latest $(MCP_GHCR_ORG_IMAGE):latest
-	docker tag $(MCP_HUB_IMAGE):dev $(MCP_GHCR_ORG_IMAGE):dev
-	docker push $(MCP_GHCR_ORG_IMAGE):$(MCP_VERSION)
-	docker push $(MCP_GHCR_ORG_IMAGE):latest
-	docker push $(MCP_GHCR_ORG_IMAGE):dev
-
-mcp-docker-push: mcp-docker-push-hub mcp-docker-push-ghcr-personal mcp-docker-push-ghcr-itc
-
-# Prefer local/Hub image; build if missing.
+# Local HTTP via webclient (SPA :8080 + /mcp). Never binds host :8790 (NCTL).
 mcp-http:
-	-docker pull $(MCP_HUB_IMAGE):$(MCP_VERSION)
-	@if ! docker image inspect $(MCP_HUB_IMAGE):$(MCP_VERSION) >/dev/null 2>&1 \
-		&& ! docker image inspect $(MCP_IMAGE) >/dev/null 2>&1; then \
-		echo "MCP image missing; building locally…"; \
-		$(MAKE) mcp-docker-build; \
-	fi
-	CASPER_SDK_MCP_IMAGE=$$(docker image inspect $(MCP_HUB_IMAGE):$(MCP_VERSION) >/dev/null 2>&1 \
-		&& echo $(MCP_HUB_IMAGE):$(MCP_VERSION) \
-		|| echo $(MCP_IMAGE)) \
+	-docker pull $(CASPER_SDK_MCP_IMAGE)
+	CASPER_SDK_MCP_IMAGE=$(CASPER_SDK_MCP_IMAGE) \
 		docker compose -f $(COMPOSE_MCP) up -d --force-recreate
 
 mcp-http-stop:
 	-docker compose -f $(COMPOSE_MCP) down --remove-orphans
-	-docker stop casper-rust-wasm-sdk-mcp 2>/dev/null
-	-docker rm casper-rust-wasm-sdk-mcp 2>/dev/null
+	-docker stop casper-webclient-mcp 2>/dev/null
+	-docker rm casper-webclient-mcp 2>/dev/null
 
 run-mcp:
 	cargo run -p casper-rust-wasm-sdk-mcp --quiet --
 
+# Host cargo HTTP — use :8081 so we do not steal NCTL :8790.
 run-mcp-http:
-	cargo run -p casper-rust-wasm-sdk-mcp --quiet -- --http --listen 127.0.0.1:8790
+	cargo run -p casper-rust-wasm-sdk-mcp --quiet -- --http --listen 127.0.0.1:8081
 
 mcp-test:
 	cargo test -p casper-rust-wasm-sdk-mcp
@@ -206,8 +161,7 @@ mcp-test-live:
 
 # HTTP (compose) + Docker stdio against live NCTL. Requires: make mcp-http, NCTL up.
 mcp-smoke:
-	bash mcp/scripts/smoke_transports.sh
+	CASPER_SDK_MCP_IMAGE=$(CASPER_SDK_MCP_IMAGE) bash mcp/scripts/smoke_transports.sh
 
-.PHONY: mcp-build mcp-docker-build mcp-docker-push-hub mcp-docker-push-ghcr-personal \
-	mcp-docker-push-ghcr-itc mcp-docker-push mcp-http mcp-http-stop \
+.PHONY: mcp-build mcp-http mcp-http-stop \
 	run-mcp run-mcp-http mcp-test mcp-test-live mcp-smoke

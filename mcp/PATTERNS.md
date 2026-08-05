@@ -106,43 +106,26 @@ assert!(include_str!("server.rs").contains(&needle));
 
 ---
 
-## Makefile targets (Phase 6)
+## Makefile targets
 
-| Target                      | Role                                     |
-| --------------------------- | ---------------------------------------- |
-| `mcp-build`                 | release build of mcp package             |
-| `run-mcp`                   | stdio                                    |
-| `run-mcp-http` / `mcp-http` | HTTP :8790                               |
-| `mcp-test`                  | `cargo test -p casper-rust-wasm-sdk-mcp` |
+| Target | Role |
+| --- | --- |
+| `mcp-build` | release build of mcp package |
+| `run-mcp` | stdio (host cargo) |
+| `mcp-http` | webclient Docker → `http://127.0.0.1:8080/mcp` |
+| `run-mcp-http` | host cargo HTTP on `127.0.0.1:8081` (not NCTL `:8790`) |
+| `mcp-test` | `cargo test -p casper-rust-wasm-sdk-mcp` |
 
----
-
-## mcp.json.example shape
-
-```json
-{
-  "mcpServers": {
-    "casper-rust-wasm-sdk-http": {
-      "url": "http://127.0.0.1:8790/mcp"
-    },
-    "casper-rust-wasm-sdk-stdio-cargo": {
-      "command": "cargo",
-      "args": ["run", "-p", "casper-rust-wasm-sdk-mcp", "--quiet", "--"],
-      "cwd": "${workspaceFolder}",
-      "env": { "RUST_LOG": "warn" }
-    }
-  }
-}
-```
+Runtime image: `interchouette/casper-webclient:{dev,latest}`. See [mcp.json.example](mcp.json.example).
 
 ---
 
 ## Copy vs differ
 
-| Copy from kms/nctl                           | Differ for rustSDK                         |
-| -------------------------------------------- | ------------------------------------------ |
-| Separate `mcp/` crate, mcpkit 0.7            | Path-dep on SDK lib (in-process)           |
-| clap `--http` / `--listen`                   | No Make/Docker lifecycle tools (Phase 1–7) |
-| stderr warn logging                          | No HTTP client to wrap an API              |
-| `run` / `run_http` + empty resources/prompts | Port 8790                                  |
-| Version sync test                            | Keep mcpkit off wasm root crate            |
+| Copy from kms/nctl | Differ for rustSDK |
+| --- | --- |
+| Separate `mcp/` crate, mcpkit 0.7 | Path-dep on SDK lib (in-process) |
+| clap `--http` / `--listen` | MCP embedded in webclient image |
+| stderr warn logging | No HTTP client to wrap an API |
+| `run` / `run_http` + empty resources/prompts | Host `:8790` is NCTL; use `:8080/mcp` |
+| Version sync test | Keep mcpkit off wasm root crate |

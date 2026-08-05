@@ -1,21 +1,19 @@
-# Slim MCP-only image (stdio / dedicated :8790).
-# Hosted webclient embeds MCP too — use https://casper-webclient.interchouette.net/mcp
+# MCP via unified webclient image (SPA :8080 + /mcp proxy).
+# Do not publish container :8790 to the host — that port is NCTL's.
 # Use: make mcp-http / make mcp-http-stop
+# Hosted: https://casper-webclient.interchouette.net/mcp
 services:
   sdk-mcp:
-    image: ${CASPER_SDK_MCP_IMAGE:-interchouette/casper-rust-wasm-sdk-mcp:2.2.2}
-    container_name: casper-rust-wasm-sdk-mcp
-    build:
-      context: ..
-      dockerfile: mcp/Dockerfile
+    image: ${CASPER_SDK_MCP_IMAGE:-interchouette/casper-webclient:dev}
+    container_name: casper-webclient-mcp
     ports:
-      - "8790:8790"
+      - "8080:8080"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      CASPER_SDK_MCP_HTTP: "1"
-      CASPER_SDK_MCP_ADDR: "0.0.0.0:8790"
+      ENABLE_MCP: "1"
       CASPER_RPC_URL: ${CASPER_RPC_URL:-http://host.docker.internal:11101}
       CASPER_NODE_URL: ${CASPER_NODE_URL:-host.docker.internal:28101}
       RUST_LOG: ${RUST_LOG:-warn}
+    command: ["web"]
     restart: unless-stopped

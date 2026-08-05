@@ -4,8 +4,8 @@
 set -euo pipefail
 
 RPC_URL="${CASPER_RPC_URL:-http://127.0.0.1:11101}"
-HTTP_URL="${CASPER_SDK_MCP_HTTP_URL:-http://127.0.0.1:8790/mcp}"
-IMAGE="${CASPER_SDK_MCP_IMAGE:-interchouette/casper-rust-wasm-sdk-mcp:2.2.2-mcp}"
+HTTP_URL="${CASPER_SDK_MCP_HTTP_URL:-http://127.0.0.1:8080/mcp}"
+IMAGE="${CASPER_SDK_MCP_IMAGE:-interchouette/casper-webclient:dev}"
 PASS=0
 FAIL=0
 TMP=$(mktemp -d)
@@ -124,7 +124,7 @@ fi
 # --- Docker stdio ---
 echo "== Docker stdio ($IMAGE) =="
 if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
-  bad "image $IMAGE missing — run: make mcp-docker-build"
+  bad "image $IMAGE missing — docker pull interchouette/casper-webclient:dev"
 else
   {
     json_rpc 1 initialize '{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"smoke-stdio","version":"0"}}'

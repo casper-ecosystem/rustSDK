@@ -1,6 +1,6 @@
-# casper-rust-wasm-sdk-mcp — Streamable HTTP on :8790
-# Build context: repository root (path-depends on the SDK crate + workspace patches).
-#   docker build -f mcp/Dockerfile -t casper-rust-wasm-sdk-mcp:2.2.2 .
+# DEPRECATED for Hub / Cursor. Prefer interchouette/casper-webclient:{dev,latest}
+# which embeds the same binary (see docker/Dockerfile.cicd). Kept for local experiments only.
+#   docker build -f mcp/Dockerfile -t casper-rust-wasm-sdk-mcp:local .
 
 ARG RUST_IMAGE=rust:slim-bookworm
 ARG RUNTIME_IMAGE=debian:bookworm-slim

@@ -32,19 +32,12 @@ jobs:
             --build-arg APP_VERSION="$APP_VERSION" \
             --build-arg GIT_SHA="${{ github.sha }}"
 
+          # MCP binary is embedded in casper-webclient (ENABLE_MCP / entrypoint mcp).
+          # Do not build or push the deprecated slim casper-rust-wasm-sdk-mcp Hub image.
           for image in casper-webclient cors-anywhere ws-proxy; do
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:latest"
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
           done
-
-          # Slim MCP image (Cursor stdio / dedicated :8790). Tags match crate version.
-          make mcp-docker-build
-          docker tag "interchouette/casper-rust-wasm-sdk-mcp:2.2.2" \
-            "${{ secrets.DOCKER_USERNAME_ITC }}/casper-rust-wasm-sdk-mcp:2.2.2"
-          docker tag "interchouette/casper-rust-wasm-sdk-mcp:latest" \
-            "${{ secrets.DOCKER_USERNAME_ITC }}/casper-rust-wasm-sdk-mcp:latest"
-          docker tag "interchouette/casper-rust-wasm-sdk-mcp:dev" \
-            "${{ secrets.DOCKER_USERNAME_ITC }}/casper-rust-wasm-sdk-mcp:dev"
 
       - name: Push Docker images to Docker Hub
         run: |
@@ -52,9 +45,6 @@ jobs:
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:latest"
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
           done
-          docker push "${{ secrets.DOCKER_USERNAME_ITC }}/casper-rust-wasm-sdk-mcp:2.2.2"
-          docker push "${{ secrets.DOCKER_USERNAME_ITC }}/casper-rust-wasm-sdk-mcp:latest"
-          docker push "${{ secrets.DOCKER_USERNAME_ITC }}/casper-rust-wasm-sdk-mcp:dev"
 
       # Render does not watch Hub for new digests — call the service Deploy Hook
       # after a successful push so it pulls interchouette/casper-webclient:latest.
