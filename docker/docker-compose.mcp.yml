@@ -1,9 +1,9 @@
-# Slim MCP sidecar (Streamable HTTP on :8790).
+# Slim MCP-only image (stdio / dedicated :8790).
+# Hosted webclient embeds MCP too — use https://casper-webclient.interchouette.net/mcp
 # Use: make mcp-http / make mcp-http-stop
-# Build context is the repo root (SDK path dep + [patch.crates-io]).
 services:
   sdk-mcp:
-    image: ${CASPER_SDK_MCP_IMAGE:-interchouette/casper-rust-wasm-sdk-mcp:2.2.2-mcp}
+    image: ${CASPER_SDK_MCP_IMAGE:-interchouette/casper-rust-wasm-sdk-mcp:2.2.2}
     container_name: casper-rust-wasm-sdk-mcp
     build:
       context: ..
@@ -17,5 +17,5 @@ services:
       CASPER_SDK_MCP_ADDR: "0.0.0.0:8790"
       CASPER_RPC_URL: ${CASPER_RPC_URL:-http://host.docker.internal:11101}
       CASPER_NODE_URL: ${CASPER_NODE_URL:-host.docker.internal:28101}
-      CASPER_VERBOSITY: ${CASPER_VERBOSITY:-low}
       RUST_LOG: ${RUST_LOG:-warn}
+    restart: unless-stopped

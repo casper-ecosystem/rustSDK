@@ -1,5 +1,30 @@
 ARG TARGETPLATFORM=linux/amd64
-FROM --platform=${TARGETPLATFORM} node:24-alpine AS build
+
+# --- Rust MCP binary (same crate as mcp/Dockerfile) ---
+ARG RUST_IMAGE=rust:slim-bookworm
+FROM --platform=${TARGETPLATFORM} ${RUST_IMAGE} AS mcp-builder
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    pkg-config \
+    libssl-dev \
+    git \
+    binutils \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+COPY Cargo.toml Cargo.lock ./
+COPY src ./src
+COPY mcp ./mcp
+COPY tests/integration/rust ./tests/integration/rust
+
+RUN cargo build -p casper-rust-wasm-sdk-mcp --release \
+  && strip -s target/release/casper-rust-wasm-sdk-mcp \
+  && cp target/release/casper-rust-wasm-sdk-mcp /casper-rust-wasm-sdk-mcp
+
+# --- Angular SPA ---
+FROM --platform=${TARGETPLATFORM} node:24-bookworm-slim AS build
 
 ENV NODE_ENV=development
 ARG BUILD_CONFIGURATION=docker
@@ -7,7 +32,6 @@ ENV BUILD_CONFIGURATION=$BUILD_CONFIGURATION
 
 WORKDIR /app
 
-# Update npm to the latest version
 RUN npm install -g npm@latest
 
 COPY ./examples/frontend/angular .
@@ -22,28 +46,36 @@ RUN npm install --ignore-scripts --verbose && npm update
 
 RUN npm run build -- --configuration=$BUILD_CONFIGURATION --verbose
 
-ARG TARGETPLATFORM=linux/amd64
-FROM --platform=${TARGETPLATFORM} node:24-alpine
+# --- Runtime: SPA + optional MCP (ENABLE_MCP=1) ---
+FROM --platform=${TARGETPLATFORM} node:24-bookworm-slim
 
 ARG APP_VERSION=2.2.2
 ARG GIT_SHA=unknown
 ENV PORT=8080
 ENV APP_VERSION=$APP_VERSION
 ENV GIT_SHA=$GIT_SHA
+ENV ENABLE_MCP=1
+ENV ENABLE_MCP_PROXY=1
+ENV CASPER_SDK_MCP_ADDR=127.0.0.1:8790
+ENV MCP_UPSTREAM=http://127.0.0.1:8790
+ENV RUST_LOG=warn
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
 WORKDIR /app
 
-# Install serve globally (better SPA support with automatic fallback)
-RUN npm install -g serve
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates libssl3 \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build --chown=node:node /app/dist/casper ./dist/
-
-# Copy and set up entrypoint script
+COPY --from=mcp-builder /casper-rust-wasm-sdk-mcp /usr/local/bin/casper-rust-wasm-sdk-mcp
 COPY --chown=node:node docker/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+COPY --chown=node:node docker/serve.mjs /app/serve.mjs
+RUN chmod +x /app/entrypoint.sh /usr/local/bin/casper-rust-wasm-sdk-mcp
 
-EXPOSE 8080
+EXPOSE 8080 8790
 
-# Use entrypoint to set BASE_HREF dynamically, then serve
+# web (default): SPA on :8080 + MCP on :8790, /mcp proxied on :8080
+# mcp: run the MCP binary only (stdio or --http)
 ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["serve", "-s", "/app/dist", "-l", "8080"]
+CMD ["web"]

@@ -14,7 +14,7 @@ Inventory: [TOOLS.md](TOOLS.md). Patterns: [PATTERNS.md](PATTERNS.md). Cursor co
 | **HTTP (host)**    | `make run-mcp-http`                                | Same URL without Docker     |
 
 ```bash
-make mcp-docker-build   # image …:2.2.2-mcp (+ Hub tags)
+make mcp-docker-build   # image …:2.2.2 + :latest + :dev
 make mcp-docker-push    # Hub + GHCR
 make mcp-http           # docker compose → http://127.0.0.1:8790/mcp
 make mcp-http-stop
@@ -25,6 +25,8 @@ make mcp-test-live      # ignored tests vs live NCTL (CASPER_RPC_URL)
 ```
 
 Family ports: 8787 tvs / 8788 nctl / 8789 kms / **8790 sdk**.
+
+**Hosted webclient** embeds MCP (same image): `https://casper-webclient.interchouette.net/mcp` (`ENABLE_MCP=1`). Slim `:2.2.2` image remains for Cursor stdio / dedicated `:8790`. Legacy `:2.2.2-mcp` is archived — use `:2.2.2`.
 
 ## Env
 
@@ -74,7 +76,7 @@ Complex inputs use JSON strings — see [TOOLS.md](TOOLS.md) and `tools/params.r
 | `casper-rust-wasm-sdk`              | HTTP `:8790/mcp` | Docker image via `make mcp-http` |
 | `casper-rust-wasm-sdk-stdio-docker` | stdio            | Same image (`docker run -i …`)   |
 
-Both use image `interchouette/casper-rust-wasm-sdk-mcp:2.2.2-mcp`. Cargo stdio is optional in [mcp.json.example](mcp.json.example) only (slow cold start).
+Both use image `interchouette/casper-rust-wasm-sdk-mcp:2.2.2`. Cargo stdio is optional in [mcp.json.example](mcp.json.example) only (slow cold start). Hosted: `https://casper-webclient.interchouette.net/mcp`.
 
 Prerequisite: `make mcp-docker-build` once; keep HTTP up with `make mcp-http`.
 

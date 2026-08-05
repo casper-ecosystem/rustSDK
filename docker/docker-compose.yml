@@ -4,6 +4,10 @@ services:
     container_name: casper-webclient
     ports:
       - "8080:8080"
+    environment:
+      ENABLE_MCP: ${ENABLE_MCP:-1}
+      CASPER_RPC_URL: ${CASPER_RPC_URL:-http://host.docker.internal:11101}
+      CASPER_NODE_URL: ${CASPER_NODE_URL:-host.docker.internal:28101}
     networks:
       - casper-network
 

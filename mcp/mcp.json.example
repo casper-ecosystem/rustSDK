@@ -19,7 +19,7 @@
         "RUST_LOG=warn",
         "--entrypoint",
         "casper-rust-wasm-sdk-mcp",
-        "interchouette/casper-rust-wasm-sdk-mcp:2.2.2-mcp"
+        "interchouette/casper-rust-wasm-sdk-mcp:2.2.2"
       ]
     },
     "casper-rust-wasm-sdk-stdio-cargo": {

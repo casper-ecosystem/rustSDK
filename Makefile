@@ -124,9 +124,10 @@ docker-deploy-prod:
 .PHONY: docker-build docker-start docker-stop docker-start-prod docker-stop-prod
 
 # --- MCP sidecar (mcp/ — path-depends on casper-rust-wasm-sdk) ---
+# Image tags match the crate version (2.2.2). Legacy :2.2.2-mcp is archived.
 
 MCP_NAME ?= casper-rust-wasm-sdk-mcp
-MCP_VERSION ?= 2.2.2-mcp
+MCP_VERSION ?= 2.2.2
 MCP_IMAGE ?= $(MCP_NAME):$(MCP_VERSION)
 MCP_HUB_IMAGE ?= interchouette/$(MCP_NAME)
 MCP_GHCR_PERSONAL_IMAGE ?= ghcr.io/groussac/$(MCP_NAME)
@@ -141,26 +142,33 @@ mcp-docker-build:
 	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build --network=host \
 		-t $(MCP_IMAGE) \
 		-t $(MCP_NAME):latest \
+		-t $(MCP_NAME):dev \
 		-t $(MCP_HUB_IMAGE):$(MCP_VERSION) \
 		-t $(MCP_HUB_IMAGE):latest \
+		-t $(MCP_HUB_IMAGE):dev \
 		-f mcp/Dockerfile \
 		.
 
 mcp-docker-push-hub:
 	docker push $(MCP_HUB_IMAGE):$(MCP_VERSION)
 	docker push $(MCP_HUB_IMAGE):latest
+	docker push $(MCP_HUB_IMAGE):dev
 
 mcp-docker-push-ghcr-personal:
 	docker tag $(MCP_HUB_IMAGE):$(MCP_VERSION) $(MCP_GHCR_PERSONAL_IMAGE):$(MCP_VERSION)
 	docker tag $(MCP_HUB_IMAGE):latest $(MCP_GHCR_PERSONAL_IMAGE):latest
+	docker tag $(MCP_HUB_IMAGE):dev $(MCP_GHCR_PERSONAL_IMAGE):dev
 	docker push $(MCP_GHCR_PERSONAL_IMAGE):$(MCP_VERSION)
 	docker push $(MCP_GHCR_PERSONAL_IMAGE):latest
+	docker push $(MCP_GHCR_PERSONAL_IMAGE):dev
 
 mcp-docker-push-ghcr-itc:
 	docker tag $(MCP_HUB_IMAGE):$(MCP_VERSION) $(MCP_GHCR_ORG_IMAGE):$(MCP_VERSION)
 	docker tag $(MCP_HUB_IMAGE):latest $(MCP_GHCR_ORG_IMAGE):latest
+	docker tag $(MCP_HUB_IMAGE):dev $(MCP_GHCR_ORG_IMAGE):dev
 	docker push $(MCP_GHCR_ORG_IMAGE):$(MCP_VERSION)
 	docker push $(MCP_GHCR_ORG_IMAGE):latest
+	docker push $(MCP_GHCR_ORG_IMAGE):dev
 
 mcp-docker-push: mcp-docker-push-hub mcp-docker-push-ghcr-personal mcp-docker-push-ghcr-itc
 

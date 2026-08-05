@@ -8,7 +8,10 @@ GIT_SHA=${GIT_SHA:-unknown}
 # Short sha for footer display
 GIT_SHA_SHORT=$(echo "$GIT_SHA" | cut -c1-7)
 
-echo "Entrypoint running. BASE_HREF=$BASE_HREF APP_VERSION=$APP_VERSION GIT_SHA=$GIT_SHA_SHORT"
+ENABLE_MCP=${ENABLE_MCP:-1}
+CASPER_SDK_MCP_ADDR=${CASPER_SDK_MCP_ADDR:-127.0.0.1:8790}
+
+echo "Entrypoint running. BASE_HREF=$BASE_HREF APP_VERSION=$APP_VERSION GIT_SHA=$GIT_SHA_SHORT ENABLE_MCP=$ENABLE_MCP"
 
 INDEX_FILE="/app/dist/index.html"
 CONFIG_FILE="/app/dist/config.js"
@@ -58,5 +61,42 @@ else
   echo "Added <base href> tag: $BASE_HREF"
 fi
 
-# Execute the original command (serve)
-exec "$@"
+mcp_enabled() {
+  [ "$ENABLE_MCP" = "1" ] || [ "$ENABLE_MCP" = "true" ]
+}
+
+start_mcp() {
+  if ! command -v casper-rust-wasm-sdk-mcp >/dev/null 2>&1; then
+    echo "[entrypoint] MCP binary missing; continuing without MCP" >&2
+    return 0
+  fi
+  echo "[entrypoint] starting MCP on ${CASPER_SDK_MCP_ADDR}" >&2
+  casper-rust-wasm-sdk-mcp --http --listen "${CASPER_SDK_MCP_ADDR}" &
+}
+
+# Optional: MCP-only mode (slim Cursor / stdio-adjacent HTTP)
+cmd="${1:-web}"
+if [ "$#" -gt 0 ]; then
+  shift
+fi
+
+case "$cmd" in
+  mcp)
+    exec casper-rust-wasm-sdk-mcp "$@"
+    ;;
+  web | serve)
+    if mcp_enabled; then
+      start_mcp
+      export ENABLE_MCP_PROXY=1
+      export MCP_UPSTREAM="http://${CASPER_SDK_MCP_ADDR}"
+    else
+      echo "[entrypoint] ENABLE_MCP=0 — web only" >&2
+      export ENABLE_MCP_PROXY=0
+    fi
+    exec node /app/serve.mjs
+    ;;
+  *)
+    # Back-compat: raw command (e.g. legacy `serve …`)
+    exec "$cmd" "$@"
+    ;;
+esac

@@ -21,12 +21,19 @@ services:
       # NETWORK_NODE_URL: Optional, overrides selected network's node_address
       # Example: ws://casper-nctl.casper-box:4300/?targetPort=28101&targetHost=...
       - NETWORK_NODE_URL=${NETWORK_NODE_URL:-}
+      # MCP in-process (evaluator-style). DISABLE with ENABLE_MCP=0.
+      - ENABLE_MCP=${ENABLE_MCP:-1}
+      - CASPER_RPC_URL=${CASPER_RPC_URL:-http://host.docker.internal:11101}
+      - CASPER_NODE_URL=${CASPER_NODE_URL:-host.docker.internal:28101}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - casper-network
 
   # Build and run image with Dockerfile
   # docker build -t casper-webclient . --force-rm
   # docker container run -t -i --rm -h casper-webclient -p 8080:8080 casper-webclient
+  # MCP via same host: http://localhost:8080/mcp
 
   cors-anywhere:
     image: cors-anywhere:latest
