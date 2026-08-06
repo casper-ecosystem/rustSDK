@@ -58,7 +58,10 @@ impl SDK {
 /// A set of functions for working with smart contract entry points.
 /// Alias of sdk.transaction
 impl SDK {
-    /// Calls a smart contract entry point with the specified parameters and returns the result.
+    /// Calls a smart contract entry point and returns the put result.
+    ///
+    /// Pins `VmCasperV1` (CEP-78 and other current stored fixtures). For VM2
+    /// contracts, use `transaction` with `set_runtime_v2` on builder params.
     ///
     /// # Arguments
     ///
@@ -75,11 +78,12 @@ impl SDK {
     /// Returns a `SdkError` if there is an error during the call.
     pub async fn call_entrypoint(
         &self,
-        builder_params: TransactionBuilderParams,
+        mut builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_PutTransactionResult>, SdkError> {
-        //log("call_entrypoint!");;
+        // Classic stored contracts (CEP-78, …) are VmCasperV1 wasm.
+        builder_params.set_runtime_v1();
         self.transaction(builder_params, transaction_params, None, rpc_address)
             .await
     }

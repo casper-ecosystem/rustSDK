@@ -232,8 +232,7 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (rpc_address, _, _, _, _) = get_network_constants();
 
-        let error_message =
-            "Failed to parse dictionary item address as a key: unknown prefix for key";
+        let error_message = "no dictionary item params set";
 
         let state_root_hash = "";
         let params = DictionaryItemStrParams::new();
