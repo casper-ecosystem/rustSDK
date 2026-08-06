@@ -101,21 +101,19 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const action =
       this.storageService.get('action') ||
       this.config['default_action'].toString();
-    this.stateService.setState({
-      action,
-    });
     try {
-      const tasks: Promise<unknown>[] = [
-        this.get_state_root_hash(no_mark_for_check),
-      ];
       if (action == this.config['default_action'].toString()) {
-        tasks.push(this.handleAction(action, true));
+        await this.handleAction(action, true);
       }
-      await Promise.all(tasks);
+      await this.get_state_root_hash(no_mark_for_check);
     } catch (error) {
       console.error(error);
       this.errorService.setError(error as string);
     }
+    this.stateService.setState({
+      action,
+    });
+    this.setStateSubscription();
   }
 
   async selectAction(action: string) {
