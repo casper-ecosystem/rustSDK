@@ -1178,7 +1178,7 @@ export class Key {
     static fromFormattedString(formatted_str: string): Key;
     static fromHash(key: HashAddr): Key;
     static fromSystemEntityRegistry(): Key;
-    static fromTransfer(key: Uint8Array): TransferAddr;
+    static fromTransfer(key: Uint8Array): Key;
     static fromURef(key: URef): Key;
     static fromUnbond(key: AccountHash): Key;
     static fromWithdraw(key: AccountHash): Key;
@@ -2773,10 +2773,30 @@ export class Transaction {
     addArg(js_value_arg: any, secret_key?: string | null): Transaction;
     addSignature(public_key: string, signature: string): Transaction;
     approvalsHash(): any;
+    /**
+     * Alias or package name for a by-name stored target (Deploy session when wrapped).
+     */
+    byName(): string | undefined;
+    /**
+     * True when the stored target (or Deploy session) is selected by name/alias.
+     */
+    isByName(): boolean;
+    /**
+     * True when the V1 target is a stored entity (`ByHash` / `ByName`), or the Deploy session is.
+     */
+    isStoredContract(): boolean;
+    /**
+     * True when the V1 target is a stored package, or the Deploy session is.
+     */
+    isStoredContractPackage(): boolean;
     constructor(transaction: any);
     static newSession(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams): Transaction;
     static newTransfer(maybe_source: URef | null | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string | null): Transaction;
     session_args(): any;
+    /**
+     * Bytesrepr session args, or an error when args are named.
+     */
+    session_args_bytes(): Bytes;
     sign(secret_key: string): Transaction;
     toJson(): any;
     verify(): boolean;
@@ -2787,6 +2807,11 @@ export class Transaction {
     withPackageHash(package_hash: PackageHash, secret_key?: string | null): Transaction;
     withPublicKey(public_key: PublicKey, secret_key?: string | null): Transaction;
     withSecretKey(secret_key?: string | null): Transaction;
+    /**
+     * Rebuild with `PaymentLimited` pricing (`standard_payment: true`), same role as Deploy's
+     * standard payment mutator.
+     */
+    withStandardPayment(amount: string, secret_key?: string | null): Transaction;
     withTTL(ttl: string, secret_key?: string | null): Transaction;
     withTimestamp(timestamp: string, secret_key?: string | null): Transaction;
     withTransactionBytes(transaction_bytes: Bytes, is_install_upgrade?: boolean | null, secret_key?: string | null): Transaction;
@@ -2801,6 +2826,8 @@ export class Transaction {
     readonly gas_price_tolerance: number;
     readonly hash: TransactionHash;
     readonly initiator_addr: string;
+    readonly is_bytesrepr: boolean;
+    readonly is_named: boolean;
     readonly is_native: boolean;
     readonly is_standard_payment: boolean;
     readonly payment_amount: bigint | undefined;
@@ -2830,6 +2857,14 @@ export class TransactionBuilderParams {
     static newTransfer(maybe_source: URef | null | undefined, target: TransferTarget, amount: string, maybe_id?: bigint | null): TransactionBuilderParams;
     static newUndelegate(delegator: PublicKey, validator: PublicKey, amount: string): TransactionBuilderParams;
     static newWithdrawBid(public_key: PublicKey, amount: string): TransactionBuilderParams;
+    /**
+     * Force VmCasperV1 (legacy).
+     */
+    setRuntimeV1(): void;
+    /**
+     * Set VmCasperV2. `seed` must be absent or exactly 32 bytes (invalid length is ignored).
+     */
+    setRuntimeV2(transferred_value: bigint, seed?: Uint8Array | null): void;
     get amount(): string | undefined;
     set amount(value: string);
     get delegation_rate(): number | undefined;
@@ -2842,6 +2877,14 @@ export class TransactionBuilderParams {
     set entity_hash(value: AddressableEntityHash);
     get entry_point(): string | undefined;
     set entry_point(value: string);
+    /**
+     * True when runtime resolves to VmCasperV1.
+     */
+    readonly isRuntimeV1: boolean;
+    /**
+     * True when runtime resolves to VmCasperV2.
+     */
+    readonly isRuntimeV2: boolean;
     get is_install_upgrade(): boolean | undefined;
     set is_install_upgrade(value: boolean);
     kind: TransactionKind;
@@ -2861,6 +2904,14 @@ export class TransactionBuilderParams {
     set package_hash(value: PackageHash);
     get public_key(): PublicKey | undefined;
     set public_key(value: PublicKey);
+    /**
+     * V2 installer seed bytes, if set.
+     */
+    readonly runtimeSeed: Uint8Array | undefined;
+    /**
+     * V2 `transferred_value`, or 0 for V1.
+     */
+    readonly runtimeTransferredValue: bigint;
     get target(): TransferTarget | undefined;
     set target(value: TransferTarget);
     get transaction_bytes(): Bytes | undefined;
@@ -3114,6 +3165,11 @@ export class Watcher {
  * Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
  */
 export function accountHashToBase64Key(formatted_account_hash: string): string;
+
+/**
+ * Maps `entity-contract-…` (or bare hex) to `hash-…` for AE-off global-state / contract-info queries.
+ */
+export function contractHashKeyForGlobalState(formatted: string): string;
 
 /**
  * Encodes the given metadata using the lower-level Blake2b hashing algorithm.
@@ -4074,6 +4130,7 @@ export interface InitOutput {
     readonly clvalue_fromURef: (a: number, b: number) => void;
     readonly clvalue_fromUnit: (a: number) => void;
     readonly clvalue_toJson: (a: number) => number;
+    readonly contractHashKeyForGlobalState: (a: number, b: number, c: number) => void;
     readonly contract_contractPackageHash: (a: number) => number;
     readonly contract_contractWasmHash: (a: number, b: number) => void;
     readonly contract_entryPoint: (a: number, b: number, c: number) => number;
@@ -4623,6 +4680,7 @@ export interface InitOutput {
     readonly transaction_approvals: (a: number) => number;
     readonly transaction_approvalsHash: (a: number) => number;
     readonly transaction_authorization_keys: (a: number) => number;
+    readonly transaction_byName: (a: number, b: number) => void;
     readonly transaction_chain_name: (a: number, b: number) => void;
     readonly transaction_entry_point: (a: number, b: number) => void;
     readonly transaction_expired: (a: number) => number;
@@ -4630,6 +4688,11 @@ export interface InitOutput {
     readonly transaction_gas_price_tolerance: (a: number) => number;
     readonly transaction_hash: (a: number) => number;
     readonly transaction_initiator_addr: (a: number, b: number) => void;
+    readonly transaction_isByName: (a: number) => number;
+    readonly transaction_isStoredContract: (a: number) => number;
+    readonly transaction_isStoredContractPackage: (a: number) => number;
+    readonly transaction_is_bytesrepr: (a: number) => number;
+    readonly transaction_is_named: (a: number) => number;
     readonly transaction_is_native: (a: number) => number;
     readonly transaction_is_standard_payment: (a: number) => number;
     readonly transaction_new: (a: number) => number;
@@ -4639,6 +4702,7 @@ export interface InitOutput {
     readonly transaction_pricing_mode: (a: number) => number;
     readonly transaction_receipt: (a: number) => number;
     readonly transaction_session_args: (a: number) => number;
+    readonly transaction_session_args_bytes: (a: number, b: number) => void;
     readonly transaction_sign: (a: number, b: number, c: number) => number;
     readonly transaction_signers: (a: number) => number;
     readonly transaction_size_estimate: (a: number) => number;
@@ -4654,6 +4718,7 @@ export interface InitOutput {
     readonly transaction_withPackageHash: (a: number, b: number, c: number, d: number) => number;
     readonly transaction_withPublicKey: (a: number, b: number, c: number, d: number) => number;
     readonly transaction_withSecretKey: (a: number, b: number, c: number) => number;
+    readonly transaction_withStandardPayment: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly transaction_withTTL: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly transaction_withTimestamp: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly transaction_withTransactionBytes: (a: number, b: number, c: number, d: number, e: number) => number;
@@ -4663,6 +4728,8 @@ export interface InitOutput {
     readonly transactionbuilderparams_entity_alias: (a: number, b: number) => void;
     readonly transactionbuilderparams_entity_hash: (a: number) => number;
     readonly transactionbuilderparams_entry_point: (a: number, b: number) => void;
+    readonly transactionbuilderparams_isRuntimeV1: (a: number) => number;
+    readonly transactionbuilderparams_isRuntimeV2: (a: number) => number;
     readonly transactionbuilderparams_is_install_upgrade: (a: number) => number;
     readonly transactionbuilderparams_kind: (a: number) => number;
     readonly transactionbuilderparams_maximum_delegation_amount: (a: number, b: number) => void;
@@ -4686,6 +4753,10 @@ export interface InitOutput {
     readonly transactionbuilderparams_package_alias: (a: number, b: number) => void;
     readonly transactionbuilderparams_package_hash: (a: number) => number;
     readonly transactionbuilderparams_public_key: (a: number) => number;
+    readonly transactionbuilderparams_runtimeSeed: (a: number, b: number) => void;
+    readonly transactionbuilderparams_runtimeTransferredValue: (a: number) => bigint;
+    readonly transactionbuilderparams_setRuntimeV1: (a: number) => void;
+    readonly transactionbuilderparams_setRuntimeV2: (a: number, b: bigint, c: number, d: number) => void;
     readonly transactionbuilderparams_set_amount: (a: number, b: number, c: number) => void;
     readonly transactionbuilderparams_set_delegation_rate: (a: number, b: number) => void;
     readonly transactionbuilderparams_set_delegator: (a: number, b: number) => void;
@@ -5007,14 +5078,14 @@ export interface InitOutput {
     readonly intounderlyingsink_write: (a: number, b: number) => number;
     readonly intounderlyingsource_cancel: (a: number) => void;
     readonly intounderlyingsource_pull: (a: number, b: number) => number;
-    readonly __wasm_bindgen_func_elem_13709: (a: number, b: number, c: number, d: number) => void;
-    readonly __wasm_bindgen_func_elem_13711: (a: number, b: number, c: number, d: number) => void;
-    readonly __wasm_bindgen_func_elem_9350: (a: number, b: number, c: number) => void;
-    readonly __wasm_bindgen_func_elem_6076: (a: number, b: number, c: number) => void;
-    readonly __wasm_bindgen_func_elem_6076_3: (a: number, b: number, c: number) => void;
-    readonly __wasm_bindgen_func_elem_6076_4: (a: number, b: number, c: number) => void;
-    readonly __wasm_bindgen_func_elem_9210: (a: number, b: number) => void;
-    readonly __wasm_bindgen_func_elem_6075: (a: number, b: number) => void;
+    readonly __wasm_bindgen_func_elem_13727: (a: number, b: number, c: number, d: number) => void;
+    readonly __wasm_bindgen_func_elem_13729: (a: number, b: number, c: number, d: number) => void;
+    readonly __wasm_bindgen_func_elem_9370: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_6118: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_6118_3: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_6118_4: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_9232: (a: number, b: number) => void;
+    readonly __wasm_bindgen_func_elem_6117: (a: number, b: number) => void;
     readonly __wbindgen_export: (a: number, b: number) => number;
     readonly __wbindgen_export2: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_export3: (a: number) => void;

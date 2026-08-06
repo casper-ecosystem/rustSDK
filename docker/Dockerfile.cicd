@@ -38,9 +38,8 @@ COPY ./examples/frontend/angular .
 COPY pkg pkg
 
 RUN rm -rf node_modules package-lock.json
-# Until pkg is npm copy files and change path to root
+# Until pkg is on npm: install from workspace-local copy
 RUN sed -i 's|\"casper-rust-wasm-sdk\": \"file:\(\.\.\/\)\+pkg\"|\"casper-rust-wasm-sdk\": \"file:pkg\"|' package.json
-RUN sed -i 's/"input": "\(\.\.\/\)\+pkg"/\"input": "pkg"/g' project.json
 
 RUN npm install --ignore-scripts --verbose && npm update
 

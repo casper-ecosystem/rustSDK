@@ -1178,7 +1178,7 @@ export class Key {
     static fromFormattedString(formatted_str: string): Key;
     static fromHash(key: HashAddr): Key;
     static fromSystemEntityRegistry(): Key;
-    static fromTransfer(key: Uint8Array): TransferAddr;
+    static fromTransfer(key: Uint8Array): Key;
     static fromURef(key: URef): Key;
     static fromUnbond(key: AccountHash): Key;
     static fromWithdraw(key: AccountHash): Key;
@@ -2773,10 +2773,30 @@ export class Transaction {
     addArg(js_value_arg: any, secret_key?: string | null): Transaction;
     addSignature(public_key: string, signature: string): Transaction;
     approvalsHash(): any;
+    /**
+     * Alias or package name for a by-name stored target (Deploy session when wrapped).
+     */
+    byName(): string | undefined;
+    /**
+     * True when the stored target (or Deploy session) is selected by name/alias.
+     */
+    isByName(): boolean;
+    /**
+     * True when the V1 target is a stored entity (`ByHash` / `ByName`), or the Deploy session is.
+     */
+    isStoredContract(): boolean;
+    /**
+     * True when the V1 target is a stored package, or the Deploy session is.
+     */
+    isStoredContractPackage(): boolean;
     constructor(transaction: any);
     static newSession(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams): Transaction;
     static newTransfer(maybe_source: URef | null | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string | null): Transaction;
     session_args(): any;
+    /**
+     * Bytesrepr session args, or an error when args are named.
+     */
+    session_args_bytes(): Bytes;
     sign(secret_key: string): Transaction;
     toJson(): any;
     verify(): boolean;
@@ -2787,6 +2807,11 @@ export class Transaction {
     withPackageHash(package_hash: PackageHash, secret_key?: string | null): Transaction;
     withPublicKey(public_key: PublicKey, secret_key?: string | null): Transaction;
     withSecretKey(secret_key?: string | null): Transaction;
+    /**
+     * Rebuild with `PaymentLimited` pricing (`standard_payment: true`), same role as Deploy's
+     * standard payment mutator.
+     */
+    withStandardPayment(amount: string, secret_key?: string | null): Transaction;
     withTTL(ttl: string, secret_key?: string | null): Transaction;
     withTimestamp(timestamp: string, secret_key?: string | null): Transaction;
     withTransactionBytes(transaction_bytes: Bytes, is_install_upgrade?: boolean | null, secret_key?: string | null): Transaction;
@@ -2801,6 +2826,8 @@ export class Transaction {
     readonly gas_price_tolerance: number;
     readonly hash: TransactionHash;
     readonly initiator_addr: string;
+    readonly is_bytesrepr: boolean;
+    readonly is_named: boolean;
     readonly is_native: boolean;
     readonly is_standard_payment: boolean;
     readonly payment_amount: bigint | undefined;
@@ -2830,6 +2857,14 @@ export class TransactionBuilderParams {
     static newTransfer(maybe_source: URef | null | undefined, target: TransferTarget, amount: string, maybe_id?: bigint | null): TransactionBuilderParams;
     static newUndelegate(delegator: PublicKey, validator: PublicKey, amount: string): TransactionBuilderParams;
     static newWithdrawBid(public_key: PublicKey, amount: string): TransactionBuilderParams;
+    /**
+     * Force VmCasperV1 (legacy).
+     */
+    setRuntimeV1(): void;
+    /**
+     * Set VmCasperV2. `seed` must be absent or exactly 32 bytes (invalid length is ignored).
+     */
+    setRuntimeV2(transferred_value: bigint, seed?: Uint8Array | null): void;
     get amount(): string | undefined;
     set amount(value: string);
     get delegation_rate(): number | undefined;
@@ -2842,6 +2877,14 @@ export class TransactionBuilderParams {
     set entity_hash(value: AddressableEntityHash);
     get entry_point(): string | undefined;
     set entry_point(value: string);
+    /**
+     * True when runtime resolves to VmCasperV1.
+     */
+    readonly isRuntimeV1: boolean;
+    /**
+     * True when runtime resolves to VmCasperV2.
+     */
+    readonly isRuntimeV2: boolean;
     get is_install_upgrade(): boolean | undefined;
     set is_install_upgrade(value: boolean);
     kind: TransactionKind;
@@ -2861,6 +2904,14 @@ export class TransactionBuilderParams {
     set package_hash(value: PackageHash);
     get public_key(): PublicKey | undefined;
     set public_key(value: PublicKey);
+    /**
+     * V2 installer seed bytes, if set.
+     */
+    readonly runtimeSeed: Uint8Array | undefined;
+    /**
+     * V2 `transferred_value`, or 0 for V1.
+     */
+    readonly runtimeTransferredValue: bigint;
     get target(): TransferTarget | undefined;
     set target(value: TransferTarget);
     get transaction_bytes(): Bytes | undefined;
@@ -3114,6 +3165,11 @@ export class Watcher {
  * Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
  */
 export function accountHashToBase64Key(formatted_account_hash: string): string;
+
+/**
+ * Maps `entity-contract-…` (or bare hex) to `hash-…` for AE-off global-state / contract-info queries.
+ */
+export function contractHashKeyForGlobalState(formatted: string): string;
 
 /**
  * Encodes the given metadata using the lower-level Blake2b hashing algorithm.

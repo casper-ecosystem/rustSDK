@@ -253,7 +253,7 @@ export class WasmModule {}
 
 You can look at a basic example of factory usage in the [Angular example app](examples/frontend/angular/libs/util/services/wasm/src/lib/wasm.factory.ts).
 
-Add the SDK Wasm file to the assets of your project with the path parameter being ` wasm_asset_path:'assets/casper_rust_wasm_sdk_bg.wasm'`, Angular will then copy the file from `pkg` in `assets` on build making it available for the fetch Wasm factory.
+Add the SDK Wasm file to the assets of your project with the path parameter being ` wasm_asset_path:'assets/casper_rust_wasm_sdk_bg.wasm'`. Angular copies it into `assets` on build for the fetch Wasm factory. From Angular 21.2 the asset `input` must stay inside the workspace root, so point at the installed package (for example `file:../../../pkg` → `node_modules/casper-rust-wasm-sdk`), not at `../../../pkg` directly.
 
 > project.json
 
@@ -261,7 +261,7 @@ Add the SDK Wasm file to the assets of your project with the path parameter bein
 "assets": [
   ...,
   {
-    "input": "pkg",
+    "input": "node_modules/casper-rust-wasm-sdk",
     "glob": "casper_rust_wasm_sdk_bg.wasm",
     "output": "assets"
   }

@@ -21,7 +21,7 @@
           "./src/favicon.png",
           "./src/assets",
           {
-            "input": "../../../pkg",
+            "input": "node_modules/casper-rust-wasm-sdk",
             "glob": "casper_rust_wasm_sdk_bg.wasm",
             "output": "assets"
           }
