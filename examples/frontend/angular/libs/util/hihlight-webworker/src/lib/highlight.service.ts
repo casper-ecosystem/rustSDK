@@ -32,4 +32,13 @@ export class HighlightService {
     this.webworker = factory[0] as Worker;
     this.hightlightWebworker = factory[1] as PromiseWorker;
   }
+
+  /** Optional teardown; highlightMessage keeps the worker warm by default. */
+  terminateWorker() {
+    if (!this.webworker) {
+      return;
+    }
+    this.webworker.terminate();
+    delete this.webworker;
+  }
 }
