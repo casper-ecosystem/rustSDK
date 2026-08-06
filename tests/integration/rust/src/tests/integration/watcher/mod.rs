@@ -314,8 +314,9 @@ mod tests {
 
     #[test]
     pub async fn test_watch_deploy_test() {
-        // Install + watch share this budget; watcher default timeout is also 60s.
-        let result = timeout(Duration::from_secs(120), test_watch_deploy()).await;
-        assert!(result.is_ok(), "Test timed out after 120 seconds");
+        // Wrap the test function with a timeout of 60 seconds
+        let result = timeout(Duration::from_secs(60), test_watch_deploy()).await;
+        // Assert whether the test completed within the timeout period
+        assert!(result.is_ok(), "Test timed out after 60 seconds");
     }
 }

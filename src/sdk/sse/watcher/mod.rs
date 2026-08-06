@@ -381,8 +381,8 @@ impl Watcher {
         }
 
         let client = reqwest::Client::new();
-        // Replay from the start of the node's event buffer so a TransactionProcessed
-        // emitted between put_deploy and SSE connect is still visible.
+        // Replay from event id 0 so a TransactionProcessed already emitted
+        // before connect is still visible (parity with SSEClient).
         let url = url_with_start_from(&self.events_url, Some(0));
 
         // TODO fix this warning
@@ -405,67 +405,107 @@ impl Watcher {
             }
         };
 
-        if response.status().is_success() {
-            let buffer_size = 1;
-            let mut buffer = Vec::with_capacity(buffer_size);
-
-            let mut bytes_stream = response.bytes_stream();
-            while let Some(chunk) = bytes_stream.next().await {
-                match chunk {
-                    Ok(bytes) => {
-                        let this_clone = Arc::clone(&watcher);
-                        if !*this_clone.lock().unwrap().active.lock().unwrap() {
-                            return None;
-                        }
-
-                        if Utc::now() - start_time >= timeout_duration {
-                            let event_parse_result = EventParseResult {
-                                err: Some("Timeout expired".to_string()),
-                                body: None,
-                            };
-                            return Some([event_parse_result].to_vec());
-                        }
-
-                        buffer.extend_from_slice(&bytes);
-
-                        while let Some(index) = buffer.iter().position(|&b| b == b'\n') {
-                            let message = buffer.drain(..=index).collect::<Vec<_>>();
-
-                            if let Ok(message) = std::str::from_utf8(&message) {
-                                let watcher_guard = this_clone.lock().unwrap();
-                                let result = watcher_guard
-                                    .clone()
-                                    .process_events(message, target_hash.as_deref());
-                                match result {
-                                    Some(event_parse_result) => return Some(event_parse_result),
-                                    None => {
-                                        continue;
-                                    }
-                                };
-                            } else {
-                                let event_parse_result = EventParseResult {
-                                    err: Some("Error decoding UTF-8 data".to_string()),
-                                    body: None,
-                                };
-                                return Some([event_parse_result].to_vec());
-                            }
-                        }
-                    }
-                    Err(err) => {
-                        let event_parse_result = EventParseResult {
-                            err: Some(format!("Error reading chunk: {err}")),
-                            body: None,
-                        };
-                        return Some([event_parse_result].to_vec());
-                    }
-                }
-            }
-        } else {
+        if !response.status().is_success() {
             let event_parse_result = EventParseResult {
                 err: Some("Failed to fetch stream".to_string()),
                 body: None,
             };
             return Some([event_parse_result].to_vec());
+        }
+
+        let buffer_size = 1;
+        let mut buffer = Vec::with_capacity(buffer_size);
+        let mut bytes_stream = response.bytes_stream();
+
+        loop {
+            let chunk = {
+                #[cfg(not(target_arch = "wasm32"))]
+                {
+                    let elapsed = Utc::now() - start_time;
+                    let remaining = timeout_duration - elapsed;
+                    if remaining <= Duration::zero() {
+                        return Some(
+                            [EventParseResult {
+                                err: Some("Timeout expired".to_string()),
+                                body: None,
+                            }]
+                            .to_vec(),
+                        );
+                    }
+                    let wait = std::time::Duration::from_millis(
+                        remaining.num_milliseconds().max(0) as u64,
+                    );
+                    match tokio::time::timeout(wait, bytes_stream.next()).await {
+                        Ok(chunk) => chunk,
+                        Err(_) => {
+                            return Some(
+                                [EventParseResult {
+                                    err: Some("Timeout expired".to_string()),
+                                    body: None,
+                                }]
+                                .to_vec(),
+                            );
+                        }
+                    }
+                }
+                #[cfg(target_arch = "wasm32")]
+                {
+                    bytes_stream.next().await
+                }
+            };
+
+            let Some(chunk) = chunk else {
+                break;
+            };
+
+            match chunk {
+                Ok(bytes) => {
+                    let this_clone = Arc::clone(&watcher);
+                    if !*this_clone.lock().unwrap().active.lock().unwrap() {
+                        return None;
+                    }
+
+                    if Utc::now() - start_time >= timeout_duration {
+                        let event_parse_result = EventParseResult {
+                            err: Some("Timeout expired".to_string()),
+                            body: None,
+                        };
+                        return Some([event_parse_result].to_vec());
+                    }
+
+                    buffer.extend_from_slice(&bytes);
+
+                    while let Some(index) = buffer.iter().position(|&b| b == b'\n') {
+                        let message = buffer.drain(..=index).collect::<Vec<_>>();
+
+                        if let Ok(message) = std::str::from_utf8(&message) {
+                            let watcher_guard = this_clone.lock().unwrap();
+                            let result = watcher_guard
+                                .clone()
+                                .process_events(message, target_hash.as_deref());
+                            match result {
+                                Some(event_parse_result) => return Some(event_parse_result),
+                                None => {
+                                    continue;
+                                }
+                            };
+                        } else {
+                            let event_parse_result = EventParseResult {
+                                err: Some("Error decoding UTF-8 data".to_string()),
+                                body: None,
+                            };
+                            return Some([event_parse_result].to_vec());
+                        }
+                    }
+                }
+                Err(err) => {
+                    let event_parse_result = EventParseResult {
+                        err: Some(format!("Error reading chunk: {err}")),
+                        body: None,
+                    };
+                    return Some([event_parse_result].to_vec());
+                }
+            }
         }
         None
     }
