@@ -23,34 +23,56 @@ export class ResultService {
     return this.result.asObservable();
   }
 
-  async setResult<T>(result: object | string) {
+  async setResult(result: object | string) {
     const generation = ++this.setResultGeneration;
-    const isString = typeof result === 'string';
-    // Strings skip the highlight worker (resultHtml is the raw string anyway).
-    if (isString) {
+    if (typeof result === 'string') {
       if (generation !== this.setResultGeneration) {
         return;
       }
       this.result.next({
-        result: result as string,
-        resultHtml: result as string,
+        result,
+        resultHtml: result,
       });
       return;
     }
-    const resultHtml = await this.highlightService.highlightMessage<T>(
-      result as T
-    );
+
+    // Yield so the shell (status bar, forms) can paint before stringify/highlight.
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+    if (generation !== this.setResultGeneration) {
+      return;
+    }
+
+    const pretty = JSON.stringify(result, null, 2);
+    if (generation !== this.setResultGeneration) {
+      return;
+    }
+    // Show plain JSON immediately; upgrade to highlighted HTML when the worker returns.
+    this.result.next({
+      result: pretty,
+      resultHtml: this.escapeHtml(pretty),
+    });
+
+    const resultHtml = await this.highlightService.highlightMessage(pretty);
     if (generation !== this.setResultGeneration) {
       return;
     }
     this.result.next({
-      result: JSON.stringify(result),
-      resultHtml,
+      result: pretty,
+      resultHtml: resultHtml || this.escapeHtml(pretty),
     });
   }
 
   copyClipboard(value: string) {
     this.window?.navigator.clipboard.writeText(value).catch(e => console.error(e));
+  }
+
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
 }

@@ -101,19 +101,22 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const action =
       this.storageService.get('action') ||
       this.config['default_action'].toString();
+    // Publish action immediately so the shell can render while RPCs run.
+    this.stateService.setState({
+      action,
+    });
     try {
+      // State root hash updates the status bar; do not wait on default
+      // get_node_status (toJson + highlight) before that finishes.
+      const stateRootHash = this.get_state_root_hash(no_mark_for_check);
       if (action == this.config['default_action'].toString()) {
-        await this.handleAction(action, true);
+        void this.handleAction(action, true);
       }
-      await this.get_state_root_hash(no_mark_for_check);
+      await stateRootHash;
     } catch (error) {
       console.error(error);
       this.errorService.setError(error as string);
     }
-    this.stateService.setState({
-      action,
-    });
-    this.setStateSubscription();
   }
 
   async selectAction(action: string) {
