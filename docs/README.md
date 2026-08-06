@@ -1027,9 +1027,19 @@ const signed_transaction = unsigned_transaction.sign(secret_key);
 <details>
     <summary><strong>SSEClient</strong> (full event stream) and <strong>CESParser</strong></summary>
 
-Feature `SSE` (enables `watcher`) exposes a JS-SDK-style node SSE client plus CES contract-event decode. Cargo `default`/`full` includes `watcher` only (`wait_transaction` / `watch_transaction`); enable `SSE` in Rust deps when you need `SSEClient` / `CESParser`. Wasm packs from `make web` / `make nodejs` include `SSE` so `pkg` and `pkg-nodejs` ship the full surface. Prefer `SSEClient` when you need continuous streams.
+Feature `SSE` (enables `watcher`) adds a JS-SDK-style node SSE client and a CES contract-event decoder. Cargo `default` / `full` includes `watcher` only (`wait_transaction` / `watch_transaction`). Enable `SSE` in Rust dependencies when you need `SSEClient` or `CESParser`. Wasm packs from `make web` / `make nodejs` already include `SSE`, so browser `pkg` and Node `pkg-nodejs` expose the full surface.
+
+How the pieces relate:
+
+- **Watcher** (`feature = "watcher"`): wait or watch until a given transaction or deploy is processed. Included in Cargo `full`.
+- **SSEClient** (`feature = "SSE"`): subscribe to or collect the node event stream (`ApiVersion`, `BlockAdded`, `TransactionProcessed`, …). Prefer this for continuous streams or bounded collects.
+- **CESParser** (`feature = "SSE"`): decode Casper Event Standard payloads from an execution result (`__events` / `__events_schema`). It does not replace the watcher; it consumes execution results you already obtained (for example from `wait_transaction` or `get_transaction`).
+
+CES only applies to contracts that publish CES schema named keys. For CEP-78 that means install-time `events_mode = 2` (CES). Mode `0` is no events; mode `1` is CEP47 (`events` dictionary) and is not readable by `CESParser`.
 
 #### Rust — SSEClient
+
+Developers using Rust can open an SSE client against a node events URL, subscribe by event name, and either run until `stop()` or collect a bounded batch (useful for scripts and MCP).
 
 ```rust
 use casper_rust_wasm_sdk::SSE::{EventName, SSEClient};
@@ -1049,7 +1059,7 @@ client
 // client.start(None).await.unwrap(); // runs until client.stop()
 ```
 
-Bounded collect (MCP / scripts):
+Bounded collect:
 
 ```rust
 let events = client
@@ -1057,6 +1067,8 @@ let events = client
     .await
     .unwrap();
 ```
+
+`start_from` / collect `Some(0)` requests the stream from the beginning of the node's retained buffer (same framing as the watcher).
 
 #### TypeScript — SSEClient
 
@@ -1079,6 +1091,8 @@ client.subscribe("TransactionProcessed", (raw) => {
 
 #### Rust — CESParser
 
+Load contract metadata (including `__events_schema`) via `query_global_state`, then parse transforms from an execution-result JSON string. Pass a `hash-…` or bare hex contract hash; if you only have an account named key of the form `entity-contract-…`, remap it to `hash-…` before create (same pattern as dictionary helpers when addressable entities are disabled).
+
 ```rust
 use casper_rust_wasm_sdk::SSE::CESParser;
 
@@ -1090,6 +1104,31 @@ let results = parser
     .unwrap();
 for r in results {
     println!("{} {:?}", r.event.name, r.error);
+}
+```
+
+Typical flow with the watcher: `wait_transaction` → take `execution_result` from the processed payload or from `get_transaction` → `parse_execution_result_json`. Prefer a mint (or other state-changing entry point) execution over a bare install when you need a CES event such as `Mint`.
+
+#### TypeScript — CESParser
+
+```ts
+import init, { SDK } from "casper-rust-wasm-sdk";
+
+await init();
+const sdk = new SDK("http://127.0.0.1:11101/rpc");
+
+const parser = await sdk.CES_parser(
+  ["hash-<contract-hash-hex>"],
+  null,
+  "http://127.0.0.1:11101/rpc",
+);
+console.log(parser.contractCount());
+
+const events = parser.parseExecutionResultJson(JSON.stringify(executionResult));
+for (const row of events) {
+  if (!row.error && row.event?.name) {
+    console.log(row.event.name, row.event);
+  }
 }
 ```
 
@@ -1243,6 +1282,8 @@ console.log(results);
 <details>
     <summary><strong><code>CEP-78</code></strong></summary>
 
+CEP-78 `events_mode` (u8): `0` NoEvents, `1` CEP47 (`events` dictionary), `2` CES (`__events` / `__events_schema`). Use `2` when you intend to decode events with `CESParser` (feature `SSE`).
+
 #### Install
 
 - <strong>Rust</strong>
@@ -1274,7 +1315,7 @@ pub const ARGS_JSON: &str = r#"[
 {"name": "nft_metadata_kind", "type": "U8", "value": 2},
 {"name": "identifier_mode", "type": "U8", "value": 0},
 {"name": "metadata_mutability", "type": "U8", "value": 0},
-{"name": "events_mode", "type": "U8", "value": 1}
+{"name": "events_mode", "type": "U8", "value": 2}
 ]"#;
 pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
 pub const CEP78_CONTRACT: &str = "cep78.wasm";
@@ -1371,7 +1412,7 @@ transaction_params.session_args_json = JSON.stringify([
   {"name": "nft_metadata_kind", "type": "U8", "value": 2},
   {"name": "identifier_mode", "type": "U8", "value": 0},
   {"name": "metadata_mutability", "type": "U8", "value": 0},
-  {"name": "events_mode", "type": "U8", "value": 1}
+  {"name": "events_mode", "type": "U8", "value": 2}
 ]);
 transaction_params.payment_amount = '500000000000';
 
@@ -2217,7 +2258,7 @@ pub const ARGS_JSON: &str = r#"[
 {"name": "nft_metadata_kind", "type": "U8", "value": 2},
 {"name": "identifier_mode", "type": "U8", "value": 0},
 {"name": "metadata_mutability", "type": "U8", "value": 0},
-{"name": "events_mode", "type": "U8", "value": 1}
+{"name": "events_mode", "type": "U8", "value": 2}
 ]"#;
 pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
 pub const CEP78_CONTRACT: &str = "cep78.wasm";
@@ -2310,7 +2351,7 @@ session_params.session_args_json = JSON.stringify([
   {"name": "nft_metadata_kind", "type": "U8", "value": 2},
   {"name": "identifier_mode", "type": "U8", "value": 0},
   {"name": "metadata_mutability", "type": "U8", "value": 0},
-  {"name": "events_mode", "type": "U8", "value": 1}
+  {"name": "events_mode", "type": "U8", "value": 2}
 ]);
 const payment_amount = '500000000000';
 

@@ -326,7 +326,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     { name: 'nft_metadata_kind', type: 'U8', value: 2 },
     { name: 'identifier_mode', type: 'U8', value: 0 },
     { name: 'metadata_mutability', type: 'U8', value: 0 },
-    { name: 'events_mode', type: 'U8', value: 1 },
+    { name: 'events_mode', type: 'U8', value: 2 },
   ]);
   transaction_params.payment_amount = '500000000000';
 
@@ -762,7 +762,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     { name: 'nft_metadata_kind', type: 'U8', value: 2 },
     { name: 'identifier_mode', type: 'U8', value: 0 },
     { name: 'metadata_mutability', type: 'U8', value: 0 },
-    { name: 'events_mode', type: 'U8', value: 1 },
+    { name: 'events_mode', type: 'U8', value: 2 },
   ]);
   const payment_amount = '500000000000';
 

@@ -18,7 +18,13 @@ import {
   get_block,
 } from './helpers';
 import puppeteer, { HTTPRequest } from 'puppeteer';
-import { SDK, Subscription } from 'casper-rust-wasm-sdk';
+import {
+  SDK,
+  Subscription,
+  TransactionStrParams,
+  TransactionBuilderParams,
+  AddressableEntityHash,
+} from 'casper-rust-wasm-sdk';
 
 describe('Angular App Tests', () => {
   beforeAll(async () => {
@@ -2638,6 +2644,44 @@ describe('Angular App Tests', () => {
 
   // Jest harness uses pkg-nodejs; reuse cep78 hash from earlier UI install when present.
   describe('SSE CES (SDK)', () => {
+    const findOkCesEvent = (events: any[]) =>
+      events.find(
+        (e: any) => !e.error && e.event?.name && e.event.name.length > 0
+      );
+
+    const parseCesFromTxHash = async (
+      sdk: SDK,
+      parser: any,
+      txHash: string
+    ) => {
+      const opts = sdk.get_transaction_options({
+        transaction_hash_as_string: txHash,
+        finalized_approvals: true,
+      });
+      const tx = await sdk.get_transaction(opts);
+      const txJson = tx.toJson() as any;
+      const execution =
+        txJson?.execution_info?.execution_result ?? txJson?.execution_result;
+      if (!execution) {
+        return undefined;
+      }
+      const events = parser.parseExecutionResultJson(JSON.stringify(execution));
+      expect(Array.isArray(events)).toBe(true);
+      return findOkCesEvent(events);
+    };
+
+    const toAddressableEntityHash = (key: string) => {
+      let formatted = key;
+      if (formatted.startsWith('entity-contract-')) {
+        formatted = formatted.replace('entity-contract-', 'addressable-entity-');
+      } else if (formatted.startsWith('hash-')) {
+        formatted = formatted.replace('hash-', 'addressable-entity-');
+      } else if (!formatted.startsWith('addressable-entity-')) {
+        formatted = `addressable-entity-${formatted}`;
+      }
+      return AddressableEntityHash.fromFormattedStr(formatted);
+    };
+
     it('should expose SSE_client and CES_parser', () => {
       const sdk = new SDK(config.rpc_address);
       expect(typeof (sdk as any).SSE_client).toBe('function');
@@ -2645,7 +2689,7 @@ describe('Angular App Tests', () => {
     });
 
     it(
-      'should CES_parser create for installed cep78 and parse install execution',
+      'should CES_parser create for installed cep78 and parse mint execution',
       async () => {
         const sdk = new SDK(config.rpc_address);
 
@@ -2661,6 +2705,7 @@ describe('Angular App Tests', () => {
           const entity =
             named.find((k: any) => k.name === config.contract_cep78_key)?.key ||
             '';
+          test.contract_cep78_entity = entity;
           contractHash = entity.replace('entity-contract', 'hash');
           test.contract_cep78_hash = contractHash;
         }
@@ -2673,27 +2718,54 @@ describe('Angular App Tests', () => {
         );
         expect(parser.contractCount()).toBeGreaterThanOrEqual(1);
 
-        // Parse when an install/mint hash is already available from the suite.
-        if (!test.transaction_hash) {
-          return;
+        // Prefer suite install/mint hash; install often has no CES dict transforms.
+        if (test.transaction_hash) {
+          const fromInstall = await parseCesFromTxHash(
+            sdk,
+            parser,
+            test.transaction_hash
+          );
+          if (fromInstall) {
+            return;
+          }
         }
-        const opts = sdk.get_transaction_options({
-          transaction_hash_as_string: test.transaction_hash,
-          finalized_approvals: true,
-        });
-        const tx = await sdk.get_transaction(opts);
-        const txJson = tx.toJson() as any;
-        const execution =
-          txJson?.execution_info?.execution_result ?? txJson?.execution_result;
-        expect(execution).toBeDefined();
-        const events = parser.parseExecutionResultJson(JSON.stringify(execution));
-        expect(Array.isArray(events)).toBe(true);
-        const ok = events.find(
-          (e: any) => !e.error && e.event?.name && e.event.name.length > 0
+
+        // One mint only (no re-install); same pattern as integration CES happy path.
+        expect(test.secret_key).toBeTruthy();
+        expect(test.account).toBeTruthy();
+        expect(test.account_hash).toBeTruthy();
+        const entityKey = test.contract_cep78_entity || contractHash;
+        const transaction_params = new TransactionStrParams(
+          config.chain_name,
+          test.account,
+          test.secret_key
         );
+        transaction_params.payment_amount = config.payment_amount;
+        transaction_params.session_args_simple = [
+          "token_meta_data:String='test_meta_data_ces_e2e'",
+          `token_owner:Key='${test.account_hash}'`,
+        ];
+        const builder_params = TransactionBuilderParams.newInvocableEntity(
+          toAddressableEntityHash(entityKey),
+          config.entrypoint
+        );
+        const put = await sdk.call_entrypoint(
+          builder_params,
+          transaction_params,
+          config.rpc_address
+        );
+        const putJson = put.toJson() as any;
+        const mintHash =
+          putJson?.transaction_hash?.Version1?.toString?.() ||
+          putJson?.transaction_hash?.toString?.() ||
+          String(putJson?.transaction_hash || '');
+        expect(mintHash).toBeTruthy();
+        await sdk.waitTransaction(config.events_address, mintHash, 60000);
+
+        const ok = await parseCesFromTxHash(sdk, parser, mintHash);
         expect(ok).toBeDefined();
       },
-      60000
+      90000
     );
   });
 
