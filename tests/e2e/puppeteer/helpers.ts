@@ -96,11 +96,35 @@ export async function sign() {
   await variables.page.click('[e2e-id="sign"]');
 }
 
-export async function getResult() {
+export async function getResult(options?: { existingOk?: boolean }) {
   if (!variables.page) {
     throw new Error('Puppeteer page is not initialized.');
   }
-  await variables.page.waitForSelector('[e2e-id="result"]');
+  if (options?.existingOk) {
+    await variables.page.waitForSelector('[e2e-id="result"]');
+    const existing = await variables.page.evaluate(() => {
+      return document.querySelector('[e2e-id="result"]')?.textContent;
+    });
+    expect(existing).toBeDefined();
+    return existing;
+  }
+  // submit() only clicks; Angular cleanResult() can clear the prior pane
+  // after a naive waitForSelector would already have matched it.
+  const previous = await variables.page.evaluate(() => {
+    return document.querySelector('[e2e-id="result"]')?.textContent ?? null;
+  });
+  await variables.page.waitForFunction(
+    (prev) => {
+      const text =
+        document.querySelector('[e2e-id="result"]')?.textContent ?? null;
+      if (text == null || text.length === 0) {
+        return false;
+      }
+      return text !== prev;
+    },
+    {},
+    previous
+  );
   const result = await variables.page.evaluate(() => {
     return document.querySelector('[e2e-id="result"]')?.textContent;
   });

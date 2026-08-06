@@ -89,7 +89,7 @@ describe('Angular App Tests', () => {
         ).value;
       });
       expect(action).toBe('get_node_status');
-      await getResult();
+      await getResult({ existingOk: true });
     });
 
     it('should have chain_name and rpc_address', async () => {
