@@ -25,6 +25,7 @@ export class ResultService {
 
   async setResult(result: object | string) {
     const generation = ++this.setResultGeneration;
+    // Strings (clear / empty) skip the highlight worker.
     if (typeof result === 'string') {
       if (generation !== this.setResultGeneration) {
         return;
@@ -35,44 +36,18 @@ export class ResultService {
       });
       return;
     }
-
-    // Yield so the shell (status bar, forms) can paint before stringify/highlight.
-    await new Promise<void>((resolve) => {
-      requestAnimationFrame(() => resolve());
-    });
-    if (generation !== this.setResultGeneration) {
-      return;
-    }
-
-    const pretty = JSON.stringify(result, null, 2);
-    if (generation !== this.setResultGeneration) {
-      return;
-    }
-    // Show plain JSON immediately; upgrade to highlighted HTML when the worker returns.
-    this.result.next({
-      result: pretty,
-      resultHtml: this.escapeHtml(pretty),
-    });
-
-    const resultHtml = await this.highlightService.highlightMessage(pretty);
+    const resultHtml = await this.highlightService.highlightMessage(result);
     if (generation !== this.setResultGeneration) {
       return;
     }
     this.result.next({
-      result: pretty,
-      resultHtml: resultHtml || this.escapeHtml(pretty),
+      result: JSON.stringify(result),
+      resultHtml,
     });
   }
 
   copyClipboard(value: string) {
     this.window?.navigator.clipboard.writeText(value).catch(e => console.error(e));
-  }
-
-  private escapeHtml(value: string): string {
-    return value
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
   }
 
 }
