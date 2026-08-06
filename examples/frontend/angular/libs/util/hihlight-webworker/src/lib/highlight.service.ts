@@ -15,7 +15,7 @@ export class HighlightService {
   async highlightMessage<T>(message: T): Promise<string> {
     this.activateWorker();
     const hightlight = this.hightlightWebworker && await this.hightlightWebworker.postMessage<string, T>(message)
-      .catch((error) => {
+      .catch((error: unknown) => {
         console.error(error);
       });
     this.terminateWorker();
