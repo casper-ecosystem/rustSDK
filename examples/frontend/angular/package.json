@@ -52,7 +52,7 @@
     "@typescript-eslint/utils": "^8.66.0",
     "angular-eslint": "~22.1.0",
     "concurrently": "^10.0.4",
-    "eslint": "~9.39.2",
+    "eslint": "~10.8.0",
     "eslint-config-prettier": "10.1.8",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
@@ -61,7 +61,6 @@
     "jsonc-eslint-parser": "^3.2.0",
     "nx": "23.1.1",
     "prettier": "^3.9.6",
-    "ts-jest": "^29.4.12",
     "ts-node": "~10.9.2",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.66.0"
@@ -84,6 +83,9 @@
     },
     "@hono/node-server": "2.1.0",
     "@modelcontextprotocol/sdk": "1.30.0",
-    "uuid": "11.1.1"
+    "uuid": "11.1.1",
+    "ts-jest": {
+      "@babel/core": "7.29.7"
+    }
   }
 }
