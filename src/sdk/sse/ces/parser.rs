@@ -538,6 +538,13 @@ mod tests {
     }
 
     #[test]
+    fn parse_event_name_rejects_missing_prefix() {
+        let bytes = "Transfer".to_string().to_bytes().unwrap();
+        let err = parse_event_name_with_remainder(&bytes).unwrap_err();
+        assert!(err.contains("event_"));
+    }
+
+    #[test]
     fn schemas_roundtrip_empty() {
         let schemas = Schemas(BTreeMap::new());
         let bytes = schemas.to_bytes().unwrap();
@@ -560,5 +567,47 @@ mod tests {
         let (decoded, _) = Schemas::from_bytes(&bytes).unwrap();
         assert!(decoded.get("Transfer").is_some());
         assert_eq!(decoded.get("Transfer").unwrap().fields().len(), 2);
+    }
+
+    #[test]
+    fn parser_new_is_empty() {
+        let parser = CESParser::new();
+        assert_eq!(parser.contract_count(), 0);
+    }
+
+    #[test]
+    fn parse_execution_result_json_rejects_invalid_json() {
+        let parser = CESParser::new();
+        assert!(parser.parse_execution_result_json("not-json").is_err());
+    }
+
+    #[test]
+    fn parse_execution_result_requires_effects() {
+        let parser = CESParser::new();
+        let err = parser
+            .parse_execution_result_json(r#"{"Success":{"cost":"1"}}"#)
+            .unwrap_err();
+        assert!(err.contains("effects") || err.contains("transforms"));
+    }
+
+    #[test]
+    fn parse_transaction_processed_requires_execution_result() {
+        let parser = CESParser::new();
+        let err = parser
+            .parse_transaction_processed_json(r#"{"hash":"abc"}"#)
+            .unwrap_err();
+        assert!(err.contains("execution_result"));
+    }
+
+    #[test]
+    fn parse_execution_result_skips_non_dictionary_transforms() {
+        let parser = CESParser::new();
+        let json = r#"{
+            "effects": [
+                {"key": "account-hash-00", "transform": "Identity"}
+            ]
+        }"#;
+        let events = parser.parse_execution_result_json(json).unwrap();
+        assert!(events.is_empty());
     }
 }

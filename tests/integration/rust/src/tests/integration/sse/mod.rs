@@ -27,6 +27,23 @@ pub mod test_module {
         );
         assert!(!events[0].data.is_empty());
     }
+
+    /// CESParser::create against a non-contract hash must fail (RPC/schema path).
+    pub async fn test_ces_parser_create_rejects_missing_contract() {
+        let config: TestConfig = get_config(true).await;
+        let sdk = create_test_sdk(Some(config.clone()));
+        let missing =
+            "0000000000000000000000000000000000000000000000000000000000000001".to_string();
+        let err = casper_rust_wasm_sdk::SSE::CESParser::create(
+            &sdk,
+            &[missing],
+            None,
+            config.rpc_address.clone(),
+        )
+        .await
+        .expect_err("CESParser::create should fail for missing contract");
+        assert!(!err.is_empty());
+    }
 }
 
 #[cfg(test)]
@@ -38,9 +55,15 @@ mod tests {
 
     #[test]
     pub async fn test_sse_collect_start_from_zero_test() {
+        let result = timeout(Duration::from_secs(30), test_sse_collect_start_from_zero()).await;
+        assert!(result.is_ok(), "Test timed out after 30 seconds");
+    }
+
+    #[test]
+    pub async fn test_ces_parser_create_rejects_missing_contract_test() {
         let result = timeout(
             Duration::from_secs(30),
-            test_sse_collect_start_from_zero(),
+            test_ces_parser_create_rejects_missing_contract(),
         )
         .await;
         assert!(result.is_ok(), "Test timed out after 30 seconds");

@@ -78,7 +78,7 @@ clean:
 	cargo clean
 
 test:
-	cargo test -- --test-threads=1 --nocapture
+	cargo test --features SSE -- --test-threads=1 --nocapture
 
 integration-test:
 	cd tests/integration/rust && cargo test -- --test-threads=1 --nocapture
