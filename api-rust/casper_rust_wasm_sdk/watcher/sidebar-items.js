@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["watcher"],"struct":["Body","EventHandlerFn","EventParseResult","ExecutionResult","Failure","HashString","Message","Messages","Payment","PublicKeyString","Subscription","TransactionProcessed","Version2","Watcher"]};
+window.SIDEBAR_ITEMS = {"struct":["Body","EventHandlerFn","EventParseResult","ExecutionResult","Failure","HashString","Message","Messages","Payment","PublicKeyString","Subscription","TransactionProcessed","Version2","Watcher"]};
