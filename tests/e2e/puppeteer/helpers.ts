@@ -35,12 +35,12 @@ export async function clear() {
   }
   await variables.page.waitForSelector('[e2e-id="clear result"]');
   await variables.page.click('[e2e-id="clear result"]');
+  // Wait for the result pane itself (not only the clear control) so a late
+  // highlight of a prior setResult cannot leave stale JSON in the DOM.
   await variables.page.waitForFunction(
-    () => !document.querySelector('[e2e-id="clear result"]')
+    () => !document.querySelector('[e2e-id="result"]')
   );
-  // wait for document to refresh
-  await delay(1000);
-  let result = await variables.page.evaluate(() => {
+  const result = await variables.page.evaluate(() => {
     return document.querySelector('[e2e-id="result"]')?.textContent;
   });
   expect(result).toBeUndefined();

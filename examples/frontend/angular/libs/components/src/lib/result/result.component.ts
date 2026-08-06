@@ -59,6 +59,7 @@ export class ResultComponent implements AfterViewInit, OnDestroy {
   reset() {
     this.result = '';
     this.resultHtml = '';
-    this.resultService.setResult('');
+    this.changeDetectorRef.markForCheck();
+    void this.resultService.setResult('');
   }
 }
