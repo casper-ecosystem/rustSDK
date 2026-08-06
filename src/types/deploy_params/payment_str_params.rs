@@ -241,16 +241,6 @@ pub fn payment_str_params_to_casper_client(
         );
     }
 
-    if let Some(payment_package_name) = payment_params.payment_entry_point.get() {
-        return _PaymentStrParams::with_package_name(
-            payment_package_name.as_str(),
-            get_str_or_default(payment_params.payment_version.get()),
-            get_str_or_default(payment_params.payment_entry_point.get()),
-            payment_args_simple,
-            get_str_or_default(payment_params.payment_args_json.get()),
-        );
-    }
-
     // Default to the Payment amount
     _PaymentStrParams::with_amount(get_str_or_default(payment_params.payment_amount.get()))
 }
@@ -269,32 +259,67 @@ mod tests {
 
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_hash("hash_value");
+        payment_params.set_payment_entry_point("call");
+        payment_params
+            .payment_args_simple
+            .set(ArgsSimple::from(vec!["foo:String='bar'".to_string()]))
+            .unwrap();
         let result = payment_str_params_to_casper_client(&payment_params);
         let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("payment_hash: \"hash_value\""));
+        assert!(result_debug_output.contains("payment_entry_point: \"call\""));
+        assert!(result_debug_output.contains("foo:String='bar'"));
 
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_name("name_value");
+        payment_params.set_payment_entry_point("entry");
+        payment_params.set_payment_args_json(r#"[{"name":"x","type":"U64","value":1}]"#);
         let result = payment_str_params_to_casper_client(&payment_params);
         let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("payment_name: \"name_value\""));
+        assert!(result_debug_output.contains("payment_entry_point: \"entry\""));
+        assert!(result_debug_output.contains("payment_args_json:"));
 
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_package_hash("package_hash_value");
+        payment_params.set_payment_version("2");
+        payment_params.set_payment_entry_point("pay");
         let result = payment_str_params_to_casper_client(&payment_params);
         let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("payment_package_hash: \"package_hash_value\""));
+        assert!(result_debug_output.contains("payment_version: \"2\""));
+        assert!(result_debug_output.contains("payment_entry_point: \"pay\""));
 
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_package_name("package_name_value");
+        payment_params.set_payment_version("3");
+        payment_params.set_payment_entry_point("pay_named");
         let result = payment_str_params_to_casper_client(&payment_params);
         let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("payment_package_name: \"package_name_value\""));
+        assert!(result_debug_output.contains("payment_version: \"3\""));
+        assert!(result_debug_output.contains("payment_entry_point: \"pay_named\""));
 
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_path("path_value");
+        payment_params.set_payment_args_json("[]");
         let result = payment_str_params_to_casper_client(&payment_params);
         let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("payment_path: \"path_value\""));
+        assert!(result_debug_output.contains("payment_args_json: \"[]\""));
+    }
+
+    #[test]
+    fn lone_payment_entry_point_does_not_become_package_name() {
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_entry_point("orphan_entry");
+        payment_params.set_payment_amount("2500000000");
+        let result = payment_str_params_to_casper_client(&payment_params);
+        let result_debug_output = format!("{result:?}");
+        assert!(
+            !result_debug_output.contains("payment_package_name: \"orphan_entry\""),
+            "entry_point alone must not map to with_package_name: {result_debug_output}"
+        );
+        assert!(result_debug_output.contains("payment_amount: \"2500000000\""));
     }
 }

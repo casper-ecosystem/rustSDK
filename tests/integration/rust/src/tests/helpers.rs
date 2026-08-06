@@ -1,9 +1,9 @@
 use self::intern::{create_test_sdk, install_cep78};
 use crate::config::{
     CONTRACT_CEP78_KEY, DEFAULT_CHAIN_NAME, DEFAULT_ENABLE_ADDRESSABLE_ENTITY,
-    DEFAULT_EVENTS_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_RPC_ADDRESS, DEFAULT_SECRET_KEY_NAME,
-    DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PACKAGE_CEP78_KEY, PAYMENT_AMOUNT,
-    SPECULATIVE_ADDRESS,
+    DEFAULT_EVENTS_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_NODE_SECRET_KEY_NCTL_PATH,
+    DEFAULT_RPC_ADDRESS, DEFAULT_SECRET_KEY_NAME, DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT,
+    PACKAGE_CEP78_KEY, PAYMENT_AMOUNT, SPECULATIVE_ADDRESS,
 };
 use casper_rust_wasm_sdk::{
     rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams},
@@ -342,6 +342,40 @@ pub fn get_user_secret_key(user: Option<&str>) -> Result<String, std::io::Error>
     read_pem_file(&user_key_path, &secret_key_name)
 }
 
+/// Load an NCTL node validator PEM (`node-1` default).
+///
+/// Resolves `SECRET_KEY_NODE_*` env, then `SECRET_KEY_NCTL_NODE_PATH`, then
+/// path derived from the user NCTL path / [`DEFAULT_NODE_SECRET_KEY_NCTL_PATH`].
+/// Does not panic when the file is missing (CI often mounts users only).
+pub fn get_node_validator_secret_key(node: Option<&str>) -> Result<String, std::io::Error> {
+    let node = node.unwrap_or("node-1");
+    let env_key = get_env_key(node);
+    if !env_key.is_empty() {
+        return Ok(env_key);
+    }
+
+    let secret_key_name =
+        env::var("SECRET_KEY_NAME").unwrap_or_else(|_| DEFAULT_SECRET_KEY_NAME.to_string());
+    let node_key_path = env::var("SECRET_KEY_NCTL_NODE_PATH").unwrap_or_else(|_| {
+        let (user_path, _) = get_secret_key_constants();
+        if user_path.contains("users/user-1") {
+            user_path
+                .replace("users/user-1", &format!("nodes/{node}/keys"))
+                .to_string()
+        } else if user_path.contains("users/user-1/") {
+            user_path
+                .replace("users/user-1/", &format!("nodes/{node}/keys/"))
+                .to_string()
+        } else {
+            DEFAULT_NODE_SECRET_KEY_NCTL_PATH
+                .replace("node-1", node)
+                .to_string()
+        }
+    });
+
+    read_pem_file_optional(&node_key_path, &secret_key_name)
+}
+
 fn get_secret_key_constants() -> (String, String) {
     let secret_key_name =
         env::var("SECRET_KEY_NAME").unwrap_or_else(|_| DEFAULT_SECRET_KEY_NAME.to_string());
@@ -370,6 +404,16 @@ pub fn get_enable_addressable_entity() -> bool {
 }
 
 fn read_pem_file(file_path: &str, secret_key_name: &str) -> Result<String, io::Error> {
+    match read_pem_file_optional(file_path, secret_key_name) {
+        Ok(contents) => Ok(contents),
+        Err(err) => {
+            eprintln!("{err} {file_path}");
+            panic!();
+        }
+    }
+}
+
+fn read_pem_file_optional(file_path: &str, secret_key_name: &str) -> Result<String, io::Error> {
     let path_buf = env::current_dir()?;
 
     let relative_path = path_buf
@@ -379,13 +423,7 @@ fn read_pem_file(file_path: &str, secret_key_name: &str) -> Result<String, io::E
     relative_path_buf.push(file_path);
     relative_path_buf.push(secret_key_name);
 
-    let mut file = match File::open(&relative_path_buf) {
-        Ok(file) => file,
-        Err(err) => {
-            eprintln!("{err} {file_path}");
-            panic!();
-        }
-    };
+    let mut file = File::open(&relative_path_buf)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
     Ok(contents)

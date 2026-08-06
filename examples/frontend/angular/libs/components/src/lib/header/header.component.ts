@@ -186,7 +186,7 @@ export class HeaderComponent implements AfterViewInit {
     );
     if (customNetwork) {
       customNetwork.rpc_address = this.rpc_address;
-      //  customNetwork.node_address = this.node_address;
+      customNetwork.node_address = this.node_address;
       this.sdk.setRPCAddress(this.rpc_address);
       this.sdk.setNodeAddress(this.node_address);
       this.stateService.setState({

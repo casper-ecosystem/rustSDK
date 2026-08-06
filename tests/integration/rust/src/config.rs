@@ -20,6 +20,9 @@ pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 // read_pem_file will look SECRET_KEY_NAME to root directory if relative path is not found (relative to root)
 pub const DEFAULT_SECRET_KEY_NCTL_PATH: &str =
     "../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/";
+/// Default NCTL node-1 validator key dir (sibling of users/ under net-1).
+pub const DEFAULT_NODE_SECRET_KEY_NCTL_PATH: &str =
+    "../NCTL/casper-node/utils/nctl/assets/net-1/nodes/node-1/keys/";
 pub const WASM_PATH: &str = "./tests/wasm/";
 pub const DEFAULT_TTL: &str = "30m";
 pub const TTL: &str = "1h";

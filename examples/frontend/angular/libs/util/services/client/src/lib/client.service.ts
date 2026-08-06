@@ -46,7 +46,7 @@ export class ClientService {
   private deploy_json!: string;
   private transaction_json!: string;
   private select_dict_identifier!: string;
-  private verbosity = Verbosity.High;
+  private verbosity = this.config['verbosity'] as Verbosity;
 
   constructor(
     @Inject(CONFIG) public readonly config: EnvironmentConfig,

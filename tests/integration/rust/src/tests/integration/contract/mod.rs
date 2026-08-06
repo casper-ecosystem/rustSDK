@@ -6,6 +6,7 @@ pub mod test_module {
             ENTRYPOINT_MINT, HELLO_CONTRACT, PAYMENT_AMOUNT, TTL, WASM_PATH,
         },
         tests::helpers::{
+            get_enable_addressable_entity,
             intern::{create_test_sdk, get_dictionnary_key},
             read_wasm_file,
         },
@@ -263,6 +264,21 @@ pub mod test_module {
         let result = query_result.unwrap().result;
 
         assert!(!result.api_version.to_string().is_empty());
+        // CEP-78 "installer" named key: Account under AE-off, AddressableEntity(Account) under AE-on.
+        let stored = casper_rust_wasm_sdk::types::stored_value::StoredValue::from(
+            result.stored_value.clone(),
+        );
+        if get_enable_addressable_entity() {
+            let entity = stored
+                .as_addressable_entity()
+                .expect("installer should be an addressable entity when AE is enabled");
+            assert_eq!(entity.entity_kind(), "Account");
+        } else {
+            assert!(
+                stored.as_account().is_some(),
+                "installer should resolve to Account when AE is disabled"
+            );
+        }
     }
 
     pub async fn test_call_entrypoint_transaction() {

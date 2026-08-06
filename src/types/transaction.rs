@@ -29,13 +29,13 @@ use casper_types::PricingMode as _PricingMode;
 use casper_types::{
     account::AccountHash as _AccountHash, bytesrepr::Bytes as _Bytes,
     AddressableEntityHash as _AddressableEntityHash, PackageHash as _PackageHash,
-    PublicKey as _PublicKey, SecretKey, TimeDiff, TransactionInvocationTarget,
-    TransferTarget as _TransferTarget, URef as _URef, U512,
+    PublicKey as _PublicKey, SecretKey, TimeDiff, TransferTarget as _TransferTarget, URef as _URef,
+    U512,
 };
 use casper_types::{
     bytesrepr, Approval, ApprovalsHash, AsymmetricType, Deploy, GasLimited, InitiatorAddr,
     RuntimeArgs, Timestamp, Transaction as _Transaction, TransactionArgs, TransactionEntryPoint,
-    TransactionTarget, TransactionV1,
+    TransactionInvocationTarget, TransactionTarget, TransactionV1,
 };
 use chrono::{DateTime, Utc};
 #[cfg(target_arch = "wasm32")]
@@ -277,6 +277,33 @@ impl Transaction {
         self.rebuild(
             RebuildOverrides {
                 secret_key,
+                ..Default::default()
+            },
+            NewBuilderParams::default(),
+        )
+    }
+
+    /// Rebuild with `PaymentLimited` pricing (`standard_payment: true`), same role as Deploy's
+    /// standard payment mutator.
+    #[cfg(feature = "transaction")]
+    #[wasm_bindgen(js_name = "withStandardPayment")]
+    pub fn with_standard_payment(&self, amount: &str, secret_key: Option<String>) -> Transaction {
+        let payment_amount = match amount.parse::<u64>() {
+            Ok(value) => value,
+            Err(err) => {
+                error(&format!("Error converting amount: {err:?}"));
+                return self.clone();
+            }
+        };
+        let pricing_mode = _PricingMode::PaymentLimited {
+            payment_amount,
+            gas_price_tolerance: self.gas_price_tolerance(),
+            standard_payment: true,
+        };
+        self.rebuild(
+            RebuildOverrides {
+                secret_key,
+                pricing_mode: Some(pricing_mode),
                 ..Default::default()
             },
             NewBuilderParams::default(),
@@ -584,6 +611,76 @@ impl Transaction {
         initiator_addr.account_hash().into()
     }
 
+    /// True when the V1 target is a stored entity (`ByHash` / `ByName`), or the Deploy session is.
+    #[wasm_bindgen(js_name = "isStoredContract")]
+    pub fn is_stored_contract(&self) -> bool {
+        match &self.0 {
+            _Transaction::Deploy(deploy) => deploy.session().is_stored_contract(),
+            _Transaction::V1(_) => match self.target() {
+                Ok(TransactionTarget::Stored { id, .. }) => {
+                    matches!(
+                        id,
+                        TransactionInvocationTarget::ByHash(_)
+                            | TransactionInvocationTarget::ByName(_)
+                    )
+                }
+                _ => false,
+            },
+        }
+    }
+
+    /// True when the V1 target is a stored package, or the Deploy session is.
+    #[wasm_bindgen(js_name = "isStoredContractPackage")]
+    pub fn is_stored_contract_package(&self) -> bool {
+        match &self.0 {
+            _Transaction::Deploy(deploy) => deploy.session().is_stored_contract_package(),
+            _Transaction::V1(_) => match self.target() {
+                Ok(TransactionTarget::Stored { id, .. }) => {
+                    matches!(
+                        id,
+                        TransactionInvocationTarget::ByPackageHash { .. }
+                            | TransactionInvocationTarget::ByPackageName { .. }
+                    )
+                }
+                _ => false,
+            },
+        }
+    }
+
+    /// True when the stored target (or Deploy session) is selected by name/alias.
+    #[wasm_bindgen(js_name = "isByName")]
+    pub fn is_by_name(&self) -> bool {
+        match &self.0 {
+            _Transaction::Deploy(deploy) => deploy.session().is_by_name(),
+            _Transaction::V1(_) => match self.target() {
+                Ok(TransactionTarget::Stored { id, .. }) => {
+                    matches!(
+                        id,
+                        TransactionInvocationTarget::ByName(_)
+                            | TransactionInvocationTarget::ByPackageName { .. }
+                    )
+                }
+                _ => false,
+            },
+        }
+    }
+
+    /// Alias or package name for a by-name stored target (Deploy session when wrapped).
+    #[wasm_bindgen(js_name = "byName")]
+    pub fn by_name(&self) -> Option<String> {
+        match &self.0 {
+            _Transaction::Deploy(deploy) => deploy.session().by_name(),
+            _Transaction::V1(_) => match self.target().ok()? {
+                TransactionTarget::Stored { id, .. } => match id {
+                    TransactionInvocationTarget::ByName(name) => Some(name),
+                    TransactionInvocationTarget::ByPackageName { name, .. } => Some(name),
+                    _ => None,
+                },
+                _ => None,
+            },
+        }
+    }
+
     #[cfg(all(target_arch = "wasm32", feature = "transaction"))]
     #[wasm_bindgen(js_name = "addArg")]
     pub fn add_arg_js_alias(
@@ -803,6 +900,7 @@ impl Transaction {
             initiator_addr,
             secret_key,
             session_args,
+            pricing_mode,
         } = overrides;
 
         let mut builder = self.seed_transaction_v1_builder(new_builder_params);
@@ -811,12 +909,13 @@ impl Transaction {
         let ttl = ttl.unwrap_or_else(|| self.0.ttl());
         let timestamp = timestamp.unwrap_or_else(|| self.0.timestamp());
         let initiator_addr = initiator_addr.unwrap_or_else(|| self.0.initiator_addr().clone());
+        let pricing_mode = pricing_mode.unwrap_or_else(|| self.pricing_mode_typed());
 
         builder = builder
             .with_chain_name(chain_name)
             .with_ttl(ttl)
             .with_timestamp(timestamp)
-            .with_pricing_mode(self.pricing_mode_typed())
+            .with_pricing_mode(pricing_mode)
             .with_initiator_addr(initiator_addr);
 
         builder = match session_args {
@@ -1045,6 +1144,7 @@ struct RebuildOverrides {
     initiator_addr: Option<InitiatorAddr>,
     secret_key: Option<String>,
     session_args: Option<RuntimeArgs>,
+    pricing_mode: Option<_PricingMode>,
 }
 
 impl From<Transaction> for _Transaction {

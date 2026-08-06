@@ -106,14 +106,16 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
 
     if (this.config['enable_addressable_entity']) {
       const get_entity = await this.clientService.get_entity(this.public_key);
-      if (!get_entity.entity_result) {
+      if (!get_entity?.entityResultTyped) {
         return;
       }
-      account_hash =
-        get_entity?.entity_result?.AddressableEntity?.entity.entity_kind
-          .Account;
-      main_purse =
-        get_entity?.entity_result?.AddressableEntity?.entity.main_purse;
+      const addressable = get_entity.entityResultTyped().asAddressableEntity();
+      if (!addressable) {
+        return;
+      }
+      const entity = addressable.entity();
+      account_hash = entity.accountHash();
+      main_purse = entity.mainPurse()?.toFormattedString();
     } else {
       const get_account = await this.clientService.get_account(this.public_key);
       if (get_account && !get_account.account) {

@@ -221,7 +221,7 @@ pub mod test_module_transaction {
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
 
         assert!(transaction.verify());
-        //assert!(transaction.is_stored_contract());
+        assert!(transaction.is_stored_contract());
 
         let new_entity_hash_string =
             "7b9f86fd244c604012002cde5961464bfd371539c5e6df4b42ada6108090421c";
@@ -231,7 +231,7 @@ pub mod test_module_transaction {
         transaction =
             transaction.with_entity_hash(new_entity_hash, Some(config.secret_key.clone()));
         assert!(transaction.verify());
-        //assert!(transaction.is_stored_contract());
+        assert!(transaction.is_stored_contract());
         assert!(!transaction
             .to_json_string()
             .unwrap()
@@ -259,6 +259,12 @@ pub mod test_module_transaction {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());
+        assert!(transaction.is_stored_contract());
+        assert!(transaction.is_by_name());
+        assert_eq!(
+            transaction.by_name().unwrap().to_string(),
+            CONTRACT_CEP78_KEY
+        );
     }
 
     pub async fn test_transaction_type_with_package_hash() {
@@ -282,7 +288,7 @@ pub mod test_module_transaction {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());
-        //assert!(transaction.is_stored_contract_package());
+        assert!(transaction.is_stored_contract_package());
 
         let new_session_package_hash_string =
             "10fed076cff22b4dc61f08d514cc89084a86fd8c4488cd280c1ca86641010937";
@@ -290,7 +296,7 @@ pub mod test_module_transaction {
         transaction = transaction
             .with_package_hash(new_session_package_hash, Some(config.secret_key.clone()));
         assert!(transaction.verify());
-        // assert!(transaction.is_stored_contract_package());
+        assert!(transaction.is_stored_contract_package());
 
         assert!(!transaction
             .to_json_string()
@@ -371,6 +377,35 @@ pub mod test_module_transaction {
         assert_eq!(transaction.initiator_addr(), config.account);
         transaction = transaction.with_secret_key(Some(config.secret_key.clone()));
         assert!(transaction.verify());
+    }
+
+    pub async fn test_transaction_type_with_standard_payment() {
+        let config: TestConfig = get_config(true).await;
+        let transaction_params = TransactionStrParams::new_with_defaults(
+            &config.chain_name,
+            Some(config.account),
+            Some(config.secret_key.clone()),
+            Some(TTL.to_string()),
+        );
+
+        let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
+
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
+        let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
+        assert!(transaction.verify());
+        assert_eq!(
+            transaction.payment_amount().unwrap().to_string(),
+            PAYMENT_AMOUNT
+        );
+        let new_payment_amount = "1111111111";
+        transaction = transaction.with_standard_payment(new_payment_amount, None);
+        assert!(!transaction.verify());
+        assert_eq!(
+            transaction.payment_amount().unwrap().to_string(),
+            new_payment_amount
+        );
     }
 
     pub async fn test_transaction_type_is_expired() {
@@ -633,6 +668,10 @@ mod tests_transaction {
     #[test]
     pub async fn test_transaction_type_test_with_secret_key_test() {
         test_transaction_type_with_secret_key().await;
+    }
+    #[test]
+    pub async fn test_transaction_type_with_standard_payment_test() {
+        test_transaction_type_with_standard_payment().await;
     }
     #[test]
     pub async fn test_transaction_type_is_expired_test() {
