@@ -58,6 +58,16 @@ export class AddressableEntityHash {
     toFormattedString(): string;
 }
 
+/**
+ * `ApiVersion` handshake payload.
+ */
+export class ApiVersionEvent {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    apiVersion: string;
+}
+
 export class ArgsSimple {
     private constructor();
     free(): void;
@@ -100,6 +110,86 @@ export class Bytes {
     [Symbol.dispose](): void;
     static fromUint8Array(uint8_array: Uint8Array): Bytes;
     constructor();
+}
+
+/**
+ * One CES event decoded from an execution transform.
+ */
+export class CESEvent {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    data(): string;
+    get contractHash(): string | undefined;
+    set contractHash(value: string | null | undefined);
+    get contractPackageHash(): string | undefined;
+    set contractPackageHash(value: string | null | undefined);
+    /**
+     * Field name → JSON string of CLValue map (use `dataJson` from wasm).
+     */
+    dataJson: string;
+    eventId: bigint;
+    name: string;
+    transformIdx: number;
+}
+
+/**
+ * Parse result for one transform (error soft-fails like ces-js-parser).
+ */
+export class CESParseResult {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    toJson(): string;
+    get error(): string | undefined;
+    set error(value: string | null | undefined);
+    event: CESEvent;
+}
+
+/**
+ * CES consume parser (ces-js-parser `Parser` parity).
+ */
+export class CESParser {
+    free(): void;
+    [Symbol.dispose](): void;
+    /**
+     * Number of contracts loaded into this parser.
+     */
+    contractCount(): number;
+    constructor();
+    parseExecutionResultJson(execution_result_json: string): any;
+    /**
+     * JSON schemas for all loaded contracts (keyed by events uref).
+     */
+    schemasJson(): string;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::CLValue`].
+ *
+ * Minimal surface for building [`crate::types::runtime_args::RuntimeArgs`] (#43).
+ * Full CLValue / StoredValue graph remains [#27](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/27).
+ */
+export class CLValue {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    static fromBool(value: boolean): CLValue;
+    static fromBytes(bytes: Bytes): CLValue;
+    static fromI32(value: number): CLValue;
+    static fromI64(value: bigint): CLValue;
+    static fromKey(key: Key): CLValue;
+    static fromPublicKey(public_key: PublicKey): CLValue;
+    static fromString(value: string): CLValue;
+    static fromU128(value: string): CLValue;
+    static fromU256(value: string): CLValue;
+    static fromU32(value: number): CLValue;
+    static fromU512(value: string): CLValue;
+    static fromU64(value: bigint): CLValue;
+    static fromU8(value: number): CLValue;
+    static fromURef(uref: URef): CLValue;
+    static fromUnit(): CLValue;
+    toJson(): any;
 }
 
 export class CasperWallet {
@@ -702,6 +792,39 @@ export class GetPeersResult {
 }
 
 /**
+ * Wrapper struct for the `GetRewardResult` from casper_client.
+ */
+export class GetRewardResult {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    /**
+     * Converts the GetRewardResult to a JsValue.
+     */
+    toJson(): any;
+    /**
+     * Gets the API version as a JsValue.
+     */
+    readonly api_version: any;
+    /**
+     * Gets the delegation rate.
+     */
+    readonly delegation_rate: number;
+    /**
+     * Gets the era id as a JsValue.
+     */
+    readonly era_id: any;
+    /**
+     * Gets the reward amount as a JsValue.
+     */
+    readonly reward_amount: any;
+    /**
+     * Gets the switch block hash as a JsValue.
+     */
+    readonly switch_block_hash: any;
+}
+
+/**
  * Wrapper struct for the `GetStateRootHashResult` from casper_client.
  */
 export class GetStateRootHashResult {
@@ -1096,15 +1219,76 @@ export class QueryGlobalStateResult {
     readonly stored_value: any;
 }
 
+/**
+ * Raw SSE envelope before typed parse (JS `RawEvent` parity).
+ */
+export class RawEvent {
+    free(): void;
+    [Symbol.dispose](): void;
+    constructor(event_type: string, data: string, last_event_id: string);
+    parseAsApiVersion(): ApiVersionEvent;
+    parseAsBlockAdded(): SSEPayload;
+    parseAsDeployAccepted(): SSEPayload;
+    parseAsDeployExpired(): SSEPayload;
+    parseAsDeployProcessed(): SSEPayload;
+    parseAsFault(): SSEPayload;
+    parseAsFinalitySignature(): SSEPayload;
+    parseAsStep(): SSEPayload;
+    parseAsTransactionAccepted(): SSEPayload;
+    parseAsTransactionExpired(): SSEPayload;
+    parseAsTransactionProcessed(): SSEPayload;
+    /**
+     * JSON string of the named payload body (wasm-friendly).
+     */
+    payloadJson(event_name: string): string;
+    data: string;
+    eventType: string;
+    lastEventId: string;
+}
+
 export class RecordId {
     free(): void;
     [Symbol.dispose](): void;
     constructor(value: number);
 }
 
+/**
+ * Wasm/native wrapper around [`casper_types::RuntimeArgs`].
+ *
+ * Pass to `set_session_args` on transaction (or legacy deploy) session params (#43).
+ * `set_session_args_simple` / `set_session_args_json` remain for string bags.
+ */
+export class RuntimeArgs {
+    free(): void;
+    [Symbol.dispose](): void;
+    /**
+     * Insert a named [`CLValue`].
+     */
+    insert(name: string, value: CLValue): void;
+    /**
+     * Insert from a JS object `{name,type,value}` or a simple arg string.
+     */
+    insertJsValue(js_value_arg: any): void;
+    /**
+     * Insert a CLI-style simple arg (`name:Type='value'`).
+     */
+    insertSimple(arg: string): void;
+    constructor();
+    toJson(): any;
+    /**
+     * JSON array suitable for `set_session_args_json` / payment args JSON.
+     */
+    toSessionArgsJson(): string;
+}
+
 export class SDK {
     free(): void;
     [Symbol.dispose](): void;
+    /**
+     * Build a [`CESParser`] for `contract_hashes` (JS array of hex / `hash-…` strings).
+     */
+    CES_parser(contract_hashes: any, state_root_hash?: string | null, rpc_address?: string | null): Promise<CESParser>;
+    SSE_client(events_url: string): SSEClient;
     /**
      * JavaScript Alias for `put_deploy`.
      */
@@ -1529,6 +1713,14 @@ export class SDK {
      */
     get_peers(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetPeersResult>;
     /**
+     * Retrieves validator/delegator reward via JSON-RPC `info_get_reward`.
+     */
+    get_reward(options?: getRewardOptions | null): Promise<GetRewardResult>;
+    /**
+     * Parses reward options from a JsValue.
+     */
+    get_reward_options(options: any): getRewardOptions;
+    /**
      * Get options for speculative execution from a JavaScript value.
      */
     get_speculative_exec_deploy_options(options: any): getSpeculativeExecDeployOptions;
@@ -1611,6 +1803,10 @@ export class SDK {
      */
     info_get_deploy(options?: getDeployOptions | null): Promise<GetDeployResult>;
     info_get_peers(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetPeersResult>;
+    /**
+     * JavaScript alias for `get_reward`.
+     */
+    info_get_reward(options?: getRewardOptions | null): Promise<GetRewardResult>;
     info_get_status(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetNodeStatusResult>;
     /**
      * Retrieves transaction information using the provided options, alias for `get_transaction`.
@@ -2115,16 +2311,85 @@ export class SDK {
     watchTransaction(events_url: string, timeout_duration?: number | null): Watcher;
 }
 
+/**
+ * Node SSE client: subscribe by [`EventName`], start/stop stream.
+ */
+export class SSEClient {
+    free(): void;
+    [Symbol.dispose](): void;
+    constructor(events_url: string);
+    /**
+     * Start streaming (wasm). Resolves when stopped, errored, or stream ends.
+     */
+    start(start_from?: bigint | null): Promise<void>;
+    /**
+     * Stop the running stream loop.
+     */
+    stop(): void;
+    /**
+     * Subscribe with a JS function handler (wasm).
+     */
+    subscribe(event_name: string, handler: Function): void;
+    /**
+     * Unsubscribe by event name string (wasm).
+     */
+    unsubscribe(event_name: string): void;
+}
+
+/**
+ * Thin typed wrapper: event name + JSON body (deep typing deferred to #27).
+ */
+export class SSEPayload {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    body(): string;
+    /**
+     * JSON string of the named payload body.
+     */
+    bodyJson: string;
+    name: string;
+}
+
+/**
+ * JSON-friendly schema field for wasm / MCP.
+ */
+export class SchemaFieldJson {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    clType: string;
+    name: string;
+}
+
+/**
+ * Legacy deploy session params. Prefer [`crate::types::transaction_params::transaction_str_params::TransactionStrParams`].
+ *
+ * Session args setters (same idea as transaction params):
+ * - [`Self::set_session_args_simple`] — CLI-style string bag
+ * - [`Self::set_session_args_json`] — JSON string
+ * - [`Self::set_session_args`] — typed [`RuntimeArgs`]
+ */
 export class SessionStrParams {
     free(): void;
     [Symbol.dispose](): void;
-    constructor(session_hash?: string | null, session_name?: string | null, session_package_hash?: string | null, session_package_name?: string | null, session_path?: string | null, session_bytes?: Bytes | null, session_args_simple?: Array<any> | null, session_args_json?: string | null, session_version?: string | null, session_entry_point?: string | null, is_session_transfer?: boolean | null);
+    constructor(session_hash?: string | null, session_name?: string | null, session_package_hash?: string | null, session_package_name?: string | null, session_path?: string | null, session_bytes?: Bytes | null, session_args_simple?: string[] | null, session_args_json?: string | null, session_version?: string | null, session_entry_point?: string | null, is_session_transfer?: boolean | null);
+    /**
+     * Typed session args. Parameter type is [`RuntimeArgs`]; string setters stay separate.
+     */
+    set_session_args(args: RuntimeArgs): void;
     get is_session_transfer(): boolean | undefined;
     set is_session_transfer(value: boolean);
     get session_args_json(): string | undefined;
+    /**
+     * JSON session args string (human-typed or ByteArray bridge encoding).
+     */
     set session_args_json(value: string);
     get session_args_simple(): ArgsSimple | undefined;
-    set session_args_simple(value: Array<any>);
+    /**
+     * CLI-style simple args (`name:Type='value'`).
+     */
+    set session_args_simple(value: string[]);
     get session_bytes(): Bytes | undefined;
     set session_bytes(value: Bytes);
     get session_entry_point(): string | undefined;
@@ -2373,6 +2638,10 @@ export class TransactionStrParams {
     static new_with_defaults(chain_name: string, initiator_addr?: string | null, secret_key?: string | null, ttl?: string | null): TransactionStrParams;
     setDefaultTTL(): void;
     setDefaultTimestamp(): void;
+    /**
+     * Typed session args. Parameter type is [`RuntimeArgs`]; string setters stay separate.
+     */
+    set_session_args(args: RuntimeArgs): void;
     get additional_computation_factor(): string | undefined;
     set additional_computation_factor(value: string);
     get chain_name(): string | undefined;
@@ -2761,6 +3030,33 @@ export class getEraSummaryOptions {
     set maybe_block_identifier(value: BlockIdentifier | null | undefined);
     get rpc_address(): string | undefined;
     set rpc_address(value: string | null | undefined);
+    get verbosity(): Verbosity | undefined;
+    set verbosity(value: Verbosity | null | undefined);
+}
+
+/**
+ * Options for the `get_reward` method.
+ */
+export class getRewardOptions {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    get delegator_public_key_as_string(): string | undefined;
+    set delegator_public_key_as_string(value: string | null | undefined);
+    get delegator_public_key(): PublicKey | undefined;
+    set delegator_public_key(value: PublicKey | null | undefined);
+    get maybe_block_identifier(): BlockIdentifier | undefined;
+    set maybe_block_identifier(value: BlockIdentifier | null | undefined);
+    get maybe_era_id_as_string(): string | undefined;
+    set maybe_era_id_as_string(value: string | null | undefined);
+    get maybe_era_id(): bigint | undefined;
+    set maybe_era_id(value: bigint | null | undefined);
+    get rpc_address(): string | undefined;
+    set rpc_address(value: string | null | undefined);
+    get validator_public_key_as_string(): string | undefined;
+    set validator_public_key_as_string(value: string | null | undefined);
+    get validator_public_key(): PublicKey | undefined;
+    set validator_public_key(value: PublicKey | null | undefined);
     get verbosity(): Verbosity | undefined;
     set verbosity(value: Verbosity | null | undefined);
 }

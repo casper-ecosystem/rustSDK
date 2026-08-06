@@ -21,11 +21,3 @@ path = "src/main.rs"
 [lib]
 name = "sdk_tests"
 path = "src/lib.rs"
-
-[patch.crates-io]
-casper-client = { version = "5", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "dev" }
-# Same temporary pin as root Cargo.toml — see comment there. Revert to
-# branch = "dev" once casper-node/dev bumps past 2.2.0.
-casper-types = { git = "https://github.com/casper-network/casper-node", tag = "v2.2.2" }
-casper-binary-port = { git = "https://github.com/casper-network/casper-node", tag = "v2.2.2" }
-casper-binary-port-access = { git = "https://github.com/gRoussac/casper-binary-port-client", branch = "casper_2.2.2" }

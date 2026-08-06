@@ -1302,7 +1302,7 @@ describe('Angular App Tests', () => {
         '[e2e-id="seedContractHashElt"]',
         test.contract_cep78_hash
       );
-      await test.page.type('[e2e-id="seedNameElt"]', 'events');
+      await test.page.type('[e2e-id="seedNameElt"]', '__events');
       await test.page.type('[e2e-id="itemKeyElt"]', '0');
       await submit();
       await getResult();
@@ -1313,7 +1313,7 @@ describe('Angular App Tests', () => {
         '[e2e-id="seedContractHashElt"]',
         test.contract_cep78_hash
       );
-      await test.page.type('[e2e-id="seedNameElt"]', 'events');
+      await test.page.type('[e2e-id="seedNameElt"]', '__events');
       await test.page.type('[e2e-id="itemKeyElt"]', '0');
       await submit();
       await getResult();
@@ -1344,7 +1344,7 @@ describe('Angular App Tests', () => {
         '[e2e-id="seedEntityHashElt"]',
         test.contract_cep78_entity
       );
-      await test.page.type('[e2e-id="seedNameElt"]', 'events');
+      await test.page.type('[e2e-id="seedNameElt"]', '__events');
       await test.page.type('[e2e-id="itemKeyElt"]', '0');
       await submit();
       await getResult();
@@ -1355,7 +1355,7 @@ describe('Angular App Tests', () => {
         '[e2e-id="seedEntityHashElt"]',
         test.contract_cep78_entity
       );
-      await test.page.type('[e2e-id="seedNameElt"]', 'events');
+      await test.page.type('[e2e-id="seedNameElt"]', '__events');
       await test.page.type('[e2e-id="itemKeyElt"]', '0');
       await submit();
       await getResult();
@@ -2386,7 +2386,7 @@ describe('Angular App Tests', () => {
         test.contract_cep78_hash
       );
       await test.page.waitForSelector('[e2e-id="seedNameElt"]');
-      await test.page.type('[e2e-id="seedNameElt"]', 'events');
+      await test.page.type('[e2e-id="seedNameElt"]', '__events');
       await test.page.waitForSelector('[e2e-id="itemKeyElt"]');
       await clearInput('[e2e-id="itemKeyElt"]');
       await test.page.type('[e2e-id="itemKeyElt"]', '0');
@@ -2443,7 +2443,7 @@ describe('Angular App Tests', () => {
       }>;
 
       test.dictionary_uref =
-        named_keys.find((key) => key.name === 'events')?.key || '';
+        named_keys.find((key) => key.name === '__events')?.key || '';
 
       await selectAction('get_dictionary_item');
       await test.page.waitForSelector('[e2e-id="selectDictIdentifierElt"]');
@@ -2485,7 +2485,7 @@ describe('Angular App Tests', () => {
       const named_keys = result_json?.entity_result?.AddressableEntity
         .named_keys as Array<{ name: string; key: string }>;
       test.dictionary_uref =
-        named_keys.find((key) => key.name === 'events')?.key || '';
+        named_keys.find((key) => key.name === '__events')?.key || '';
       await selectAction('get_dictionary_item');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="selectDictIdentifierElt"]');
@@ -2511,7 +2511,7 @@ describe('Angular App Tests', () => {
         test.contract_cep78_entity
       );
       await test.page.waitForSelector('[e2e-id="seedNameElt"]');
-      await test.page.type('[e2e-id="seedNameElt"]', 'events');
+      await test.page.type('[e2e-id="seedNameElt"]', '__events');
       await test.page.waitForSelector('[e2e-id="itemKeyElt"]');
       await clearInput('[e2e-id="itemKeyElt"]');
       await test.page.type('[e2e-id="itemKeyElt"]', '0');
@@ -2633,6 +2633,67 @@ describe('Angular App Tests', () => {
         expect(results?.[0]?.err).toBe('Timeout expired');
       },
       15000
+    );
+  });
+
+  // Jest harness uses pkg-nodejs; reuse cep78 hash from earlier UI install when present.
+  describe('SSE CES (SDK)', () => {
+    it('should expose SSE_client and CES_parser', () => {
+      const sdk = new SDK(config.rpc_address);
+      expect(typeof (sdk as any).SSE_client).toBe('function');
+      expect(typeof (sdk as any).CES_parser).toBe('function');
+    });
+
+    it(
+      'should CES_parser create for installed cep78 and parse install execution',
+      async () => {
+        const sdk = new SDK(config.rpc_address);
+
+        // Recycle UI suite fixtures; otherwise resolve from account named keys on chain.
+        let contractHash = test.contract_cep78_hash;
+        if (!contractHash) {
+          expect(test.account_hash).toBeTruthy();
+          const q = await sdk.query_global_state(
+            sdk.query_global_state_options({ key: test.account_hash })
+          );
+          const named =
+            (q.toJson() as any)?.stored_value?.Account?.named_keys || [];
+          const entity =
+            named.find((k: any) => k.name === config.contract_cep78_key)?.key ||
+            '';
+          contractHash = entity.replace('entity-contract', 'hash');
+          test.contract_cep78_hash = contractHash;
+        }
+        expect(contractHash).toBeTruthy();
+
+        const parser = await (sdk as any).CES_parser(
+          [contractHash],
+          null,
+          config.rpc_address
+        );
+        expect(parser.contractCount()).toBeGreaterThanOrEqual(1);
+
+        // Parse when an install/mint hash is already available from the suite.
+        if (!test.transaction_hash) {
+          return;
+        }
+        const opts = sdk.get_transaction_options({
+          transaction_hash_as_string: test.transaction_hash,
+          finalized_approvals: true,
+        });
+        const tx = await sdk.get_transaction(opts);
+        const txJson = tx.toJson() as any;
+        const execution =
+          txJson?.execution_info?.execution_result ?? txJson?.execution_result;
+        expect(execution).toBeDefined();
+        const events = parser.parseExecutionResultJson(JSON.stringify(execution));
+        expect(Array.isArray(events)).toBe(true);
+        const ok = events.find(
+          (e: any) => !e.error && e.event?.name && e.event.name.length > 0
+        );
+        expect(ok).toBeDefined();
+      },
+      60000
     );
   });
 

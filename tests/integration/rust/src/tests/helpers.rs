@@ -500,7 +500,7 @@ pub async fn mint_nft(
     target_account_hash: &str,
     secret_key: &str,
     network_constants: (&str, &str, &str),
-) {
+) -> String {
     let (rpc_address, events_address, chain_name) = network_constants;
 
     let mut transaction_params = TransactionStrParams::default();
@@ -553,6 +553,7 @@ pub async fn mint_nft(
         transaction_processed.hash.to_string(),
         transaction_hash_as_string
     );
+    transaction_hash_as_string
 }
 
 pub async fn get_block(rpc_address: &str) -> (String, u64) {

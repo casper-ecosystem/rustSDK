@@ -35,7 +35,7 @@ pub const PACKAGE_CEP78_KEY: &str = "cep78_contract_package_enhanced-nft-1";
 pub const ENTRYPOINT_MINT: &str = "mint";
 pub const ENTRYPOINT_DECIMALS: &str = "decimals";
 pub const COLLECTION_NAME: &str = "enhanced-nft-1";
-pub const DICTIONARY_NAME: &str = "events";
+pub const DICTIONARY_NAME: &str = "__events";
 pub const DICTIONARY_ITEM_KEY: &str = "0";
 pub const ARGS_SIMPLE: [&str; 2] = [
     "key-name:String='test_hello_key'",
@@ -55,7 +55,7 @@ pub const ARGS_JSON: &str = r#"[
 {"name": "nft_metadata_kind", "type": "U8", "value": 2},
 {"name": "identifier_mode", "type": "U8", "value": 0},
 {"name": "metadata_mutability", "type": "U8", "value": 0},
-{"name": "events_mode", "type": "U8", "value": 1}
+{"name": "events_mode", "type": "U8", "value": 2}
 ]"#;
 
 pub const DEFAULT_ENABLE_ADDRESSABLE_ENTITY: bool = false;
@@ -159,7 +159,7 @@ pub async fn initialize_test_config(
 
         println!("mint_nft");
         // install has been running for over 60 seconds
-        mint_nft(
+        let _mint_hash = mint_nft(
             &contract_cep78_key,
             &account,
             &account_hash,

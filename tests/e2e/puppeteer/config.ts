@@ -46,5 +46,5 @@ export const args_json = `[
 {"name": "nft_metadata_kind", "type": "U8", "value": 2},
 {"name": "identifier_mode", "type": "U8", "value": 0},
 {"name": "metadata_mutability", "type": "U8", "value": 0},
-{"name": "events_mode", "type": "U8", "value": 1}
+{"name": "events_mode", "type": "U8", "value": 2}
 ]`;

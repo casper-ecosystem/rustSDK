@@ -99,6 +99,11 @@ opt-level = "s"
 strip = true
 panic = "abort"
 
+# SSE (and current rustc) emit bulk-memory / saturating trunc ops; Binaryen 130
+# needs features enabled or wasm-opt rejects the module.
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-O", "-all"]
+
 [dev-dependencies]
 sdk_tests = { path = "tests/integration/rust" }
 tokio = { version = "1", features = ["full"] }

@@ -73,6 +73,24 @@ impl SDK {
     pub fn SSE_client_js(&self, events_url: &str) -> SSEClient {
         self.SSE_client(events_url)
     }
+
+    /// Build a [`CESParser`] for `contract_hashes` (JS array of hex / `hash-…` strings).
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "CES_parser")]
+    #[allow(non_snake_case)]
+    pub async fn CES_parser_js(
+        &self,
+        contract_hashes: JsValue,
+        state_root_hash: Option<String>,
+        rpc_address: Option<String>,
+    ) -> Result<crate::sdk::SSE::CESParser, JsError> {
+        let hashes: Vec<String> = contract_hashes
+            .into_serde()
+            .map_err(|e| JsError::new(&format!("contract_hashes: {e}")))?;
+        self.CES_parser(&hashes, state_root_hash.as_deref(), rpc_address)
+            .await
+            .map_err(|e| JsError::new(&e))
+    }
 }
 
 #[wasm_bindgen]
