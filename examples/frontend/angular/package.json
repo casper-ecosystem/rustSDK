@@ -16,15 +16,15 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "~21.1.5",
-    "@angular/common": "~21.1.5",
-    "@angular/compiler": "~21.1.5",
-    "@angular/core": "~21.1.5",
-    "@angular/forms": "~21.1.5",
-    "@angular/platform-browser": "~21.1.5",
-    "@angular/platform-browser-dynamic": "~21.1.5",
-    "@angular/router": "~21.1.5",
-    "@nx/angular": "22.5.2",
+    "@angular/animations": "~21.2.19",
+    "@angular/common": "~21.2.19",
+    "@angular/compiler": "~21.2.19",
+    "@angular/core": "~21.2.19",
+    "@angular/forms": "~21.2.19",
+    "@angular/platform-browser": "~21.2.19",
+    "@angular/platform-browser-dynamic": "~21.2.19",
+    "@angular/router": "~21.2.19",
+    "@nx/angular": "22.7.8",
     "casper-rust-wasm-sdk": "file:../../../pkg",
     "highlight.js": "^11.11.1",
     "promise-worker": "^2.0.1",
@@ -33,20 +33,20 @@
     "zone.js": "~0.16.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "=21.1.4",
-    "@angular-devkit/core": "~21.1.4",
-    "@angular-devkit/schematics": "~21.1.4",
+    "@angular-devkit/build-angular": "~21.2.20",
+    "@angular-devkit/core": "~21.2.20",
+    "@angular-devkit/schematics": "~21.2.20",
     "@angular-eslint/eslint-plugin": "~21.4.0",
     "@angular-eslint/eslint-plugin-template": "~21.4.0",
     "@angular-eslint/template-parser": "~21.4.0",
-    "@angular/cli": "~21.1.4",
-    "@angular/compiler-cli": "~21.1.5",
-    "@angular/language-service": "~21.1.5",
-    "@nx/eslint-plugin": "22.5.2",
-    "@nx/jest": "22.5.2",
-    "@nx/js": "22.5.2",
-    "@nx/workspace": "22.5.2",
-    "@schematics/angular": "~21.1.4",
+    "@angular/cli": "~21.2.20",
+    "@angular/compiler-cli": "~21.2.19",
+    "@angular/language-service": "~21.2.19",
+    "@nx/eslint-plugin": "22.7.8",
+    "@nx/jest": "22.7.8",
+    "@nx/js": "22.7.8",
+    "@nx/workspace": "22.7.8",
+    "@schematics/angular": "~21.2.20",
     "@swc-node/register": "~1.11.1",
     "@swc/core": "~1.15.47",
     "@swc/helpers": "~0.5.23",
@@ -63,7 +63,7 @@
     "jest-environment-node": "^30.4.1",
     "jest-preset-angular": "~16.1.5",
     "jsonc-eslint-parser": "^3.1.0",
-    "nx": "22.5.2",
+    "nx": "22.7.8",
     "prettier": "^3.9.6",
     "ts-jest": "^29.4.12",
     "ts-node": "~10.9.2",
@@ -77,5 +77,13 @@
     "msgpackr-extract": true,
     "nx": true,
     "unrs-resolver": true
+  },
+  "overrides": {
+    "nx": {
+      "brace-expansion": "5.0.9"
+    },
+    "@angular/build": {
+      "undici": "7.29.0"
+    }
   }
 }
