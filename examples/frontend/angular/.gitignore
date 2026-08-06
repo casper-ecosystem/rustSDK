@@ -1,18 +1,9 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
-
+/dist
 tmp
 /out-tsc
-
-# ng serve unhashed bundles (hashed production files under dist/casper/ stay tracked).
-/dist/casper/main.js
-/dist/casper/polyfills.js
-/dist/casper/runtime.js
-/dist/casper/styles.css
-/dist/casper/vendor.js
-/dist/casper/highlight.worker.js
-/dist/casper/*.map
 
 # dependencies
 node_modules
