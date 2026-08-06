@@ -68,5 +68,14 @@
     "ts-jest": "^29.4.12",
     "ts-node": "~10.9.2",
     "typescript": "~5.9.3"
+  },
+  "allowScripts": {
+    "@parcel/watcher": true,
+    "@swc/core": true,
+    "esbuild": true,
+    "lmdb": true,
+    "msgpackr-extract": true,
+    "nx": true,
+    "unrs-resolver": true
   }
 }
