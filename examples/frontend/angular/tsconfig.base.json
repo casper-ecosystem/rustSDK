@@ -13,8 +13,8 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    // Angular 21 requires typescript >=5.9 <6.0; silence 5.x option deprecations until Angular 22.
-    "ignoreDeprecations": "5.0",
+    // Angular 21 requires typescript >=5.9 <6.0; silence TS 6 option deprecations until Angular 22 (file:../ pkg deps blocked there).
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@components": ["libs/components/src/index.ts"],
