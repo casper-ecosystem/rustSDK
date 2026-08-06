@@ -6,7 +6,8 @@
 import type { Config } from 'jest';
 
 const config: Config = {
-  testTimeout: 20000,
+  // Above Puppeteer's default waitForSelector (30s); module-bytes installs need headroom under CI load.
+  testTimeout: 60000,
 
   // All imported modules in your tests should be mocked automatically
   // automock: false,
