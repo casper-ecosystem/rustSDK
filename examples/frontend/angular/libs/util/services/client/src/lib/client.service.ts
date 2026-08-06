@@ -1565,9 +1565,17 @@ export class ClientService {
     }
 
     if (wasm) {
-      const is_install_upgrade: boolean =
-        this.getIdentifier('selectTransactionCategory')?.value?.trim() ===
-        'true';
+      const category_raw = this.getIdentifier('selectTransactionCategory')
+        ?.value;
+      const category =
+        typeof category_raw === 'string'
+          ? category_raw.trim()
+          : String(category_raw ?? '');
+      // Match sdk.install / put_transaction session path: InstallUpgrade unless Session chosen.
+      const is_install_upgrade =
+        category === ''
+          ? !!this.config['default_is_install_upgrade']
+          : category === 'true';
       builder_params = TransactionBuilderParams.newSession(
         Bytes.fromUint8Array(wasm),
         is_install_upgrade,

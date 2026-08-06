@@ -185,6 +185,10 @@ export class FormService {
           }
         } else if (select && select.enabled_when) {
           if (this.has_wasm && select.enabled_when?.includes('has_wasm')) {
+            if (control.value == null || control.value === '') {
+              const defaultVal = this.getDefaultOptionValue(select.options);
+              defaultVal != null && control.setValue(defaultVal);
+            }
             control.enable();
           } else {
             control.disable();
