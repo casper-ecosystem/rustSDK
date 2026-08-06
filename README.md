@@ -23,17 +23,18 @@ Demo / development only — same warning as above.
 
 ## MCP
 
-The workspace package [`mcp/`](../mcp/) (`casper-rust-wasm-sdk-mcp`) exposes the native Rust SDK as [MCP](https://modelcontextprotocol.io/) tools for Cursor and other agents. The binary ships inside **`interchouette/casper-webclient`** (`:dev` / `:latest` / `:$APP_VERSION`).
+The workspace package [`mcp/`](../mcp/) (`casper-rust-wasm-sdk-mcp`) exposes the native Rust SDK as [MCP](https://modelcontextprotocol.io/) tools for Cursor and other agents.
 
-- **Hosted:** https://casper-webclient.interchouette.net/mcp (`ENABLE_MCP=1`, `/mcp` proxy on the SPA)
-- **Local Docker:** `make mcp-http` → http://127.0.0.1:8080/mcp
+- **Cursor/agents (slim Hub):** `interchouette/casper-rust-wasm-sdk-mcp` (`:dev` / `:latest` / `:$APP_VERSION`)
+- **Hosted SPA:** https://casper-webclient.interchouette.net/mcp (`casper-webclient` embeds the same binary, `ENABLE_MCP=1`)
+- **Local Docker:** `make mcp-http` → http://127.0.0.1:5790/mcp
 - **Host HTTP:** `make run-mcp-http` → http://127.0.0.1:5790/mcp
-- **stdio:** `interchouette/casper-webclient:dev` with `--entrypoint casper-rust-wasm-sdk-mcp` (see [`mcp/mcp.json.example`](../mcp/mcp.json.example))
+- **stdio:** `interchouette/casper-rust-wasm-sdk-mcp:dev` (see [`mcp/mcp.json.example`](../mcp/mcp.json.example))
 
 ```bash
 make run-mcp      # stdio (host cargo)
 make run-mcp-http # HTTP on 127.0.0.1:5790
-make mcp-http     # webclient → http://127.0.0.1:8080/mcp
+make mcp-http     # slim image → http://127.0.0.1:5790/mcp
 make mcp-test
 make mcp-test-live  # against a live local node
 ```
