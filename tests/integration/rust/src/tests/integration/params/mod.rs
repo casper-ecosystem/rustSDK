@@ -57,16 +57,16 @@ pub mod test_module {
         let config: TestConfig = get_config(true).await;
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(
-            &config
-                .contract_cep78_key
-                .replace("entity-contract-", "hash-"),
+            &casper_rust_wasm_sdk::helpers::contract_hash_key_for_global_state(
+                &config.contract_cep78_key,
+            ),
         );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         assert_eq!(
             session_params.session_hash().unwrap(),
-            config
-                .contract_cep78_key
-                .replace("entity-contract-", "hash-")
+            casper_rust_wasm_sdk::helpers::contract_hash_key_for_global_state(
+                &config.contract_cep78_key
+            )
         );
         assert_eq!(
             session_params.session_entry_point().unwrap(),

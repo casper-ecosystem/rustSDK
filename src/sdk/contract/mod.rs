@@ -107,7 +107,7 @@ async fn get_dictionary_item_input(entity_addr: &str) -> DictionaryItemInput {
     } else {
         DictionaryItemInput::Identifier(
             DictionaryItemIdentifier::new_from_contract_info(
-                &entity_addr.replace("entity-contract", "hash"),
+                &crate::helpers::contract_hash_key_for_global_state(entity_addr),
                 DICTIONARY_NAME,
                 DICTIONARY_ITEM_KEY,
             )
@@ -127,7 +127,7 @@ async fn get_dictionary_item_params_input(key: &str) -> DictionaryItemInput {
         params.set_entity_named_key(key, DICTIONARY_NAME, DICTIONARY_ITEM_KEY);
     } else {
         params.set_contract_named_key(
-            &key.replace("entity-contract", "hash"),
+            &crate::helpers::contract_hash_key_for_global_state(key),
             DICTIONARY_NAME,
             DICTIONARY_ITEM_KEY,
         );

@@ -106,14 +106,8 @@ impl CESParser {
         rpc_address: Option<String>,
     ) -> Result<ContractMetadata, String> {
         // NCTL/account named keys often use entity-contract-…; query_global_state
-        // expects hash-… (same remap as dictionary helpers).
-        let key = if contract_hash.starts_with("entity-contract-") {
-            contract_hash.replacen("entity-contract-", "hash-", 1)
-        } else if contract_hash.starts_with("hash-") {
-            contract_hash.to_string()
-        } else {
-            format!("hash-{contract_hash}")
-        };
+        // expects hash-… (see helpers::contract_hash_key_for_global_state).
+        let key = crate::helpers::contract_hash_key_for_global_state(contract_hash);
 
         let contract_json =
             query_stored_value_json(sdk, &key, &[], state_root_hash, rpc_address.clone()).await?;
@@ -129,10 +123,7 @@ impl CESParser {
             .ok_or_else(|| format!("no CLValue bytes for schema uref {events_schema_uref}"))?;
         let schemas = parse_schemas_from_bytes(&schema_bytes)?;
 
-        let hash_hex = contract_hash
-            .trim_start_matches("hash-")
-            .trim_start_matches("entity-contract-")
-            .to_string();
+        let hash_hex = crate::helpers::strip_contract_key_prefix(contract_hash).to_string();
 
         Ok(ContractMetadata {
             schemas,
@@ -619,5 +610,36 @@ mod tests {
         }"#;
         let events = parser.parse_execution_result_json(json).unwrap();
         assert!(events.is_empty());
+    }
+
+    /// Regression: `into_t::<Vec<u8>>` / `Vec::<u8>::from_bytes` hits
+    /// `debug_assert` in casper_types (`ensure_efficient_serialization`); use `Bytes`.
+    #[test]
+    fn dictionary_list_u8_decodes_via_bytes() {
+        let payload = b"event_Mint\x01\x02\x03".to_vec();
+        let cl = CLValue::from_t(Bytes::from(payload.clone())).unwrap();
+        let uref_addr = [0xab_u8; 32];
+        let dict_key = "42".to_string();
+
+        let mut wire = cl.to_bytes().unwrap();
+        wire.extend((uref_addr.len() as u32).to_bytes().unwrap());
+        wire.extend_from_slice(&uref_addr);
+        wire.extend(dict_key.to_bytes().unwrap());
+
+        let dict = new_dictionary_from_bytes(&wire).expect("Bytes path must not panic/fail");
+        assert_eq!(dict.value, payload);
+        assert_eq!(dict.key, dict_key);
+        assert!(dict.uref.starts_with("uref-"));
+    }
+
+    #[test]
+    fn list_u8_field_decodes_via_bytes() {
+        let raw = Bytes::from(vec![9_u8, 8, 7]);
+        let encoded = raw.to_bytes().unwrap();
+        let (cl, rest) =
+            decode_clvalue_by_type(CLType::List(Box::new(CLType::U8)), &encoded).unwrap();
+        assert!(rest.is_empty());
+        let roundtrip: Bytes = cl.into_t().unwrap();
+        assert_eq!(roundtrip.as_ref(), raw.as_ref());
     }
 }

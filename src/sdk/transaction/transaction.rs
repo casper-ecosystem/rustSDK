@@ -176,10 +176,12 @@ mod tests {
 
             let is_install_upgrade = Some(true);
 
-            let new_builder_params = TransactionBuilderParams::new_session(
+            let mut new_builder_params = TransactionBuilderParams::new_session(
                 Some(transaction_bytes.into()),
                 is_install_upgrade,
             );
+            // HELLO fixture is classic VmCasperV1 wasm.
+            new_builder_params.set_runtime_v1();
             *builder_params = Some(new_builder_params);
         }
 

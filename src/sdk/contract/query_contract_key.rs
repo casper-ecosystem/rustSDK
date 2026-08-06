@@ -187,7 +187,8 @@ impl SDK {
             }
             Err(_) => {
                 // Entities not enabled
-                let key_as_string = key_as_string.replace("entity-contract", "hash");
+                let key_as_string =
+                    crate::helpers::contract_hash_key_for_global_state(&key_as_string);
                 let key = KeyIdentifierInput::String(key_as_string);
                 self.query_global_state(QueryGlobalStateParams {
                     key,

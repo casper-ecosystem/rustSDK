@@ -109,9 +109,6 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
       if (!get_entity.entity_result) {
         return;
       }
-      // TODO Fix this camelcase syntax with helpers
-      // const account_hash = get_account?.account?.account_hash;
-      // const main_purse = get_account?.account?.main_purse;
       account_hash =
         get_entity?.entity_result?.AddressableEntity?.entity.entity_kind
           .Account;

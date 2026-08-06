@@ -112,7 +112,7 @@ pub(crate) mod intern {
             params.set_entity_named_key(contract_entity, dictionary_name, dictionary_item_key);
         } else {
             params.set_contract_named_key(
-                &contract_entity.replace("entity-contract", "hash"),
+                &casper_rust_wasm_sdk::helpers::contract_hash_key_for_global_state(contract_entity),
                 dictionary_name,
                 dictionary_item_key,
             );
@@ -179,7 +179,11 @@ pub(crate) mod intern {
         } else {
             // Prepare the query parameters
             let query_params = QueryGlobalStateParams {
-                key: KeyIdentifierInput::String(contract_entity.replace("entity-contract", "hash")),
+                key: KeyIdentifierInput::String(
+                    casper_rust_wasm_sdk::helpers::contract_hash_key_for_global_state(
+                        contract_entity,
+                    ),
+                ),
                 path: None,
                 maybe_global_state_identifier: None,
                 state_root_hash: None,

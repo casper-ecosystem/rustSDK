@@ -184,7 +184,6 @@ export class HeaderComponent implements AfterViewInit {
     const customNetwork = this.networks.find(
       (network) => network.name === 'custom',
     );
-    // Todo check
     if (customNetwork) {
       customNetwork.rpc_address = this.rpc_address;
       //  customNetwork.node_address = this.node_address;

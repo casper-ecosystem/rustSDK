@@ -24,6 +24,7 @@ import {
   TransactionStrParams,
   TransactionBuilderParams,
   AddressableEntityHash,
+  contractHashKeyForGlobalState,
 } from 'casper-rust-wasm-sdk';
 
 describe('Angular App Tests', () => {
@@ -849,10 +850,9 @@ describe('Angular App Tests', () => {
       test.contract_cep78_entity =
         named_keys.find((key) => key.name === config.contract_cep78_key)?.key ||
         '';
-      // Hack 2.0
-      test.contract_cep78_hash = test.contract_cep78_entity.replace(
-        'entity-contract',
-        'hash'
+      // AE-off: named keys may be entity-contract-…; session/global-state use hash-…
+      test.contract_cep78_hash = contractHashKeyForGlobalState(
+        test.contract_cep78_entity
       );
       test.contract_cep78_package_hash =
         named_keys.find((key) => key.name === config.package_cep78_key)?.key ||
@@ -960,9 +960,8 @@ describe('Angular App Tests', () => {
       if (!test.contract_cep78_entity) {
         throw 'test.contract_cep78_entity missing';
       }
-      test.contract_cep78_hash = test.contract_cep78_entity.replace(
-        'entity-contract',
-        'hash'
+      test.contract_cep78_hash = contractHashKeyForGlobalState(
+        test.contract_cep78_entity
       );
     });
   });
@@ -2706,7 +2705,7 @@ describe('Angular App Tests', () => {
             named.find((k: any) => k.name === config.contract_cep78_key)?.key ||
             '';
           test.contract_cep78_entity = entity;
-          contractHash = entity.replace('entity-contract', 'hash');
+          contractHash = contractHashKeyForGlobalState(entity);
           test.contract_cep78_hash = contractHash;
         }
         expect(contractHash).toBeTruthy();

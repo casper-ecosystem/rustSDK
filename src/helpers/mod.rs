@@ -167,6 +167,43 @@ pub fn get_base64_key_from_key_hash(formatted_hash: &str) -> Result<String, Box<
     Ok(general_purpose::STANDARD.encode(key)) // base64.encode
 }
 
+/// Prefix used when addressable entities are enabled for contract-shaped named keys.
+pub const ENTITY_CONTRACT_PREFIX: &str = "entity-contract-";
+/// Prefix expected by `query_global_state` for classic `StoredValue::Contract` keys.
+pub const HASH_PREFIX: &str = "hash-";
+
+/// Maps a contract-shaped formatted key to the `hash-…` form used when AE is off.
+///
+/// With addressable entities disabled, account named keys often still store
+/// `entity-contract-<hex>`, but `query_global_state` and contract-info identifiers
+/// resolve `hash-<hex>` to `StoredValue::Contract`. Pass the named-key string
+/// through this helper before those queries.
+///
+/// - `entity-contract-<hex>` → `hash-<hex>`
+/// - already `hash-…` → unchanged
+/// - bare hex (no prefix) → `hash-<hex>`
+/// - any other prefix → unchanged
+pub fn contract_hash_key_for_global_state(formatted: &str) -> String {
+    if let Some(hex) = formatted.strip_prefix(ENTITY_CONTRACT_PREFIX) {
+        format!("{HASH_PREFIX}{hex}")
+    } else if formatted.starts_with(HASH_PREFIX) {
+        formatted.to_string()
+    } else if formatted.contains('-') {
+        // account-hash-, uref-, package-, addressable-entity-, …
+        formatted.to_string()
+    } else {
+        format!("{HASH_PREFIX}{formatted}")
+    }
+}
+
+/// Strips `hash-` or `entity-contract-` for hex-only comparisons.
+pub fn strip_contract_key_prefix(formatted: &str) -> &str {
+    formatted
+        .strip_prefix(HASH_PREFIX)
+        .or_else(|| formatted.strip_prefix(ENTITY_CONTRACT_PREFIX))
+        .unwrap_or(formatted)
+}
+
 /// Gets the time to live (TTL) value or returns the default value if not provided.
 ///
 /// # Arguments
@@ -496,6 +533,32 @@ pub(crate) fn insert_arg(args: &mut RuntimeArgs, new_arg: String) -> &RuntimeArg
 mod tests {
     use super::*;
     use casper_types::U256;
+
+    #[test]
+    fn test_contract_hash_key_for_global_state() {
+        let hex = "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+        assert_eq!(
+            contract_hash_key_for_global_state(&format!("entity-contract-{hex}")),
+            format!("hash-{hex}")
+        );
+        assert_eq!(
+            contract_hash_key_for_global_state(&format!("hash-{hex}")),
+            format!("hash-{hex}")
+        );
+        assert_eq!(
+            contract_hash_key_for_global_state(hex),
+            format!("hash-{hex}")
+        );
+        assert_eq!(
+            contract_hash_key_for_global_state(&format!("uref-{hex}-007")),
+            format!("uref-{hex}-007")
+        );
+        assert_eq!(
+            strip_contract_key_prefix(&format!("entity-contract-{hex}")),
+            hex
+        );
+        assert_eq!(strip_contract_key_prefix(&format!("hash-{hex}")), hex);
+    }
 
     #[test]
     fn test_cl_value_to_json() {

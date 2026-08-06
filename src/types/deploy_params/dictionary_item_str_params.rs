@@ -1,4 +1,4 @@
-use crate::{debug::error, helpers::get_str_or_default, types::sdk_error::SdkError};
+use crate::{helpers::get_str_or_default, types::sdk_error::SdkError};
 use casper_client::cli::DictionaryItemStrParams as _DictionaryItemStrParams;
 use casper_types::URef;
 #[cfg(target_arch = "wasm32")]
@@ -241,48 +241,49 @@ impl DictionaryItemStrParams {
 
 pub fn dictionary_item_str_params_to_casper_client(
     dictionary_item_params: &DictionaryItemStrParams,
-) -> _DictionaryItemStrParams<'_> {
+) -> Result<_DictionaryItemStrParams<'_>, Box<SdkError>> {
     if let Some(account_named_key) = &dictionary_item_params.account_named_key {
         let account_hash = get_str_or_default(account_named_key.key.get());
         let dictionary_name = get_str_or_default(account_named_key.dictionary_name.get());
         let dictionary_item_key = get_str_or_default(account_named_key.dictionary_item_key.get());
-        _DictionaryItemStrParams::AccountNamedKey {
+        Ok(_DictionaryItemStrParams::AccountNamedKey {
             account_hash,
             dictionary_name,
             dictionary_item_key,
-        }
+        })
     } else if let Some(contract_named_key) = &dictionary_item_params.contract_named_key {
         let hash_addr = get_str_or_default(contract_named_key.key.get());
         let dictionary_name = get_str_or_default(contract_named_key.dictionary_name.get());
         let dictionary_item_key = get_str_or_default(contract_named_key.dictionary_item_key.get());
-        _DictionaryItemStrParams::ContractNamedKey {
+        Ok(_DictionaryItemStrParams::ContractNamedKey {
             hash_addr,
             dictionary_name,
             dictionary_item_key,
-        }
+        })
     } else if let Some(entity_named_key) = &dictionary_item_params.entity_named_key {
         let entity_addr = get_str_or_default(entity_named_key.key.get());
         let dictionary_name = get_str_or_default(entity_named_key.dictionary_name.get());
         let dictionary_item_key = get_str_or_default(entity_named_key.dictionary_item_key.get());
-        _DictionaryItemStrParams::EntityNamedKey {
+        Ok(_DictionaryItemStrParams::EntityNamedKey {
             entity_addr,
             dictionary_name,
             dictionary_item_key,
-        }
+        })
     } else if let Some(uref_variant) = &dictionary_item_params.uref {
         let seed_uref = get_str_or_default(uref_variant.seed_uref.get());
         let dictionary_item_key = get_str_or_default(uref_variant.dictionary_item_key.get());
-        _DictionaryItemStrParams::URef {
+        Ok(_DictionaryItemStrParams::URef {
             seed_uref,
             dictionary_item_key,
-        }
+        })
     } else if let Some(dictionary_variant) = &dictionary_item_params.dictionary {
         let value = get_str_or_default(dictionary_variant.value.get());
-        _DictionaryItemStrParams::Dictionary(value)
+        Ok(_DictionaryItemStrParams::Dictionary(value))
     } else {
-        // TODO Fix return type
-        error("Error converting dictionary_item_params");
-        _DictionaryItemStrParams::Dictionary("")
+        Err(Box::new(SdkError::InvalidArgument {
+            context: "dictionary_item_str_params_to_casper_client",
+            error: "no dictionary item params set".to_string(),
+        }))
     }
 }
 
@@ -323,7 +324,7 @@ mod tests {
             account_hash,
             dictionary_name,
             dictionary_item_key,
-        } = dictionary_item_str_params_to_casper_client(&dictionary_item_params)
+        } = dictionary_item_str_params_to_casper_client(&dictionary_item_params).unwrap()
         {
             assert_eq!(account_hash, "account_key");
             assert_eq!(dictionary_name, "test_dict");
@@ -363,7 +364,7 @@ mod tests {
             hash_addr,
             dictionary_name,
             dictionary_item_key,
-        } = dictionary_item_str_params_to_casper_client(&dictionary_item_params)
+        } = dictionary_item_str_params_to_casper_client(&dictionary_item_params).unwrap()
         {
             assert_eq!(hash_addr, "contract_key");
             assert_eq!(dictionary_name, "test_contract_dict");
@@ -400,7 +401,7 @@ mod tests {
             entity_addr,
             dictionary_name,
             dictionary_item_key,
-        } = dictionary_item_str_params_to_casper_client(&dictionary_item_params)
+        } = dictionary_item_str_params_to_casper_client(&dictionary_item_params).unwrap()
         {
             assert_eq!(entity_addr, "entity_key");
             assert_eq!(dictionary_name, "test_entity_dict");
@@ -431,7 +432,7 @@ mod tests {
         if let _DictionaryItemStrParams::URef {
             seed_uref,
             dictionary_item_key,
-        } = dictionary_item_str_params_to_casper_client(&dictionary_item_params)
+        } = dictionary_item_str_params_to_casper_client(&dictionary_item_params).unwrap()
         {
             assert_eq!(seed_uref, "seed_uref");
             assert_eq!(dictionary_item_key, "uref_item_key");
@@ -457,7 +458,7 @@ mod tests {
         };
 
         if let _DictionaryItemStrParams::Dictionary(value) =
-            dictionary_item_str_params_to_casper_client(&dictionary_item_params)
+            dictionary_item_str_params_to_casper_client(&dictionary_item_params).unwrap()
         {
             assert_eq!(value, "dictionary_value");
         } else {
@@ -473,12 +474,6 @@ mod tests {
             entity_named_key: None,
         };
 
-        if let _DictionaryItemStrParams::Dictionary(value) =
-            dictionary_item_str_params_to_casper_client(&invalid_params)
-        {
-            assert_eq!(value, "");
-        } else {
-            panic!("Unexpected enum variant");
-        }
+        assert!(dictionary_item_str_params_to_casper_client(&invalid_params).is_err());
     }
 }

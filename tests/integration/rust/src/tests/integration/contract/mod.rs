@@ -121,9 +121,9 @@ pub mod test_module {
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(
-            &config
-                .contract_cep78_key
-                .replace("entity-contract-", "hash-"),
+            &casper_rust_wasm_sdk::helpers::contract_hash_key_for_global_state(
+                &config.contract_cep78_key,
+            ),
         );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         session_params.set_session_args_json(ARGS_JSON);
@@ -263,12 +263,6 @@ pub mod test_module {
         let result = query_result.unwrap().result;
 
         assert!(!result.api_version.to_string().is_empty());
-        // TODO Check as_addressable_entity
-        // assert!(result
-        //     .stored_value
-        //     .as_addressable_entity()
-        //     .unwrap()
-        //     .is_account_kind());
     }
 
     pub async fn test_call_entrypoint_transaction() {

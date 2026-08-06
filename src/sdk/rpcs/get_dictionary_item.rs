@@ -255,15 +255,20 @@ impl SDK {
         };
         let random_id = rand::rng().random::<u64>().to_string();
         match dictionary_item_input {
-            DictionaryItemInput::Params(dictionary_item_params) => get_dictionary_item_cli(
-                &random_id,
-                &self.get_rpc_address(rpc_address),
-                self.get_verbosity(verbosity).into(),
-                &state_root_hash.to_string(),
-                dictionary_item_str_params_to_casper_client(&dictionary_item_params),
-            )
-            .await
-            .map_err(SdkError::from),
+            DictionaryItemInput::Params(dictionary_item_params) => {
+                let dictionary_item_params =
+                    dictionary_item_str_params_to_casper_client(&dictionary_item_params)
+                        .map_err(|err| *err)?;
+                get_dictionary_item_cli(
+                    &random_id,
+                    &self.get_rpc_address(rpc_address),
+                    self.get_verbosity(verbosity).into(),
+                    &state_root_hash.to_string(),
+                    dictionary_item_params,
+                )
+                .await
+                .map_err(SdkError::from)
+            }
             DictionaryItemInput::Identifier(dictionary_item_identifier) => get_dictionary_item_lib(
                 JsonRpcId::from(random_id),
                 &self.get_rpc_address(rpc_address),

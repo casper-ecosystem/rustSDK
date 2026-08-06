@@ -296,7 +296,9 @@ pub mod test_module {
             );
         } else {
             params.set_contract_named_key(
-                &config.contract_cep78_key.replace("entity-contract", "hash"),
+                &casper_rust_wasm_sdk::helpers::contract_hash_key_for_global_state(
+                    &config.contract_cep78_key,
+                ),
                 DICTIONARY_NAME,
                 DICTIONARY_ITEM_KEY,
             );
@@ -333,7 +335,9 @@ pub mod test_module {
             );
         } else {
             params.set_contract_named_key(
-                &config.contract_cep78_key.replace("entity-contract", "hash"),
+                &casper_rust_wasm_sdk::helpers::contract_hash_key_for_global_state(
+                    &config.contract_cep78_key,
+                ),
                 DICTIONARY_NAME,
                 DICTIONARY_ITEM_KEY,
             );
@@ -475,10 +479,9 @@ pub mod test_module {
         let key = if get_enable_addressable_entity() {
             config.to_owned().contract_cep78_key
         } else {
-            config
-                .to_owned()
-                .contract_cep78_key
-                .replace("entity-contract", "hash")
+            casper_rust_wasm_sdk::helpers::contract_hash_key_for_global_state(
+                &config.to_owned().contract_cep78_key,
+            )
         };
 
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {

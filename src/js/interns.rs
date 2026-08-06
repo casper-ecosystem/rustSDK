@@ -1,6 +1,6 @@
 use crate::helpers::{
-    get_base64_key_from_account_hash, get_base64_key_from_key_hash, get_blake2b_hash,
-    get_current_timestamp, hex_to_uint8_vec,
+    contract_hash_key_for_global_state, get_base64_key_from_account_hash,
+    get_base64_key_from_key_hash, get_blake2b_hash, get_current_timestamp, hex_to_uint8_vec,
     make_dictionary_item_key as make_dictionary_item_key_helper, public_key_from_secret_key,
     secret_key_generate, secret_key_secp256k1_generate,
 };
@@ -234,6 +234,12 @@ pub fn get_base64_key_from_key_hash_js_alias(formatted_key_hash: &str) -> Result
         let error_text = format!("Error serializing package hash: {err:?}");
         JsError::new(&error_text)
     })
+}
+
+/// Maps `entity-contract-…` (or bare hex) to `hash-…` for AE-off global-state / contract-info queries.
+#[wasm_bindgen(js_name = "contractHashKeyForGlobalState")]
+pub fn contract_hash_key_for_global_state_js_alias(formatted: &str) -> String {
+    contract_hash_key_for_global_state(formatted)
 }
 
 /// Gets the current timestamp.

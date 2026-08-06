@@ -5,9 +5,9 @@ use crate::helpers::secret_key_from_pem;
 use crate::helpers::{
     get_current_timestamp, get_ttl_or_default, insert_arg, parse_timestamp, parse_ttl,
 };
+use crate::types::{cl::bytes::Bytes, hash::account_hash::AccountHash, sdk_error::SdkError};
 #[cfg(feature = "transaction")]
 use crate::types::{
-    cl::bytes::Bytes,
     hash::{addressable_entity_hash::AddressableEntityHash, package_hash::PackageHash},
     public_key::PublicKey,
     transaction_params::{
@@ -16,7 +16,6 @@ use crate::types::{
     },
     uref::URef,
 };
-use crate::types::{hash::account_hash::AccountHash, sdk_error::SdkError};
 use crate::{
     debug::{error, log},
     types::{digest::Digest, hash::transaction_hash::TransactionHash, pricing_mode::PricingMode},
@@ -432,13 +431,39 @@ impl Transaction {
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "session_args")]
     pub fn session_args_js_alias(&self) -> JsValue {
-        match JsValue::from_serde(&self.session_args()) {
-            Ok(json) => json,
+        match self.session_args() {
+            Ok(args) => match JsValue::from_serde(&args) {
+                Ok(json) => json,
+                Err(err) => {
+                    error(&format!("Error serializing session_args to JSON: {err:?}"));
+                    JsValue::null()
+                }
+            },
             Err(err) => {
-                error(&format!("Error serializing session_args to JSON: {err:?}"));
+                error(&format!("Error retrieving session_args: {err:?}"));
                 JsValue::null()
             }
         }
+    }
+
+    /// Bytesrepr session args, or an error when args are named.
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "session_args_bytes")]
+    pub fn session_args_bytes_js_alias(&self) -> Result<Bytes, JsError> {
+        self.session_args_bytes()
+            .map_err(|err| JsError::new(&format!("{err:?}")))
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(getter, js_name = "is_bytesrepr")]
+    pub fn is_bytesrepr_js_alias(&self) -> bool {
+        self.is_bytesrepr()
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(getter, js_name = "is_named")]
+    pub fn is_named_js_alias(&self) -> bool {
+        self.is_named()
     }
 
     #[wasm_bindgen(js_name = "addSignature")]
@@ -535,9 +560,11 @@ impl Transaction {
         match &self.0 {
             _Transaction::Deploy(_deploy) => {
                 unimplemented!("receipt not implemented in deploy!")
-            } // TODO
-            // _Transaction::V1(transaction_v1) => transaction_v1.pricing_mode().receipt().into(),
-            _Transaction::V1(_transaction_v1) => Digest::new("0").unwrap(),
+            }
+            _Transaction::V1(transaction_v1) => match transaction_v1.pricing_mode() {
+                _PricingMode::Prepaid { receipt } => (*receipt).into(),
+                _ => Digest::default(),
+            },
         }
     }
 
@@ -564,7 +591,9 @@ impl Transaction {
         js_value_arg: JsValue,
         secret_key: Option<String>,
     ) -> Result<Transaction, JsError> {
-        let mut args = self.session_args().clone();
+        let mut args = self
+            .session_args()
+            .map_err(|err| JsError::new(&format!("Error adding argument: {err}")))?;
         let new_args = match insert_js_value_arg(&mut args, js_value_arg) {
             Ok(new_args) => new_args,
             Err(err) => return Err(JsError::new(&format!("Error adding argument: {err}"))),
@@ -574,24 +603,52 @@ impl Transaction {
 }
 
 impl Transaction {
-    pub fn session_args(&self) -> RuntimeArgs {
+    fn transaction_args(&self) -> Result<TransactionArgs, Box<SdkError>> {
         match &self.0 {
-            _Transaction::Deploy(deploy) => deploy.session().args().clone(),
-            _Transaction::V1(transaction_v1) => {
-                let args = transaction_v1
-                    .deserialize_field::<TransactionArgs>(ARGS_MAP_KEY)
-                    .map_err(|err| SdkError::FieldDeserialization {
-                        index: TARGET_MAP_KEY,
+            _Transaction::Deploy(deploy) => {
+                Ok(TransactionArgs::Named(deploy.session().args().clone()))
+            }
+            _Transaction::V1(transaction_v1) => transaction_v1
+                .deserialize_field::<TransactionArgs>(ARGS_MAP_KEY)
+                .map_err(|err| {
+                    Box::new(SdkError::FieldDeserialization {
+                        index: ARGS_MAP_KEY,
                         error: format!("{err:?}"),
                     })
-                    .unwrap();
+                }),
+        }
+    }
 
-                match args {
-                    TransactionArgs::Named(runtime_args) => runtime_args,
-                    TransactionArgs::Bytesrepr(_) => unimplemented!(), // TODO Return TransactionArgs for new Bytesrepr
-                }
+    /// Named session args. Errors when args are Bytesrepr (`UnexpectedTransactionArgsVariant`).
+    pub fn session_args(&self) -> Result<RuntimeArgs, Box<SdkError>> {
+        match self.transaction_args()? {
+            TransactionArgs::Named(runtime_args) => Ok(runtime_args),
+            TransactionArgs::Bytesrepr(_) => {
+                Err(Box::new(SdkError::UnexpectedTransactionArgsVariant))
             }
         }
+    }
+
+    /// Bytesrepr session args. Errors when args are Named (`UnexpectedTransactionArgsVariant`).
+    pub fn session_args_bytes(&self) -> Result<Bytes, Box<SdkError>> {
+        match self.transaction_args()? {
+            TransactionArgs::Bytesrepr(bytes) => Ok(bytes.into()),
+            TransactionArgs::Named(_) => Err(Box::new(SdkError::UnexpectedTransactionArgsVariant)),
+        }
+    }
+
+    /// True when V1 args are Bytesrepr (Deploy is always named).
+    pub fn is_bytesrepr(&self) -> bool {
+        self.transaction_args()
+            .map(|args| args.is_bytesrepr())
+            .unwrap_or(false)
+    }
+
+    /// True when args are Named (Deploy is always named).
+    pub fn is_named(&self) -> bool {
+        self.transaction_args()
+            .map(|args| args.is_named())
+            .unwrap_or(true)
     }
 
     pub fn target(&self) -> Result<TransactionTarget, Box<SdkError>> {
@@ -607,10 +664,14 @@ impl Transaction {
     }
 
     #[cfg(feature = "transaction")]
-    pub fn add_arg(&mut self, new_value_arg: String, secret_key: Option<String>) -> Transaction {
-        let mut session_args = self.session_args().clone();
+    pub fn add_arg(
+        &mut self,
+        new_value_arg: String,
+        secret_key: Option<String>,
+    ) -> Result<Transaction, Box<SdkError>> {
+        let mut session_args = self.session_args()?;
         let new_args = insert_arg(&mut session_args, new_value_arg);
-        self.add_arg_common(new_args, secret_key)
+        Ok(self.add_arg_common(new_args, secret_key))
     }
 
     #[cfg(feature = "transaction")]
@@ -750,15 +811,26 @@ impl Transaction {
         let ttl = ttl.unwrap_or_else(|| self.0.ttl());
         let timestamp = timestamp.unwrap_or_else(|| self.0.timestamp());
         let initiator_addr = initiator_addr.unwrap_or_else(|| self.0.initiator_addr().clone());
-        let runtime_args = session_args.unwrap_or_else(|| self.session_args());
 
         builder = builder
             .with_chain_name(chain_name)
             .with_ttl(ttl)
             .with_timestamp(timestamp)
             .with_pricing_mode(self.pricing_mode_typed())
-            .with_initiator_addr(initiator_addr)
-            .with_runtime_args(runtime_args);
+            .with_initiator_addr(initiator_addr);
+
+        builder = match session_args {
+            Some(named) => builder.with_runtime_args(named),
+            None => match self.transaction_args().unwrap_or_else(|err| {
+                error(&format!(
+                    "Error reading transaction args for rebuild: {err:?}"
+                ));
+                TransactionArgs::Named(RuntimeArgs::new())
+            }) {
+                TransactionArgs::Named(named) => builder.with_runtime_args(named),
+                TransactionArgs::Bytesrepr(bytes) => builder.with_chunked_args(bytes),
+            },
+        };
 
         let secret_key_owned: Option<SecretKey> = secret_key.as_ref().map(|pem| {
             secret_key_from_pem(pem)
@@ -813,7 +885,9 @@ impl Transaction {
         let builder = match target {
             TransactionTarget::Native => match entry_point {
                 TransactionEntryPoint::Transfer => {
-                    let args = self.session_args();
+                    let args = self
+                        .session_args()
+                        .expect("transfer rebuild requires named session args");
 
                     let target_arg = args.get("target").expect("Expected 'target' argument");
 
@@ -1018,14 +1092,21 @@ mod tests {
 
         let builder_params = TransactionBuilderParams::default();
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
-        let transaction = transaction.add_arg("foo:bool='false".to_string(), None);
+        let transaction = transaction
+            .add_arg("foo:bool='false".to_string(), None)
+            .unwrap();
 
-        assert_eq!(transaction.session_args().len(), 1);
+        assert_eq!(transaction.session_args().unwrap().len(), 1);
         // Direct RuntimeArgs path (bool false), not JSON→CLI rematerialization.
         let expected_inner_bytes = vec![0];
 
         assert_eq!(
-            *transaction.session_args().get("foo").unwrap().inner_bytes(),
+            *transaction
+                .session_args()
+                .unwrap()
+                .get("foo")
+                .unwrap()
+                .inner_bytes(),
             expected_inner_bytes
         );
     }
@@ -1043,13 +1124,18 @@ mod tests {
 
         let builder_params = TransactionBuilderParams::default();
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
-        let transaction = transaction.add_arg("foo:bool='false".to_string(), None);
-
-        let expected_inner_bytes = vec![0];
+        let transaction = transaction
+            .add_arg("foo:bool='false".to_string(), None)
+            .unwrap();
 
         assert_eq!(
-            *transaction.session_args().get("foo").unwrap().inner_bytes(),
-            expected_inner_bytes
+            *transaction
+                .session_args()
+                .unwrap()
+                .get("foo")
+                .unwrap()
+                .inner_bytes(),
+            vec![0]
         );
     }
 
@@ -1065,16 +1151,53 @@ mod tests {
 
         let builder_params = TransactionBuilderParams::default();
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
-        let transaction = transaction.add_arg("foo:bool='true".to_string(), None);
+        let transaction = transaction
+            .add_arg("foo:bool='true".to_string(), None)
+            .unwrap();
         let rebuilt = transaction.with_ttl("1h", None);
 
         assert_eq!(rebuilt.ttl(), "1h");
         assert_eq!(rebuilt.chain_name(), chain_name);
-        assert_eq!(rebuilt.session_args().len(), 1);
+        assert_eq!(rebuilt.session_args().unwrap().len(), 1);
         assert_eq!(
-            *rebuilt.session_args().get("foo").unwrap().inner_bytes(),
+            *rebuilt
+                .session_args()
+                .unwrap()
+                .get("foo")
+                .unwrap()
+                .inner_bytes(),
             vec![1]
         );
+    }
+
+    #[test]
+    fn test_session_args_bytesrepr_accessors() {
+        let (_, _, _, _, chain_name) = get_network_constants();
+        let secret_key = get_user_secret_key(None).unwrap();
+
+        let transaction_params = TransactionStrParams::default();
+        transaction_params.set_secret_key(&secret_key);
+        transaction_params.set_chain_name(&chain_name);
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
+        transaction_params.set_chunked_args(Bytes::from(vec![1, 2, 3, 4]));
+
+        let builder_params = TransactionBuilderParams::default();
+        let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
+
+        assert!(transaction.is_bytesrepr());
+        assert!(!transaction.is_named());
+        assert!(matches!(
+            *transaction.session_args().unwrap_err(),
+            SdkError::UnexpectedTransactionArgsVariant
+        ));
+        assert_eq!(
+            transaction.session_args_bytes().unwrap().as_ref(),
+            &[1, 2, 3, 4]
+        );
+        assert!(transaction
+            .clone()
+            .add_arg("foo:bool='false".to_string(), None)
+            .is_err());
     }
 
     #[test]

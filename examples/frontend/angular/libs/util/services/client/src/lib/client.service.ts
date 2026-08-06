@@ -46,7 +46,6 @@ export class ClientService {
   private deploy_json!: string;
   private transaction_json!: string;
   private select_dict_identifier!: string;
-  // TODO Verbosity from config
   private verbosity = Verbosity.High;
 
   constructor(
@@ -944,10 +943,6 @@ export class ClientService {
       err && this.errorService.setError(err.toString());
       return;
     }
-
-    // TODO
-    // deploy_to_sign = deploy_to_sign.addArg("test:bool='false"); // Deploy was modified has no approvals anymore
-    // deploy_to_sign = deploy_to_sign.addArg({ "name": "name_of_my_key", "type": "U256", "value": 1 });
 
     let signed_deploy;
     try {

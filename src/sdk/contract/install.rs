@@ -59,7 +59,10 @@ impl SDK {
 /// A set of functions for installing smart contracts on the blockchain.
 /// Alias of sdk.transaction
 impl SDK {
-    /// Installs a smart contract with the specified parameters and returns the result.
+    /// Installs classic session wasm (`is_install_upgrade`) and returns the put result.
+    ///
+    /// Pins `VmCasperV1` (CEP-78, HELLO, and other current session fixtures). For VM2
+    /// contracts, use `TransactionBuilderParams` with `set_runtime_v2` instead.
     ///
     /// # Arguments
     ///
@@ -82,8 +85,10 @@ impl SDK {
     ) -> Result<SuccessResponse<_PutTransactionResult>, SdkError> {
         //log("install!");
         let is_install_upgrade = Some(true);
-        let builder_params =
+        let mut builder_params =
             TransactionBuilderParams::new_session(Some(transaction_bytes), is_install_upgrade);
+        // Classic session installs (CEP-78, HELLO, …) are VmCasperV1 wasm.
+        builder_params.set_runtime_v1();
         self.transaction(builder_params, transaction_params, None, rpc_address)
             .await
     }

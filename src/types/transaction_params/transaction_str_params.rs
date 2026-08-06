@@ -553,8 +553,10 @@ mod tests {
         assert_eq!(result.standard_payment, "true");
         assert_eq!(result.transferred_value, "0");
         assert_eq!(result.session_entry_point, Some("session_entry_point"));
-        // TODO FIX
-        //assert_eq!(result.chunked_args, Some());
+        assert_eq!(
+            result.chunked_args,
+            Some(Bytes::from("json".to_bytes().unwrap()).to_vec())
+        );
         assert_eq!(result.min_bid_override, true);
     }
 

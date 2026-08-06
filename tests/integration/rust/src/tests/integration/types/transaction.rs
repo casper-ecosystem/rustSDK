@@ -259,12 +259,6 @@ pub mod test_module_transaction {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());
-        // TODO
-        //assert!(transaction.is_stored_contract());
-        // assert_eq!(
-        //     transaction.by_name().unwrap().to_string(),
-        //     CONTRACT_CEP78_KEY
-        // );
     }
 
     pub async fn test_transaction_type_with_package_hash() {
@@ -379,32 +373,6 @@ pub mod test_module_transaction {
         assert!(transaction.verify());
     }
 
-    // TODO
-    // pub async fn test_transaction_type_with_standard_payment() {
-    //     let config: TestConfig = get_config(true).await;
-    //     let transaction_params = TransactionStrParams::new_with_defaults(
-    //         &config.chain_name,
-    //         Some(config.account),
-    //         Some(config.secret_key.clone()),
-    //         Some(TTL.to_string()),
-    //     );
-
-    //     let builder_params =
-    //     TransactionBuilderParams::new_invocable_entity(&config.contract_cep78_key, ENTRYPOINT_MINT);
-
-    //     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
-    //     let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
-    //     assert!(transaction.verify());
-    //     assert_eq!(transaction.payment_amount(1_u8).to_string(), PAYMENT_AMOUNT);
-    //     let new_payment_amount = "1111111111";
-    //     transaction = transaction.with_standard_payment(new_payment_amount, None);
-    //     assert!(!transaction.verify());
-    //     assert_eq!(
-    //         transaction.payment_amount(1_u8).to_string(),
-    //         new_payment_amount
-    //     );
-    // }
-
     pub async fn test_transaction_type_is_expired() {
         let config: TestConfig = get_config(true).await;
         let old_timestamp = "2023-09-05T16:53:46";
@@ -486,7 +454,7 @@ pub mod test_module_transaction {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());
-        assert!(transaction.session_args().is_empty());
+        assert!(transaction.session_args().unwrap().is_empty());
     }
 
     pub async fn test_transaction_type_args() {
@@ -511,8 +479,8 @@ pub mod test_module_transaction {
 
         let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());
-        assert!(!transaction.session_args().is_empty());
-        assert_eq!(transaction.session_args().len(), args.len());
+        assert!(!transaction.session_args().unwrap().is_empty());
+        assert_eq!(transaction.session_args().unwrap().len(), args.len());
     }
 
     pub async fn test_transaction_type_args_json() {
@@ -534,8 +502,8 @@ pub mod test_module_transaction {
 
         let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());
-        assert!(!transaction.session_args().is_empty());
-        assert_eq!(transaction.session_args().len(), 11);
+        assert!(!transaction.session_args().unwrap().is_empty());
+        assert_eq!(transaction.session_args().unwrap().len(), 11);
     }
 
     pub async fn test_transaction_type_add_arg() {
@@ -555,15 +523,18 @@ pub mod test_module_transaction {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());
-        assert!(transaction.session_args().is_empty());
-        transaction =
-            transaction.add_arg("foo:bool='false".into(), Some(config.secret_key.clone()));
+        assert!(transaction.session_args().unwrap().is_empty());
+        transaction = transaction
+            .add_arg("foo:bool='false".into(), Some(config.secret_key.clone()))
+            .unwrap();
         assert!(transaction.verify());
-        assert_eq!(transaction.session_args().len(), 1);
+        assert_eq!(transaction.session_args().unwrap().len(), 1);
         let arg_json = r#"{"name": "bar", "type": "U256", "value": 1}"#; // No brackets only one arg
-        transaction = transaction.add_arg(arg_json.into(), Some(config.secret_key.clone()));
+        transaction = transaction
+            .add_arg(arg_json.into(), Some(config.secret_key.clone()))
+            .unwrap();
         assert!(transaction.verify());
-        assert_eq!(transaction.session_args().len(), 2);
+        assert_eq!(transaction.session_args().unwrap().len(), 2);
     }
 
     pub async fn test_transaction_type_add_signature() {
@@ -663,11 +634,6 @@ mod tests_transaction {
     pub async fn test_transaction_type_test_with_secret_key_test() {
         test_transaction_type_with_secret_key().await;
     }
-    // TODO
-    // #[test]
-    // pub async fn test_transaction_type_with_standard_payment_test() {
-    //     test_transaction_type_with_standard_payment().await;
-    // }
     #[test]
     pub async fn test_transaction_type_is_expired_test() {
         test_transaction_type_is_expired().await;

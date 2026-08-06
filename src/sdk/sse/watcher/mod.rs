@@ -385,8 +385,7 @@ impl Watcher {
         // before connect is still visible (parity with SSEClient).
         let url = url_with_start_from(&self.events_url, Some(0));
 
-        // TODO fix this warning
-        // https://github.com/rust-lang/rust-clippy/issues/11034
+        // Clippy false positive until rust-lang/rust-clippy#11034 is fixed.
         #[allow(clippy::arc_with_non_send_sync)]
         let watcher = Arc::new(Mutex::new(self.clone()));
 

@@ -1092,7 +1092,7 @@ client.subscribe("TransactionProcessed", (raw) => {
 
 #### Rust — CESParser
 
-Load contract metadata (including `__events_schema`) via `query_global_state`, then parse transforms from an execution-result JSON string. Pass a `hash-…` or bare hex contract hash; if you only have an account named key of the form `entity-contract-…`, remap it to `hash-…` before create (same pattern as dictionary helpers when addressable entities are disabled).
+Load contract metadata (including `__events_schema`) via `query_global_state`, then parse transforms from an execution-result JSON string. Pass a `hash-…`, bare hex, or `entity-contract-…` named key: `CESParser::create` remaps via `helpers::contract_hash_key_for_global_state` when addressable entities are disabled and global state expects `hash-…` → `StoredValue::Contract`.
 
 ```rust
 use casper_rust_wasm_sdk::SSE::CESParser;
@@ -2509,99 +2509,81 @@ Download pre-built desktop demos from the **[GitHub Releases](https://github.com
 
 ## Rust API
 
-- [Modules and Structs](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/)
+Published rustdoc: [crate root](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/) · [all items](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/all.html)
 
-- [Full item list](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/all.html)
+Cargo features (see `Cargo.toml`): `transaction`, `deploy`, `contract`, `binary-port`, `watcher`, `SSE` (includes `watcher` + `SSEClient` / `CESParser`), `helpers`. Default bundle is `full` (not the same as enabling `SSE`).
 
-### SDK
+### SDK and RPC
 
-- [SDK Struct and methods](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/struct.SDK.html)
+- [SDK](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/struct.SDK.html) — construct with RPC URL / verbosity; all `get_*` / `put_*` / builders hang here
+- [RPC module](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
 
-### RPC
+### Transactions (Casper 2.x)
 
-- [RPC List](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
+- [TransactionStrParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/transaction_params/transaction_str_params/index.html) — chain name, signing, TTL, payment, session args
+- [TransactionBuilderParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/transaction_params/transaction_builder_params/index.html) — session / entity / package / transfer targets; **runtime** `VmCasperV1` or `VmCasperV2` (session/entity/package default to V2; set V1 for classic wasm such as CEP-78)
+- [Transaction](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/transaction/struct.Transaction.html) — sign / put / rebuild; session args are either **named** (`session_args`) or **Bytesrepr** (`session_args_bytes`, `is_bytesrepr` / `is_named`)
 
-### Transaction Params
+### Deploys (legacy 1.x path)
 
-- [TransactionStrParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/transaction_params/transaction_str_params/index.html)
-- [TransactionBuilderParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/transaction_params/transaction_builder_params/index.html)
+- [Deploy params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html) — `DeployStrParams`, `SessionStrParams`, `PaymentStrParams`, dictionary params
+- [Deploy](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
 
-### Transaction
+### Contracts (feature `contract`)
 
-- [Transaction Type](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/transaction/struct.Transaction.html)
+High-level install / entrypoint / dictionary / key query helpers on `SDK` (see rustdoc methods and the [Install / Mint examples](#more-examples) above). When addressable entities are **off**, named keys may still look like `entity-contract-…` while `query_global_state` expects `hash-…` — use [`contract_hash_key_for_global_state`](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/helpers/fn.contract_hash_key_for_global_state.html) (or pass `entity-contract-…` into `CESParser::create`, which remaps). Background for node core: [#96](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/96).
 
-### Deploy Params (Legacy)
+### Watcher and SSE
 
-- [Params and Args simple](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
+- [watcher](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/watcher/index.html) — wait / watch for a transaction (or legacy deploy) to finalize (`Subscription`, `EventParseResult`)
+- Feature **`SSE`**: [`SSEClient`](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/SSE/index.html) for the node event stream (`BlockAdded`, `TransactionProcessed`, …) and [`CESParser`](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/SSE/index.html) for Casper Event Standard transforms (`events_mode: 2`). Examples: [SSEClient / CESParser](#rust--sseclient)
 
-### Deploy (Legacy)
+### Types and helpers
 
-- [Deploy Type and static builder](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
+- [types](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/index.html) — keys, hashes, CL values, verbosity, …
+- [helpers](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/helpers/index.html) — hashing, TTL/timestamp parse, dictionary item key, motes, **AE-off contract key remap**, …
 
-### Transaction Watcher
+### Binary Port (feature `binary-port`)
 
-- [Watcher](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/watcher/index.html)
-- [Subscription](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/watcher/struct.Subscription.html)
-- [EventParseResult](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/watcher/struct.EventParseResult.html)
+- [binary_port](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/binary_port/index.html) — native binary-port reads (block headers, global state, rewards, speculative exec, …) when talking to a node that exposes the port
 
-### Types
+### MCP (agents)
 
-- [Current exposed types](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/index.html)
-
-### Helpers functions
-
-- [Rust helpers](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/helpers/index.html)
-
-### Binary Port
-
-- [Binary methods](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/binary_port/index.html)
+Not part of the Rust crate root: sibling package [`mcp/`](../mcp/) wraps the same SDK as MCP tools. See [MCP](#mcp) above and [`mcp/TOOLS.md`](../mcp/TOOLS.md).
 
 ## Typescript API
 
-- [Full item list](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/index.html)
+Published typedoc: [index](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/index.html)
 
-### SDK
+Same surface as Rust, via the Wasm pack (`pkg` / `pkg-nodejs`). Notable entry points:
 
-- [SDK Class and methods](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/SDK.html)
+### SDK and RPC
 
-### Transaction Params
+- [SDK](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/SDK.html)
 
-- [Transaction Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/TransactionStrParams.html)
-- [Transaction Builder Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/TransactionBuilderParams.html)
-- [Dictionary Item Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/DictionaryItemStrParams.html)
+### Transactions
 
-### Transaction
+- [TransactionStrParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/TransactionStrParams.html)
+- [TransactionBuilderParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/TransactionBuilderParams.html) — `setRuntimeV1` / `setRuntimeV2`
+- [Transaction](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/Transaction.html) — named vs Bytesrepr session args (`session_args` / `session_args_bytes` / `is_bytesrepr`)
 
-- [Transaction Type](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/Transaction.html)
+### Deploys (legacy)
 
-### Deploy Params (Legacy)
+- [DeployStrParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/DeployStrParams.html), [SessionStrParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/SessionStrParams.html), [PaymentStrParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/PaymentStrParams.html), [DictionaryItemStrParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/DictionaryItemStrParams.html)
+- [Deploy](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/Deploy.html)
 
-- [Deploy Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/DeployStrParams.html)
-- [Session Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/SessionStrParams.html)
-- [Payment Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/PaymentStrParams.html)
-- [Dictionary Item Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/DictionaryItemStrParams.html)
+### Watcher and SSE / CES
 
-### Deploy (Legacy)
+- [Watcher](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/Watcher.html), [Subscription](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/Subscription.html), [EventParseResult](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/EventParseResult.html)
+- `SDK.SSE_client` / `SDK.CES_parser` (Wasm build with `SSE`) — see [TypeScript SSE / CES examples](#typescript--sseclient)
 
-- [Deploy Type and static builder](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/Deploy.html)
+### Types and helpers
 
-### Transaction Watcher
-
-- [Watcher](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/Watcher.html)
-- [Subscription](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/Subscription.html)
-- [EventParseResult](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/EventParseResult.html)
-
-### Types
-
-- [Current exposed types](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/modules.html)
-
-### Helpers functions
-
-- [TS helpers](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/modules.html#Functions)
+- [modules](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/modules.html) — types + free functions (`contractHashKeyForGlobalState`, `makeDictionaryItemKey`, …)
 
 ### Binary Port
 
-- [Binary methods](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/SDK.html#Methods)
+- Methods on [SDK](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/SDK.html#Methods) (binary-port feature)
 
 ## Casper Wallet
 
@@ -2676,7 +2658,13 @@ SECRET_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
 
 ## Todo
 
-- Expose more CL Types and Casper Client result Types
-- EventStream for other events than transaction processed
+Open tracking (not a full roadmap):
+
+- [#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9) — Python / PyO3 bindings
+- [#27](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/27) — more typed `StoredValue` / entrypoint / named-keys surface (code largely landed; issue open until accepted)
+- [#36](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/36) — first crates.io publish
+- [#96](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/96) — explainer for node core: AE-off `entity-contract-…` vs `hash-…` on `query_global_state` (SDK remaps; permanent fix is upstream)
+
+Mac desktop Electron build is still TODO (Windows / Linux demos ship on releases).
 
 ⚠ **Reminder**: Do not use private keys or perform real transactions on the testnet/mainnet unless you are fully aware of the security risks.

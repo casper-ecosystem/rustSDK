@@ -187,7 +187,7 @@ fn parse_transfer_target(obj: &Value) -> Result<TransferTarget, String> {
 pub fn parse_transaction_builder_params(json: &str) -> Result<TransactionBuilderParams, String> {
     let obj: Value = serde_json::from_str(json).map_err(|e| format!("builder_params JSON: {e}"))?;
     let kind = req_str(&obj, "kind")?;
-    match kind.to_lowercase().as_str() {
+    let mut params = match kind.to_lowercase().as_str() {
         "session" => {
             let bytes = match opt_str(&obj, "transaction_bytes_hex") {
                 Some(h) => Some(bytes_from_hex(&h)?),
@@ -304,7 +304,30 @@ pub fn parse_transaction_builder_params(json: &str) -> Result<TransactionBuilder
         other => Err(format!(
             "unknown builder kind `{other}` (Session|Transfer|InvocableEntity|…)"
         )),
+    }?;
+    apply_builder_runtime(&mut params, &obj)?;
+    Ok(params)
+}
+
+fn apply_builder_runtime(params: &mut TransactionBuilderParams, obj: &Value) -> Result<(), String> {
+    let seed = match opt_str(obj, "seed_hex") {
+        Some(h) => Some(Vec::<u8>::from(bytes_from_hex(&h)?)),
+        None => None,
+    };
+    if let Some(runtime) = opt_str(obj, "runtime") {
+        match runtime.to_lowercase().as_str() {
+            "v1" | "vmcasperv1" | "vm_casper_v1" => params.set_runtime_v1(),
+            "v2" | "vmcasperv2" | "vm_casper_v2" => {
+                let transferred_value = opt_u64(obj, "transferred_value").unwrap_or(0);
+                params.set_runtime_v2(transferred_value, seed);
+            }
+            other => return Err(format!("unknown runtime `{other}` (v1|v2)")),
+        }
+    } else if opt_u64(obj, "transferred_value").is_some() || seed.is_some() {
+        let transferred_value = opt_u64(obj, "transferred_value").unwrap_or(0);
+        params.set_runtime_v2(transferred_value, seed);
     }
+    Ok(())
 }
 
 /// Parse `DeployStrParams` from JSON.

@@ -856,7 +856,6 @@ mod tests {
             .get_binary_consensus_validator_changes(Some(node_address))
             .await;
         let changes = result.unwrap();
-        // Todo check empty
         assert!(changes.into_inner().is_empty());
     }
 
@@ -891,7 +890,6 @@ mod tests {
 
         let result = sdk.get_binary_next_upgrade(Some(node_address)).await;
         let upgrade = result.unwrap();
-        // TODO check
         assert!(upgrade.is_none());
     }
 
@@ -935,7 +933,6 @@ mod tests {
     async fn test_get_binary_validator_reward_by_era_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
-        // TODO Get validator key
         let secret_key = get_user_secret_key(None).unwrap();
         let secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
         let validator_key = PublicKey::from(&secret_key_from_pem);
@@ -945,7 +942,6 @@ mod tests {
             .get_binary_validator_reward_by_era(Some(node_address), validator_key, era)
             .await;
 
-        // TODO
         let reward = result.unwrap();
         assert!(reward.is_none());
     }
@@ -954,7 +950,6 @@ mod tests {
     async fn test_get_binary_validator_reward_by_block_height_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
-        // TODO Get validator key
         let secret_key = get_user_secret_key(None).unwrap();
         let secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
         let validator_key = PublicKey::from(&secret_key_from_pem);
@@ -968,7 +963,6 @@ mod tests {
             )
             .await;
 
-        // TODO
         let reward = result.unwrap();
         assert!(reward.is_none());
     }
@@ -977,7 +971,6 @@ mod tests {
     async fn test_get_binary_validator_reward_by_block_hash_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
-        // TODO Get validator key
         let secret_key = get_user_secret_key(None).unwrap();
         let secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
         let validator_key = PublicKey::from(&secret_key_from_pem);
@@ -1002,7 +995,6 @@ mod tests {
             )
             .await;
 
-        // TODO
         let reward = result.unwrap();
         assert!(reward.is_none());
     }
@@ -1011,12 +1003,10 @@ mod tests {
     async fn test_get_binary_delegator_reward_by_era_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
-        // TODO Get delegator key
         let secret_key = get_user_secret_key(None).unwrap();
         let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
         let validator_key = PublicKey::from(&validator_secret_key_from_pem);
 
-        // TODO Get Delegator key
         let secret_key = get_user_secret_key(Some("user-2")).unwrap();
         let delegator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
         let delegator_key = PublicKey::from(&delegator_secret_key_from_pem);
@@ -1032,7 +1022,6 @@ mod tests {
             )
             .await;
 
-        // TODO
         let reward = result.unwrap();
         assert!(reward.is_none());
     }
@@ -1041,12 +1030,10 @@ mod tests {
     async fn test_get_binary_delegator_reward_by_block_height_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
-        // TODO Get delegator key
         let secret_key = get_user_secret_key(None).unwrap();
         let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
         let validator_key = PublicKey::from(&validator_secret_key_from_pem);
 
-        // TODO Get Delegator key
         let secret_key = get_user_secret_key(Some("user-2")).unwrap();
         let delegator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
         let delegator_key = PublicKey::from(&delegator_secret_key_from_pem);
@@ -1061,7 +1048,6 @@ mod tests {
             )
             .await;
 
-        // TODO
         let reward = result.unwrap();
         assert!(reward.is_none());
     }
@@ -1070,12 +1056,10 @@ mod tests {
     async fn test_get_binary_delegator_reward_by_block_hash_success() {
         let sdk = SDK::new(None, None, None);
         let (_, _, _, node_address, _) = get_network_constants();
-        // TODO Get delegator key
         let secret_key = get_user_secret_key(None).unwrap();
         let validator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
         let validator_key = PublicKey::from(&validator_secret_key_from_pem);
 
-        // TODO Get Delegator key
         let secret_key = get_user_secret_key(Some("user-2")).unwrap();
         let delegator_secret_key_from_pem = secret_key_from_pem(&secret_key).unwrap();
         let delegator_key = PublicKey::from(&delegator_secret_key_from_pem);
@@ -1101,7 +1085,6 @@ mod tests {
             )
             .await;
 
-        // TODO
         let reward = result.unwrap();
         assert!(reward.is_none());
     }
@@ -1117,9 +1100,8 @@ mod tests {
             .get_binary_read_record(Some(node_address), record_id, key)
             .await;
 
-        // TODO
-        let reward = result.unwrap();
-        assert!(reward.is_empty());
+        let record = result.unwrap();
+        assert!(record.is_empty());
     }
 
     #[tokio::test]
@@ -1297,7 +1279,6 @@ mod tests {
             )
             .await;
 
-        // TODO check transaction V1 in speculative exec
         assert!(result.is_ok());
     }
 

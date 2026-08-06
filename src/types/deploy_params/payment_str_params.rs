@@ -296,7 +296,5 @@ mod tests {
         let result = payment_str_params_to_casper_client(&payment_params);
         let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("payment_path: \"path_value\""));
-
-        // TODO Find alternative as no setter in client
     }
 }

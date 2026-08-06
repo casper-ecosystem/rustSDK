@@ -54,10 +54,8 @@ impl Key {
     }
 
     #[wasm_bindgen(js_name = "fromTransfer")]
-    pub fn from_transfer(key: Vec<u8>) -> TransferAddr {
-        // TODO Fix with TransferAddr as _TransferAddr, and [u8; 32]
-        // Key(_Key::Transfer(key.into()))
-        TransferAddr::from(key)
+    pub fn from_transfer(key: Vec<u8>) -> Self {
+        Self(_Key::Transfer(TransferAddr::from(key).into()))
     }
 
     #[wasm_bindgen(js_name = "fromEraInfo")]

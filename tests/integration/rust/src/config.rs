@@ -14,8 +14,8 @@ pub const SPECULATIVE_ADDRESS: &str = "http://127.0.0.1:25101";
 pub const DEFAULT_NODE_ADDRESS: &str = "127.0.0.1:28101";
 pub const DEFAULT_CHAIN_NAME: &str = "casper-net-1";
 pub const DEFAULT_SECRET_KEY_NAME: &str = "secret_key.pem";
-// TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static erroring with runtime dropped the dispatch task
-// https://github.com/seanmonstar/reqwest/issues/1148#issuecomment-910868788
+// Hyper/reqwest + lazy_static can error with "runtime dropped the dispatch task"
+// (hyperium/hyper#2112, seanmonstar/reqwest#1148).
 pub const TIMESTAMP_WAIT_TIME: Duration = time::Duration::from_millis(1000);
 pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 // read_pem_file will look SECRET_KEY_NAME to root directory if relative path is not found (relative to root)
