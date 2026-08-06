@@ -25,11 +25,12 @@ Demo / development only — same warning as above.
 
 The workspace package [`mcp/`](../mcp/) (`casper-rust-wasm-sdk-mcp`) exposes the native Rust SDK as [MCP](https://modelcontextprotocol.io/) tools for Cursor and other agents.
 
-- **Cursor/agents (slim Hub):** `interchouette/casper-rust-wasm-sdk-mcp` (`:dev` / `:latest` / `:$APP_VERSION`)
+- **Cursor/agents (slim Hub):** `interchouette/casper-rust-wasm-sdk-mcp` — `:dev` (tip) / `:latest` = `:2.2.2` (stable)
 - **Hosted SPA:** https://casper-webclient.interchouette.net/mcp (`casper-webclient` embeds the same binary, `ENABLE_MCP=1`)
 - **Local Docker:** `make mcp-http` → http://127.0.0.1:5790/mcp
 - **Host HTTP:** `make run-mcp-http` → http://127.0.0.1:5790/mcp
 - **stdio:** `interchouette/casper-rust-wasm-sdk-mcp:dev` (see [`mcp/mcp.json.example`](../mcp/mcp.json.example))
+- **GitHub Releases:** Latest = node-aligned semver (`v2.2.2`); tip desktop cut = Pre-release [`dev-preview`](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases) (overwritten after green nightly)
 
 ```bash
 make run-mcp      # stdio (host cargo)
