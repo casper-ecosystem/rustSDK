@@ -11,7 +11,7 @@
   "type": "module",
   "devDependencies": {
     "@types/jest": "^30.0.0",
-    "@types/node": "^25.9.5",
+    "@types/node": "^26.1.2",
     "jest": "^30.4.2",
     "jest-puppeteer": "11.0.0",
     "ts-jest": "^29.4.12",
@@ -20,7 +20,7 @@
   "dependencies": {
     "casper-rust-wasm-sdk": "file:../../pkg-nodejs",
     "dotenv": "^17.4.2",
-    "puppeteer": "^25.4.0"
+    "puppeteer": "^25.5.0"
   },
   "overrides": {
     "jest-environment-node": "30.4.1",
