@@ -178,7 +178,8 @@ const config: Config = {
 
   // A map from regular expressions to paths to transformers
   transform: {
-    // Include .js so puppeteer ESM under node_modules is transformed.
+    // .js included so puppeteer ESM under node_modules can be transformed.
+    // pkg-nodejs is excluded via transformIgnorePatterns (not allowJs).
     '^.+\\.[tj]sx?$': ['ts-jest', { useESM: true }],
   },
 
@@ -201,9 +202,10 @@ const config: Config = {
   // watchman: true,
 
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
-  // Transform puppeteer ESM; leave pkg-nodejs (CJS via file:) alone to avoid ts-jest allowJs noise.
+  // Transform puppeteer ESM; skip the local wasm pack so ts-jest never compiles its .js.
   transformIgnorePatterns: [
     '/node_modules/(?!puppeteer(?:-core)?|@puppeteer)/',
+    '[\\\\/]pkg-nodejs[\\\\/]',
   ],
 };
 
