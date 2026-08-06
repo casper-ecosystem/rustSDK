@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-casper-rust-wasm-sdk = { path = "../../../", version = "2.2.2" }
+casper-rust-wasm-sdk = { path = "../../../", version = "2.2.2", features = ["SSE"] }
 tokio = { version = "1", features = ["full"] }
 once_cell = "*"
 chrono = "0.4"

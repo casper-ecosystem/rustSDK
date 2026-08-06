@@ -4,6 +4,7 @@ pub mod deploy;
 pub mod deploy_utils;
 pub mod params;
 pub mod rpcs;
+pub mod sse;
 pub mod transaction;
 pub mod transaction_utils;
 pub mod types;

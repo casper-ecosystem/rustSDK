@@ -71,9 +71,16 @@ mod tests {
         assert_eq!(frames[2].data, "segment3");
     }
 
-    #[cfg(test)]
     #[test]
     fn start_from_query() {
+        assert_eq!(
+            url_with_start_from("http://n:9999/events", None),
+            "http://n:9999/events"
+        );
+        assert_eq!(
+            url_with_start_from("http://n:9999/events", Some(0)),
+            "http://n:9999/events?start_from=0"
+        );
         assert_eq!(
             url_with_start_from("http://n:9999/events", Some(10)),
             "http://n:9999/events?start_from=10"

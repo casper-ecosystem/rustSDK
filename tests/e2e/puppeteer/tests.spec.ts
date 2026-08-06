@@ -18,6 +18,7 @@ import {
   get_block,
 } from './helpers';
 import puppeteer, { HTTPRequest } from 'puppeteer';
+import { SDK, Subscription } from 'casper-rust-wasm-sdk';
 
 describe('Angular App Tests', () => {
   beforeAll(async () => {
@@ -2596,6 +2597,43 @@ describe('Angular App Tests', () => {
       await submit();
       await getResult();
     });
+  });
+
+  // Angular demo filters wait/watch actions; hit the SDK watcher against NCTL SSE.
+  describe('SSE wait_transaction (SDK)', () => {
+    const missing_hash =
+      'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+
+    it(
+      'should time out wait_transaction for a missing hash',
+      async () => {
+        const sdk = new SDK(config.rpc_address);
+        const result = await sdk.waitTransaction(
+          config.events_address,
+          missing_hash,
+          3000
+        );
+        expect(result.err).toBe('Timeout expired');
+      },
+      15000
+    );
+
+    it(
+      'should time out watch_transaction for a missing hash',
+      async () => {
+        const sdk = new SDK(config.rpc_address);
+        const watcher = sdk.watchTransaction(config.events_address, 3000);
+        watcher.subscribe([
+          new Subscription(missing_hash, () => {
+            return false;
+          }),
+        ]);
+        const results = await watcher.start();
+        watcher.stop();
+        expect(results?.[0]?.err).toBe('Timeout expired');
+      },
+      15000
+    );
   });
 
   afterAll(async () => {
