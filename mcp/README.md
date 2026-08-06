@@ -17,7 +17,7 @@ Inventory: [TOOLS.md](TOOLS.md). Patterns: [PATTERNS.md](PATTERNS.md). MCP clien
 | ------------------ | -------------------------------------------------------- | ------------------------------------------------ |
 | **Hosted**         | Render webclient                                         | `https://casper-webclient.interchouette.net/mcp` |
 | **HTTP (Docker)**  | `make mcp-http` → slim MCP image                         | `http://127.0.0.1:5790/mcp`                      |
-| **stdio (Docker)** | `docker run -i … interchouette/casper-rust-wasm-sdk-mcp` | `:dev` / `:latest` / `:$APP_VERSION`             |
+| **stdio (Docker)** | `docker run -i … interchouette/casper-rust-wasm-sdk-mcp` | `:dev` (tip) / `:latest` = `:2.2.2` (stable) |
 | **stdio (host)**   | `make run-mcp`                                           | cargo; for local debug                           |
 | **HTTP (host)**    | `make run-mcp-http`                                      | cargo on `127.0.0.1:5790`                        |
 
@@ -73,7 +73,7 @@ Complex inputs use JSON strings — see [TOOLS.md](TOOLS.md) and `tools/params.r
 
 ## MCP client config
 
-Hub tags for `interchouette/casper-rust-wasm-sdk-mcp` and `interchouette/casper-webclient`: **`dev`**, **`latest`**, and the app version (e.g. **`2.2.2`**).
+Hub tags for `interchouette/casper-rust-wasm-sdk-mcp` and `interchouette/casper-webclient`: **`dev`** (tip), **`latest`** = current stable semver (e.g. **`2.2.2`**). GitHub Pre-release **`dev-preview`** carries overnight tip desktop assets (not Latest).
 
 | Server name (example)       | Transport | Backing                                                       |
 | --------------------------- | --------- | ------------------------------------------------------------- |

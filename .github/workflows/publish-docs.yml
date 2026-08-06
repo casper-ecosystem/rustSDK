@@ -2,6 +2,7 @@ name: Publish docs
 
 on:
   release:
+    # created: semver cuts and each overwrite of Pre-release tag (delete+recreate).
     types: [created]
 
 permissions:
@@ -9,6 +10,8 @@ permissions:
 
 jobs:
   build-and-deploy:
+    # Stable docs only — do not overwrite GitHub Pages from overnight Pre-releases.
+    if: ${{ !github.event.release.prerelease }}
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -40,7 +43,7 @@ jobs:
           folder: docs # The folder the action should deploy.
 
   desktop-assets:
-    # Electron demos belong on product releases, not MCP sidecar tags.
+    # Electron demos on product releases and the overwritten dev-preview Pre-release.
     if: ${{ !contains(github.event.release.tag_name, 'mcp') }}
     runs-on: ubuntu-latest
 
