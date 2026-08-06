@@ -2,22 +2,27 @@
 
 Rust **mcpkit** crate (`casper-rust-wasm-sdk-mcp`) exposing the native SDK API as MCP tools (in-process path dependency — not an HTTP proxy of the SDK).
 
-**Runtime image:** the binary ships inside **`interchouette/casper-webclient`** (`:dev`, `:latest`, and the app version tag such as `:2.2.2`). The slim Hub image `casper-rust-wasm-sdk-mcp` is deprecated.
+**Two Hub images:**
+
+| Image | Role |
+| ----- | ---- |
+| **`interchouette/casper-rust-wasm-sdk-mcp`** | Slim MCP for Cursor/agents (stdio / HTTP `:5790`) |
+| **`interchouette/casper-webclient`** | SPA demo; embeds the same binary (`ENABLE_MCP=1`, `/mcp` on `:8080`) |
 
 Inventory: [TOOLS.md](TOOLS.md). Patterns: [PATTERNS.md](PATTERNS.md). MCP client sample: [mcp.json.example](mcp.json.example).
 
 ## Transports
 
-| Mode               | How                                                     | URL / notes                                      |
-| ------------------ | ------------------------------------------------------- | ------------------------------------------------ |
-| **Hosted**         | Render webclient                                        | `https://casper-webclient.interchouette.net/mcp` |
-| **HTTP (Docker)**  | `make mcp-http` → webclient SPA                         | `http://127.0.0.1:8080/mcp` (`ENABLE_MCP=1`)     |
-| **stdio (Docker)** | `docker run -i … --entrypoint casper-rust-wasm-sdk-mcp` | `interchouette/casper-webclient:dev`             |
-| **stdio (host)**   | `make run-mcp`                                          | cargo; for local debug                           |
-| **HTTP (host)**    | `make run-mcp-http`                                     | cargo on `127.0.0.1:5790`                        |
+| Mode               | How                                                      | URL / notes                                      |
+| ------------------ | -------------------------------------------------------- | ------------------------------------------------ |
+| **Hosted**         | Render webclient                                         | `https://casper-webclient.interchouette.net/mcp` |
+| **HTTP (Docker)**  | `make mcp-http` → slim MCP image                         | `http://127.0.0.1:5790/mcp`                      |
+| **stdio (Docker)** | `docker run -i … interchouette/casper-rust-wasm-sdk-mcp` | `:dev` / `:latest` / `:$APP_VERSION`             |
+| **stdio (host)**   | `make run-mcp`                                           | cargo; for local debug                           |
+| **HTTP (host)**    | `make run-mcp-http`                                      | cargo on `127.0.0.1:5790`                        |
 
 ```bash
-make mcp-http           # webclient → http://127.0.0.1:8080/mcp
+make mcp-http           # slim image → http://127.0.0.1:5790/mcp
 make mcp-http-stop
 make run-mcp            # stdio (host cargo)
 make run-mcp-http       # HTTP host on 127.0.0.1:5790
@@ -27,15 +32,15 @@ make mcp-test-live      # ignored tests vs live local node (CASPER_RPC_URL)
 
 ## Env
 
-| Variable              | Role                                    | Default                                                       |
-| --------------------- | --------------------------------------- | ------------------------------------------------------------- |
-| `ENABLE_MCP`          | Start MCP inside webclient (`web` mode) | `1`                                                           |
-| `MCP_HTTP`            | Use HTTP transport (binary)             | off (stdio) / on (web loopback)                               |
-| `CASPER_SDK_MCP_ADDR` | HTTP bind                               | `0.0.0.0:5790` (host) / `127.0.0.1:5790` (webclient loopback) |
-| `CASPER_RPC_URL`      | JSON-RPC                                | `http://127.0.0.1:11101`                                      |
-| `CASPER_NODE_URL`     | Binary port                             | `127.0.0.1:28101`                                             |
-| `CASPER_VERBOSITY`    | `low` / `medium` / `high`               | `low`                                                         |
-| `RUST_LOG`            | tracing filter (stderr, no ANSI)        | `warn`                                                        |
+| Variable              | Role                                    | Default                                                     |
+| --------------------- | --------------------------------------- | ----------------------------------------------------------- |
+| `ENABLE_MCP`          | Start MCP inside webclient (`web` mode) | `1`                                                         |
+| `MCP_HTTP`            | Use HTTP transport (binary)             | off (stdio) / on (Docker HTTP / web loopback)               |
+| `CASPER_SDK_MCP_ADDR` | HTTP bind                               | `0.0.0.0:5790` (slim / host) / `127.0.0.1:5790` (webclient) |
+| `CASPER_RPC_URL`      | JSON-RPC                                | `http://127.0.0.1:11101`                                    |
+| `CASPER_NODE_URL`     | Binary port                             | `127.0.0.1:28101`                                           |
+| `CASPER_VERBOSITY`    | `low` / `medium` / `high`               | `low`                                                       |
+| `RUST_LOG`            | tracing filter (stderr, no ANSI)        | `warn`                                                      |
 
 Docker containers reach the host node via `host.docker.internal`.
 
@@ -68,11 +73,11 @@ Complex inputs use JSON strings — see [TOOLS.md](TOOLS.md) and `tools/params.r
 
 ## MCP client config
 
-Hub tags for `interchouette/casper-webclient`: **`dev`**, **`latest`**, and the app version (e.g. **`2.2.2`**).
+Hub tags for `interchouette/casper-rust-wasm-sdk-mcp` and `interchouette/casper-webclient`: **`dev`**, **`latest`**, and the app version (e.g. **`2.2.2`**).
 
-| Server name (example)       | Transport | Backing                                                                        |
-| --------------------------- | --------- | ------------------------------------------------------------------------------ |
-| `casper-rust-wasm-sdk`      | stdio     | `interchouette/casper-webclient:dev` (`--entrypoint casper-rust-wasm-sdk-mcp`) |
-| `casper-rust-wasm-sdk-http` | HTTP      | `http://127.0.0.1:8080/mcp` (webclient) or `http://127.0.0.1:5790/mcp` (host)  |
+| Server name (example)       | Transport | Backing                                                       |
+| --------------------------- | --------- | ------------------------------------------------------------- |
+| `casper-rust-wasm-sdk`      | stdio     | `interchouette/casper-rust-wasm-sdk-mcp:dev`                  |
+| `casper-rust-wasm-sdk-http` | HTTP      | `http://127.0.0.1:5790/mcp` (slim) or hosted webclient `/mcp` |
 
 Full sample: [mcp.json.example](mcp.json.example).

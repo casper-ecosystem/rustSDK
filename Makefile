@@ -162,17 +162,17 @@ docker-deploy-prod:
 
 .PHONY: docker-build docker-start docker-stop docker-start-prod docker-stop-prod
 
-# --- MCP (mcp/ crate; runtime via casper-webclient image) ---
-# Hub: interchouette/casper-webclient:{dev,latest,$APP_VERSION}. Slim casper-rust-wasm-sdk-mcp Hub image is deprecated.
+# --- MCP (mcp/ crate) ---
+# Cursor/agents: interchouette/casper-rust-wasm-sdk-mcp:{dev,latest,$APP_VERSION} (stdio / HTTP :5790)
+# SPA demo:      interchouette/casper-webclient embeds the same binary (ENABLE_MCP, /mcp on :8080)
 
-WEBCLIENT_HUB_IMAGE ?= interchouette/casper-webclient
-CASPER_SDK_MCP_IMAGE ?= $(WEBCLIENT_HUB_IMAGE):dev
+CASPER_SDK_MCP_IMAGE ?= interchouette/casper-rust-wasm-sdk-mcp:dev
 COMPOSE_MCP ?= docker/docker-compose.mcp.yml
 
 mcp-build:
 	cargo build -p casper-rust-wasm-sdk-mcp --release
 
-# Local HTTP via webclient (SPA :8080 + /mcp). MCP stays on container loopback.
+# Local HTTP via slim MCP image (:5790).
 mcp-http:
 	-docker pull $(CASPER_SDK_MCP_IMAGE)
 	CASPER_SDK_MCP_IMAGE=$(CASPER_SDK_MCP_IMAGE) \
@@ -180,8 +180,8 @@ mcp-http:
 
 mcp-http-stop:
 	-docker compose -f $(COMPOSE_MCP) down --remove-orphans
-	-docker stop casper-webclient-mcp 2>/dev/null
-	-docker rm casper-webclient-mcp 2>/dev/null
+	-docker stop casper-rust-wasm-sdk-mcp 2>/dev/null
+	-docker rm casper-rust-wasm-sdk-mcp 2>/dev/null
 
 run-mcp:
 	cargo run -p casper-rust-wasm-sdk-mcp --quiet --

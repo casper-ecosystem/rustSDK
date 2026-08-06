@@ -111,11 +111,11 @@ assert!(include_str!("server.rs").contains(&needle));
 | --- | --- |
 | `mcp-build` | release build of mcp package |
 | `run-mcp` | stdio (host cargo) |
-| `mcp-http` | webclient Docker → `http://127.0.0.1:8080/mcp` |
+| `mcp-http` | slim Docker → `http://127.0.0.1:5790/mcp` |
 | `run-mcp-http` | host cargo HTTP on `127.0.0.1:5790` |
 | `mcp-test` | `cargo test -p casper-rust-wasm-sdk-mcp` |
 
-Runtime image: `interchouette/casper-webclient:{dev,latest,$APP_VERSION}`. See [mcp.json.example](mcp.json.example).
+Cursor/agents image: `interchouette/casper-rust-wasm-sdk-mcp:{dev,latest,$APP_VERSION}`. SPA embeds the same binary: `interchouette/casper-webclient`. See [mcp.json.example](mcp.json.example).
 
 ---
 
@@ -126,5 +126,6 @@ Runtime image: `interchouette/casper-webclient:{dev,latest,$APP_VERSION}`. See [
 | Separate `mcp/` crate, mcpkit | keep mcpkit off the wasm root crate |
 | Path-dep on SDK lib | in-process tools, not an HTTP proxy of the SDK |
 | clap `--http` / `--listen` | stdio or Streamable HTTP from one binary |
-| MCP embedded in webclient image | SPA `:8080` + loopback MCP `:5790` + `/mcp` proxy |
+| Slim Hub image for agents | Cursor pulls MCP without SPA/Node layers |
+| MCP also embedded in webclient | SPA `:8080` + loopback MCP `:5790` + `/mcp` proxy |
 | stderr warn logging | quiet default for MCP clients |

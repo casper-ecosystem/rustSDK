@@ -1,19 +1,18 @@
-# MCP via unified webclient image (SPA :8080 + /mcp proxy).
-# Publishes host :8080 only; MCP listens on container loopback :5790.
+# Slim MCP for Cursor/agents (HTTP :5790).
 # Use: make mcp-http / make mcp-http-stop
-# Hosted: https://casper-webclient.interchouette.net/mcp
+# Hosted SPA + /mcp: https://casper-webclient.interchouette.net/mcp (casper-webclient image)
 services:
   sdk-mcp:
-    image: ${CASPER_SDK_MCP_IMAGE:-interchouette/casper-webclient:dev}
-    container_name: casper-webclient-mcp
+    image: ${CASPER_SDK_MCP_IMAGE:-interchouette/casper-rust-wasm-sdk-mcp:dev}
+    container_name: casper-rust-wasm-sdk-mcp
     ports:
-      - "8080:8080"
+      - "5790:5790"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      ENABLE_MCP: "1"
+      CASPER_SDK_MCP_ADDR: "0.0.0.0:5790"
       CASPER_RPC_URL: ${CASPER_RPC_URL:-http://host.docker.internal:11101}
       CASPER_NODE_URL: ${CASPER_NODE_URL:-host.docker.internal:28101}
       RUST_LOG: ${RUST_LOG:-warn}
-    command: ["web"]
+    command: ["--http", "--listen", "0.0.0.0:5790"]
     restart: unless-stopped

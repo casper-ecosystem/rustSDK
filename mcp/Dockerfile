@@ -1,5 +1,6 @@
-# DEPRECATED for Hub / Cursor. Prefer interchouette/casper-webclient:{dev,latest,$APP_VERSION}
-# which embeds the same binary (see docker/Dockerfile.cicd). Kept for local experiments only.
+# Hub / Cursor runtime: interchouette/casper-rust-wasm-sdk-mcp:{dev,latest,$APP_VERSION}
+# Slim MCP that drives the SDK (stdio or HTTP :5790).
+# Webclient embeds the same binary (docker/Dockerfile.cicd); that image is the SPA + /mcp demo.
 #   docker build -f mcp/Dockerfile -t casper-rust-wasm-sdk-mcp:local .
 
 ARG RUST_IMAGE=rust:slim-bookworm
@@ -42,5 +43,5 @@ ENV CASPER_SDK_MCP_ADDR=0.0.0.0:5790 \
 
 EXPOSE 5790
 
+# Default stdio for Cursor; pass --http --listen for Docker HTTP (see docker-compose.mcp.yml).
 ENTRYPOINT ["casper-rust-wasm-sdk-mcp"]
-CMD ["--http", "--listen", "0.0.0.0:5790"]

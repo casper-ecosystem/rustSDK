@@ -32,10 +32,12 @@ jobs:
             --build-arg APP_VERSION="$APP_VERSION" \
             --build-arg GIT_SHA="${{ github.sha }}"
 
-          # MCP binary is embedded in casper-webclient (ENABLE_MCP / entrypoint mcp).
-          # Do not build or push the deprecated slim casper-rust-wasm-sdk-mcp Hub image.
+          # Slim MCP for Cursor/agents (stdio / HTTP :5790).
+          docker build -f mcp/Dockerfile -t casper-rust-wasm-sdk-mcp:latest .
+
           # Tags: :latest, :dev, and :$APP_VERSION (from package.json, e.g. 2.2.2). No :stable.
-          for image in casper-webclient cors-anywhere ws-proxy; do
+          # webclient also embeds the MCP binary (ENABLE_MCP / entrypoint mcp).
+          for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:latest"
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:${APP_VERSION}"
@@ -44,7 +46,7 @@ jobs:
       - name: Push Docker images to Docker Hub
         run: |
           APP_VERSION=$(jq -r .version examples/frontend/angular/package.json)
-          for image in casper-webclient cors-anywhere ws-proxy; do
+          for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:latest"
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:${APP_VERSION}"

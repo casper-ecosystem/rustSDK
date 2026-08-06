@@ -13,14 +13,17 @@
         "-e",
         "CASPER_NODE_URL=host.docker.internal:28101",
         "-e",
+        "MCP_HTTP=false",
+        "-e",
         "RUST_LOG=warn",
-        "--entrypoint",
-        "casper-rust-wasm-sdk-mcp",
-        "interchouette/casper-webclient:dev"
+        "interchouette/casper-rust-wasm-sdk-mcp:dev"
       ]
     },
     "casper-rust-wasm-sdk-http": {
-      "url": "http://127.0.0.1:8080/mcp"
+      "url": "http://127.0.0.1:5790/mcp"
+    },
+    "casper-rust-wasm-sdk-hosted": {
+      "url": "https://casper-webclient.interchouette.net/mcp"
     },
     "casper-rust-wasm-sdk-stdio-cargo": {
       "command": "cargo",
