@@ -3,16 +3,11 @@
     "target": "es2020",
     "module": "esnext",
     "strict": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "ignoreDeprecations": "5.0",
     "typeRoots": ["./node_modules/@types"],
-    "types": ["jest", "node"],
-    "baseUrl": ".",
-    "paths": {
-      "casper-rust-wasm-sdk": ["../../../pkg-nodejs"]
-    }
+    "types": ["jest", "node"]
   }
 }

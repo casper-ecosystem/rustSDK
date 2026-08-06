@@ -4,7 +4,7 @@
     "rootDir": ".",
     "sourceMap": true,
     "declaration": false,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
@@ -13,9 +13,8 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    // Angular 21 requires typescript >=5.9 <6.0; silence 5.x option deprecations until Angular 22.
-    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
     "paths": {
       "@components": ["libs/components/src/index.ts"],
       "@util-binary": ["libs/util/services/binary/src/index.ts"],
