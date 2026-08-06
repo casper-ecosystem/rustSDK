@@ -3,7 +3,7 @@ pub(crate) mod deploy_mock;
 #[cfg(test)]
 pub(crate) mod transaction_mock;
 
-use crate::sdk::sse::framing::extract_frames;
+use crate::sdk::sse::framing::{extract_frames, url_with_start_from};
 use crate::SDK;
 use chrono::{Duration, Utc};
 use futures_util::StreamExt;
@@ -381,7 +381,9 @@ impl Watcher {
         }
 
         let client = reqwest::Client::new();
-        let url = self.events_url.clone();
+        // Replay from the start of the node's event buffer so a TransactionProcessed
+        // emitted between put_deploy and SSE connect is still visible.
+        let url = url_with_start_from(&self.events_url, Some(0));
 
         // TODO fix this warning
         // https://github.com/rust-lang/rust-clippy/issues/11034
