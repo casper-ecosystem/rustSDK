@@ -11,6 +11,7 @@ import {
   selectAction,
   setWasm,
   submit,
+  waitForResult,
   get_state_root_hash,
   sign,
   screenshot,
@@ -2277,7 +2278,7 @@ describe('Angular App Tests', () => {
       });
       expect(transaction).toBeUndefined();
       await submit();
-      await test.page.waitForSelector('[e2e-id="result"]');
+      await waitForResult();
       transaction = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });

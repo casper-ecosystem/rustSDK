@@ -202,6 +202,40 @@ export async function setWasm(file_name: string) {
     return document.querySelector('[e2e-id="wasmName"]')?.textContent;
   });
   expect(name).toContain(file_name);
+  // Wait for has_wasm form rebuild (category select enables; entity fields disable).
+  await variables.page
+    .waitForSelector('[e2e-id="selectTransactionCategoryElt"]:not([disabled])', {
+      timeout: 5000,
+    })
+    .catch(() => undefined);
+}
+
+/** Wait until result or error pane has text; fail loudly on UI errors. */
+export async function waitForResult(timeoutMs = 60000) {
+  if (!variables.page) {
+    throw new Error('Puppeteer page is not initialized.');
+  }
+  await variables.page.waitForFunction(
+    () => {
+      const result =
+        document.querySelector('[e2e-id="result"]')?.textContent ?? '';
+      const error =
+        document.querySelector('[e2e-id="error"]')?.textContent ?? '';
+      return result.length > 0 || error.length > 0;
+    },
+    { timeout: timeoutMs },
+  );
+  const error = await variables.page.evaluate(() => {
+    return document.querySelector('[e2e-id="error"]')?.textContent ?? '';
+  });
+  if (error) {
+    throw new Error(`UI error: ${error}`);
+  }
+  const result = await variables.page.evaluate(() => {
+    return document.querySelector('[e2e-id="result"]')?.textContent;
+  });
+  expect(result).toBeDefined();
+  return result;
 }
 
 export async function screenshot() {

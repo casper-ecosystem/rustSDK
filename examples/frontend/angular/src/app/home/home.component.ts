@@ -132,7 +132,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const exec = true;
     if (this.form.disabled || this.form.valid) {
       await this.handleAction(action, exec);
+      return;
     }
+    this.errorService.setError('form is invalid');
   }
 
   async walletSign(_$event: Event, action: string) {
