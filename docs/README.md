@@ -9,7 +9,7 @@ You can use the Casper Rust/Wasm SDK in two ways:
 
 This page covers different examples of using the SDK.
 
-⚠ WARNING: This application is for testing and development purposes. Do NOT use private keys or perform real transactions on the testnet/mainnet unless you fully understand the security risks.
+⚠ WARNING: This application is for testing and development purposes. Do NOT use private keys or perform real transactions on mainnet unless you fully understand the security risks.
 
 ## Try the Wasm webclient
 
@@ -2661,10 +2661,9 @@ SECRET_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
 Open tracking (not a full roadmap):
 
 - [#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9) — Python / PyO3 bindings
-- [#27](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/27) — more typed `StoredValue` / entrypoint / named-keys surface (code largely landed; issue open until accepted)
 - [#36](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/36) — first crates.io publish
 - [#96](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/96) — explainer for node core: AE-off `entity-contract-…` vs `hash-…` on `query_global_state` (SDK remaps; permanent fix is upstream)
 
 Mac desktop Electron build is still TODO (Windows / Linux demos ship on releases).
 
-⚠ **Reminder**: Do not use private keys or perform real transactions on the testnet/mainnet unless you are fully aware of the security risks.
+⚠ **Reminder**: Do not use private keys or perform real transactions on mainnet unless you are fully aware of the security risks.
