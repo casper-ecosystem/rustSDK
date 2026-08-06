@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["contract","contract_package","entry_point","entry_points"]};

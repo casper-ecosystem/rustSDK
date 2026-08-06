@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["DictionaryItemInput"]};
+window.SIDEBAR_ITEMS = {"enum":["DictionaryItemInput"],"struct":["GetDictionaryItemResult"]};
