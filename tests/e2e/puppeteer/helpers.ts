@@ -29,12 +29,17 @@ export const variables = {
   sdk: undefined as unknown as typeof SDK,
 };
 
-export async function clear() {
+const clearResultSel = '[e2e-id="clear result"]';
+
+/** Click clear when present; returns whether a clear was performed. */
+async function clearResultPaneIfPresent(): Promise<boolean> {
   if (!variables.page) {
     throw new Error('Puppeteer page is not initialized.');
   }
-  const sel = '[e2e-id="clear result"]';
-  await variables.page.waitForSelector(sel);
+  const present = await variables.page.$(clearResultSel);
+  if (!present) {
+    return false;
+  }
   // page.click() holds an ElementHandle; Angular CD can detach it mid-click.
   let clicked = false;
   for (let attempt = 0; attempt < 5; attempt++) {
@@ -45,20 +50,29 @@ export async function clear() {
       }
       el.click();
       return true;
-    }, sel);
+    }, clearResultSel);
     if (clicked) {
       break;
     }
     await delay(100);
   }
   if (!clicked) {
-    throw new Error(`No element found for selector: ${sel}`);
+    throw new Error(`No element found for selector: ${clearResultSel}`);
   }
   await variables.page.waitForFunction(
     (selector) => !document.querySelector(selector),
     {},
-    sel
+    clearResultSel
   );
+  return true;
+}
+
+export async function clear() {
+  if (!variables.page) {
+    throw new Error('Puppeteer page is not initialized.');
+  }
+  await variables.page.waitForSelector(clearResultSel);
+  await clearResultPaneIfPresent();
   // wait for document to refresh
   await delay(1000);
   const result = await variables.page.evaluate(() => {
@@ -84,6 +98,9 @@ export async function submit() {
   if (!variables.page) {
     throw new Error('Puppeteer page is not initialized.');
   }
+  // Drop prior pane so getResult can wait for a fresh result even when the
+  // next RPC JSON is identical to the previous pane text.
+  await clearResultPaneIfPresent();
   await variables.page.waitForSelector('[e2e-id="submit"]');
   await variables.page.click('[e2e-id="submit"]');
 }
@@ -108,23 +125,11 @@ export async function getResult(options?: { existingOk?: boolean }) {
     expect(existing).toBeDefined();
     return existing;
   }
-  // submit() only clicks; Angular cleanResult() can clear the prior pane
-  // after a naive waitForSelector would already have matched it.
-  const previous = await variables.page.evaluate(() => {
-    return document.querySelector('[e2e-id="result"]')?.textContent ?? null;
+  await variables.page.waitForFunction(() => {
+    const text =
+      document.querySelector('[e2e-id="result"]')?.textContent ?? null;
+    return text != null && text.length > 0;
   });
-  await variables.page.waitForFunction(
-    (prev) => {
-      const text =
-        document.querySelector('[e2e-id="result"]')?.textContent ?? null;
-      if (text == null || text.length === 0) {
-        return false;
-      }
-      return text !== prev;
-    },
-    {},
-    previous
-  );
   const result = await variables.page.evaluate(() => {
     return document.querySelector('[e2e-id="result"]')?.textContent;
   });
