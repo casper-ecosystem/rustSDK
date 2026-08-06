@@ -2605,8 +2605,8 @@ describe('Angular App Tests', () => {
     });
   });
 
-  // Angular demo filters wait/watch actions; hit the SDK watcher against NCTL SSE.
-  describe('SSE wait_transaction (SDK)', () => {
+  // Angular demo filters wait/watch actions; hit the watcher against NCTL SSE.
+  describe('SSE wait_transaction', () => {
     const missing_hash =
       'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
 
@@ -2643,7 +2643,7 @@ describe('Angular App Tests', () => {
   });
 
   // Jest harness uses pkg-nodejs; reuse cep78 hash from earlier UI install when present.
-  describe('SSE CES (SDK)', () => {
+  describe('SSE CES', () => {
     const findOkCesEvent = (events: any[]) =>
       events.find(
         (e: any) => !e.error && e.event?.name && e.event.name.length > 0
