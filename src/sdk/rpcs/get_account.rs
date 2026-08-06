@@ -2,6 +2,7 @@
 use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
+        account::Account,
         identifier::{
             account_identifier::AccountIdentifier, block_identifier::BlockIdentifierInput,
         },
@@ -18,36 +19,36 @@ use casper_client::{
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-// Define the GetAccountResult struct to wrap the result from Casper Client RPC call
-#[cfg(target_arch = "wasm32")]
+/// Wrapper around Casper Client `GetAccountResult`.
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetAccountResult(_GetAccountResult);
 
-// Implement conversions between GetAccountResult and _GetAccountResult
-#[cfg(target_arch = "wasm32")]
 impl From<GetAccountResult> for _GetAccountResult {
     fn from(result: GetAccountResult) -> Self {
         result.0
     }
 }
 
-#[cfg(target_arch = "wasm32")]
 impl From<_GetAccountResult> for GetAccountResult {
     fn from(result: _GetAccountResult) -> Self {
         GetAccountResult(result)
     }
 }
 
+impl GetAccountResult {
+    /// Gets the typed account wrapper.
+    pub fn account_typed(&self) -> Account {
+        self.0.account.clone().into()
+    }
+}
+
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetAccountResult {
-    // Define getters for various fields of GetAccountResult
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
@@ -56,6 +57,12 @@ impl GetAccountResult {
     #[wasm_bindgen(getter)]
     pub fn account(&self) -> JsValue {
         JsValue::from_serde(&self.0.account).unwrap()
+    }
+
+    /// Gets the typed account wrapper.
+    #[wasm_bindgen(js_name = "accountTyped")]
+    pub fn account_typed_js(&self) -> Account {
+        self.account_typed()
     }
 
     #[wasm_bindgen(getter)]
@@ -387,19 +394,43 @@ mod tests {
     #[tokio::test]
     #[allow(deprecated)]
     async fn test_get_account_with_error() {
-        // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let account_identifier = get_account_identifier();
         let error_message = "error sending request";
 
-        // Act
         let result = sdk
             .get_account(Some(account_identifier), None, None, None, None)
             .await;
 
-        // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
         assert!(err_string.contains(error_message));
+    }
+
+    #[tokio::test]
+    #[allow(deprecated)]
+    async fn test_get_account_typed_legacy() {
+        if get_enable_addressable_entity() {
+            return;
+        }
+        let sdk = SDK::new(None, None, None);
+        let account_identifier = get_account_identifier();
+        let verbosity = Some(Verbosity::High);
+        let (rpc_address, _, _, _, _) = get_network_constants();
+
+        let result = sdk
+            .get_account(
+                Some(account_identifier),
+                None,
+                None,
+                verbosity,
+                Some(rpc_address),
+            )
+            .await
+            .expect("get_account");
+
+        let account = GetAccountResult::from(result.result).account_typed();
+        assert!(!account.account_hash().to_formatted_string().is_empty());
+        assert!(!account.main_purse().to_formatted_string().is_empty());
     }
 }

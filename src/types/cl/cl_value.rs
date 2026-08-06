@@ -13,8 +13,8 @@ use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::CLValue`].
 ///
-/// Minimal surface for building [`crate::types::runtime_args::RuntimeArgs`] (#43).
-/// Full CLValue / StoredValue graph remains [#27](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/27).
+/// Minimal surface for building [`crate::types::runtime_args::RuntimeArgs`].
+/// This wrapper currently focuses on runtime-args construction.
 #[wasm_bindgen]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CLValue(_CLValue);

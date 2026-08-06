@@ -2,6 +2,7 @@
 use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
+        entity_or_account::EntityOrAccount,
         identifier::{block_identifier::BlockIdentifierInput, entity_identifier::EntityIdentifier},
         sdk_error::SdkError,
         verbosity::Verbosity,
@@ -17,36 +18,36 @@ use casper_client::{
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-// Define the GetAddressableEntityResult struct to wrap the result from Casper Client RPC call
-#[cfg(target_arch = "wasm32")]
+/// Wrapper around Casper Client `GetAddressableEntityResult`.
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetAddressableEntityResult(_GetAddressableEntityResult);
 
-// Implement conversions between GetAddressableEntityResult and _GetAddressableEntityResult
-#[cfg(target_arch = "wasm32")]
 impl From<GetAddressableEntityResult> for _GetAddressableEntityResult {
     fn from(result: GetAddressableEntityResult) -> Self {
         result.0
     }
 }
 
-#[cfg(target_arch = "wasm32")]
 impl From<_GetAddressableEntityResult> for GetAddressableEntityResult {
     fn from(result: _GetAddressableEntityResult) -> Self {
         GetAddressableEntityResult(result)
     }
 }
 
+impl GetAddressableEntityResult {
+    /// Typed `entity_result` (`AddressableEntity` or legacy `Account`).
+    pub fn entity_result_typed(&self) -> EntityOrAccount {
+        self.0.entity_result.clone().into()
+    }
+}
+
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetAddressableEntityResult {
-    // Define getters for various fields of GetAddressableEntityResult
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
@@ -55,6 +56,12 @@ impl GetAddressableEntityResult {
     #[wasm_bindgen(getter)]
     pub fn entity_result(&self) -> JsValue {
         JsValue::from_serde(&self.0.entity_result).unwrap()
+    }
+
+    /// Typed `entity_result` (`AddressableEntity` or legacy `Account`).
+    #[wasm_bindgen(js_name = "entityResultTyped")]
+    pub fn entity_result_typed_js(&self) -> EntityOrAccount {
+        self.entity_result_typed()
     }
 
     #[wasm_bindgen(getter)]
@@ -313,6 +320,9 @@ mod tests {
             .await;
         // Assert
         assert!(result.is_ok());
+        let typed = GetAddressableEntityResult::from(result.unwrap().result).entity_result_typed();
+        assert_eq!(typed.variant(), "AddressableEntity");
+        assert!(typed.as_addressable_entity().is_some());
     }
 
     #[tokio::test]

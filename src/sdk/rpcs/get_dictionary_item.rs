@@ -7,6 +7,7 @@ use crate::{
         digest::ToDigest,
         identifier::dictionary_item_identifier::DictionaryItemIdentifier,
         sdk_error::SdkError,
+        stored_value::StoredValue,
         verbosity::Verbosity,
     },
     SDK,
@@ -19,27 +20,29 @@ use casper_client::{
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetDictionaryItemResult
-#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetDictionaryItemResult(_GetDictionaryItemResult);
 
-#[cfg(target_arch = "wasm32")]
 impl From<GetDictionaryItemResult> for _GetDictionaryItemResult {
     fn from(result: GetDictionaryItemResult) -> Self {
         result.0
     }
 }
-#[cfg(target_arch = "wasm32")]
 impl From<_GetDictionaryItemResult> for GetDictionaryItemResult {
     fn from(result: _GetDictionaryItemResult) -> Self {
         GetDictionaryItemResult(result)
+    }
+}
+
+impl GetDictionaryItemResult {
+    /// Gets the typed stored value wrapper.
+    pub fn stored_value_typed(&self) -> StoredValue {
+        self.0.stored_value.clone().into()
     }
 }
 
@@ -62,6 +65,12 @@ impl GetDictionaryItemResult {
     #[wasm_bindgen(getter)]
     pub fn stored_value(&self) -> JsValue {
         JsValue::from_serde(&self.0.stored_value).unwrap()
+    }
+
+    /// Gets the typed stored value wrapper.
+    #[wasm_bindgen(js_name = "storedValueTyped")]
+    pub fn stored_value_typed_js(&self) -> StoredValue {
+        self.stored_value_typed()
     }
 
     /// Gets the merkle proof as a String.

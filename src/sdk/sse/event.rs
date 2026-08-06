@@ -267,7 +267,7 @@ impl RawEvent {
     }
 }
 
-/// Thin typed wrapper: event name + JSON body (deep typing deferred to #27).
+/// Typed wrapper with event name and JSON payload body.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
 pub struct SSEPayload {

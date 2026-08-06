@@ -1,7 +1,7 @@
 use crate::{
     types::{
         digest::Digest, identifier::global_state_identifier::GlobalStateIdentifier, key::Key,
-        path::Path, sdk_error::SdkError, verbosity::Verbosity,
+        path::Path, sdk_error::SdkError, stored_value::StoredValue, verbosity::Verbosity,
     },
     SDK,
 };
@@ -33,6 +33,13 @@ impl From<_QueryGlobalStateResult> for QueryGlobalStateResult {
     }
 }
 
+impl QueryGlobalStateResult {
+    /// Gets the typed stored value wrapper.
+    pub fn stored_value_typed(&self) -> StoredValue {
+        self.0.stored_value.clone().into()
+    }
+}
+
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl QueryGlobalStateResult {
@@ -52,6 +59,12 @@ impl QueryGlobalStateResult {
     #[wasm_bindgen(getter)]
     pub fn stored_value(&self) -> JsValue {
         JsValue::from_serde(&self.0.stored_value).unwrap()
+    }
+
+    /// Gets the typed stored value wrapper.
+    #[wasm_bindgen(js_name = "storedValueTyped")]
+    pub fn stored_value_typed_js(&self) -> StoredValue {
+        self.stored_value_typed()
     }
 
     /// Gets the Merkle proof as a string.
@@ -545,28 +558,32 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_query_global_state_with_error() {
-        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
+    async fn test_query_global_state_typed_account_access() {
+        let sdk = SDK::new(None, None, None);
+        let verbosity = Some(Verbosity::High);
+        let (rpc_address, _, _, _, _) = get_network_constants();
+        let global_state_identifier = GlobalStateIdentifier::from_block_height(1);
 
-        let error_message = "error sending request";
-        // Act
         let result = sdk
             .query_global_state(QueryGlobalStateParams {
                 key: get_key_input(),
                 path: None,
-                maybe_global_state_identifier: None,
-                state_root_hash: Some(
-                    "588ee7aacb2d3d31476a2d2fb7800ced453926024b97788f8d8cc5cd56b45bf0".to_string(),
-                ),
+                maybe_global_state_identifier: Some(global_state_identifier),
+                state_root_hash: None,
                 maybe_block_id: None,
-                verbosity: None,
-                rpc_address: None,
+                verbosity,
+                rpc_address: Some(rpc_address),
             })
-            .await;
+            .await
+            .expect("query_global_state");
 
-        // Assert
-        assert!(result.is_err());
-        let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(error_message));
+        let stored = StoredValue::from(result.result.stored_value.clone());
+        assert_eq!(stored.variant(), "Account");
+        let account = stored.as_account().expect("typed Account");
+        assert!(!account.account_hash().to_formatted_string().is_empty());
+        assert!(!account.main_purse().to_formatted_string().is_empty());
+        // JSON escape hatch remains available on the parent result path via serde.
+        let json = serde_json::to_value(&result.result.stored_value).expect("json");
+        assert!(json.get("Account").is_some());
     }
 }
