@@ -33,14 +33,35 @@ export async function clear() {
   if (!variables.page) {
     throw new Error('Puppeteer page is not initialized.');
   }
-  await variables.page.waitForSelector('[e2e-id="clear result"]');
-  await variables.page.click('[e2e-id="clear result"]');
+  const sel = '[e2e-id="clear result"]';
+  await variables.page.waitForSelector(sel);
+  // page.click() holds an ElementHandle; Angular CD can detach it mid-click.
+  let clicked = false;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    clicked = await variables.page.evaluate((selector) => {
+      const el = document.querySelector(selector) as HTMLElement | null;
+      if (!el) {
+        return false;
+      }
+      el.click();
+      return true;
+    }, sel);
+    if (clicked) {
+      break;
+    }
+    await delay(100);
+  }
+  if (!clicked) {
+    throw new Error(`No element found for selector: ${sel}`);
+  }
   await variables.page.waitForFunction(
-    () => !document.querySelector('[e2e-id="clear result"]')
+    (selector) => !document.querySelector(selector),
+    {},
+    sel
   );
   // wait for document to refresh
   await delay(1000);
-  let result = await variables.page.evaluate(() => {
+  const result = await variables.page.evaluate(() => {
     return document.querySelector('[e2e-id="result"]')?.textContent;
   });
   expect(result).toBeUndefined();
