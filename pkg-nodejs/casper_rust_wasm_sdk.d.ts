@@ -27,6 +27,19 @@ export class AccessRights {
     constructor(access_rights: number);
 }
 
+/**
+ * Wasm/native wrapper around [`casper_types::account::Account`].
+ */
+export class Account {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    accountHash(): AccountHash;
+    mainPurse(): URef;
+    namedKeys(): NamedKeys;
+    toJson(): any;
+}
+
 export class AccountHash {
     free(): void;
     [Symbol.dispose](): void;
@@ -49,6 +62,22 @@ export class AccountIdentifier {
     toJson(): any;
 }
 
+/**
+ * Wasm/native wrapper around [`casper_types::AddressableEntity`].
+ */
+export class AddressableEntity {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    accountHash(): string | undefined;
+    byteCodeHash(): string;
+    entityKind(): string;
+    mainPurse(): URef;
+    packageHash(): PackageHash;
+    protocolVersion(): string;
+    toJson(): any;
+}
+
 export class AddressableEntityHash {
     free(): void;
     [Symbol.dispose](): void;
@@ -56,6 +85,21 @@ export class AddressableEntityHash {
     static fromUint8Array(bytes: Uint8Array): AddressableEntityHash;
     constructor(addressable_entity_hex_str: string);
     toFormattedString(): string;
+}
+
+/**
+ * Typed view of `state_get_entity` payload for addressable-entity mode.
+ *
+ * Contains the entity body plus named keys and entry points returned by the RPC.
+ */
+export class AddressableEntityInfo {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    entity(): AddressableEntity;
+    entryPoints(): EntryPointValue[];
+    namedKeys(): NamedKeys;
+    toJson(): any;
 }
 
 /**
@@ -103,6 +147,20 @@ export class Body {
     readonly get_transaction_processed: TransactionProcessed | undefined;
     get transaction_processed(): TransactionProcessed | undefined;
     set transaction_processed(value: TransactionProcessed | null | undefined);
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::ByteCode`].
+ */
+export class ByteCode {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    bytes(): Uint8Array;
+    isEmpty(): boolean;
+    kind(): string;
+    len(): number;
+    toJson(): any;
 }
 
 export class Bytes {
@@ -167,8 +225,8 @@ export class CESParser {
 /**
  * Wasm/native wrapper around [`casper_types::CLValue`].
  *
- * Minimal surface for building [`crate::types::runtime_args::RuntimeArgs`] (#43).
- * Full CLValue / StoredValue graph remains [#27](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/27).
+ * Minimal surface for building [`crate::types::runtime_args::RuntimeArgs`].
+ * This wrapper currently focuses on runtime-args construction.
  */
 export class CLValue {
     private constructor();
@@ -293,6 +351,23 @@ export class CasperWallet {
     switchAccount(): Promise<boolean>;
 }
 
+/**
+ * Wasm/native wrapper around [`casper_types::contracts::Contract`].
+ */
+export class Contract {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    contractPackageHash(): ContractPackageHash;
+    contractWasmHash(): string;
+    entryPoint(name: string): EntryPoint | undefined;
+    entryPoints(): EntryPoints;
+    hasEntryPoint(name: string): boolean;
+    namedKeys(): NamedKeys;
+    protocolVersion(): string;
+    toJson(): any;
+}
+
 export class ContractHash {
     free(): void;
     [Symbol.dispose](): void;
@@ -302,6 +377,22 @@ export class ContractHash {
     toFormattedString(): string;
 }
 
+/**
+ * Wasm/native wrapper around [`casper_types::contracts::ContractPackage`].
+ */
+export class ContractPackage {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    accessKey(): URef;
+    currentContractHash(): ContractHash | undefined;
+    isLocked(): boolean;
+    /**
+     * Versions / groups / lock metadata as JSON for escape-hatch parsing.
+     */
+    toJson(): any;
+}
+
 export class ContractPackageHash {
     free(): void;
     [Symbol.dispose](): void;
@@ -309,6 +400,19 @@ export class ContractPackageHash {
     static fromUint8Array(bytes: Uint8Array): ContractPackageHash;
     constructor(contract_package_hash_hex_str: string);
     toFormattedString(): string;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::ContractWasm`].
+ */
+export class ContractWasm {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    bytes(): Uint8Array;
+    isEmpty(): boolean;
+    len(): number;
+    toJson(): any;
 }
 
 export class Deploy {
@@ -363,6 +467,22 @@ export class DeployHash {
     constructor(deploy_hash_hex_str: string);
     toJson(): any;
     toString(): string;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::DeployInfo`].
+ */
+export class DeployInfo {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    deployHash(): string;
+    fromAccount(): AccountHash;
+    gas(): string;
+    source(): URef;
+    toJson(): any;
+    transferAddrs(): string[];
+    transferCount(): number;
 }
 
 export class DeployStrParams {
@@ -446,11 +566,81 @@ export class EntityIdentifier {
     toJson(): any;
 }
 
+/**
+ * Dual-mode `state_get_entity` result body.
+ *
+ * - Addressable-entity mode (`enable_addressable_entity = true`): `AddressableEntity`
+ * - Legacy mode (default in NCTL/CI): `LegacyAccount` (node may serialize as `Account`)
+ */
+export class EntityOrAccount {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    asAddressableEntity(): AddressableEntityInfo | undefined;
+    asLegacyAccount(): Account | undefined;
+    toJson(): any;
+    variant(): string;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::contracts::EntryPoint`].
+ */
+export class EntryPoint {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    entryPointType(): string;
+    name(): string;
+    /**
+     * Nested args / access / return type as JSON for escape-hatch parsing.
+     */
+    toJson(): any;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::EntryPointValue`].
+ */
+export class EntryPointValue {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    entryPointType(): string | undefined;
+    name(): string | undefined;
+    toJson(): any;
+    variant(): string;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::contracts::EntryPoints`].
+ */
+export class EntryPoints {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    get(name: string): EntryPoint | undefined;
+    hasEntryPoint(name: string): boolean;
+    isEmpty(): boolean;
+    len(): number;
+    names(): string[];
+    toJson(): any;
+}
+
 export class EraId {
     free(): void;
     [Symbol.dispose](): void;
     constructor(value: bigint);
     value(): bigint;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::EraInfo`].
+ */
+export class EraInfo {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    seigniorageAllocationCount(): number;
+    toJson(): any;
 }
 
 /**
@@ -502,20 +692,34 @@ export class Failure {
     error_message: string;
 }
 
+/**
+ * Wrapper around Casper Client `GetAccountResult`.
+ */
 export class GetAccountResult {
     private constructor();
     free(): void;
     [Symbol.dispose](): void;
+    /**
+     * Gets the typed account wrapper.
+     */
+    accountTyped(): Account;
     toJson(): any;
     readonly account: any;
     readonly api_version: any;
     readonly merkle_proof: string;
 }
 
+/**
+ * Wrapper around Casper Client `GetAddressableEntityResult`.
+ */
 export class GetAddressableEntityResult {
     private constructor();
     free(): void;
     [Symbol.dispose](): void;
+    /**
+     * Typed `entity_result` (`AddressableEntity` or legacy `Account`).
+     */
+    entityResultTyped(): EntityOrAccount;
     toJson(): any;
     readonly api_version: any;
     readonly entity_result: any;
@@ -649,6 +853,10 @@ export class GetDictionaryItemResult {
     private constructor();
     free(): void;
     [Symbol.dispose](): void;
+    /**
+     * Gets the typed stored value wrapper.
+     */
+    storedValueTyped(): StoredValue;
     /**
      * Converts the GetDictionaryItemResult to a JsValue.
      */
@@ -1029,6 +1237,46 @@ export class Messages {
     topic_name: string;
 }
 
+/**
+ * Wasm/native wrapper around [`casper_types::NamedKeyValue`].
+ */
+export class NamedKeyValue {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    key(): Key | undefined;
+    keyClValue(): CLValue;
+    name(): string | undefined;
+    nameClValue(): CLValue;
+    toJson(): any;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::NamedKeys`].
+ */
+export class NamedKeys {
+    free(): void;
+    [Symbol.dispose](): void;
+    get(name: string): Key | undefined;
+    isEmpty(): boolean;
+    len(): number;
+    names(): string[];
+    constructor();
+    toJson(): any;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::Package`] (`StoredValue::SmartContract`).
+ */
+export class Package {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    currentEntityHash(): EntityAddr | undefined;
+    isLocked(): boolean;
+    toJson(): any;
+}
+
 export class PackageHash {
     free(): void;
     [Symbol.dispose](): void;
@@ -1197,6 +1445,10 @@ export class QueryGlobalStateResult {
     private constructor();
     free(): void;
     [Symbol.dispose](): void;
+    /**
+     * Gets the typed stored value wrapper.
+     */
+    storedValueTyped(): StoredValue;
     /**
      * Converts the QueryGlobalStateResult to a JsValue.
      */
@@ -2337,7 +2589,7 @@ export class SSEClient {
 }
 
 /**
- * Thin typed wrapper: event name + JSON body (deep typing deferred to #27).
+ * Typed wrapper with event name and JSON payload body.
  */
 export class SSEPayload {
     private constructor();
@@ -2459,6 +2711,35 @@ export class SpeculativeExecTxnResult {
      * Get the execution result.
      */
     readonly execution_result: any;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::StoredValue`].
+ *
+ * Typed `as_*` covers the common query variants. Auction/message variants
+ * (`Bid`, `BidKind`, `Withdraw`, `Unbonding`, `MessageTopic`, `Message`,
+ * `Prepayment`) expose `variant` and `toJson` only.
+ */
+export class StoredValue {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    asAccount(): Account | undefined;
+    asAddressableEntity(): AddressableEntity | undefined;
+    asByteCode(): ByteCode | undefined;
+    asClValue(): CLValue | undefined;
+    asContract(): Contract | undefined;
+    asContractPackage(): ContractPackage | undefined;
+    asContractWasm(): ContractWasm | undefined;
+    asDeployInfo(): DeployInfo | undefined;
+    asEntryPoint(): EntryPointValue | undefined;
+    asEraInfo(): EraInfo | undefined;
+    asNamedKey(): NamedKeyValue | undefined;
+    asRawBytes(): Uint8Array | undefined;
+    asSmartContract(): Package | undefined;
+    asTransfer(): Transfer | undefined;
+    toJson(): any;
+    variant(): string;
 }
 
 /**
@@ -2675,6 +2956,24 @@ export class TransactionStrParams {
     set transferred_value(value: string);
     get ttl(): string | undefined;
     set ttl(value: string | null | undefined);
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::TransferV1`] (`StoredValue::Transfer`).
+ */
+export class Transfer {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    amount(): string;
+    deployHash(): string;
+    fromAccount(): AccountHash;
+    gas(): string;
+    id(): bigint | undefined;
+    source(): URef;
+    target(): URef;
+    to(): AccountHash | undefined;
+    toJson(): any;
 }
 
 export class TransferAddr {

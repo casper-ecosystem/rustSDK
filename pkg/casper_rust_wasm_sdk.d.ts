@@ -27,6 +27,19 @@ export class AccessRights {
     constructor(access_rights: number);
 }
 
+/**
+ * Wasm/native wrapper around [`casper_types::account::Account`].
+ */
+export class Account {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    accountHash(): AccountHash;
+    mainPurse(): URef;
+    namedKeys(): NamedKeys;
+    toJson(): any;
+}
+
 export class AccountHash {
     free(): void;
     [Symbol.dispose](): void;
@@ -49,6 +62,22 @@ export class AccountIdentifier {
     toJson(): any;
 }
 
+/**
+ * Wasm/native wrapper around [`casper_types::AddressableEntity`].
+ */
+export class AddressableEntity {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    accountHash(): string | undefined;
+    byteCodeHash(): string;
+    entityKind(): string;
+    mainPurse(): URef;
+    packageHash(): PackageHash;
+    protocolVersion(): string;
+    toJson(): any;
+}
+
 export class AddressableEntityHash {
     free(): void;
     [Symbol.dispose](): void;
@@ -56,6 +85,21 @@ export class AddressableEntityHash {
     static fromUint8Array(bytes: Uint8Array): AddressableEntityHash;
     constructor(addressable_entity_hex_str: string);
     toFormattedString(): string;
+}
+
+/**
+ * Typed view of `state_get_entity` payload for addressable-entity mode.
+ *
+ * Contains the entity body plus named keys and entry points returned by the RPC.
+ */
+export class AddressableEntityInfo {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    entity(): AddressableEntity;
+    entryPoints(): EntryPointValue[];
+    namedKeys(): NamedKeys;
+    toJson(): any;
 }
 
 /**
@@ -103,6 +147,20 @@ export class Body {
     readonly get_transaction_processed: TransactionProcessed | undefined;
     get transaction_processed(): TransactionProcessed | undefined;
     set transaction_processed(value: TransactionProcessed | null | undefined);
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::ByteCode`].
+ */
+export class ByteCode {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    bytes(): Uint8Array;
+    isEmpty(): boolean;
+    kind(): string;
+    len(): number;
+    toJson(): any;
 }
 
 export class Bytes {
@@ -167,8 +225,8 @@ export class CESParser {
 /**
  * Wasm/native wrapper around [`casper_types::CLValue`].
  *
- * Minimal surface for building [`crate::types::runtime_args::RuntimeArgs`] (#43).
- * Full CLValue / StoredValue graph remains [#27](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/27).
+ * Minimal surface for building [`crate::types::runtime_args::RuntimeArgs`].
+ * This wrapper currently focuses on runtime-args construction.
  */
 export class CLValue {
     private constructor();
@@ -293,6 +351,23 @@ export class CasperWallet {
     switchAccount(): Promise<boolean>;
 }
 
+/**
+ * Wasm/native wrapper around [`casper_types::contracts::Contract`].
+ */
+export class Contract {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    contractPackageHash(): ContractPackageHash;
+    contractWasmHash(): string;
+    entryPoint(name: string): EntryPoint | undefined;
+    entryPoints(): EntryPoints;
+    hasEntryPoint(name: string): boolean;
+    namedKeys(): NamedKeys;
+    protocolVersion(): string;
+    toJson(): any;
+}
+
 export class ContractHash {
     free(): void;
     [Symbol.dispose](): void;
@@ -302,6 +377,22 @@ export class ContractHash {
     toFormattedString(): string;
 }
 
+/**
+ * Wasm/native wrapper around [`casper_types::contracts::ContractPackage`].
+ */
+export class ContractPackage {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    accessKey(): URef;
+    currentContractHash(): ContractHash | undefined;
+    isLocked(): boolean;
+    /**
+     * Versions / groups / lock metadata as JSON for escape-hatch parsing.
+     */
+    toJson(): any;
+}
+
 export class ContractPackageHash {
     free(): void;
     [Symbol.dispose](): void;
@@ -309,6 +400,19 @@ export class ContractPackageHash {
     static fromUint8Array(bytes: Uint8Array): ContractPackageHash;
     constructor(contract_package_hash_hex_str: string);
     toFormattedString(): string;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::ContractWasm`].
+ */
+export class ContractWasm {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    bytes(): Uint8Array;
+    isEmpty(): boolean;
+    len(): number;
+    toJson(): any;
 }
 
 export class Deploy {
@@ -363,6 +467,22 @@ export class DeployHash {
     constructor(deploy_hash_hex_str: string);
     toJson(): any;
     toString(): string;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::DeployInfo`].
+ */
+export class DeployInfo {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    deployHash(): string;
+    fromAccount(): AccountHash;
+    gas(): string;
+    source(): URef;
+    toJson(): any;
+    transferAddrs(): string[];
+    transferCount(): number;
 }
 
 export class DeployStrParams {
@@ -446,11 +566,81 @@ export class EntityIdentifier {
     toJson(): any;
 }
 
+/**
+ * Dual-mode `state_get_entity` result body.
+ *
+ * - Addressable-entity mode (`enable_addressable_entity = true`): `AddressableEntity`
+ * - Legacy mode (default in NCTL/CI): `LegacyAccount` (node may serialize as `Account`)
+ */
+export class EntityOrAccount {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    asAddressableEntity(): AddressableEntityInfo | undefined;
+    asLegacyAccount(): Account | undefined;
+    toJson(): any;
+    variant(): string;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::contracts::EntryPoint`].
+ */
+export class EntryPoint {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    entryPointType(): string;
+    name(): string;
+    /**
+     * Nested args / access / return type as JSON for escape-hatch parsing.
+     */
+    toJson(): any;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::EntryPointValue`].
+ */
+export class EntryPointValue {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    entryPointType(): string | undefined;
+    name(): string | undefined;
+    toJson(): any;
+    variant(): string;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::contracts::EntryPoints`].
+ */
+export class EntryPoints {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    get(name: string): EntryPoint | undefined;
+    hasEntryPoint(name: string): boolean;
+    isEmpty(): boolean;
+    len(): number;
+    names(): string[];
+    toJson(): any;
+}
+
 export class EraId {
     free(): void;
     [Symbol.dispose](): void;
     constructor(value: bigint);
     value(): bigint;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::EraInfo`].
+ */
+export class EraInfo {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    seigniorageAllocationCount(): number;
+    toJson(): any;
 }
 
 /**
@@ -502,20 +692,34 @@ export class Failure {
     error_message: string;
 }
 
+/**
+ * Wrapper around Casper Client `GetAccountResult`.
+ */
 export class GetAccountResult {
     private constructor();
     free(): void;
     [Symbol.dispose](): void;
+    /**
+     * Gets the typed account wrapper.
+     */
+    accountTyped(): Account;
     toJson(): any;
     readonly account: any;
     readonly api_version: any;
     readonly merkle_proof: string;
 }
 
+/**
+ * Wrapper around Casper Client `GetAddressableEntityResult`.
+ */
 export class GetAddressableEntityResult {
     private constructor();
     free(): void;
     [Symbol.dispose](): void;
+    /**
+     * Typed `entity_result` (`AddressableEntity` or legacy `Account`).
+     */
+    entityResultTyped(): EntityOrAccount;
     toJson(): any;
     readonly api_version: any;
     readonly entity_result: any;
@@ -649,6 +853,10 @@ export class GetDictionaryItemResult {
     private constructor();
     free(): void;
     [Symbol.dispose](): void;
+    /**
+     * Gets the typed stored value wrapper.
+     */
+    storedValueTyped(): StoredValue;
     /**
      * Converts the GetDictionaryItemResult to a JsValue.
      */
@@ -1029,6 +1237,46 @@ export class Messages {
     topic_name: string;
 }
 
+/**
+ * Wasm/native wrapper around [`casper_types::NamedKeyValue`].
+ */
+export class NamedKeyValue {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    key(): Key | undefined;
+    keyClValue(): CLValue;
+    name(): string | undefined;
+    nameClValue(): CLValue;
+    toJson(): any;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::NamedKeys`].
+ */
+export class NamedKeys {
+    free(): void;
+    [Symbol.dispose](): void;
+    get(name: string): Key | undefined;
+    isEmpty(): boolean;
+    len(): number;
+    names(): string[];
+    constructor();
+    toJson(): any;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::Package`] (`StoredValue::SmartContract`).
+ */
+export class Package {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    currentEntityHash(): EntityAddr | undefined;
+    isLocked(): boolean;
+    toJson(): any;
+}
+
 export class PackageHash {
     free(): void;
     [Symbol.dispose](): void;
@@ -1197,6 +1445,10 @@ export class QueryGlobalStateResult {
     private constructor();
     free(): void;
     [Symbol.dispose](): void;
+    /**
+     * Gets the typed stored value wrapper.
+     */
+    storedValueTyped(): StoredValue;
     /**
      * Converts the QueryGlobalStateResult to a JsValue.
      */
@@ -2337,7 +2589,7 @@ export class SSEClient {
 }
 
 /**
- * Thin typed wrapper: event name + JSON body (deep typing deferred to #27).
+ * Typed wrapper with event name and JSON payload body.
  */
 export class SSEPayload {
     private constructor();
@@ -2459,6 +2711,35 @@ export class SpeculativeExecTxnResult {
      * Get the execution result.
      */
     readonly execution_result: any;
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::StoredValue`].
+ *
+ * Typed `as_*` covers the common query variants. Auction/message variants
+ * (`Bid`, `BidKind`, `Withdraw`, `Unbonding`, `MessageTopic`, `Message`,
+ * `Prepayment`) expose `variant` and `toJson` only.
+ */
+export class StoredValue {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    asAccount(): Account | undefined;
+    asAddressableEntity(): AddressableEntity | undefined;
+    asByteCode(): ByteCode | undefined;
+    asClValue(): CLValue | undefined;
+    asContract(): Contract | undefined;
+    asContractPackage(): ContractPackage | undefined;
+    asContractWasm(): ContractWasm | undefined;
+    asDeployInfo(): DeployInfo | undefined;
+    asEntryPoint(): EntryPointValue | undefined;
+    asEraInfo(): EraInfo | undefined;
+    asNamedKey(): NamedKeyValue | undefined;
+    asRawBytes(): Uint8Array | undefined;
+    asSmartContract(): Package | undefined;
+    asTransfer(): Transfer | undefined;
+    toJson(): any;
+    variant(): string;
 }
 
 /**
@@ -2675,6 +2956,24 @@ export class TransactionStrParams {
     set transferred_value(value: string);
     get ttl(): string | undefined;
     set ttl(value: string | null | undefined);
+}
+
+/**
+ * Wasm/native wrapper around [`casper_types::TransferV1`] (`StoredValue::Transfer`).
+ */
+export class Transfer {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    amount(): string;
+    deployHash(): string;
+    fromAccount(): AccountHash;
+    gas(): string;
+    id(): bigint | undefined;
+    source(): URef;
+    target(): URef;
+    to(): AccountHash | undefined;
+    toJson(): any;
 }
 
 export class TransferAddr {
@@ -3431,23 +3730,35 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly __wbg_accessrights_free: (a: number, b: number) => void;
+    readonly __wbg_account_free: (a: number, b: number) => void;
     readonly __wbg_accounthash_free: (a: number, b: number) => void;
     readonly __wbg_accountidentifier_free: (a: number, b: number) => void;
+    readonly __wbg_addressableentity_free: (a: number, b: number) => void;
+    readonly __wbg_addressableentityinfo_free: (a: number, b: number) => void;
     readonly __wbg_apiversionevent_free: (a: number, b: number) => void;
     readonly __wbg_argssimple_free: (a: number, b: number) => void;
     readonly __wbg_blockidentifier_free: (a: number, b: number) => void;
     readonly __wbg_body_free: (a: number, b: number) => void;
+    readonly __wbg_bytecode_free: (a: number, b: number) => void;
     readonly __wbg_casperwallet_free: (a: number, b: number) => void;
     readonly __wbg_cesevent_free: (a: number, b: number) => void;
     readonly __wbg_cesparser_free: (a: number, b: number) => void;
     readonly __wbg_cesparseresult_free: (a: number, b: number) => void;
     readonly __wbg_clvalue_free: (a: number, b: number) => void;
+    readonly __wbg_contract_free: (a: number, b: number) => void;
+    readonly __wbg_contractpackage_free: (a: number, b: number) => void;
     readonly __wbg_deploy_free: (a: number, b: number) => void;
+    readonly __wbg_deployinfo_free: (a: number, b: number) => void;
     readonly __wbg_deploystrparams_free: (a: number, b: number) => void;
     readonly __wbg_dictionaryitemidentifier_free: (a: number, b: number) => void;
     readonly __wbg_dictionaryitemstrparams_free: (a: number, b: number) => void;
     readonly __wbg_entityaddr_free: (a: number, b: number) => void;
+    readonly __wbg_entityoraccount_free: (a: number, b: number) => void;
+    readonly __wbg_entrypoint_free: (a: number, b: number) => void;
+    readonly __wbg_entrypoints_free: (a: number, b: number) => void;
+    readonly __wbg_entrypointvalue_free: (a: number, b: number) => void;
     readonly __wbg_eraid_free: (a: number, b: number) => void;
+    readonly __wbg_erainfo_free: (a: number, b: number) => void;
     readonly __wbg_eventparseresult_free: (a: number, b: number) => void;
     readonly __wbg_executionresult_free: (a: number, b: number) => void;
     readonly __wbg_failure_free: (a: number, b: number) => void;
@@ -3558,6 +3869,9 @@ export interface InitOutput {
     readonly __wbg_key_free: (a: number, b: number) => void;
     readonly __wbg_listrpcsresult_free: (a: number, b: number) => void;
     readonly __wbg_messages_free: (a: number, b: number) => void;
+    readonly __wbg_namedkeys_free: (a: number, b: number) => void;
+    readonly __wbg_namedkeyvalue_free: (a: number, b: number) => void;
+    readonly __wbg_package_free: (a: number, b: number) => void;
     readonly __wbg_paymentstrparams_free: (a: number, b: number) => void;
     readonly __wbg_peerentry_free: (a: number, b: number) => void;
     readonly __wbg_putdeployresult_free: (a: number, b: number) => void;
@@ -3655,11 +3969,13 @@ export interface InitOutput {
     readonly __wbg_signatureresponse_free: (a: number, b: number) => void;
     readonly __wbg_speculativeexecresult_free: (a: number, b: number) => void;
     readonly __wbg_sseclient_free: (a: number, b: number) => void;
+    readonly __wbg_storedvalue_free: (a: number, b: number) => void;
     readonly __wbg_subscription_free: (a: number, b: number) => void;
     readonly __wbg_transaction_free: (a: number, b: number) => void;
     readonly __wbg_transactionbuilderparams_free: (a: number, b: number) => void;
     readonly __wbg_transactionprocessed_free: (a: number, b: number) => void;
     readonly __wbg_transactionstrparams_free: (a: number, b: number) => void;
+    readonly __wbg_transfer_free: (a: number, b: number) => void;
     readonly __wbg_transfertarget_free: (a: number, b: number) => void;
     readonly __wbg_version2_free: (a: number, b: number) => void;
     readonly __wbg_watcher_free: (a: number, b: number) => void;
@@ -3678,6 +3994,10 @@ export interface InitOutput {
     readonly accessrights_is_writeable: (a: number) => number;
     readonly accessrights_new: (a: number, b: number) => void;
     readonly accountHashToBase64Key: (a: number, b: number, c: number) => void;
+    readonly account_accountHash: (a: number) => number;
+    readonly account_mainPurse: (a: number) => number;
+    readonly account_namedKeys: (a: number) => number;
+    readonly account_toJson: (a: number) => number;
     readonly accounthash_fromFormattedStr: (a: number, b: number, c: number) => void;
     readonly accounthash_fromPublicKey: (a: number) => number;
     readonly accounthash_fromUint8Array: (a: number, b: number) => number;
@@ -3689,10 +4009,21 @@ export interface InitOutput {
     readonly accountidentifier_fromFormattedStr: (a: number, b: number, c: number) => void;
     readonly accountidentifier_fromPublicKey: (a: number) => number;
     readonly accountidentifier_toJson: (a: number) => number;
+    readonly addressableentity_accountHash: (a: number, b: number) => void;
+    readonly addressableentity_byteCodeHash: (a: number, b: number) => void;
+    readonly addressableentity_entityKind: (a: number, b: number) => void;
+    readonly addressableentity_mainPurse: (a: number) => number;
+    readonly addressableentity_packageHash: (a: number) => number;
+    readonly addressableentity_protocolVersion: (a: number, b: number) => void;
+    readonly addressableentity_toJson: (a: number) => number;
     readonly addressableentityhash_fromFormattedStr: (a: number, b: number, c: number) => void;
     readonly addressableentityhash_fromUint8Array: (a: number, b: number) => number;
     readonly addressableentityhash_new_js_alias: (a: number, b: number, c: number) => void;
     readonly addressableentityhash_toFormattedString: (a: number, b: number) => void;
+    readonly addressableentityinfo_entity: (a: number) => number;
+    readonly addressableentityinfo_entryPoints: (a: number, b: number) => void;
+    readonly addressableentityinfo_namedKeys: (a: number) => number;
+    readonly addressableentityinfo_toJson: (a: number) => number;
     readonly blockhash_fromDigest: (a: number, b: number) => void;
     readonly blockhash_new_js_alias: (a: number, b: number, c: number) => void;
     readonly blockhash_toJson: (a: number) => number;
@@ -3702,6 +4033,11 @@ export interface InitOutput {
     readonly blockidentifier_new: (a: number) => number;
     readonly blockidentifier_toJson: (a: number) => number;
     readonly body_get_deploy_processed: (a: number) => number;
+    readonly bytecode_bytes: (a: number, b: number) => void;
+    readonly bytecode_isEmpty: (a: number) => number;
+    readonly bytecode_kind: (a: number, b: number) => void;
+    readonly bytecode_len: (a: number) => number;
+    readonly bytecode_toJson: (a: number) => number;
     readonly bytes_fromUint8Array: (a: number) => number;
     readonly bytes_new: () => number;
     readonly casperwallet_connect: (a: number) => number;
@@ -3738,14 +4074,30 @@ export interface InitOutput {
     readonly clvalue_fromURef: (a: number, b: number) => void;
     readonly clvalue_fromUnit: (a: number) => void;
     readonly clvalue_toJson: (a: number) => number;
+    readonly contract_contractPackageHash: (a: number) => number;
+    readonly contract_contractWasmHash: (a: number, b: number) => void;
+    readonly contract_entryPoint: (a: number, b: number, c: number) => number;
+    readonly contract_entryPoints: (a: number) => number;
+    readonly contract_hasEntryPoint: (a: number, b: number, c: number) => number;
+    readonly contract_namedKeys: (a: number) => number;
+    readonly contract_protocolVersion: (a: number, b: number) => void;
+    readonly contract_toJson: (a: number) => number;
     readonly contracthash_fromFormattedStr: (a: number, b: number, c: number) => void;
     readonly contracthash_fromUint8Array: (a: number, b: number) => number;
     readonly contracthash_new_js_alias: (a: number, b: number, c: number) => void;
     readonly contracthash_toFormattedString: (a: number, b: number) => void;
+    readonly contractpackage_accessKey: (a: number) => number;
+    readonly contractpackage_currentContractHash: (a: number) => number;
+    readonly contractpackage_isLocked: (a: number) => number;
+    readonly contractpackage_toJson: (a: number) => number;
     readonly contractpackagehash_fromFormattedStr: (a: number, b: number, c: number) => void;
     readonly contractpackagehash_fromUint8Array: (a: number, b: number) => number;
     readonly contractpackagehash_new_js_alias: (a: number, b: number, c: number) => void;
     readonly contractpackagehash_toFormattedString: (a: number, b: number) => void;
+    readonly contractwasm_bytes: (a: number, b: number) => void;
+    readonly contractwasm_isEmpty: (a: number) => number;
+    readonly contractwasm_len: (a: number) => number;
+    readonly contractwasm_toJson: (a: number) => number;
     readonly deploy_TTL: (a: number, b: number) => void;
     readonly deploy_account: (a: number, b: number) => void;
     readonly deploy_addArg: (a: number, b: number, c: number, d: number, e: number) => void;
@@ -3788,6 +4140,13 @@ export interface InitOutput {
     readonly deploy_withTransfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
     readonly deployhash_new_js_alias: (a: number, b: number, c: number) => void;
     readonly deployhash_toString: (a: number, b: number) => void;
+    readonly deployinfo_deployHash: (a: number, b: number) => void;
+    readonly deployinfo_fromAccount: (a: number) => number;
+    readonly deployinfo_gas: (a: number, b: number) => void;
+    readonly deployinfo_source: (a: number) => number;
+    readonly deployinfo_toJson: (a: number) => number;
+    readonly deployinfo_transferAddrs: (a: number, b: number) => void;
+    readonly deployinfo_transferCount: (a: number) => number;
     readonly deploystrparams_chain_name: (a: number, b: number) => void;
     readonly deploystrparams_gas_price_tolerance: (a: number, b: number) => void;
     readonly deploystrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
@@ -3829,16 +4188,37 @@ export interface InitOutput {
     readonly entityidentifier_fromEntityAddr: (a: number) => number;
     readonly entityidentifier_fromFormattedStr: (a: number, b: number, c: number) => void;
     readonly entityidentifier_toJson: (a: number) => number;
+    readonly entityoraccount_asAddressableEntity: (a: number) => number;
+    readonly entityoraccount_asLegacyAccount: (a: number) => number;
+    readonly entityoraccount_toJson: (a: number) => number;
+    readonly entityoraccount_variant: (a: number, b: number) => void;
+    readonly entrypoint_entryPointType: (a: number, b: number) => void;
+    readonly entrypoint_name: (a: number, b: number) => void;
+    readonly entrypoint_toJson: (a: number) => number;
+    readonly entrypoints_get: (a: number, b: number, c: number) => number;
+    readonly entrypoints_hasEntryPoint: (a: number, b: number, c: number) => number;
+    readonly entrypoints_isEmpty: (a: number) => number;
+    readonly entrypoints_len: (a: number) => number;
+    readonly entrypoints_names: (a: number, b: number) => void;
+    readonly entrypoints_toJson: (a: number) => number;
+    readonly entrypointvalue_entryPointType: (a: number, b: number) => void;
+    readonly entrypointvalue_name: (a: number, b: number) => void;
+    readonly entrypointvalue_toJson: (a: number) => number;
+    readonly entrypointvalue_variant: (a: number, b: number) => void;
     readonly eraid_new: (a: bigint) => number;
     readonly eraid_value: (a: number) => bigint;
+    readonly erainfo_seigniorageAllocationCount: (a: number) => number;
+    readonly erainfo_toJson: (a: number) => number;
     readonly generateSecretKey: (a: number) => void;
     readonly generateSecretKey_secp256k1: (a: number) => void;
     readonly getTimestamp: () => number;
     readonly getaccountresult_account: (a: number) => number;
+    readonly getaccountresult_accountTyped: (a: number) => number;
     readonly getaccountresult_api_version: (a: number) => number;
     readonly getaccountresult_merkle_proof: (a: number, b: number) => void;
     readonly getaccountresult_toJson: (a: number) => number;
     readonly getaddressableentityresult_api_version: (a: number) => number;
+    readonly getaddressableentityresult_entityResultTyped: (a: number) => number;
     readonly getaddressableentityresult_entity_result: (a: number) => number;
     readonly getaddressableentityresult_merkle_proof: (a: number, b: number) => void;
     readonly getaddressableentityresult_toJson: (a: number) => number;
@@ -3866,6 +4246,7 @@ export interface InitOutput {
     readonly getdictionaryitemresult_api_version: (a: number) => number;
     readonly getdictionaryitemresult_dictionary_key: (a: number, b: number) => void;
     readonly getdictionaryitemresult_merkle_proof: (a: number, b: number) => void;
+    readonly getdictionaryitemresult_storedValueTyped: (a: number) => number;
     readonly getdictionaryitemresult_stored_value: (a: number) => number;
     readonly getdictionaryitemresult_toJson: (a: number) => number;
     readonly geterainforesult_api_version: (a: number) => number;
@@ -3954,6 +4335,20 @@ export interface InitOutput {
     readonly listrpcsresult_toJson: (a: number) => number;
     readonly makeDictionaryItemKey: (a: number, b: number, c: number, d: number) => void;
     readonly motesToCSPR: (a: number, b: number, c: number) => void;
+    readonly namedkeys_get: (a: number, b: number, c: number) => number;
+    readonly namedkeys_isEmpty: (a: number) => number;
+    readonly namedkeys_len: (a: number) => number;
+    readonly namedkeys_names: (a: number, b: number) => void;
+    readonly namedkeys_new: () => number;
+    readonly namedkeys_toJson: (a: number) => number;
+    readonly namedkeyvalue_key: (a: number) => number;
+    readonly namedkeyvalue_keyClValue: (a: number) => number;
+    readonly namedkeyvalue_name: (a: number, b: number) => void;
+    readonly namedkeyvalue_nameClValue: (a: number) => number;
+    readonly namedkeyvalue_toJson: (a: number) => number;
+    readonly package_currentEntityHash: (a: number) => number;
+    readonly package_isLocked: (a: number) => number;
+    readonly package_toJson: (a: number) => number;
     readonly packagehash_fromFormattedStr: (a: number, b: number, c: number) => void;
     readonly packagehash_fromUint8Array: (a: number, b: number) => number;
     readonly packagehash_new_js_alias: (a: number, b: number, c: number) => void;
@@ -4012,6 +4407,7 @@ export interface InitOutput {
     readonly queryglobalstateresult_api_version: (a: number) => number;
     readonly queryglobalstateresult_block_header: (a: number) => number;
     readonly queryglobalstateresult_merkle_proof: (a: number, b: number) => void;
+    readonly queryglobalstateresult_storedValueTyped: (a: number) => number;
     readonly queryglobalstateresult_stored_value: (a: number) => number;
     readonly queryglobalstateresult_toJson: (a: number) => number;
     readonly rawevent_new_js: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
@@ -4203,6 +4599,22 @@ export interface InitOutput {
     readonly sseclient_subscribe: (a: number, b: number, c: number, d: number, e: number) => void;
     readonly sseclient_unsubscribe: (a: number, b: number, c: number, d: number) => void;
     readonly ssepayload_body: (a: number, b: number) => void;
+    readonly storedvalue_asAccount: (a: number) => number;
+    readonly storedvalue_asAddressableEntity: (a: number) => number;
+    readonly storedvalue_asByteCode: (a: number) => number;
+    readonly storedvalue_asClValue: (a: number) => number;
+    readonly storedvalue_asContract: (a: number) => number;
+    readonly storedvalue_asContractPackage: (a: number) => number;
+    readonly storedvalue_asContractWasm: (a: number) => number;
+    readonly storedvalue_asDeployInfo: (a: number) => number;
+    readonly storedvalue_asEntryPoint: (a: number) => number;
+    readonly storedvalue_asEraInfo: (a: number) => number;
+    readonly storedvalue_asNamedKey: (a: number) => number;
+    readonly storedvalue_asRawBytes: (a: number, b: number) => void;
+    readonly storedvalue_asSmartContract: (a: number) => number;
+    readonly storedvalue_asTransfer: (a: number) => number;
+    readonly storedvalue_toJson: (a: number) => number;
+    readonly storedvalue_variant: (a: number, b: number) => void;
     readonly subscription_new: (a: number, b: number, c: number) => number;
     readonly transaction_account_hash: (a: number) => number;
     readonly transaction_addArg: (a: number, b: number, c: number, d: number, e: number) => void;
@@ -4339,6 +4751,15 @@ export interface InitOutput {
     readonly transactionstrparams_timestamp: (a: number, b: number) => void;
     readonly transactionstrparams_transferred_value: (a: number, b: number) => void;
     readonly transactionstrparams_ttl: (a: number, b: number) => void;
+    readonly transfer_amount: (a: number, b: number) => void;
+    readonly transfer_deployHash: (a: number, b: number) => void;
+    readonly transfer_fromAccount: (a: number) => number;
+    readonly transfer_gas: (a: number, b: number) => void;
+    readonly transfer_id: (a: number, b: number) => void;
+    readonly transfer_source: (a: number) => number;
+    readonly transfer_target: (a: number) => number;
+    readonly transfer_to: (a: number) => number;
+    readonly transfer_toJson: (a: number) => number;
     readonly transferaddr_new: (a: number, b: number, c: number) => void;
     readonly transfertarget_new: (a: number, b: number, c: number, d: number) => number;
     readonly uref_fromFormattedStr: (a: number, b: number, c: number) => void;
@@ -4550,6 +4971,7 @@ export interface InitOutput {
     readonly __wbg_bytes_free: (a: number, b: number) => void;
     readonly __wbg_contracthash_free: (a: number, b: number) => void;
     readonly __wbg_blockhash_free: (a: number, b: number) => void;
+    readonly __wbg_contractwasm_free: (a: number, b: number) => void;
     readonly __wbg_publickey_free: (a: number, b: number) => void;
     readonly __wbg_purseidentifier_free: (a: number, b: number) => void;
     readonly __wbg_entityidentifier_free: (a: number, b: number) => void;
@@ -4585,14 +5007,14 @@ export interface InitOutput {
     readonly intounderlyingsink_write: (a: number, b: number) => number;
     readonly intounderlyingsource_cancel: (a: number) => void;
     readonly intounderlyingsource_pull: (a: number, b: number) => number;
-    readonly __wasm_bindgen_func_elem_13221: (a: number, b: number, c: number, d: number) => void;
-    readonly __wasm_bindgen_func_elem_13223: (a: number, b: number, c: number, d: number) => void;
-    readonly __wasm_bindgen_func_elem_8920: (a: number, b: number, c: number) => void;
-    readonly __wasm_bindgen_func_elem_5646: (a: number, b: number, c: number) => void;
-    readonly __wasm_bindgen_func_elem_5646_3: (a: number, b: number, c: number) => void;
-    readonly __wasm_bindgen_func_elem_5646_4: (a: number, b: number, c: number) => void;
-    readonly __wasm_bindgen_func_elem_8780: (a: number, b: number) => void;
-    readonly __wasm_bindgen_func_elem_5645: (a: number, b: number) => void;
+    readonly __wasm_bindgen_func_elem_13709: (a: number, b: number, c: number, d: number) => void;
+    readonly __wasm_bindgen_func_elem_13711: (a: number, b: number, c: number, d: number) => void;
+    readonly __wasm_bindgen_func_elem_9350: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_6076: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_6076_3: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_6076_4: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_9210: (a: number, b: number) => void;
+    readonly __wasm_bindgen_func_elem_6075: (a: number, b: number) => void;
     readonly __wbindgen_export: (a: number, b: number) => number;
     readonly __wbindgen_export2: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_export3: (a: number) => void;
