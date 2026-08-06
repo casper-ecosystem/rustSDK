@@ -10,6 +10,23 @@ use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 
+/// HTTP client for native SSE. Disables idle keep-alive so a dropped tokio
+/// runtime cannot leave pooled connections (hyperium/hyper#2136).
+#[cfg(not(target_arch = "wasm32"))]
+fn sse_http_client() -> Result<reqwest::Client, String> {
+    reqwest::Client::builder()
+        .pool_max_idle_per_host(0)
+        .build()
+        .map_err(|e| format!("SSE HTTP client build failed: {e}"))
+}
+
+#[cfg(target_arch = "wasm32")]
+fn sse_http_client() -> Result<reqwest::Client, String> {
+    reqwest::Client::builder()
+        .build()
+        .map_err(|e| format!("SSE HTTP client build failed: {e}"))
+}
+
 /// Native event handler.
 #[cfg(not(target_arch = "wasm32"))]
 pub type SSEHandlerFn = Arc<Mutex<dyn Fn(RawEvent) + Send + Sync>>;
@@ -183,7 +200,7 @@ impl SSEClient {
         }
 
         let url = url_with_start_from(&self.events_url, start_from);
-        let client = reqwest::Client::new();
+        let client = sse_http_client()?;
         let response = client
             .get(&url)
             .send()
@@ -274,7 +291,7 @@ impl SSEClient {
         use chrono::{Duration, Utc};
 
         let url = url_with_start_from(&self.events_url, start_from);
-        let client = reqwest::Client::new();
+        let client = sse_http_client()?;
         let response = client
             .get(&url)
             .send()

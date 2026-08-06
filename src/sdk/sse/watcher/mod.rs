@@ -23,6 +23,23 @@ use wasm_bindgen_futures::future_to_promise;
 
 const DEFAULT_TIMEOUT_MS: u64 = 60000;
 
+/// HTTP client for native SSE. Disables idle keep-alive so a dropped tokio
+/// runtime cannot leave pooled connections (hyperium/hyper#2136).
+#[cfg(not(target_arch = "wasm32"))]
+fn sse_http_client() -> Result<reqwest::Client, String> {
+    reqwest::Client::builder()
+        .pool_max_idle_per_host(0)
+        .build()
+        .map_err(|e| format!("SSE HTTP client build failed: {e}"))
+}
+
+#[cfg(target_arch = "wasm32")]
+fn sse_http_client() -> Result<reqwest::Client, String> {
+    reqwest::Client::builder()
+        .build()
+        .map_err(|e| format!("SSE HTTP client build failed: {e}"))
+}
+
 impl SDK {
     /// Creates a new Watcher instance to watch deploys.
     /// Legacy alias
@@ -380,7 +397,16 @@ impl Watcher {
             *active = true;
         }
 
-        let client = reqwest::Client::new();
+        let client = match sse_http_client() {
+            Ok(client) => client,
+            Err(err) => {
+                let event_parse_result = EventParseResult {
+                    err: Some(err),
+                    body: None,
+                };
+                return Some(vec![event_parse_result]);
+            }
+        };
         // Replay from event id 0 so a TransactionProcessed already emitted
         // before connect is still visible (parity with SSEClient).
         let url = url_with_start_from(&self.events_url, Some(0));

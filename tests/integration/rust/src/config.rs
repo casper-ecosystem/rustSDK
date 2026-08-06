@@ -4,7 +4,7 @@ use crate::tests::helpers::{
 };
 use casper_rust_wasm_sdk::types::verbosity::Verbosity;
 use casper_rust_wasm_sdk::{helpers::public_key_from_secret_key, types::public_key::PublicKey};
-use lazy_static::lazy_static;
+use std::sync::OnceLock;
 use std::time::{self, Duration};
 use tokio::sync::{Mutex, RwLock};
 
@@ -14,8 +14,7 @@ pub const SPECULATIVE_ADDRESS: &str = "http://127.0.0.1:25101";
 pub const DEFAULT_NODE_ADDRESS: &str = "127.0.0.1:28101";
 pub const DEFAULT_CHAIN_NAME: &str = "casper-net-1";
 pub const DEFAULT_SECRET_KEY_NAME: &str = "secret_key.pem";
-// Hyper/reqwest + lazy_static can error with "runtime dropped the dispatch task"
-// (hyperium/hyper#2112, seanmonstar/reqwest#1148).
+/// Sleep so two wall-clock timestamps differ in integration assertions.
 pub const TIMESTAMP_WAIT_TIME: Duration = time::Duration::from_millis(1000);
 pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 // read_pem_file will look SECRET_KEY_NAME to root directory if relative path is not found (relative to root)
@@ -89,10 +88,15 @@ pub(crate) enum InitializationState {
     InstallComplete,      // install cep_78 has occured
 }
 
-lazy_static! {
-    pub(crate) static ref CONFIG: Mutex<Option<TestConfig>> = Mutex::new(None);
-    pub(crate) static ref INITIALIZATION_STATE: RwLock<InitializationState> =
-        RwLock::new(InitializationState::NotInitialized);
+static CONFIG: OnceLock<Mutex<Option<TestConfig>>> = OnceLock::new();
+static INITIALIZATION_STATE: OnceLock<RwLock<InitializationState>> = OnceLock::new();
+
+pub(crate) fn config() -> &'static Mutex<Option<TestConfig>> {
+    CONFIG.get_or_init(|| Mutex::new(None))
+}
+
+fn initialization_state() -> &'static RwLock<InitializationState> {
+    INITIALIZATION_STATE.get_or_init(|| RwLock::new(InitializationState::NotInitialized))
 }
 
 pub async fn initialize_test_config(
@@ -101,11 +105,11 @@ pub async fn initialize_test_config(
     use crate::tests::helpers::{get_contract_cep78_hash_keys, install_cep78_if_needed, mint_nft};
     use dotenvy::dotenv;
 
-    let mut initialization_state = INITIALIZATION_STATE.write().await;
+    let mut initialization_state = initialization_state().write().await;
 
     if *initialization_state == InitializationState::InstallComplete {
         // If already fully initialized, skip initialization
-        return Ok(CONFIG.lock().await.clone().unwrap());
+        return Ok(config().lock().await.clone().unwrap());
     }
 
     dotenv().ok();
@@ -212,9 +216,9 @@ pub async fn initialize_test_config(
 }
 
 pub async fn get_config(skip_install: bool) -> TestConfig {
-    let mut config_guard = CONFIG.lock().await;
+    let mut config_guard = config().lock().await;
     // Acquire the initialization state
-    let initialization_state = INITIALIZATION_STATE.read().await;
+    let initialization_state = initialization_state().read().await;
 
     // If the initialization state is NotInitialized, initialize based on `skip_install`
     if *initialization_state == InitializationState::NotInitialized {

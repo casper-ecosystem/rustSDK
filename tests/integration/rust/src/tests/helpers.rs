@@ -18,7 +18,6 @@ use casper_rust_wasm_sdk::{
     },
     watcher::EventParseResult,
 };
-use lazy_static::lazy_static;
 use serde_json::{to_string, Value};
 use std::{
     env,
@@ -26,16 +25,23 @@ use std::{
     io::{self, Read},
     path::PathBuf,
     process,
+    sync::OnceLock,
 };
 use tokio::sync::Mutex;
 
-lazy_static! {
-    pub static ref CEP78_INSTALLED_GUARD: Mutex<bool> = Mutex::new(false);
-    pub static ref CEP78_REINSTALL_GUARD: Mutex<bool> = Mutex::new(false);
+static CEP78_INSTALLED_GUARD: OnceLock<Mutex<bool>> = OnceLock::new();
+static CEP78_REINSTALL_GUARD: OnceLock<Mutex<bool>> = OnceLock::new();
+
+fn cep78_installed_guard() -> &'static Mutex<bool> {
+    CEP78_INSTALLED_GUARD.get_or_init(|| Mutex::new(false))
+}
+
+fn cep78_reinstall_guard() -> &'static Mutex<bool> {
+    CEP78_REINSTALL_GUARD.get_or_init(|| Mutex::new(false))
 }
 
 pub(crate) mod intern {
-    use super::{get_enable_addressable_entity, read_wasm_file, CEP78_REINSTALL_GUARD};
+    use super::{cep78_reinstall_guard, get_enable_addressable_entity, read_wasm_file};
     use crate::config::{
         TestConfig, ARGS_JSON, CEP78_CONTRACT, PAYMENT_AMOUNT_CONTRACT_CEP78, WASM_PATH,
     };
@@ -221,7 +227,7 @@ pub(crate) mod intern {
         path: Option<&str>,
         network_constants: (&str, &str, &str),
     ) -> Result<String, Box<dyn std::error::Error>> {
-        let mut cep78_reinstall_guard = CEP78_REINSTALL_GUARD.lock().await;
+        let mut cep78_reinstall_guard = cep78_reinstall_guard().lock().await;
         if *cep78_reinstall_guard {
             return Err("CEP78 contract already installed".into());
         }
@@ -410,7 +416,7 @@ pub async fn install_cep78_if_needed(
     path: Option<&str>,
     network_constants: (&str, &str, &str),
 ) -> Option<String> {
-    let mut install_guard = CEP78_INSTALLED_GUARD.lock().await;
+    let mut install_guard = cep78_installed_guard().lock().await;
     if !(*install_guard) {
         let deploy_hash = install_cep78(account, secret_key, path, network_constants)
             .await

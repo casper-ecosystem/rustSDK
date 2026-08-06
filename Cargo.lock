@@ -2607,8 +2607,6 @@ dependencies = [
  "casper-rust-wasm-sdk",
  "chrono",
  "dotenvy",
- "lazy_static",
- "once_cell",
  "serde_json",
  "tokio",
 ]

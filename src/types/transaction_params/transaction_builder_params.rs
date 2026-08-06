@@ -78,7 +78,8 @@ pub struct TransactionBuilderParams {
     maximum_delegation_amount: Option<Option<u64>>,
     reserved_slots: Option<Option<u32>>,
     major_protocol_version: Option<ProtocolVersionMajor>,
-    /// Session/entity/package runtime. `None` means default VmCasperV2.
+    /// Session/entity/package runtime. `None` uses kind default: Session → V2,
+    /// stored invocation (entity/package) → V1.
     runtime: Option<TransactionRuntimeParams>,
 }
 
@@ -692,7 +693,7 @@ impl TransactionBuilderParams {
         )
     }
 
-    /// True when runtime resolves to VmCasperV2 (the default).
+    /// True when runtime resolves to VmCasperV2.
     #[wasm_bindgen(getter, js_name = "isRuntimeV2")]
     pub fn is_runtime_v2(&self) -> bool {
         matches!(
@@ -738,7 +739,23 @@ impl TransactionBuilderParams {
 
 impl TransactionBuilderParams {
     fn resolved_runtime(&self) -> TransactionRuntimeParams {
-        self.runtime.clone().unwrap_or_else(default_runtime_v2)
+        self.runtime
+            .clone()
+            .unwrap_or_else(|| default_runtime_for_kind(self.kind))
+    }
+}
+
+/// Session defaults to V2 (VM2-oriented installs). Stored entity/package calls
+/// default to V1 (classic CEP-78 and current on-chain fixtures).
+fn default_runtime_for_kind(kind: TransactionKind) -> TransactionRuntimeParams {
+    match kind {
+        TransactionKind::Session => default_runtime_v2(),
+        TransactionKind::InvocableEntity
+        | TransactionKind::InvocableEntityAlias
+        | TransactionKind::Package
+        | TransactionKind::PackageAlias => TransactionRuntimeParams::VmCasperV1,
+        // Transfer / auction kinds do not carry a session runtime field.
+        _ => default_runtime_v2(),
     }
 }
 
@@ -901,7 +918,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn default_runtime_is_v2_for_session_and_entity() {
+    fn default_runtime_is_v2_for_session_v1_for_entity() {
         let session = TransactionBuilderParams::new_session(None, None);
         assert!(session.is_runtime_v2());
         assert!(!session.is_runtime_v1());
@@ -921,10 +938,9 @@ mod tests {
             _ => panic!("expected Session"),
         }
 
-        let mut entity = TransactionBuilderParams::new_invocable_entity_alias("cep78", "mint");
-        assert!(entity.is_runtime_v2());
-        entity.set_runtime_v1();
+        let entity = TransactionBuilderParams::new_invocable_entity_alias("cep78", "mint");
         assert!(entity.is_runtime_v1());
+        assert!(!entity.is_runtime_v2());
         let client = transaction_builder_params_to_casper_client(&entity);
         match client {
             _TransactionBuilderParams::InvocableEntityAlias { runtime, .. } => {
@@ -932,6 +948,10 @@ mod tests {
             }
             _ => panic!("expected InvocableEntityAlias"),
         }
+
+        let mut entity_v2 = entity;
+        entity_v2.set_runtime_v2(0, None);
+        assert!(entity_v2.is_runtime_v2());
     }
 
     #[test]
