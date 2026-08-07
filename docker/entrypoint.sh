@@ -30,16 +30,23 @@ if [ ! -f "$INDEX_FILE" ]; then
 fi
 
 # Generate runtime config.js file
+# DEBUG_MODE=1|true enables colored [wc:boot] console timings in the browser.
+DEBUG_MODE_FLAG=false
+case "${DEBUG_MODE:-}" in
+  1|true|TRUE|yes|YES) DEBUG_MODE_FLAG=true ;;
+esac
+
 cat > "$CONFIG_FILE" <<EOF
 window.__APP_CONFIG__ = {
   cors_anywhere_url: '${CORS_ANYWHERE_URL:-}',
   network_rpc_url: '${NETWORK_RPC_URL:-}',
   network_node_url: '${NETWORK_NODE_URL:-}',
   app_version: '${APP_VERSION}',
-  git_sha: '${GIT_SHA_SHORT}'
+  git_sha: '${GIT_SHA_SHORT}',
+  debug_mode: ${DEBUG_MODE_FLAG}
 };
 EOF
-echo "Generated runtime config.js"
+echo "Generated runtime config.js (debug_mode=${DEBUG_MODE_FLAG})"
 
 # Inject config.js script tag into index.html if not already present
 if ! grep -q '<script src="config.js">' "$INDEX_FILE"; then

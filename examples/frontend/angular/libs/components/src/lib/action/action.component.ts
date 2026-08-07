@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SDK } from 'casper-rust-wasm-sdk';
-import { SDK_TOKEN } from '@util/wasm';
+import { SDK_TOKEN, wcBoot } from '@util/wasm';
 import { Subscription } from 'rxjs';
 import { State, StateService } from '@util/state';
 import { CONFIG, EnvironmentConfig } from '@util/config';
@@ -46,6 +46,7 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
   ) {}
 
   async ngAfterViewInit(): Promise<void> {
+    wcBoot.mark('action_build_start');
     const seeded = this.stateService.getValue()?.action;
     if (seeded) {
       this.action = seeded;
@@ -195,6 +196,10 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
     );
     this.setStateSubscription();
     this.changeDetectorRef.detectChanges();
+    wcBoot.mark('action_build_done', {
+      action: this.action || '',
+      rpc_methods: this.sdk_rpc_methods?.length ?? 0,
+    });
   }
 
   ngOnDestroy() {

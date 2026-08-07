@@ -28,6 +28,57 @@
     ></script>
   </head>
   <body>
+    <script>
+      (function () {
+        try {
+          var params = new URLSearchParams(location.search);
+          var q =
+            params.get('debug') ||
+            params.get('DEBUG_MODE') ||
+            params.get('debug_mode');
+          var fromQuery = q === '1' || q === 'true';
+          var fromConfig =
+            window.__APP_CONFIG__ && window.__APP_CONFIG__.debug_mode === true;
+          if (!fromQuery && !fromConfig) {
+            return;
+          }
+          window.__bootT0 = performance.now();
+          var ms = performance.now();
+          var d = new Date();
+          function pad(n, w) {
+            w = w || 2;
+            return String(Math.trunc(n)).padStart(w, '0');
+          }
+          var clock =
+            d.getFullYear() +
+            '-' +
+            pad(d.getMonth() + 1) +
+            '-' +
+            pad(d.getDate()) +
+            ' ' +
+            pad(d.getHours()) +
+            ':' +
+            pad(d.getMinutes()) +
+            ':' +
+            pad(d.getSeconds()) +
+            '.' +
+            pad(d.getMilliseconds(), 3);
+          console.log(
+            '%c[wc:boot]%c html_body %c' +
+              clock +
+              '%c %c' +
+              ms.toFixed(1) +
+              'ms%c splash=1',
+            'color:#00ff9c;font-weight:700;background:#0a0a0a;padding:0.1em 0.35em;border-radius:0.2em',
+            'color:#e8f7ff;font-weight:600',
+            'color:#80cbc4;font-weight:600',
+            'color:inherit;font-weight:normal;background:transparent',
+            'color:#ffea00;font-weight:700',
+            'color:inherit;font-weight:normal;background:transparent',
+          );
+        } catch (e) {}
+      })();
+    </script>
     <app-root>
       <div
         style="

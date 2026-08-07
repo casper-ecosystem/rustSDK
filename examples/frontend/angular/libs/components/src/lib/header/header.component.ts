@@ -11,7 +11,7 @@ import {
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { CONFIG, ENV, EnvironmentConfig, Network } from '@util/config';
 import { PeerEntry, SDK } from 'casper-rust-wasm-sdk';
-import { SDK_TOKEN } from '@util/wasm';
+import { SDK_TOKEN, wcBoot } from '@util/wasm';
 import { StateService } from '@util/state';
 import { StorageService } from '@util/storage';
 
@@ -387,6 +387,15 @@ export class HeaderComponent implements AfterViewInit {
       } else {
         this.sdk.setNodeAddress(this.node_address);
       }
+      const rpc =
+        typeof (this.sdk as { getRPCAddress?: () => string }).getRPCAddress ===
+        'function'
+          ? (this.sdk as { getRPCAddress: () => string }).getRPCAddress()
+          : this.rpc_address;
+      wcBoot.mark('header_rpc_set', {
+        rpc,
+        node: this.node_address,
+      });
     } catch (e) {
       console.error(e);
     }

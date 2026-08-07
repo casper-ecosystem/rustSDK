@@ -17,6 +17,12 @@ const ENABLE_MCP_PROXY =
   process.env.ENABLE_MCP_PROXY === 'true' ||
   process.env.ENABLE_MCP === '1' ||
   process.env.ENABLE_MCP === 'true';
+const DEBUG_MODE =
+  process.env.DEBUG_MODE === '1' ||
+  process.env.DEBUG_MODE === 'true' ||
+  process.env.DEBUG_MODE === 'TRUE';
+const PROCESS_STARTED_AT = Date.now();
+let firstHitLogged = false;
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -106,6 +112,13 @@ function proxyMcp(req, res) {
 
 const server = http.createServer((req, res) => {
   const urlPath = req.url || '/';
+  if (DEBUG_MODE && !firstHitLogged) {
+    firstHitLogged = true;
+    const sinceStartMs = Date.now() - PROCESS_STARTED_AT;
+    console.error(
+      `[serve] first-hit path=${urlPath.split('?')[0]} since_start_ms=${sinceStartMs}`,
+    );
+  }
   if (ENABLE_MCP_PROXY && (urlPath === '/mcp' || urlPath.startsWith('/mcp/'))) {
     proxyMcp(req, res);
     return;
@@ -115,6 +128,11 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.error(
-    `[serve] listening on :${PORT} dist=${DIST} mcp_proxy=${ENABLE_MCP_PROXY ? MCP_UPSTREAM : 'off'}`,
+    `[serve] listening on :${PORT} dist=${DIST} mcp_proxy=${ENABLE_MCP_PROXY ? MCP_UPSTREAM : 'off'} debug_mode=${DEBUG_MODE}`,
   );
+  if (DEBUG_MODE) {
+    console.error(
+      `[serve] up pid=${process.pid} started_at=${new Date(PROCESS_STARTED_AT).toISOString()}`,
+    );
+  }
 });

@@ -6,6 +6,7 @@ import {
   Provider,
 } from '@angular/core';
 import init, { SDK, Verbosity } from 'casper-rust-wasm-sdk';
+import { wcBoot } from './boot-timing';
 
 export const SDK_TOKEN = new InjectionToken<SDK>('SDK');
 export const WASM_ASSET_PATH = new InjectionToken<string>('wasm_asset_path');
@@ -21,11 +22,18 @@ type Params = {
 };
 
 export const fetchWasmFactory = async (params: Params): Promise<SDK> => {
-  // console.log('Loading wasm from', params.wasm_asset_path);
-  const wasm = await init({ module_or_path: params.wasm_asset_path });
-  return (
-    wasm && new SDK(params.rpc_address, params.node_address, params.verbosity)
+  await wcBoot.measure(
+    'wasm_init',
+    async () => {
+      await init({ module_or_path: params.wasm_asset_path });
+    },
+    { path: params.wasm_asset_path },
   );
+  wcBoot.mark('sdk_ctor', {
+    rpc: params.rpc_address,
+    node: params.node_address,
+  });
+  return new SDK(params.rpc_address, params.node_address, params.verbosity);
 };
 
 export function provideSafeAsync<T>(

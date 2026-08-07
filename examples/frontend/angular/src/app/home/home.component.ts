@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
-import { SDK_TOKEN } from '@util/wasm';
+import { SDK_TOKEN, wcBoot } from '@util/wasm';
 import { SDK, PeerEntry, Transaction } from 'casper-rust-wasm-sdk';
 import {
   ResultComponent,
@@ -91,6 +91,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       action,
       status_loading: true,
     });
+    wcBoot.mark('home_init', { action, status_loading: true });
   }
 
   public ngOnDestroy() {
@@ -111,38 +112,47 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.action ||
       this.storageService.get('action') ||
       this.config['default_action'].toString();
+    wcBoot.mark('home_after_view', { action });
     void this.bootstrapChainStatus(action);
   }
 
   private async bootstrapChainStatus(action: string) {
     const generation = ++this.bootstrapGeneration;
     const no_mark_for_check = true;
-    try {
-      if (action == this.config['default_action'].toString()) {
-        const get_node_status = await this.sdk.get_node_status();
+    await wcBoot.measure('bootstrap_chain', async () => {
+      try {
+        if (action == this.config['default_action'].toString()) {
+          const get_node_status = await wcBoot.measure(
+            'rpc_get_node_status',
+            () => this.sdk.get_node_status(),
+          );
+          if (generation !== this.bootstrapGeneration) {
+            return;
+          }
+          if (get_node_status) {
+            await this.resultService.setResult(get_node_status.toJson());
+          }
+        }
         if (generation !== this.bootstrapGeneration) {
           return;
         }
-        if (get_node_status) {
-          await this.resultService.setResult(get_node_status.toJson());
+        await wcBoot.measure('rpc_get_srh', () =>
+          this.get_state_root_hash(no_mark_for_check),
+        );
+      } catch (error) {
+        if (generation === this.bootstrapGeneration) {
+          console.error(error);
+          this.errorService.setError(error as string);
+        }
+      } finally {
+        if (generation === this.bootstrapGeneration) {
+          this.stateService.setState({
+            status_loading: false,
+          });
+          wcBoot.mark('status_loading_false');
         }
       }
-      if (generation !== this.bootstrapGeneration) {
-        return;
-      }
-      await this.get_state_root_hash(no_mark_for_check);
-    } catch (error) {
-      if (generation === this.bootstrapGeneration) {
-        console.error(error);
-        this.errorService.setError(error as string);
-      }
-    } finally {
-      if (generation === this.bootstrapGeneration) {
-        this.stateService.setState({
-          status_loading: false,
-        });
-      }
-    }
+    });
   }
 
   async selectAction(action: string) {

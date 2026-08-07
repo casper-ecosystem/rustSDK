@@ -94,4 +94,5 @@ export const config: EnvironmentConfig = {
   // network_rpc_url: optional, overrides selected network's rpc_address (ntcl/dev)
   // network_node_url: optional, overrides selected network's node_address
   // allow_secret_key_load: optional boolean override
+  // debug_mode: optional; DEBUG_MODE env enables [wc:boot] console timings
 };

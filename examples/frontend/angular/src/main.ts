@@ -13,6 +13,8 @@ import {
   VERBOSITY,
   WASM_ASSET_PATH,
   WasmModule,
+  resolveWcBootEnabled,
+  wcBoot,
 } from '@util/wasm';
 import { config, CONFIG, ENV, Network } from '@util/config';
 import { environment } from './environments/environment';
@@ -22,19 +24,8 @@ import { HomeComponent } from './app/home/home.component';
 import { Verbosity } from 'casper-rust-wasm-sdk';
 import { ResultModule } from '@util/result';
 
-// Declare global window interface for runtime config
-declare global {
-  interface Window {
-    __APP_CONFIG__?: {
-      cors_anywhere_url?: string;
-      network_rpc_url?: string;
-      network_node_url?: string;
-      app_version?: string;
-      git_sha?: string;
-      allow_secret_key_load?: boolean;
-    };
-  }
-}
+wcBoot.configure({ enabled: resolveWcBootEnabled(!!environment.production) });
+wcBoot.mark('main_enter');
 
 /** Electron loads the UI via file://; PathLocationStrategy breaks asset URLs there. */
 function isElectronShell(): boolean {
@@ -105,6 +96,9 @@ if (typeof window !== 'undefined' && window.__APP_CONFIG__) {
   if (typeof runtimeConfig.allow_secret_key_load === 'boolean') {
     config['allow_secret_key_load'] = runtimeConfig.allow_secret_key_load;
   }
+  if (typeof runtimeConfig.debug_mode === 'boolean') {
+    config['debug_mode'] = runtimeConfig.debug_mode;
+  }
 }
 
 const routes: Routes = [
@@ -136,8 +130,9 @@ const providers: Array<Provider | EnvironmentProviders> = [
 
 bootstrapApplication(AppComponent, { providers })
   .then(() => {
-    //
+    wcBoot.mark('bootstrap_done');
   })
-  .catch(() => {
-    //
+  .catch((err) => {
+    const message = err instanceof Error ? err.message : String(err);
+    wcBoot.mark('bootstrap_error', { error: message });
   });

@@ -10,6 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { State, StateService } from '@util/state';
+import { wcBoot } from '@util/wasm';
 
 @Component({
   selector: 'comp-status',
@@ -49,8 +50,18 @@ export class StatusComponent implements OnInit, OnDestroy {
       .subscribe((state: State) => {
         state.account_hash && (this.account_hash = state.account_hash);
         state.main_purse && (this.main_purse = state.main_purse);
+        const prevLoading = this.status_loading;
+        const hadSrh = !!this.state_root_hash;
         state.state_root_hash && (this.state_root_hash = state.state_root_hash);
         this.status_loading = !!state.status_loading;
+        if (prevLoading !== this.status_loading) {
+          wcBoot.mark('status_loading', { value: this.status_loading });
+        }
+        if (!hadSrh && this.state_root_hash) {
+          wcBoot.mark('status_srh_set', {
+            state_root_hash: this.state_root_hash,
+          });
+        }
         this.changeDetectorRef.markForCheck();
       });
   }
