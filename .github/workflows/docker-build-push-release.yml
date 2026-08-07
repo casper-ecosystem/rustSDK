@@ -1,4 +1,5 @@
-# Frozen Hub semver + :latest (same digest). Tip of dev is CI/CD Image dev (:dev only).
+# Hub semver + :latest + :dev (same digest on release). Tip of ecosystem/dev
+# also builds :dev via CI/CD Image dev; Render should pull casper-webclient:dev.
 name: CI/CD Image release
 
 on:
@@ -69,10 +70,12 @@ jobs:
 
           docker build -f mcp/Dockerfile -t casper-rust-wasm-sdk-mcp:latest .
 
-          # Stable: :$APP_VERSION and :latest (same digest). Do not move :dev.
+          # Stable: :$APP_VERSION and :latest (same digest). Also move :dev so
+          # Render (casper-webclient:dev) picks up the release when redeployed.
           for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:${APP_VERSION}"
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:latest"
+            docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
           done
 
       - name: Push Docker images to Docker Hub
@@ -81,9 +84,11 @@ jobs:
           for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:${APP_VERSION}"
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:latest"
+            docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
           done
 
-      # Hosted demo pulls :latest (stable). Tip of :dev is not redeployed here.
+      # Hosted demo pulls :dev (Render). Tip CI/CD Image dev can redeploy via
+      # workflow_dispatch without waiting for a release.
       - name: Trigger Render redeploy
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
@@ -92,7 +97,7 @@ jobs:
             echo "RENDER_DEPLOY_HOOK secret not set; skipping Render redeploy"
             exit 0
           fi
-          echo "Triggering Render deploy hook…"
+          echo "Triggering Render deploy hook (image tag :dev)…"
           curl -fsS -X GET "${RENDER_DEPLOY_HOOK}"
           echo
           echo "Render deploy requested"

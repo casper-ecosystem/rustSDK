@@ -1,3 +1,5 @@
+# Tip Hub tag :dev. Hosted demo (Render) should pull interchouette/casper-webclient:dev.
+# Push to ecosystem/dev builds/pushes :dev only. Manual workflow_dispatch also triggers Render.
 name: CI/CD Image dev
 
 on:
@@ -35,7 +37,7 @@ jobs:
           # Slim MCP for Cursor/agents (stdio / HTTP :5790).
           docker build -f mcp/Dockerfile -t casper-rust-wasm-sdk-mcp:latest .
 
-          # Tip only: :dev. Semver (:$APP_VERSION) and :latest are owned by
+          # Tip: :dev. Semver (:$APP_VERSION) and :latest stay on
           # docker-build-push-release.yml (stable = last release).
           for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
@@ -46,3 +48,18 @@ jobs:
           for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
           done
+
+      # Hosted demo pulls :dev. Only on manual Run workflow (not every tip push).
+      - name: Trigger Render redeploy
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "${RENDER_DEPLOY_HOOK}" ]; then
+            echo "RENDER_DEPLOY_HOOK secret not set; skipping Render redeploy"
+            exit 0
+          fi
+          echo "Triggering Render deploy hook (image tag :dev)…"
+          curl -fsS -X GET "${RENDER_DEPLOY_HOOK}"
+          echo
+          echo "Render deploy requested"
