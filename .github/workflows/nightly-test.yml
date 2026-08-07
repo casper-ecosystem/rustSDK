@@ -45,6 +45,8 @@ jobs:
 
       - name: Start Casper NCTL Service
         run: |
+          # Hub :dev — compose pins BRANCH_NODE=v2.2.2 (same as :2.2) until
+          # casper-node branch dev advances past package 2.2.0; matches SDK types pin.
           docker run -d \
             --name casper-nctl \
             -p 11101-11105:11101-11105 \
