@@ -36,7 +36,6 @@ export class StatusComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // Subscribe before first paint so Home ngOnInit status_loading is visible.
     this.setStateSubscription();
   }
 

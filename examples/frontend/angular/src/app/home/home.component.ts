@@ -84,7 +84,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public ngOnInit(): void {
     console.info(this.sdk);
-    // Seed before child first paint so Status shows the loading banner immediately.
     const action =
       this.storageService.get('action') ||
       this.config['default_action'].toString();
@@ -109,7 +108,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public ngAfterViewInit() {
-    // After Header has set CORS/RPC; do not block Action paint on these RPCs.
     const action =
       this.action ||
       this.storageService.get('action') ||
