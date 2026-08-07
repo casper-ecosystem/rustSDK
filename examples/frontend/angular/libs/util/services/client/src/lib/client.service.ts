@@ -1580,6 +1580,10 @@ export class ClientService {
         Bytes.fromUint8Array(wasm),
         is_install_upgrade,
       );
+      // Classic install wasm (HELLO, CEP-78, …) is VmCasperV1; session defaults to V2.
+      if (is_install_upgrade) {
+        builder_params.setRuntimeV1();
+      }
     }
 
     return builder_params;
