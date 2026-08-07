@@ -64,7 +64,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private wasm!: Uint8Array | undefined;
   private stateSubscription!: Subscription;
-  /** Bumped to ignore late cold-start RPC results after the user changes action. */
   private bootstrapGeneration = 0;
 
   constructor(
@@ -115,7 +114,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     void this.bootstrapChainStatus(action);
   }
 
-  /** Cold-start status + SRH; must not block Action/form paint. */
   private async bootstrapChainStatus(action: string) {
     const generation = ++this.bootstrapGeneration;
     const no_mark_for_check = true;
