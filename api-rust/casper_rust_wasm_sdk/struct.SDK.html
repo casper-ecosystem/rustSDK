@@ -876,21 +876,24 @@ Legacy alias</p>
 </ul>
 <h5 id="returns-40"><a class="doc-anchor" href="#returns-40">§</a>Returns</h5>
 <p>A <code>Result</code> containing either the processed <code>EventParseResult</code> or an error message</p>
-</div></details></div></details><details class="toggle implementors-toggle" open><summary><section id="impl-SDK-41" class="impl"><a class="src rightside" href="../src/casper_rust_wasm_sdk/sdk/contract/call_entrypoint.rs.html#60-90">Source</a><a href="#impl-SDK-41" class="anchor">§</a><h3 class="code-header">impl <a class="struct" href="struct.SDK.html" title="struct casper_rust_wasm_sdk::SDK">SDK</a></h3><div class="docblock"><p>A set of functions for working with smart contract entry points.
+</div></details></div></details><details class="toggle implementors-toggle" open><summary><section id="impl-SDK-41" class="impl"><a class="src rightside" href="../src/casper_rust_wasm_sdk/sdk/contract/call_entrypoint.rs.html#61-93">Source</a><a href="#impl-SDK-41" class="anchor">§</a><h3 class="code-header">impl <a class="struct" href="struct.SDK.html" title="struct casper_rust_wasm_sdk::SDK">SDK</a></h3><div class="docblock"><p>A set of functions for working with smart contract entry points.
 Alias of sdk.transaction</p>
-</div></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.call_entrypoint" class="method"><a class="src rightside" href="../src/casper_rust_wasm_sdk/sdk/contract/call_entrypoint.rs.html#79-89">Source</a><h4 class="code-header">pub async fn <a href="#method.call_entrypoint" class="fn">call_entrypoint</a>(
+</div></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.call_entrypoint" class="method"><a class="src rightside" href="../src/casper_rust_wasm_sdk/sdk/contract/call_entrypoint.rs.html#82-92">Source</a><h4 class="code-header">pub async fn <a href="#method.call_entrypoint" class="fn">call_entrypoint</a>(
     &amp;self,
     builder_params: <a class="struct" href="types/transaction_params/transaction_builder_params/struct.TransactionBuilderParams.html" title="struct casper_rust_wasm_sdk::types::transaction_params::transaction_builder_params::TransactionBuilderParams">TransactionBuilderParams</a>,
     transaction_params: <a class="struct" href="types/transaction_params/transaction_str_params/struct.TransactionStrParams.html" title="struct casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams">TransactionStrParams</a>,
     rpc_address: <a class="enum" href="https://doc.rust-lang.org/1.97.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/1.97.1/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
+    runtime_v2: <a class="enum" href="https://doc.rust-lang.org/1.97.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/1.97.1/std/primitive.bool.html">bool</a>&gt;,
 ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.97.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://docs.rs/casper-client/5.0.1/casper_client/json_rpc/success_response/struct.SuccessResponse.html" title="struct casper_client::json_rpc::success_response::SuccessResponse">SuccessResponse</a>&lt;<a class="struct" href="https://docs.rs/casper-client/5.0.1/casper_client/rpcs/v2_0_0/put_transaction/struct.PutTransactionResult.html" title="struct casper_client::rpcs::v2_0_0::put_transaction::PutTransactionResult">_PutTransactionResult</a>&gt;, <a class="enum" href="types/sdk_error/enum.SdkError.html" title="enum casper_rust_wasm_sdk::types::sdk_error::SdkError">SdkError</a>&gt;</h4></section></summary><div class="docblock"><p>Calls a smart contract entry point and returns the put result.</p>
-<p>Pins <code>VmCasperV1</code> (CEP-78 and other current stored fixtures). For VM2
-contracts, use <code>transaction</code> with <code>set_runtime_v2</code> on builder params.</p>
+<p>When <code>runtime_v2</code> is omitted, the builder runtime is left unchanged
+(entity/package builders default to VmCasperV1). Pass <code>true</code> for
+VmCasperV2 or <code>false</code> for VmCasperV1.</p>
 <h5 id="arguments-42"><a class="doc-anchor" href="#arguments-42">§</a>Arguments</h5>
 <ul>
 <li><code>builder_params</code> - Transaction Builder parameters.</li>
 <li><code>transaction_params</code> - Transaction parameters.</li>
 <li><code>rpc_address</code> - An optional rpc address to send the request to.</li>
+<li><code>runtime_v2</code> - <code>None</code> → keep builder; <code>true</code> → V2; <code>false</code> → V1.</li>
 </ul>
 <h5 id="returns-41"><a class="doc-anchor" href="#returns-41">§</a>Returns</h5>
 <p>A <code>Result</code> containing either a <code>_PutTransactionResult</code> or a <code>SdkError</code> in case of an error.</p>
@@ -917,21 +920,23 @@ Alias of sdk.deploy</p>
 <p>A <code>Result</code> containing either a <code>_PutDeployResult</code> or a <code>SdkError</code> in case of an error.</p>
 <h5 id="errors-17"><a class="doc-anchor" href="#errors-17">§</a>Errors</h5>
 <p>Returns a <code>SdkError</code> if there is an error during the call.</p>
-</div></details></div></details><details class="toggle implementors-toggle" open><summary><section id="impl-SDK-43" class="impl"><a class="src rightside" href="../src/casper_rust_wasm_sdk/sdk/contract/install.rs.html#61-95">Source</a><a href="#impl-SDK-43" class="anchor">§</a><h3 class="code-header">impl <a class="struct" href="struct.SDK.html" title="struct casper_rust_wasm_sdk::SDK">SDK</a></h3><div class="docblock"><p>A set of functions for installing smart contracts on the blockchain.
+</div></details></div></details><details class="toggle implementors-toggle" open><summary><section id="impl-SDK-43" class="impl"><a class="src rightside" href="../src/casper_rust_wasm_sdk/sdk/contract/install.rs.html#67-102">Source</a><a href="#impl-SDK-43" class="anchor">§</a><h3 class="code-header">impl <a class="struct" href="struct.SDK.html" title="struct casper_rust_wasm_sdk::SDK">SDK</a></h3><div class="docblock"><p>A set of functions for installing smart contracts on the blockchain.
 Alias of sdk.transaction</p>
-</div></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.install" class="method"><a class="src rightside" href="../src/casper_rust_wasm_sdk/sdk/contract/install.rs.html#80-94">Source</a><h4 class="code-header">pub async fn <a href="#method.install" class="fn">install</a>(
+</div></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.install" class="method"><a class="src rightside" href="../src/casper_rust_wasm_sdk/sdk/contract/install.rs.html#87-101">Source</a><h4 class="code-header">pub async fn <a href="#method.install" class="fn">install</a>(
     &amp;self,
     transaction_params: <a class="struct" href="types/transaction_params/transaction_str_params/struct.TransactionStrParams.html" title="struct casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams">TransactionStrParams</a>,
     transaction_bytes: <a class="struct" href="types/cl/bytes/struct.Bytes.html" title="struct casper_rust_wasm_sdk::types::cl::bytes::Bytes">Bytes</a>,
     rpc_address: <a class="enum" href="https://doc.rust-lang.org/1.97.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/1.97.1/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
-) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.97.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://docs.rs/casper-client/5.0.1/casper_client/json_rpc/success_response/struct.SuccessResponse.html" title="struct casper_client::json_rpc::success_response::SuccessResponse">SuccessResponse</a>&lt;<a class="struct" href="https://docs.rs/casper-client/5.0.1/casper_client/rpcs/v2_0_0/put_transaction/struct.PutTransactionResult.html" title="struct casper_client::rpcs::v2_0_0::put_transaction::PutTransactionResult">_PutTransactionResult</a>&gt;, <a class="enum" href="types/sdk_error/enum.SdkError.html" title="enum casper_rust_wasm_sdk::types::sdk_error::SdkError">SdkError</a>&gt;</h4></section></summary><div class="docblock"><p>Installs classic session wasm (<code>is_install_upgrade</code>) and returns the put result.</p>
-<p>Pins <code>VmCasperV1</code> (CEP-78, HELLO, and other current session fixtures). For VM2
-contracts, use <code>TransactionBuilderParams</code> with <code>set_runtime_v2</code> instead.</p>
+    runtime_v2: <a class="enum" href="https://doc.rust-lang.org/1.97.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/1.97.1/std/primitive.bool.html">bool</a>&gt;,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.97.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://docs.rs/casper-client/5.0.1/casper_client/json_rpc/success_response/struct.SuccessResponse.html" title="struct casper_client::json_rpc::success_response::SuccessResponse">SuccessResponse</a>&lt;<a class="struct" href="https://docs.rs/casper-client/5.0.1/casper_client/rpcs/v2_0_0/put_transaction/struct.PutTransactionResult.html" title="struct casper_client::rpcs::v2_0_0::put_transaction::PutTransactionResult">_PutTransactionResult</a>&gt;, <a class="enum" href="types/sdk_error/enum.SdkError.html" title="enum casper_rust_wasm_sdk::types::sdk_error::SdkError">SdkError</a>&gt;</h4></section></summary><div class="docblock"><p>Installs session wasm (<code>is_install_upgrade</code>) and returns the put result.</p>
+<p>Session runtime defaults to VmCasperV2 (<code>runtime_v2</code> omitted or <code>true</code>).
+Pass <code>runtime_v2: false</code> for classic VmCasperV1 wasm (HELLO, CEP-78, …).</p>
 <h5 id="arguments-44"><a class="doc-anchor" href="#arguments-44">§</a>Arguments</h5>
 <ul>
 <li><code>transaction_params</code> - Transaction parameters.</li>
 <li><code>transaction_bytes</code> - Transaction Bytes to install</li>
 <li><code>rpc_address</code> - An optional rpc address to send the request to.</li>
+<li><code>runtime_v2</code> - <code>None</code>/<code>true</code> → VmCasperV2; <code>false</code> → VmCasperV1.</li>
 </ul>
 <h5 id="returns-43"><a class="doc-anchor" href="#returns-43">§</a>Returns</h5>
 <p>A <code>Result</code> containing either a <code>_PutTransactionResult</code> or a <code>SdkError</code> in case of an error.</p>
