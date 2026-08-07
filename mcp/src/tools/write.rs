@@ -228,6 +228,7 @@ pub async fn install(
     transaction_params_json: String,
     wasm_hex: String,
     rpc_address: Option<String>,
+    runtime_v2: Option<bool>,
 ) -> ToolOutput {
     let params = match parse_transaction_str_params(&transaction_params_json) {
         Ok(p) => p,
@@ -238,7 +239,10 @@ pub async fn install(
         return format::err("wasm_hex decoded empty");
     }
     let sdk = sdk_handle::sdk_snapshot();
-    match sdk.install(params, Bytes::from(bytes), rpc_address).await {
+    match sdk
+        .install(params, Bytes::from(bytes), rpc_address, runtime_v2)
+        .await
+    {
         Ok(resp) => format::serialize_ok(&resp.result),
         Err(err) => format::err(err),
     }
@@ -272,6 +276,7 @@ pub async fn call_entrypoint(
     builder_params_json: String,
     transaction_params_json: String,
     rpc_address: Option<String>,
+    runtime_v2: Option<bool>,
 ) -> ToolOutput {
     let builder = match parse_transaction_builder_params(&builder_params_json) {
         Ok(b) => b,
@@ -282,7 +287,10 @@ pub async fn call_entrypoint(
         Err(err) => return format::err(err),
     };
     let sdk = sdk_handle::sdk_snapshot();
-    match sdk.call_entrypoint(builder, params, rpc_address).await {
+    match sdk
+        .call_entrypoint(builder, params, rpc_address, runtime_v2)
+        .await
+    {
         Ok(resp) => format::serialize_ok(&resp.result),
         Err(err) => format::err(err),
     }

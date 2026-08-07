@@ -62,6 +62,9 @@ pub const ARGS_JSON: &str = r#"[
 
 pub const DEFAULT_ENABLE_ADDRESSABLE_ENTITY: bool = false;
 
+/// Classic HELLO/CEP-78 fixtures need VmCasperV1 (`false`). Flip to `true` for VM2 fixtures.
+pub const DEFAULT_SESSION_RUNTIME_V2: bool = false;
+
 #[derive(Clone, Debug)]
 pub struct TestConfig {
     pub rpc_address: Option<String>,

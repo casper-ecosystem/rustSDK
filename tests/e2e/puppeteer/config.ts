@@ -9,6 +9,7 @@ export const app_address_default = 'http://localhost:4200';
 export const events_address_default = 'http://localhost:18101/events';
 export const chain_name_default = 'casper-net-1';
 export const enable_addressable_entity_default = false;
+export const session_runtime_v2_default = false;
 
 // Either use direct env variables for secret keys of casper-node-launcher-js  or key path to NTCL
 export const secret_key_user_1 = process.env.SECRET_KEY_USER_1;
@@ -23,6 +24,8 @@ export const events_address =
 export const chain_name = process.env.CHAIN_NAME || chain_name_default;
 export const enable_addressable_entity =
   process.env.ENABLE_ADDRESSABLE_ENTITY || enable_addressable_entity_default;
+export const session_runtime_v2 =
+  process.env.SESSION_RUNTIME_V2 || String(session_runtime_v2_default);
 
 export const payment_amount = '5500000000';
 export const transfer_amount = '2500000000';

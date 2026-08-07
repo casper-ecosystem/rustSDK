@@ -1566,7 +1566,7 @@ export class SDK {
      *
      * Returns a `JsError` if there is an error during the call.
      */
-    call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, rpc_address?: string | null): Promise<PutTransactionResult>;
+    call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, rpc_address?: string | null, runtime_v2?: boolean | null): Promise<PutTransactionResult>;
     /**
      * Calls a smart contract entry point with the specified parameters and returns the result.
      *
@@ -2082,7 +2082,7 @@ export class SDK {
      *
      * Returns a `JsError` if there is an error during the installation.
      */
-    install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, rpc_address?: string | null): Promise<PutTransactionResult>;
+    install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, rpc_address?: string | null, runtime_v2?: boolean | null): Promise<PutTransactionResult>;
     /**
      * Installs a smart contract with the specified parameters and returns the result.
      *

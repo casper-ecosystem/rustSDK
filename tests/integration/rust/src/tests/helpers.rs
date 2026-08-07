@@ -2,8 +2,9 @@ use self::intern::{create_test_sdk, install_cep78};
 use crate::config::{
     CONTRACT_CEP78_KEY, DEFAULT_CHAIN_NAME, DEFAULT_ENABLE_ADDRESSABLE_ENTITY,
     DEFAULT_EVENTS_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_NODE_SECRET_KEY_NCTL_PATH,
-    DEFAULT_RPC_ADDRESS, DEFAULT_SECRET_KEY_NAME, DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT,
-    PACKAGE_CEP78_KEY, PAYMENT_AMOUNT, SPECULATIVE_ADDRESS,
+    DEFAULT_RPC_ADDRESS, DEFAULT_SECRET_KEY_NAME, DEFAULT_SECRET_KEY_NCTL_PATH,
+    DEFAULT_SESSION_RUNTIME_V2, ENTRYPOINT_MINT, PACKAGE_CEP78_KEY, PAYMENT_AMOUNT,
+    SPECULATIVE_ADDRESS,
 };
 use casper_rust_wasm_sdk::{
     rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams},
@@ -41,7 +42,10 @@ fn cep78_reinstall_guard() -> &'static Mutex<bool> {
 }
 
 pub(crate) mod intern {
-    use super::{cep78_reinstall_guard, get_enable_addressable_entity, read_wasm_file};
+    use super::{
+        cep78_reinstall_guard, get_enable_addressable_entity, get_session_runtime_v2,
+        read_wasm_file,
+    };
     use crate::config::{
         TestConfig, ARGS_JSON, CEP78_CONTRACT, PAYMENT_AMOUNT_CONTRACT_CEP78, WASM_PATH,
     };
@@ -261,6 +265,7 @@ pub(crate) mod intern {
                 transaction_params,
                 transaction_bytes.into(),
                 Some(rpc_address.to_string()),
+                Some(get_session_runtime_v2()),
             )
             .await;
         assert!(!install
@@ -401,6 +406,12 @@ pub fn get_enable_addressable_entity() -> bool {
     let enable_addressable_entity = env::var("ENABLE_ADDRESSABLE_ENTITY")
         .unwrap_or_else(|_| DEFAULT_ENABLE_ADDRESSABLE_ENTITY.to_string());
     enable_addressable_entity == "true"
+}
+
+pub fn get_session_runtime_v2() -> bool {
+    let session_runtime_v2 =
+        env::var("SESSION_RUNTIME_V2").unwrap_or_else(|_| DEFAULT_SESSION_RUNTIME_V2.to_string());
+    session_runtime_v2 == "true"
 }
 
 fn read_pem_file(file_path: &str, secret_key_name: &str) -> Result<String, io::Error> {
@@ -579,6 +590,7 @@ pub async fn mint_nft(
             builder_params,
             transaction_params,
             Some(rpc_address.to_string()),
+            Some(get_session_runtime_v2()),
         )
         .await;
     let result = &test_call_entrypoint.as_ref().unwrap().result;

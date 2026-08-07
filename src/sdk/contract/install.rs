@@ -42,9 +42,15 @@ impl SDK {
         transaction_params: TransactionStrParams,
         transaction_bytes: Bytes,
         rpc_address: Option<String>,
+        runtime_v2: Option<bool>,
     ) -> Result<PutTransactionResult, JsError> {
         let result = self
-            .install(transaction_params, transaction_bytes, rpc_address)
+            .install(
+                transaction_params,
+                transaction_bytes,
+                rpc_address,
+                runtime_v2,
+            )
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -59,16 +65,17 @@ impl SDK {
 /// A set of functions for installing smart contracts on the blockchain.
 /// Alias of sdk.transaction
 impl SDK {
-    /// Installs classic session wasm (`is_install_upgrade`) and returns the put result.
+    /// Installs session wasm (`is_install_upgrade`) and returns the put result.
     ///
-    /// Pins `VmCasperV1` (CEP-78, HELLO, and other current session fixtures). For VM2
-    /// contracts, use `TransactionBuilderParams` with `set_runtime_v2` instead.
+    /// Session runtime defaults to VmCasperV2 (`runtime_v2` omitted or `true`).
+    /// Pass `runtime_v2: false` for classic VmCasperV1 wasm (HELLO, CEP-78, …).
     ///
     /// # Arguments
     ///
     /// * `transaction_params` - Transaction parameters.
     /// * `transaction_bytes` - Transaction Bytes to install
     /// * `rpc_address` - An optional rpc address to send the request to.
+    /// * `runtime_v2` - `None`/`true` → VmCasperV2; `false` → VmCasperV1.
     ///
     /// # Returns
     ///
@@ -82,15 +89,22 @@ impl SDK {
         transaction_params: TransactionStrParams,
         transaction_bytes: Bytes,
         rpc_address: Option<String>,
+        runtime_v2: Option<bool>,
     ) -> Result<SuccessResponse<_PutTransactionResult>, SdkError> {
         //log("install!");
         let is_install_upgrade = Some(true);
         let mut builder_params =
             TransactionBuilderParams::new_session(Some(transaction_bytes), is_install_upgrade);
-        // Classic session installs (CEP-78, HELLO, …) are VmCasperV1 wasm.
-        builder_params.set_runtime_v1();
+        apply_runtime_v2(&mut builder_params, runtime_v2);
         self.transaction(builder_params, transaction_params, None, rpc_address)
             .await
+    }
+}
+
+fn apply_runtime_v2(builder_params: &mut TransactionBuilderParams, runtime_v2: Option<bool>) {
+    match runtime_v2 {
+        None | Some(true) => {}
+        Some(false) => builder_params.set_runtime_v1(),
     }
 }
 
@@ -121,7 +135,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .install(transaction_params, transaction_bytes, None)
+            .install(transaction_params, transaction_bytes, None, None)
             .await;
 
         // Assert
@@ -158,6 +172,7 @@ mod tests {
                 transaction_params,
                 transaction_bytes.into(),
                 Some(rpc_address),
+                Some(false),
             )
             .await;
 
@@ -196,6 +211,7 @@ mod tests {
                 transaction_params,
                 transaction_bytes.into(),
                 Some(rpc_address),
+                Some(false),
             )
             .await;
 
@@ -235,6 +251,7 @@ mod tests {
                 transaction_params,
                 transaction_bytes.into(),
                 Some(rpc_address),
+                Some(false),
             )
             .await;
 
@@ -268,7 +285,12 @@ mod tests {
         };
         // Act
         let result = sdk
-            .install(transaction_params, transaction_bytes.into(), None)
+            .install(
+                transaction_params,
+                transaction_bytes.into(),
+                None,
+                Some(false),
+            )
             .await;
 
         // Assert

@@ -208,6 +208,21 @@ export async function setWasm(file_name: string) {
       timeout: 5000,
     })
     .catch(() => undefined);
+  await setSessionRuntimeFromConfig();
+}
+
+/** Classic fixtures need V1 when SESSION_RUNTIME_V2 is false. */
+export async function setSessionRuntimeFromConfig() {
+  if (!variables.page) {
+    throw new Error('Puppeteer page is not initialized.');
+  }
+  const runtimeValue = config.session_runtime_v2 === 'true' ? 'true' : 'false';
+  const selector = '[e2e-id="selectTransactionRuntimeElt"]';
+  const present = await variables.page.$(selector);
+  if (!present) {
+    return;
+  }
+  await variables.page.select(selector, runtimeValue);
 }
 
 /** Wait until result or error pane has text; fail loudly on UI errors. */

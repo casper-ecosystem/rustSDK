@@ -41,9 +41,10 @@ impl SDK {
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
         rpc_address: Option<String>,
+        runtime_v2: Option<bool>,
     ) -> Result<PutTransactionResult, JsError> {
         let result = self
-            .call_entrypoint(builder_params, transaction_params, rpc_address)
+            .call_entrypoint(builder_params, transaction_params, rpc_address, runtime_v2)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -60,14 +61,16 @@ impl SDK {
 impl SDK {
     /// Calls a smart contract entry point and returns the put result.
     ///
-    /// Pins `VmCasperV1` (CEP-78 and other current stored fixtures). For VM2
-    /// contracts, use `transaction` with `set_runtime_v2` on builder params.
+    /// When `runtime_v2` is omitted, the builder runtime is left unchanged
+    /// (entity/package builders default to VmCasperV1). Pass `true` for
+    /// VmCasperV2 or `false` for VmCasperV1.
     ///
     /// # Arguments
     ///
     /// * `builder_params` - Transaction Builder parameters.
     /// * `transaction_params` - Transaction parameters.
     /// * `rpc_address` - An optional rpc address to send the request to.
+    /// * `runtime_v2` - `None` → keep builder; `true` → V2; `false` → V1.
     ///
     /// # Returns
     ///
@@ -81,11 +84,19 @@ impl SDK {
         mut builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
         rpc_address: Option<String>,
+        runtime_v2: Option<bool>,
     ) -> Result<SuccessResponse<_PutTransactionResult>, SdkError> {
-        // Classic stored contracts (CEP-78, …) are VmCasperV1 wasm.
-        builder_params.set_runtime_v1();
+        apply_call_runtime_v2(&mut builder_params, runtime_v2);
         self.transaction(builder_params, transaction_params, None, rpc_address)
             .await
+    }
+}
+
+fn apply_call_runtime_v2(builder_params: &mut TransactionBuilderParams, runtime_v2: Option<bool>) {
+    match runtime_v2 {
+        None => {}
+        Some(true) => builder_params.set_runtime_v2(0, None),
+        Some(false) => builder_params.set_runtime_v1(),
     }
 }
 
@@ -122,7 +133,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(builder_params, transaction_params, None)
+            .call_entrypoint(builder_params, transaction_params, None, None)
             .await;
 
         // Assert
@@ -151,7 +162,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(builder_params, transaction_params, Some(rpc_address))
+            .call_entrypoint(builder_params, transaction_params, Some(rpc_address), None)
             .await;
 
         // Assert
@@ -184,7 +195,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(builder_params, transaction_params, Some(rpc_address))
+            .call_entrypoint(builder_params, transaction_params, Some(rpc_address), None)
             .await;
 
         // Assert
@@ -219,7 +230,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(builder_params, transaction_params, Some(rpc_address))
+            .call_entrypoint(builder_params, transaction_params, Some(rpc_address), None)
             .await;
 
         // Assert
@@ -253,7 +264,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(builder_params, transaction_params, None)
+            .call_entrypoint(builder_params, transaction_params, None, None)
             .await;
 
         // Assert

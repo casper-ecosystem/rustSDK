@@ -441,7 +441,12 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     };
 
     let install = sdk
-        .install(transaction_params, transaction_bytes.into(), None)
+        .install(
+            transaction_params,
+            transaction_bytes.into(),
+            None,
+            Some(false),
+        )
         .await;
 
     let transaction_hash = install.as_ref().unwrap().result.transaction_hash;
@@ -522,7 +527,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
     let call_entrypoint_deploy = sdk
-        .call_entrypoint(builder_params, transaction_params, None)
+        .call_entrypoint(builder_params, transaction_params, None, Some(false))
         .await;
     let transaction_hash_result = call_entrypoint_deploy
         .as_ref()

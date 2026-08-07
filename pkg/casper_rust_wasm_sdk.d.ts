@@ -1566,7 +1566,7 @@ export class SDK {
      *
      * Returns a `JsError` if there is an error during the call.
      */
-    call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, rpc_address?: string | null): Promise<PutTransactionResult>;
+    call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, rpc_address?: string | null, runtime_v2?: boolean | null): Promise<PutTransactionResult>;
     /**
      * Calls a smart contract entry point with the specified parameters and returns the result.
      *
@@ -2082,7 +2082,7 @@ export class SDK {
      *
      * Returns a `JsError` if there is an error during the installation.
      */
-    install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, rpc_address?: string | null): Promise<PutTransactionResult>;
+    install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, rpc_address?: string | null, runtime_v2?: boolean | null): Promise<PutTransactionResult>;
     /**
      * Installs a smart contract with the specified parameters and returns the result.
      *
@@ -4491,7 +4491,7 @@ export interface InitOutput {
     readonly sdk_SSE_client: (a: number, b: number, c: number) => number;
     readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly sdk_account_put_transaction: (a: number, b: number, c: number, d: number, e: number) => number;
-    readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number) => number;
+    readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
     readonly sdk_call_entrypoint_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
     readonly sdk_chain_get_block: (a: number, b: number) => number;
     readonly sdk_chain_get_block_transfers: (a: number, b: number) => number;
@@ -4575,7 +4575,7 @@ export interface InitOutput {
     readonly sdk_info_get_status: (a: number, b: number, c: number, d: number) => number;
     readonly sdk_info_get_transaction: (a: number, b: number) => number;
     readonly sdk_info_get_validator_change: (a: number, b: number, c: number, d: number) => number;
-    readonly sdk_install: (a: number, b: number, c: number, d: number, e: number) => number;
+    readonly sdk_install: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
     readonly sdk_install_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
     readonly sdk_list_rpcs: (a: number, b: number, c: number, d: number) => number;
     readonly sdk_make_deploy: (a: number, b: number, c: number, d: number, e: number) => void;
@@ -5078,14 +5078,14 @@ export interface InitOutput {
     readonly intounderlyingsink_write: (a: number, b: number) => number;
     readonly intounderlyingsource_cancel: (a: number) => void;
     readonly intounderlyingsource_pull: (a: number, b: number) => number;
-    readonly __wasm_bindgen_func_elem_13727: (a: number, b: number, c: number, d: number) => void;
-    readonly __wasm_bindgen_func_elem_13729: (a: number, b: number, c: number, d: number) => void;
-    readonly __wasm_bindgen_func_elem_9370: (a: number, b: number, c: number) => void;
-    readonly __wasm_bindgen_func_elem_6118: (a: number, b: number, c: number) => void;
-    readonly __wasm_bindgen_func_elem_6118_3: (a: number, b: number, c: number) => void;
-    readonly __wasm_bindgen_func_elem_6118_4: (a: number, b: number, c: number) => void;
-    readonly __wasm_bindgen_func_elem_9232: (a: number, b: number) => void;
-    readonly __wasm_bindgen_func_elem_6117: (a: number, b: number) => void;
+    readonly __wasm_bindgen_func_elem_13728: (a: number, b: number, c: number, d: number) => void;
+    readonly __wasm_bindgen_func_elem_13730: (a: number, b: number, c: number, d: number) => void;
+    readonly __wasm_bindgen_func_elem_9371: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_6119: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_6119_3: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_6119_4: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_9233: (a: number, b: number) => void;
+    readonly __wasm_bindgen_func_elem_6118: (a: number, b: number) => void;
     readonly __wbindgen_export: (a: number, b: number) => number;
     readonly __wbindgen_export2: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_export3: (a: number) => void;

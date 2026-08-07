@@ -1112,14 +1112,17 @@ impl CasperSdkMcp {
         .await
     }
 
-    #[tool(description = "Install wasm (hex) as transaction session with is_install_upgrade")]
+    #[tool(
+        description = "Install wasm (hex) as transaction session with is_install_upgrade. runtime_v2 omitted/true = VmCasperV2; false = VmCasperV1"
+    )]
     async fn sdk_install(
         &self,
         transaction_params_json: String,
         wasm_hex: String,
         rpc_address: Option<String>,
+        runtime_v2: Option<bool>,
     ) -> ToolOutput {
-        tools::write::install(transaction_params_json, wasm_hex, rpc_address).await
+        tools::write::install(transaction_params_json, wasm_hex, rpc_address, runtime_v2).await
     }
 
     #[tool(description = "Install via legacy deploy (deprecated; prefer sdk_install)")]
@@ -1139,15 +1142,23 @@ impl CasperSdkMcp {
         .await
     }
 
-    #[tool(description = "Call contract entrypoint via transaction submit")]
+    #[tool(
+        description = "Call contract entrypoint via transaction submit. runtime_v2 omitted = keep builder default; true = V2; false = V1"
+    )]
     async fn sdk_call_entrypoint(
         &self,
         builder_params_json: String,
         transaction_params_json: String,
         rpc_address: Option<String>,
+        runtime_v2: Option<bool>,
     ) -> ToolOutput {
-        tools::write::call_entrypoint(builder_params_json, transaction_params_json, rpc_address)
-            .await
+        tools::write::call_entrypoint(
+            builder_params_json,
+            transaction_params_json,
+            rpc_address,
+            runtime_v2,
+        )
+        .await
     }
 
     #[tool(description = "Call entrypoint via legacy deploy (deprecated)")]

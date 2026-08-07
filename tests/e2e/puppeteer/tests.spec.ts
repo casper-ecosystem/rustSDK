@@ -12,6 +12,7 @@ import {
   setWasm,
   submit,
   waitForResult,
+  setSessionRuntimeFromConfig,
   get_state_root_hash,
   sign,
   screenshot,
@@ -204,6 +205,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await selectAction('install');
+      await setSessionRuntimeFromConfig();
       await setSecretKey();
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
@@ -1149,6 +1151,7 @@ describe('Angular App Tests', () => {
       await test.page.reload();
       await setSecretKey();
       await selectAction('call_entrypoint');
+      await setSessionRuntimeFromConfig();
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="entityHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
@@ -1530,6 +1533,7 @@ describe('Angular App Tests', () => {
       );
       await test.page.waitForSelector('[e2e-id="main_purse"]');
       await selectAction('make_transaction');
+      await setSessionRuntimeFromConfig();
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="entityHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
@@ -2118,6 +2122,7 @@ describe('Angular App Tests', () => {
       await test.page.reload();
       await setSecretKey();
       await selectAction('transaction');
+      await setSessionRuntimeFromConfig();
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="entityHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
@@ -2759,7 +2764,8 @@ describe('Angular App Tests', () => {
         const put = await sdk.call_entrypoint(
           builder_params,
           transaction_params,
-          config.rpc_address
+          config.rpc_address,
+          config.session_runtime_v2 === 'true'
         );
         const putJson = put.toJson() as any;
         const mintHash =

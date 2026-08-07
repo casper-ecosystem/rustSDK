@@ -6,7 +6,7 @@ pub mod test_module {
             ENTRYPOINT_MINT, HELLO_CONTRACT, PAYMENT_AMOUNT, TTL, WASM_PATH,
         },
         tests::helpers::{
-            get_enable_addressable_entity,
+            get_enable_addressable_entity, get_session_runtime_v2,
             intern::{create_test_sdk, get_dictionnary_key},
             read_wasm_file,
         },
@@ -89,7 +89,12 @@ pub mod test_module {
         };
 
         let install = create_test_sdk(Some(config))
-            .install(transaction_params, transaction_bytes.into(), None)
+            .install(
+                transaction_params,
+                transaction_bytes.into(),
+                None,
+                Some(get_session_runtime_v2()),
+            )
             .await;
         assert!(!install
             .as_ref()
@@ -297,7 +302,12 @@ pub mod test_module {
             TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         let test_call_entrypoint_transaction = create_test_sdk(Some(config))
-            .call_entrypoint(builder_params, transaction_params, None)
+            .call_entrypoint(
+                builder_params,
+                transaction_params,
+                None,
+                Some(get_session_runtime_v2()),
+            )
             .await;
         assert!(!test_call_entrypoint_transaction
             .as_ref()

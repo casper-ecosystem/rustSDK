@@ -670,6 +670,8 @@ export class ClientService {
         (await this.sdk.install(
           transaction_params,
           Bytes.fromUint8Array(wasm),
+          undefined,
+          this.getRuntimeV2(),
         ));
       install && this.resultService.setResult(install.toJson());
     } catch (err) {
@@ -1193,7 +1195,12 @@ export class ClientService {
     try {
       const call_entrypoint =
         builder_params &&
-        (await this.sdk.call_entrypoint(builder_params, transaction_params));
+        (await this.sdk.call_entrypoint(
+          builder_params,
+          transaction_params,
+          undefined,
+          this.getRuntimeV2(),
+        ));
       call_entrypoint && this.resultService.setResult(call_entrypoint.toJson());
     } catch (err) {
       err && this.errorService.setError(err.toString());
@@ -1580,13 +1587,29 @@ export class ClientService {
         Bytes.fromUint8Array(wasm),
         is_install_upgrade,
       );
-      // Classic install wasm (HELLO, CEP-78, …) is VmCasperV1; session defaults to V2.
-      if (is_install_upgrade) {
-        builder_params.setRuntimeV1();
-      }
+      this.applyRuntimeFromUi(builder_params);
+    } else if (builder_params) {
+      this.applyRuntimeFromUi(builder_params);
     }
 
     return builder_params;
+  }
+
+  /** Form Runtime select: true/omit → V2, false → V1. */
+  private getRuntimeV2(): boolean {
+    const raw = this.getIdentifier('selectTransactionRuntime')?.value;
+    if (raw === undefined || raw === null || String(raw).trim() === '') {
+      return true;
+    }
+    return String(raw).trim() === 'true';
+  }
+
+  private applyRuntimeFromUi(builder_params: TransactionBuilderParams): void {
+    if (this.getRuntimeV2()) {
+      builder_params.setRuntimeV2(BigInt(0), undefined);
+    } else {
+      builder_params.setRuntimeV1();
+    }
   }
 
   private addTransactionArgs(

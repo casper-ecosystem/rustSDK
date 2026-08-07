@@ -658,6 +658,31 @@ const selectTransactionCategory: InputField = {
   enabled_when: ['has_wasm'],
 };
 
+/** VmCasperV2 default; classic HELLO/CEP-78 need V1. */
+const selectTransactionRuntime: InputField = {
+  id: 'selectTransactionRuntime',
+  type: 'select',
+  wrap_class: 'mt-3 col-xl-3 mb-3',
+  class: 'form-select form-control form-control-sm',
+  label: 'Runtime',
+  label_class: 'input-group-text',
+  name: 'transaction_runtime',
+  controlName: 'selectTransactionRuntime',
+  e2e: 'selectTransactionRuntimeElt',
+  options: [
+    {
+      value: 'true',
+      label: 'VmCasperV2',
+      default: true,
+    },
+    {
+      value: 'false',
+      label: 'VmCasperV1',
+      default: false,
+    },
+  ],
+};
+
 const selectStandardParyment: InputField = {
   id: 'standardPayment',
   type: 'checkbox',
@@ -764,6 +789,7 @@ const installFields: InputContainer[][] = [
   [
     { wasm_button: true },
     { select: selectTransactionCategory },
+    { select: selectTransactionRuntime },
     { input: selectStandardParyment },
   ],
   [{ input: argsSimpleInput }],
@@ -812,6 +838,7 @@ const makeTransactionFields: InputContainer[][] = [
   [
     { wasm_button: true },
     { select: selectTransactionCategory },
+    { select: selectTransactionRuntime },
     { input: selectStandardParyment },
   ],
   [
@@ -839,6 +866,7 @@ const callEntrypointFields: InputContainer[][] = [
     { select: selectPricingMode },
     { input: additionalComputationFactor },
   ],
+  [{ select: selectTransactionRuntime }],
   [{ input: entityHash }, { input: callPackage }, { input: versionInput }],
   [{ input: entityAlias }],
   [{ input: entryPointInput }],
