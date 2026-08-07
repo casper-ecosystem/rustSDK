@@ -73,7 +73,7 @@ Complex inputs use JSON strings — see [TOOLS.md](TOOLS.md) and `tools/params.r
 
 ## MCP client config
 
-Hub tags for `interchouette/casper-rust-wasm-sdk-mcp` and `interchouette/casper-webclient`: **`dev`** (tip), **`latest`** = current stable semver (e.g. **`2.2.2`**). GitHub Pre-release **`dev-preview`** carries overnight tip desktop assets (not Latest).
+Hub tags for `interchouette/casper-rust-wasm-sdk-mcp` and `interchouette/casper-webclient`: **`dev`** (tip), **`latest`** = current stable semver (e.g. **`2.2.2`**). GitHub Pre-release **`dev-preview`** is overwritten after green nightly and attaches tip Electron (exe / AppImage / snap) plus the MCP linux binary (not Latest).
 
 | Server name (example)       | Transport | Backing                                                       |
 | --------------------------- | --------- | ------------------------------------------------------------- |
