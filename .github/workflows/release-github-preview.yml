@@ -79,3 +79,23 @@ jobs:
       tag: dev-preview
       ref: ${{ needs.overwrite-prerelease.outputs.sha }}
     secrets: inherit
+
+  # Pull latest Hub :dev on Render after overnight-green tip (or manual preview run).
+  render-redeploy:
+    name: Trigger Render redeploy
+    needs: overwrite-prerelease
+    if: needs.overwrite-prerelease.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render redeploy
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "${RENDER_DEPLOY_HOOK}" ]; then
+            echo "RENDER_DEPLOY_HOOK secret not set; skipping Render redeploy"
+            exit 0
+          fi
+          echo "Triggering Render deploy hook (image tag :dev)…"
+          curl -fsS -X GET "${RENDER_DEPLOY_HOOK}"
+          echo
+          echo "Render deploy requested"

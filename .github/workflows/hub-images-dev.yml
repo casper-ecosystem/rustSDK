@@ -1,4 +1,4 @@
-# Hub tip images (:dev). Render redeploy only on manual Run workflow.
+# Hub tip images (:dev). Push + Render on every push to `dev` (and manual Run).
 name: hub-images-dev
 
 on:
@@ -45,7 +45,6 @@ jobs:
           done
 
       - name: Trigger Render redeploy
-        if: github.event_name == 'workflow_dispatch'
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
