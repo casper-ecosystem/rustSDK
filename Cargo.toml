@@ -1,5 +1,8 @@
 [workspace]
-members = [".", "mcp"]
+members = [".", "mcp", "python"]
+# Keep the root package as the only default member so `cargo clippy --lib` /
+# CI do not build mcp or the maturin python/ cdylib.
+default-members = ["."]
 resolver = "2"
 
 [package]
@@ -18,6 +21,8 @@ exclude = [
   "docs/api-wasm",
   "docs/images",
   "examples",
+  "mcp",
+  "python",
   "pkg",
   "pkg-nodejs",
   "tests/**",

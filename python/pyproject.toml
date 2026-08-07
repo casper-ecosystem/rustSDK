@@ -1,0 +1,19 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "casper-rust-wasm-sdk-py"
+version = "0.1.0"
+description = "PyO3 bindings for casper-rust-wasm-sdk"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+classifiers = [
+  "Programming Language :: Rust",
+  "Programming Language :: Python :: Implementation :: CPython",
+]
+
+[tool.maturin]
+manifest-path = "Cargo.toml"
+module-name = "casper_rust_wasm_sdk_py"
+features = ["pyo3/extension-module"]

@@ -1,0 +1,9 @@
+/.venv/
+/target/
+*.so
+*.dylib
+*.pyd
+__pycache__/
+*.egg-info/
+dist/
+.wheels/

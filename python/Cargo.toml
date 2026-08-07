@@ -1,0 +1,24 @@
+[package]
+name = "casper_rust_wasm_sdk_py"
+version = "0.1.0"
+edition = "2021"
+description = "PyO3 bindings for casper-rust-wasm-sdk"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+name = "casper_rust_wasm_sdk_py"
+crate-type = ["cdylib"]
+
+[dependencies]
+casper-rust-wasm-sdk = { path = "..", default-features = false, features = [
+  "transaction",
+  "helpers",
+] }
+casper-types = { version = "7.1.1", default-features = false }
+pyo3 = { version = "0.25", features = ["extension-module"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+
+[package.metadata.maturin]
+name = "casper_rust_wasm_sdk_py"
