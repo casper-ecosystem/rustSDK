@@ -1,8 +1,10 @@
-# Hub semver + :latest + :dev (same digest on release). Tip of ecosystem/dev
-# also builds :dev via CI/CD Image dev; Render should pull casper-webclient:dev.
-name: CI/CD Image release
+# Hub stable images after a real GitHub Release (not bare tag push).
+# Also moves :dev to the release digest (intentional) and redeploys Render.
+name: hub-images-release
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       version:
@@ -10,29 +12,28 @@ on:
         required: false
         type: string
       ref:
-        description: Git ref to build (tag, branch, or SHA). Empty uses the workflow ref / default branch checkout.
+        description: Git ref to build (tag, branch, or SHA). Empty uses the workflow ref.
         required: false
         type: string
-  push:
-    tags:
-      - "v*.*.*"
 
 jobs:
   build-push-release:
-    name: Build and Push Docker Image release
+    name: Build and push Hub semver + latest + :dev
+    if: github.event_name == 'workflow_dispatch' || !github.event.release.prerelease
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
         with:
-          ref: ${{ inputs.ref || github.ref }}
+          ref: ${{ inputs.ref || github.event.release.tag_name || github.ref }}
 
       - name: Resolve release version
         id: ver
         run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            VERSION="${GITHUB_REF_NAME#v}"
+          if [ "${{ github.event_name }}" = "release" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+            VERSION="${VERSION#v}"
           elif [ -n "${{ inputs.version }}" ]; then
             VERSION="${{ inputs.version }}"
             VERSION="${VERSION#v}"
@@ -70,8 +71,6 @@ jobs:
 
           docker build -f mcp/Dockerfile -t casper-rust-wasm-sdk-mcp:latest .
 
-          # Stable: :$APP_VERSION and :latest (same digest). Also move :dev so
-          # Render (casper-webclient:dev) picks up the release when redeployed.
           for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:${APP_VERSION}"
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:latest"
@@ -87,8 +86,6 @@ jobs:
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
           done
 
-      # Hosted demo pulls :dev (Render). Tip CI/CD Image dev can redeploy via
-      # workflow_dispatch without waiting for a release.
       - name: Trigger Render redeploy
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}

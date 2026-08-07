@@ -1,6 +1,5 @@
-# Tip Hub tag :dev. Hosted demo (Render) should pull interchouette/casper-webclient:dev.
-# Push to ecosystem/dev builds/pushes :dev only. Manual workflow_dispatch also triggers Render.
-name: CI/CD Image dev
+# Hub tip images (:dev). Render redeploy only on manual Run workflow.
+name: hub-images-dev
 
 on:
   workflow_dispatch:
@@ -10,7 +9,7 @@ on:
 
 jobs:
   build-push-dev:
-    name: Build and Push Docker Image dev
+    name: Build and push Hub :dev
     runs-on: ubuntu-latest
 
     steps:
@@ -20,25 +19,21 @@ jobs:
       - name: Set up Make
         run: sudo apt-get install -y make
 
-      # Login as a Hub user with write access to the interchouette org namespace.
       - name: Log in to Docker Hub
         uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker images for dev
+      - name: Build Docker images for tip
         run: |
           APP_VERSION=$(jq -r .version examples/frontend/angular/package.json)
           docker compose -f docker/docker-compose.cicd.yml build \
             --build-arg APP_VERSION="$APP_VERSION" \
             --build-arg GIT_SHA="${{ github.sha }}"
 
-          # Slim MCP for Cursor/agents (stdio / HTTP :5790).
           docker build -f mcp/Dockerfile -t casper-rust-wasm-sdk-mcp:latest .
 
-          # Tip: :dev. Semver (:$APP_VERSION) and :latest stay on
-          # docker-build-push-release.yml (stable = last release).
           for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
             docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
           done
@@ -49,7 +44,6 @@ jobs:
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
           done
 
-      # Hosted demo pulls :dev. Only on manual Run workflow (not every tip push).
       - name: Trigger Render redeploy
         if: github.event_name == 'workflow_dispatch'
         env:

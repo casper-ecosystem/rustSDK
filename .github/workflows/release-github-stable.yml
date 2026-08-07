@@ -1,0 +1,19 @@
+# Attach Electron + MCP to a stable (non-prerelease) GitHub Release.
+# Trigger: Release published via UI/PAT (not GITHUB_TOKEN). No Pages here.
+name: release-github-stable
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  upload-assets:
+    if: ${{ !github.event.release.prerelease }}
+    uses: ./.github/workflows/release-github-assets.yml
+    with:
+      tag: ${{ github.event.release.tag_name }}
+      ref: ${{ github.event.release.tag_name }}
+    secrets: inherit

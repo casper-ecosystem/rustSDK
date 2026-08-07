@@ -1,0 +1,129 @@
+# Tip line tests. No Pages, no Hub product images, no GitHub Releases.
+name: ci-test
+
+on:
+  push:
+    branches: [dev, "feat*", "release-*"]
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    branches: [dev, "feat*", "release-*"]
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  build_and_test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [24.x]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev
+
+      - uses: actions/checkout@v5
+
+      - name: Swatinem cache
+        uses: Swatinem/rust-cache@v2
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Start Casper NCTL Service
+        run: |
+          docker run -d \
+            --name casper-nctl \
+            -p 11101-11105:11101-11105 \
+            -p 14101-14105:14101-14105 \
+            -p 18101-18105:18101-18105 \
+            -p 25101-25105:25101-25105 \
+            -p 28101-28105:28101-28105 \
+            -v $PWD/assets/users:/app/casper-nctl/assets/net-1/users/ \
+            -v $PWD/assets/faucet:/app/casper-nctl/assets/net-1/faucet/ \
+            interchouette/casper-nctl-2-docker:dev
+
+      - name: Wait for the service to be ready
+        run: |
+          echo "Waiting for the service to be ready on port 11101..."
+          for i in {1..30}; do
+            if nc -z localhost 11101; then
+              echo "Service is up!"
+              echo "Wait 45s for nctl to boot and create keys"
+              sleep 45
+              break
+            fi
+            echo "Waiting..."
+            sleep 1
+          done
+
+          if ! nc -z localhost 11101; then
+            echo "Service did not start in time!"
+            exit 1
+          fi
+
+          echo "Waiting for the service to be ready on http://127.0.0.1:18101/events..."
+          for i in {1..30}; do
+            if curl --silent --max-time 2 http://127.0.0.1:18101/events | grep -q "ApiVersion"; then
+              echo "Service is up!"
+              break
+            fi
+            echo "Waiting..."
+            sleep 1
+          done
+
+          if ! curl --silent --max-time 2 http://127.0.0.1:18101/events | grep -q "ApiVersion"; then
+            echo "Service did not start in time!"
+            exit 1
+          fi
+
+      # WARNING: These accounts, and their private keys, are now publicly known.
+      - name: Set SECRET_KEY_USER_1 and SECRET_KEY_USER_2 environment variables
+        run: |
+          echo "SECRET_KEY_USER_1=$(sed -n '2p' ./assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
+          echo "SECRET_KEY_USER_2=$(sed -n '2p' ./assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
+          echo "ENABLE_ADDRESSABLE_ENTITY=false" >> $GITHUB_ENV
+
+      - name: Run cargo audit
+        run: cargo audit
+
+      - name: Lint
+        run: make check-lint
+
+      - name: Feature matrix (read-only + transaction-without-deploy)
+        run: |
+          cargo check --lib --no-default-features
+          cargo check --lib --no-default-features --features transaction,helpers,watcher
+          cargo check --lib --no-default-features --features transaction,helpers,SSE
+          cargo check --lib --target wasm32-unknown-unknown --no-default-features
+          cargo check --lib --target wasm32-unknown-unknown
+
+      - name: Unit Tests
+        run: make test
+
+      - name: Integration Tests
+        run: make integration-test
+
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+
+      - name: Disable AppArmor
+        run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
+
+      - name: E2E Tests
+        run: make e2e-test
+
+      - name: Build lib for all targets
+        run: cargo build --lib --all-targets

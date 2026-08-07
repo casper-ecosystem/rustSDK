@@ -1,10 +1,9 @@
-# Overwrite one GitHub Pre-release after green overnight tests (not Latest).
-# Fixed tag: dev-preview (does not match crates v*.*.*; does not collide with branch dev).
-name: Dev preview release
+# Overnight tip Pre-release. Assets uploaded in this run (GITHUB_TOKEN cannot chain on: release).
+name: release-github-preview
 
 on:
   workflow_run:
-    workflows: ["nightly-scheduled-test"]
+    workflows: ["nightly-test"]
     types: [completed]
   workflow_dispatch:
 
@@ -18,6 +17,8 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.sha.outputs.sha }}
 
     steps:
       - name: Resolve SHA
@@ -48,19 +49,33 @@ jobs:
           SHORT=$(git rev-parse --short "$SHA")
           NOTES="Nightly-green tip of \`dev\` @ \`${SHORT}\` (\`${SHA}\`).
 
-          Overwritten on each successful [nightly-scheduled-test](https://github.com/${{ github.repository }}/actions/workflows/nightly-scheduled-test.yml). Not Latest — that remains the node-aligned semver release (e.g. v2.2.2).
+          Overwritten on each successful [nightly-test](https://github.com/${{ github.repository }}/actions/workflows/nightly-test.yml). Not Latest — that remains the node-aligned semver release (e.g. v2.2.2).
+
+          ## Desktop / MCP assets
+          - \`Casper.Webclient.dev-preview.exe\`
+          - \`Casper.Webclient-dev-preview.AppImage\`
+          - \`casper-webclient_dev-preview_amd64.snap\`
+          - \`casper-rust-wasm-sdk-mcp-dev-preview-linux-x86_64\`
           "
 
-          # Drop prior Pre-release entry (keep tag for now); then repoint tag and recreate.
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release delete "$TAG" --yes || true
           fi
           git tag -f "$TAG" "$SHA"
           git push -f origin "refs/tags/$TAG"
 
-          # Recreate so publish-docs (release: created) rebuilds desktop assets.
           gh release create "$TAG" \
             --prerelease \
             --title "dev preview" \
             --notes "$NOTES" \
             --target "$SHA"
+
+  upload-assets:
+    name: Upload Electron + MCP assets
+    needs: overwrite-prerelease
+    if: needs.overwrite-prerelease.result == 'success'
+    uses: ./.github/workflows/release-github-assets.yml
+    with:
+      tag: dev-preview
+      ref: ${{ needs.overwrite-prerelease.outputs.sha }}
+    secrets: inherit

@@ -1,0 +1,23 @@
+# crates.io publish — manual only (not on tag push).
+name: publish-crates
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to publish (tag, branch, or SHA). Empty = default branch tip.
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Crate Publish
+        run: cargo publish --token ${{ secrets.crates_io_token }}
