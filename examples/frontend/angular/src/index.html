@@ -31,15 +31,12 @@
     <script>
       (function () {
         try {
-          var params = new URLSearchParams(location.search);
-          var q =
-            params.get('debug') ||
-            params.get('DEBUG_MODE') ||
-            params.get('debug_mode');
-          var fromQuery = q === '1' || q === 'true';
-          var fromConfig =
-            window.__APP_CONFIG__ && window.__APP_CONFIG__.debug_mode === true;
-          if (!fromQuery && !fromConfig) {
+          if (
+            !(
+              window.__APP_CONFIG__ &&
+              window.__APP_CONFIG__.debug_mode === true
+            )
+          ) {
             return;
           }
           window.__bootT0 = performance.now();

@@ -47,30 +47,8 @@ function resolveT0(): number {
   return state.t0;
 }
 
-/** True when query has debug=1 / DEBUG_MODE=1. */
-export function wcBootQueryEnabled(): boolean {
-  if (typeof globalThis === 'undefined' || !('location' in globalThis)) {
-    return false;
-  }
-  try {
-    const params = new URLSearchParams(
-      (globalThis as Window & typeof globalThis).location.search,
-    );
-    const q =
-      params.get('debug') ??
-      params.get('DEBUG_MODE') ??
-      params.get('debug_mode');
-    return q === '1' || q === 'true';
-  } catch {
-    return false;
-  }
-}
-
-/** Resolve DEBUG_MODE from query, __APP_CONFIG__, or non-production default. */
+/** Resolve DEBUG_MODE from __APP_CONFIG__ (Docker env) or non-production default. */
 export function resolveWcBootEnabled(production: boolean): boolean {
-  if (wcBootQueryEnabled()) {
-    return true;
-  }
   if (
     typeof window !== 'undefined' &&
     window.__APP_CONFIG__?.debug_mode === true
