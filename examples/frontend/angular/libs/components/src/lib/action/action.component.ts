@@ -69,6 +69,9 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
             'setVerbosity',
             'watchDeploy',
             'waitDeploy',
+            // Factory helpers (not WebClient Action demos).
+            'SSE_client',
+            'CES_parser',
           ].includes(name),
       )
       .filter((name) => !name.endsWith('_options'))
