@@ -57,7 +57,7 @@ cd python
 uv venv .venv && source .venv/bin/activate
 uv pip install maturin
 maturin develop
-python -c "import casper_rust_wasm_sdk_py as m; print(m.get_node_status('http://127.0.0.1:11101/rpc')['chainspec_name'])"
+python -c "import casper_rust_wasm_sdk_py as m; print(m.get_node_status('http://127.0.0.1:11101/rpc'))"
 ```
 
 Build is local via maturin (not part of `make pack` / CI Wasm jobs). See [`python/README.md`](../python/README.md).

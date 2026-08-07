@@ -6,12 +6,12 @@ Not a port of the SDK into Python. Same Rust `rlib`, thin Python face (like Wasm
 
 ## Surface
 
-| Function | Behavior |
-| --- | --- |
-| `get_node_status(rpc_address=None)` | JSON-RPC `info_get_status` → dict (`chainspec_name`, `build_version`, `api_version`, `json`) |
-| `make_signed_transfer(...)` | Make + sign a native transfer (no put) → transaction JSON |
-| `generate_secret_key_pem()` / `public_key_hex(pem)` | Local key helpers |
-| `version()` | Extension package version |
+| Function                                            | Behavior                                                                                     |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `get_node_status(rpc_address=None)`                 | JSON-RPC `info_get_status` → dict (`chainspec_name`, `build_version`, `api_version`, `json`) |
+| `make_signed_transfer(...)`                         | Make + sign a native transfer (no put) → transaction JSON                                    |
+| `generate_secret_key_pem()` / `public_key_hex(pem)` | Local key helpers                                                                            |
+| `version()`                                         | Extension package version                                                                    |
 
 Async SDK calls use an owned tokio multi-thread runtime and `block_on` inside the pyfunction.
 
@@ -31,8 +31,10 @@ uv venv .venv
 source .venv/bin/activate
 uv pip install maturin
 maturin develop
-python -c "import casper_rust_wasm_sdk_py as m; print(m.get_node_status('http://127.0.0.1:11101/rpc')['chainspec_name'])"
+python -c "import casper_rust_wasm_sdk_py as m; print(m.get_node_status('http://127.0.0.1:11101/rpc'))"
 ```
+
+Returns a dict (`chainspec_name`, `build_version`, `api_version`, `json`). Print the whole dict for a smoke check; pick fields only when you need them (e.g. `chain_name` for a transfer).
 
 Use the venv interpreter (`python` after `source .venv/bin/activate`, or `.venv/bin/python`). System `python3` will not see the wheel.
 
@@ -44,7 +46,8 @@ import casper_rust_wasm_sdk_py as casper
 RPC = "http://127.0.0.1:11101/rpc"
 
 status = casper.get_node_status(RPC)
-print(status["chainspec_name"], status["build_version"])
+print(status)  # full status dict
+# optional fields: status["chainspec_name"], status["build_version"], status["json"]
 
 pem = casper.generate_secret_key_pem()
 sender = casper.public_key_hex(pem)
