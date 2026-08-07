@@ -190,6 +190,7 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
         ].includes(name),
     );
     this.setStateSubscription();
+    this.changeDetectorRef.detectChanges();
   }
 
   ngOnDestroy() {

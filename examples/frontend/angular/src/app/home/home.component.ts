@@ -64,6 +64,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private wasm!: Uint8Array | undefined;
   private stateSubscription!: Subscription;
+  /** Bumped to ignore late cold-start RPC results after the user changes action. */
+  private bootstrapGeneration = 0;
 
   constructor(
     @Inject(SDK_TOKEN) private readonly sdk: SDK,
@@ -85,6 +87,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public ngOnDestroy() {
+    this.bootstrapGeneration++;
     this.stateSubscription && this.stateSubscription.unsubscribe();
   }
 
@@ -96,31 +99,56 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  public async ngAfterViewInit() {
-    const no_mark_for_check = true;
+  public ngAfterViewInit() {
     const action =
       this.storageService.get('action') ||
       this.config['default_action'].toString();
+    this.stateService.setState({
+      action,
+      status_loading: true,
+    });
+    void this.bootstrapChainStatus(action);
+  }
+
+  /** Cold-start status + SRH; must not block Action/form paint. */
+  private async bootstrapChainStatus(action: string) {
+    const generation = ++this.bootstrapGeneration;
+    const no_mark_for_check = true;
     try {
       if (action == this.config['default_action'].toString()) {
-        await this.handleAction(action, true);
+        const get_node_status = await this.sdk.get_node_status();
+        if (generation !== this.bootstrapGeneration) {
+          return;
+        }
+        if (get_node_status) {
+          await this.resultService.setResult(get_node_status.toJson());
+        }
+      }
+      if (generation !== this.bootstrapGeneration) {
+        return;
       }
       await this.get_state_root_hash(no_mark_for_check);
     } catch (error) {
-      console.error(error);
-      this.errorService.setError(error as string);
+      if (generation === this.bootstrapGeneration) {
+        console.error(error);
+        this.errorService.setError(error as string);
+      }
+    } finally {
+      if (generation === this.bootstrapGeneration) {
+        this.stateService.setState({
+          status_loading: false,
+        });
+      }
     }
-    this.stateService.setState({
-      action,
-    });
-    this.setStateSubscription();
   }
 
   async selectAction(action: string) {
-    await this.cleanResult();
+    this.bootstrapGeneration++;
     this.stateService.setState({
       action,
+      status_loading: false,
     });
+    await this.cleanResult();
     await this.handleAction(action);
     this.storageService.setState({
       action,

@@ -8,6 +8,8 @@ export type State = {
   enity?: string;
   main_purse?: string;
   state_root_hash?: string;
+  /** True while cold-start status / state-root-hash RPCs are in flight. */
+  status_loading?: boolean;
   action?: string;
   public_key?: string;
   secret_key?: string;
