@@ -46,6 +46,11 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
   ) {}
 
   async ngAfterViewInit(): Promise<void> {
+    // Home sets action in ngOnInit; pick it up before the first options paint.
+    const seeded = this.stateService.getValue()?.action;
+    if (seeded) {
+      this.action = seeded;
+    }
     this.sdk_methods = Object.getOwnPropertyNames(
       Object.getPrototypeOf(this.sdk),
     )

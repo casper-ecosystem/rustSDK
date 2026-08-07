@@ -1,10 +1,10 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   EventEmitter,
   OnDestroy,
+  OnInit,
   Output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -19,7 +19,7 @@ import { State, StateService } from '@util/state';
   styleUrls: ['./status.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StatusComponent implements AfterViewInit, OnDestroy {
+export class StatusComponent implements OnInit, OnDestroy {
   account_hash!: string;
   main_purse!: string;
   state_root_hash!: string;
@@ -35,6 +35,11 @@ export class StatusComponent implements AfterViewInit, OnDestroy {
     private readonly changeDetectorRef: ChangeDetectorRef,
   ) {}
 
+  ngOnInit() {
+    // Subscribe before first paint so Home ngOnInit status_loading is visible.
+    this.setStateSubscription();
+  }
+
   ngOnDestroy() {
     this.stateSubscription && this.stateSubscription.unsubscribe();
   }
@@ -47,12 +52,8 @@ export class StatusComponent implements AfterViewInit, OnDestroy {
         state.main_purse && (this.main_purse = state.main_purse);
         state.state_root_hash && (this.state_root_hash = state.state_root_hash);
         this.status_loading = !!state.status_loading;
-        state && this.changeDetectorRef.markForCheck();
+        this.changeDetectorRef.markForCheck();
       });
-  }
-
-  async ngAfterViewInit() {
-    this.setStateSubscription();
   }
 
   get_state_root_hash() {
