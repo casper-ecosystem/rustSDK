@@ -1,11 +1,12 @@
 # Casper Rust/Wasm SDK 2.2.2
 
-The Rust/Wasm SDK allows developers and users to interact with the Casper Blockchain using Rust or TypeScript. It provides a way to embed the [casper-client-rs](https://github.com/casper-ecosystem/casper-client-rs) into another application without the CLI interface. The SDK exposes a list of types and methods from a subset of the Casper client.
+The Rust/Wasm SDK allows developers and users to interact with the Casper Blockchain using Rust, TypeScript, or Python. It provides a way to embed the [casper-client-rs](https://github.com/casper-ecosystem/casper-client-rs) into another application without the CLI interface. The SDK exposes a list of types and methods from a subset of the Casper client.
 
-You can use the Casper Rust/Wasm SDK in two ways:
+You can use the Casper Rust/Wasm SDK in these ways:
 
 - In a <strong>Rust application</strong> by importing the SDK crate.
 - In a <strong>Typescript application</strong> by importing the SDK Wasm file and the Typescript interfaces.
+- In a <strong>Python application</strong> via the PyO3 / maturin package [`python/`](../python/) (`casper-rust-wasm-sdk-py`).
 
 This page covers different examples of using the SDK.
 
@@ -41,26 +42,6 @@ make mcp-test-live  # against a live local node
 ```
 
 See [`mcp/README.md`](../mcp/README.md), tool inventory [`mcp/TOOLS.md`](../mcp/TOOLS.md), and Cursor sample [`mcp/mcp.json.example`](../mcp/mcp.json.example).
-
-## Python
-
-The workspace package [`python/`](../python/) (`casper-rust-wasm-sdk-py`) exposes the same native Rust SDK as a PyO3 / maturin extension ([#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9)). Not a Python port: one `rlib`, thin language face (same idea as Wasm and MCP).
-
-Initial surface (grow incrementally; not full Wasm/TS parity):
-
-- `get_node_status(rpc_address=None)`: JSON-RPC status dict
-- `make_signed_transfer(...)`: make + sign transfer (no put)
-- `generate_secret_key_pem()` / `public_key_hex(pem)` / `version()`
-
-```bash
-cd python
-uv venv .venv && source .venv/bin/activate
-uv pip install maturin
-maturin develop
-python -c "import casper_rust_wasm_sdk_py as m; print(m.get_node_status('http://127.0.0.1:11101/rpc'))"
-```
-
-Build is local via maturin (`make python-test` for an offline smoke). Separate Actions workflow `python-bindings` (not part of `ci-test` / `make pack`). See [`python/README.md`](../python/README.md).
 
 ## Install
 
@@ -350,6 +331,44 @@ $ npm start
 
 </details>
 
+<details>
+  <summary><strong><code>Python Project</code></strong></summary>
+
+## Python Project
+
+The workspace package [`python/`](../python/) (`casper-rust-wasm-sdk-py`) is a PyO3 / maturin extension over the same native Rust `rlib` (not a Python port). Full surface and helpers: [`python/README.md`](../python/README.md).
+
+Requires CPython 3.10+ and a Rust toolchain.
+
+```bash
+cd python
+uv venv .venv
+source .venv/bin/activate
+uv pip install maturin
+maturin develop
+```
+
+From the repo root you can also run `make python-test` (offline unit) or `make python-test-nctl` (live node). The `python-bindings` workflow runs both against Hub NCTL `:dev`.
+
+## Usage
+
+```python
+import casper_rust_wasm_sdk_py as casper
+
+RPC = "https://node.testnet.casper.network/rpc"
+
+status = casper.get_node_status(RPC)
+print(status["chainspec_name"], status["build_version"])
+
+# Optional session wrapper for addresses / verbosity
+sdk = casper.Sdk(RPC, verbosity="low")
+print(sdk.get_rpc_address(), sdk.get_verbosity())
+```
+
+Deploy APIs and binary-port are not wrapped. Transaction V1 and Runtime V1 / V2 are supported on the transaction / contract helpers.
+
+</details>
+
 ## Usage
 
 ### RPC call examples
@@ -532,6 +551,63 @@ You can find more examples in [NodeJs examples](../examples/desktop/node/index.t
 
 </details>
 
+<details>
+  <summary><strong><code>Python</code></strong></summary>
+<br>
+
+Python bindings return JSON strings for most RPC results (parse with `json.loads`). Full list: [`python/README.md`](../python/README.md). Examples below use Testnet-style URLs; swap in your node as needed.
+
+```python
+import json
+import casper_rust_wasm_sdk_py as casper
+
+RPC = "https://node.testnet.casper.network/rpc"
+```
+
+#### Get transaction by transaction hash
+
+```python
+raw = casper.get_transaction(
+    "94b3e6253a4448138fb8b637bd0ca0604270d2f5664f7c221d67eae568fcd668",
+    True,
+    RPC,
+)
+result = json.loads(raw)
+print(list(result.keys()))
+```
+
+#### Get auction state information
+
+```python
+auction = json.loads(casper.get_auction_info(None, RPC))
+print(list(auction.keys()))
+```
+
+#### Get peers from the network
+
+```python
+peers = json.loads(casper.get_peers(RPC))
+print(len(peers.get("peers") or []))
+```
+
+#### Get the latest block information
+
+```python
+block = json.loads(casper.get_block(None, RPC))
+print(list(block.keys()))
+```
+
+#### Get node status
+
+```python
+status = casper.get_node_status(RPC)
+print(status["chainspec_name"], status["build_version"])
+```
+
+`get_deploy` / `get_account` / `get_era_info` are not wrapped (prefer `get_transaction`, `get_entity`, `get_era_summary`). More examples: [`python/README.md`](../python/README.md), `make python-test`, `make python-test-nctl`.
+
+</details>
+
 ### More examples
 
 <details>
@@ -607,6 +683,32 @@ const make_transfer_transaction = sdk.make_transfer_transaction(
 );
 const make_transfer_transaction_as_json = make_transfer_transaction.toJson();
 console.log(make_transfer_transaction_as_json);
+```
+
+#### Python
+
+```python
+import json
+import casper_rust_wasm_sdk_py as casper
+
+chain_name = "integration-test"
+payment_amount = "100000000"
+transfer_amount = "2500000000"
+target_account = (
+    "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54"
+)
+pem = casper.secret_key_generate()  # treat as secret
+
+params = json.dumps(
+    {
+        "chain_name": chain_name,
+        "payment_amount": payment_amount,
+        "secret_key": pem,
+    }
+)
+unsigned = casper.make_transfer_transaction(target_account, transfer_amount, params)
+signed = casper.sign_transaction(unsigned, pem)
+print(signed[:120], "...")
 ```
 
 </details>
@@ -692,6 +794,42 @@ console.log(transfer_transaction_result_as_json);
 const transaction_hash =
   transfer_transaction_result.transaction_hash.toString();
 console.log(transaction_hash);
+```
+
+#### Python
+
+```python
+import json
+import casper_rust_wasm_sdk_py as casper
+
+RPC = "http://127.0.0.1:11101/rpc"
+chain_name = "casper-net-1"
+payment_amount = "100000000"
+transfer_amount = "2500000000"
+target_account = (
+    "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54"
+)
+# Load a funded secret key PEM (do not commit real secrets)
+pem = open("secret_key.pem", encoding="utf-8").read()
+
+params = json.dumps(
+    {
+        "chain_name": chain_name,
+        "payment_amount": payment_amount,
+        "secret_key": pem,
+    }
+)
+put = json.loads(
+    casper.transfer_transaction(
+        target_account,
+        transfer_amount,
+        params,
+        None,
+        None,
+        RPC,
+    )
+)
+print(put.get("transaction_hash") or put)
 ```
 
 </details>
@@ -1202,6 +1340,23 @@ console.log(eventParseResult.body.transaction_processed);
 const cost =
   eventParseResult.body?.transaction_processed?.execution_result.Success?.cost;
 console.log(`transaction cost ${cost}`);
+```
+
+#### Python
+
+```python
+import json
+import casper_rust_wasm_sdk_py as casper
+
+events_url = "http://127.0.0.1:18101/events"
+transaction_hash = (
+    "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4"
+)
+timeout_ms = None  # or 30_000 for 30s; default is 60s when omitted
+
+waited = casper.wait_transaction(events_url, transaction_hash, timeout_ms)
+body = json.loads(waited)
+print(body.get("body"))
 ```
 
 </details>
