@@ -8,8 +8,8 @@ use ratatui::Frame;
 
 use crate::model::{AppModel, InputMode, ViewMode, TIPS};
 use crate::views::{
-    draw_accounts, draw_actions, draw_blocks, draw_coming_soon, draw_contracts, draw_help,
-    draw_network, draw_transactions, draw_wait, draw_writes,
+    draw_accounts, draw_actions, draw_blocks, draw_contracts, draw_help, draw_network,
+    draw_transactions, draw_validators, draw_wait, draw_writes,
 };
 
 pub fn draw(frame: &mut Frame, model: &AppModel) {
@@ -93,12 +93,12 @@ fn draw_body(frame: &mut Frame, area: Rect, model: &AppModel) {
         ViewMode::Blocks => draw_blocks(frame, area, model),
         ViewMode::Transactions => draw_transactions(frame, area, model),
         ViewMode::Accounts => draw_accounts(frame, area, model),
+        ViewMode::Validators => draw_validators(frame, area, model),
         ViewMode::Contracts => draw_contracts(frame, area, model),
         ViewMode::Actions => draw_actions(frame, area, model),
         ViewMode::Writes => draw_writes(frame, area, model),
         ViewMode::Wait => draw_wait(frame, area, model),
         ViewMode::Help => draw_help(frame, area, model),
-        other => draw_coming_soon(frame, area, model, other),
     }
 }
 

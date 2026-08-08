@@ -112,6 +112,7 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
         InputMode::TxLookup => return handle_tx_lookup_key(code, ctx),
         InputMode::AccountLookup => return handle_account_lookup_key(code, ctx),
         InputMode::AccountReward => return handle_account_reward_key(code, ctx),
+        InputMode::ValidatorFilter => return handle_validator_filter_key(code, ctx),
         InputMode::ContractLookup => return handle_contract_lookup_key(code, ctx),
         InputMode::ContractQueryKey => return handle_contract_query_key_key(code, ctx),
         InputMode::ContractQueryDict => return handle_contract_query_dict_key(code, ctx),
@@ -153,6 +154,9 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
         KeyCode::Char('/') if ctx.model.view == ViewMode::Accounts => {
             ctx.model.open_account_lookup();
         }
+        KeyCode::Char('/') if ctx.model.view == ViewMode::Validators => {
+            ctx.model.open_validator_filter();
+        }
         KeyCode::Char('/') if ctx.model.view == ViewMode::Contracts => {
             ctx.model.open_contract_lookup();
         }
@@ -161,6 +165,9 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
         }
         KeyCode::Char('w') if ctx.model.view == ViewMode::Accounts => {
             ctx.model.open_account_reward_form();
+        }
+        KeyCode::Char('w') if ctx.model.view == ViewMode::Validators => {
+            ctx.model.open_validator_reward_form();
         }
         KeyCode::Char('w') if ctx.model.view == ViewMode::Wait => request_wait_or_collect(ctx),
         KeyCode::Char(' ') if ctx.model.view == ViewMode::Wait => {
@@ -184,6 +191,12 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
                 ctx.model.accounts.cycle_section(true);
                 ctx.model
                     .set_status(format!("accounts | {}", ctx.model.accounts.section.title()));
+            } else if ctx.model.view == ViewMode::Validators {
+                ctx.model.validators.cycle_section(true);
+                ctx.model.set_status(format!(
+                    "validators | {}",
+                    ctx.model.validators.section.title()
+                ));
             } else if ctx.model.view == ViewMode::Contracts {
                 let enable = ctx.model.enable_writes;
                 ctx.model.contracts.cycle_section(true, enable);
@@ -211,6 +224,12 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
                 ctx.model.accounts.cycle_section(false);
                 ctx.model
                     .set_status(format!("accounts | {}", ctx.model.accounts.section.title()));
+            } else if ctx.model.view == ViewMode::Validators {
+                ctx.model.validators.cycle_section(false);
+                ctx.model.set_status(format!(
+                    "validators | {}",
+                    ctx.model.validators.section.title()
+                ));
             } else if ctx.model.view == ViewMode::Contracts {
                 let enable = ctx.model.enable_writes;
                 ctx.model.contracts.cycle_section(false, enable);
@@ -247,6 +266,9 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
             if let Some(view) = ViewMode::from_digit(c) {
                 ctx.model.view = view;
                 ctx.model.set_status(format!("view | {}", view.title()));
+                if view == ViewMode::Validators && ctx.model.validators.bidders.is_empty() {
+                    request_validators_auction(ctx);
+                }
             }
         }
         KeyCode::Down | KeyCode::Char('j') => scroll_or_list(ctx.model, 1),
@@ -258,6 +280,7 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
             ViewMode::Blocks => blocks_enter(ctx),
             ViewMode::Transactions => request_transaction(ctx),
             ViewMode::Accounts => accounts_enter(ctx),
+            ViewMode::Validators => validators_enter(ctx),
             ViewMode::Contracts => contracts_enter(ctx),
             ViewMode::Writes => ctx.model.open_write_form(),
             ViewMode::Wait => {
@@ -443,36 +466,90 @@ fn handle_account_lookup_key(code: KeyCode, ctx: &mut KeyCtx<'_>) -> Result<bool
 }
 
 fn handle_account_reward_key(code: KeyCode, ctx: &mut KeyCtx<'_>) -> Result<bool> {
+    let on_validators = ctx.model.view == ViewMode::Validators;
     match code {
         KeyCode::Esc => {
             ctx.model.input_mode = InputMode::Normal;
             ctx.model.set_status("reward form cancelled");
         }
         KeyCode::Tab => {
-            ctx.model.accounts.reward_field = (ctx.model.accounts.reward_field + 1) % 3;
+            if on_validators {
+                ctx.model.validators.reward_field = (ctx.model.validators.reward_field + 1) % 3;
+            } else {
+                ctx.model.accounts.reward_field = (ctx.model.accounts.reward_field + 1) % 3;
+            }
         }
         KeyCode::BackTab => {
-            ctx.model.accounts.reward_field = (ctx.model.accounts.reward_field + 2) % 3;
+            if on_validators {
+                ctx.model.validators.reward_field = (ctx.model.validators.reward_field + 2) % 3;
+            } else {
+                ctx.model.accounts.reward_field = (ctx.model.accounts.reward_field + 2) % 3;
+            }
         }
         KeyCode::Enter => {
             ctx.model.input_mode = InputMode::Normal;
             request_reward(ctx);
         }
         KeyCode::Backspace => {
-            ctx.model.accounts.reward_field_mut().backspace();
+            if on_validators {
+                ctx.model.validators.reward_field_mut().backspace();
+            } else {
+                ctx.model.accounts.reward_field_mut().backspace();
+            }
         }
         KeyCode::Delete => {
-            ctx.model.accounts.reward_field_mut().delete();
+            if on_validators {
+                ctx.model.validators.reward_field_mut().delete();
+            } else {
+                ctx.model.accounts.reward_field_mut().delete();
+            }
         }
         KeyCode::Left => {
-            ctx.model.accounts.reward_field_mut().move_left();
+            if on_validators {
+                ctx.model.validators.reward_field_mut().move_left();
+            } else {
+                ctx.model.accounts.reward_field_mut().move_left();
+            }
         }
         KeyCode::Right => {
-            ctx.model.accounts.reward_field_mut().move_right();
+            if on_validators {
+                ctx.model.validators.reward_field_mut().move_right();
+            } else {
+                ctx.model.accounts.reward_field_mut().move_right();
+            }
         }
         KeyCode::Char(c) => {
-            ctx.model.accounts.reward_field_mut().insert(c);
+            if on_validators {
+                ctx.model.validators.reward_field_mut().insert(c);
+            } else {
+                ctx.model.accounts.reward_field_mut().insert(c);
+            }
         }
+        _ => {}
+    }
+    Ok(false)
+}
+
+fn handle_validator_filter_key(code: KeyCode, ctx: &mut KeyCtx<'_>) -> Result<bool> {
+    match code {
+        KeyCode::Esc => {
+            ctx.model.input_mode = InputMode::Normal;
+            ctx.model.set_status("filter cancelled");
+        }
+        KeyCode::Enter => {
+            ctx.model.input_mode = InputMode::Normal;
+            ctx.model.validators.list_selected = 0;
+            ctx.model.set_status(format!(
+                "filter applied | {} validators / {} bidders visible",
+                ctx.model.validators.filtered_validators().len(),
+                ctx.model.validators.filtered_bidders().len()
+            ));
+        }
+        KeyCode::Backspace => ctx.model.validators.filter.backspace(),
+        KeyCode::Delete => ctx.model.validators.filter.delete(),
+        KeyCode::Left => ctx.model.validators.filter.move_left(),
+        KeyCode::Right => ctx.model.validators.filter.move_right(),
+        KeyCode::Char(c) => ctx.model.validators.filter.insert(c),
         _ => {}
     }
     Ok(false)
@@ -520,13 +597,70 @@ fn request_account_load(ctx: &mut KeyCtx<'_>) {
 }
 
 fn request_reward(ctx: &mut KeyCtx<'_>) {
-    let validator = ctx
-        .model
-        .accounts
-        .reward_validator
-        .buffer
-        .trim()
-        .to_string();
+    let on_validators = ctx.model.view == ViewMode::Validators;
+    let (validator, era, delegator) = if on_validators {
+        (
+            ctx.model
+                .validators
+                .reward_validator
+                .buffer
+                .trim()
+                .to_string(),
+            {
+                let s = ctx.model.validators.reward_era.buffer.trim().to_string();
+                if s.is_empty() {
+                    None
+                } else {
+                    Some(s)
+                }
+            },
+            {
+                let s = ctx
+                    .model
+                    .validators
+                    .reward_delegator
+                    .buffer
+                    .trim()
+                    .to_string();
+                if s.is_empty() {
+                    None
+                } else {
+                    Some(s)
+                }
+            },
+        )
+    } else {
+        (
+            ctx.model
+                .accounts
+                .reward_validator
+                .buffer
+                .trim()
+                .to_string(),
+            {
+                let s = ctx.model.accounts.reward_era.buffer.trim().to_string();
+                if s.is_empty() {
+                    None
+                } else {
+                    Some(s)
+                }
+            },
+            {
+                let s = ctx
+                    .model
+                    .accounts
+                    .reward_delegator
+                    .buffer
+                    .trim()
+                    .to_string();
+                if s.is_empty() {
+                    None
+                } else {
+                    Some(s)
+                }
+            },
+        )
+    };
     if validator.is_empty() {
         ctx.model
             .set_status("reward needs a validator pubkey | press w");
@@ -537,32 +671,105 @@ fn request_reward(ctx: &mut KeyCtx<'_>) {
             .set_status("still busy · let the previous spell land");
         return;
     }
-    let era = {
-        let s = ctx.model.accounts.reward_era.buffer.trim().to_string();
-        if s.is_empty() {
-            None
-        } else {
-            Some(s)
-        }
-    };
-    let delegator = {
-        let s = ctx
-            .model
-            .accounts
-            .reward_delegator
-            .buffer
-            .trim()
-            .to_string();
-        if s.is_empty() {
-            None
-        } else {
-            Some(s)
-        }
-    };
-    ctx.model
-        .begin_account_job("asking the era for its tip jar...");
+    if on_validators {
+        ctx.model
+            .begin_validators_job("asking the era for its tip jar...");
+    } else {
+        ctx.model
+            .begin_account_job("asking the era for its tip jar...");
+    }
     ctx.client
         .spawn_reward(validator, delegator, era, ctx.rpc_tx.clone());
+}
+
+fn validators_enter(ctx: &mut KeyCtx<'_>) {
+    use casperatatui::model::ValidatorsSection;
+    match ctx.model.validators.section {
+        ValidatorsSection::Rewards => {
+            if ctx
+                .model
+                .validators
+                .reward_validator
+                .buffer
+                .trim()
+                .is_empty()
+            {
+                ctx.model.open_validator_reward_form();
+            } else {
+                request_reward(ctx);
+            }
+        }
+        ValidatorsSection::Detail => {
+            if ctx.model.validators.detail.is_none() {
+                ctx.model.set_status("pick a validator from the list first");
+            } else {
+                ctx.model.open_validator_reward_form();
+            }
+        }
+        ValidatorsSection::Validators | ValidatorsSection::Bidders => {
+            if ctx.model.validators.bidders.is_empty() {
+                request_validators_auction(ctx);
+                return;
+            }
+            let rows: Vec<String> = if ctx.model.validators.section == ValidatorsSection::Validators
+            {
+                ctx.model
+                    .validators
+                    .filtered_validators()
+                    .into_iter()
+                    .map(|r| r.public_key.clone())
+                    .collect()
+            } else {
+                ctx.model
+                    .validators
+                    .filtered_bidders()
+                    .into_iter()
+                    .map(|r| r.public_key.clone())
+                    .collect()
+            };
+            if rows.is_empty() {
+                ctx.model
+                    .set_status("no rows | adjust / filter or r reload");
+                return;
+            }
+            let idx = ctx.model.validators.list_selected.min(rows.len() - 1);
+            let pk = rows[idx].clone();
+            // Re-parse detail from last auction by reloading if needed: use get_validator on stored lists.
+            request_validator_detail(ctx, &pk);
+        }
+    }
+}
+
+fn request_validator_detail(ctx: &mut KeyCtx<'_>, public_key: &str) {
+    // Prefer detail from current bidder list via a fresh auction reload is heavy;
+    // rebuild from in-memory auction by matching list rows + get_validator needs raw JSON.
+    // Keep last auction in state: store raw Value on ValidatorsState.
+    if let Some(raw) = ctx.model.validators.raw_auction.clone() {
+        if let Some(detail) = casperatatui::auction_view::get_validator(&raw, public_key) {
+            ctx.model.validators.detail = Some(detail);
+            ctx.model.validators.section = casperatatui::model::ValidatorsSection::Detail;
+            ctx.model.validators.del_selected = 0;
+            ctx.model.validators.scroll = 0;
+            ctx.model.set_status(format!(
+                "detail | {}",
+                &public_key[..16.min(public_key.len())]
+            ));
+            return;
+        }
+    }
+    ctx.model
+        .set_status("reload auction with r, then Enter again");
+}
+
+fn request_validators_auction(ctx: &mut KeyCtx<'_>) {
+    if !ctx.model.can_refresh() {
+        ctx.model
+            .set_status("still busy | let the previous haunt finish");
+        return;
+    }
+    ctx.model
+        .begin_validators_job("polling the auction house...");
+    ctx.client.spawn_auction_info(ctx.rpc_tx.clone());
 }
 
 fn handle_contract_lookup_key(code: KeyCode, ctx: &mut KeyCtx<'_>) -> Result<bool> {
@@ -822,6 +1029,31 @@ fn scroll_or_list(model: &mut AppModel, delta: i32) {
                 _ => adjust_u16(&mut model.accounts.scroll, delta),
             }
         }
+        ViewMode::Validators => {
+            use casperatatui::model::ValidatorsSection;
+            let list_len = model.validators.list_len();
+            match model.validators.section {
+                ValidatorsSection::Validators | ValidatorsSection::Bidders if list_len > 0 => {
+                    if delta > 0 {
+                        model.validators.list_selected =
+                            (model.validators.list_selected + 1) % list_len;
+                    } else {
+                        model.validators.list_selected =
+                            (model.validators.list_selected + list_len - 1) % list_len;
+                    }
+                }
+                ValidatorsSection::Detail if list_len > 0 => {
+                    if delta > 0 {
+                        model.validators.del_selected =
+                            (model.validators.del_selected + 1) % list_len;
+                    } else {
+                        model.validators.del_selected =
+                            (model.validators.del_selected + list_len - 1) % list_len;
+                    }
+                }
+                _ => adjust_u16(&mut model.validators.scroll, delta),
+            }
+        }
         ViewMode::Contracts => {
             use casperatatui::model::ContractsSection;
             let list_len = model.contracts.list_len();
@@ -1078,6 +1310,9 @@ fn apply_command(cmd: ParsedCommand, ctx: &mut KeyCtx<'_>) -> Result<bool> {
             if let Some(view) = parse_view_name(&name) {
                 ctx.model.view = view;
                 ctx.model.set_status(format!("goto {}", view.title()));
+                if view == ViewMode::Validators && ctx.model.validators.bidders.is_empty() {
+                    request_validators_auction(ctx);
+                }
             } else {
                 ctx.model.set_error(format!("unknown view `{name}`"));
             }
@@ -1135,6 +1370,10 @@ fn request_refresh(ctx: &mut KeyCtx<'_>) {
     if !ctx.model.can_refresh() {
         ctx.model
             .set_status("refresh cooling down · sip some ectoplasm");
+        return;
+    }
+    if ctx.model.view == ViewMode::Validators {
+        request_validators_auction(ctx);
         return;
     }
     ctx.model.begin_network_refresh();

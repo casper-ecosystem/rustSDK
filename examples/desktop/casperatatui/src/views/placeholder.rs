@@ -10,7 +10,6 @@ use crate::model::{AppModel, ViewMode};
 
 pub fn draw_coming_soon(frame: &mut Frame, area: Rect, model: &AppModel, view: ViewMode) {
     let gag = match view {
-        ViewMode::Validators => "Validators are stretching before the auction.",
         ViewMode::Contracts => "Contracts is live! Press 6, / auction, Enter.",
         ViewMode::Writes => "Writes is live on tab 8 when --enable-writes is set (o loads PEM).",
         ViewMode::Wait => "Wait is live on tab 9 (wait_transaction + SSE collect).",
@@ -19,6 +18,7 @@ pub fn draw_coming_soon(frame: &mut Frame, area: Rect, model: &AppModel, view: V
         | ViewMode::Blocks
         | ViewMode::Transactions
         | ViewMode::Accounts
+        | ViewMode::Validators
         | ViewMode::Actions => "You should not see this (view is already live).",
     };
 

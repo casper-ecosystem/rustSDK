@@ -354,6 +354,21 @@ impl SdkClient {
         });
     }
 
+    /// Load `get_auction_info` for Validators / Bidders screens.
+    pub fn spawn_auction_info(&self, tx: mpsc::UnboundedSender<RpcEvent>) {
+        let rpc = self.rpc_url.clone();
+        let verbosity = self.verbosity;
+        tokio::spawn(async move {
+            let sdk = Self::sdk_at(&rpc, verbosity);
+            let result = ok_json(
+                sdk.get_auction_info(None, None, None)
+                    .await
+                    .map(|r| r.result),
+            );
+            let _ = tx.send(RpcEvent::ValidatorsAuction(result));
+        });
+    }
+
     /// Era reward lookup (`info_get_reward`).
     pub fn spawn_reward(
         &self,

@@ -2685,7 +2685,6 @@ For a terminal UI over the same SDK (not Electron), see [Casperatatui](#casperat
 **Casperatatui** is a Casper TUI (terminal UI) based on [ratatui](https://ratatui.rs/), over the native Rust SDK. JSON-RPC and SSE only (no binary port).
 
 - Source: [`examples/desktop/casperatatui`](../examples/desktop/casperatatui)
-- Issue: [#123](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/123)
 - GitHub Releases / Pre-release [`dev-preview`](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases): linux binary `casperatatui-<label>-linux-x86_64`
 
 ```bash

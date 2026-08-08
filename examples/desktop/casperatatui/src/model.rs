@@ -2,7 +2,9 @@
 
 use crate::account_view::EntityOverview;
 use crate::actions_catalog::{find_action, visible_actions, ActionSpec};
-use crate::auction_view::{DelegationRow, SelfStakeRow, UndelegationRow};
+use crate::auction_view::{
+    DelegationRow, SelfStakeRow, UndelegationRow, ValidatorDetail, ValidatorRow,
+};
 use crate::block_view::{BlockRow, TransferRow};
 use crate::command::CommandPalette;
 use crate::contract_view::ContractOverview;
@@ -119,6 +121,7 @@ pub enum RpcEvent {
     Transaction(Result<Value, String>),
     Account(AccountLoadResult),
     Reward(Result<Value, String>),
+    ValidatorsAuction(Result<Value, String>),
     Contract(Result<ContractLoadResult, String>),
     ContractQuery(Result<Value, String>),
     WriteBuild(Result<Value, String>),
@@ -148,6 +151,7 @@ pub enum InputMode {
     TxLookup,
     AccountLookup,
     AccountReward,
+    ValidatorFilter,
     ContractLookup,
     ContractQueryKey,
     ContractQueryDict,
@@ -420,6 +424,156 @@ impl Default for AccountsState {
     fn default() -> Self {
         Self::new()
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ValidatorsSection {
+    Validators,
+    Bidders,
+    Detail,
+    Rewards,
+}
+
+impl ValidatorsSection {
+    pub const ALL: [ValidatorsSection; 4] = [
+        Self::Validators,
+        Self::Bidders,
+        Self::Detail,
+        Self::Rewards,
+    ];
+
+    pub fn title(self) -> &'static str {
+        match self {
+            Self::Validators => "Validators",
+            Self::Bidders => "Bidders",
+            Self::Detail => "Detail",
+            Self::Rewards => "Rewards",
+        }
+    }
+
+    pub fn next(self) -> Self {
+        let idx = Self::ALL.iter().position(|s| *s == self).unwrap_or(0);
+        Self::ALL[(idx + 1) % Self::ALL.len()]
+    }
+
+    pub fn prev(self) -> Self {
+        let idx = Self::ALL.iter().position(|s| *s == self).unwrap_or(0);
+        let len = Self::ALL.len();
+        Self::ALL[(idx + len - 1) % len]
+    }
+}
+
+/// Validators / Bidders screen state.
+pub struct ValidatorsState {
+    pub section: ValidatorsSection,
+    pub filter: TextInput,
+    pub validators: Vec<ValidatorRow>,
+    pub bidders: Vec<ValidatorRow>,
+    pub raw_auction: Option<Value>,
+    pub list_selected: usize,
+    pub detail: Option<ValidatorDetail>,
+    pub del_selected: usize,
+    pub reward_validator: TextInput,
+    pub reward_era: TextInput,
+    pub reward_delegator: TextInput,
+    pub reward_field: usize,
+    pub reward_result: Option<Value>,
+    pub reward_text: Option<String>,
+    pub scroll: u16,
+    pub error: Option<String>,
+}
+
+impl ValidatorsState {
+    pub fn new() -> Self {
+        Self {
+            section: ValidatorsSection::Validators,
+            filter: TextInput::new(),
+            validators: Vec::new(),
+            bidders: Vec::new(),
+            raw_auction: None,
+            list_selected: 0,
+            detail: None,
+            del_selected: 0,
+            reward_validator: TextInput::new(),
+            reward_era: TextInput::new(),
+            reward_delegator: TextInput::new(),
+            reward_field: 0,
+            reward_result: None,
+            reward_text: None,
+            scroll: 0,
+            error: None,
+        }
+    }
+
+    pub fn cycle_section(&mut self, forward: bool) {
+        self.section = if forward {
+            self.section.next()
+        } else {
+            self.section.prev()
+        };
+        self.list_selected = 0;
+        self.del_selected = 0;
+        self.scroll = 0;
+    }
+
+    pub fn filtered_validators(&self) -> Vec<&ValidatorRow> {
+        filter_rows(&self.validators, self.filter.buffer.trim())
+    }
+
+    pub fn filtered_bidders(&self) -> Vec<&ValidatorRow> {
+        filter_rows(&self.bidders, self.filter.buffer.trim())
+    }
+
+    pub fn list_len(&self) -> usize {
+        match self.section {
+            ValidatorsSection::Validators => self.filtered_validators().len(),
+            ValidatorsSection::Bidders => self.filtered_bidders().len(),
+            ValidatorsSection::Detail => self
+                .detail
+                .as_ref()
+                .map(|d| d.delegators.len())
+                .unwrap_or(0),
+            ValidatorsSection::Rewards => 0,
+        }
+    }
+
+    pub fn reward_field_mut(&mut self) -> &mut TextInput {
+        match self.reward_field % 3 {
+            0 => &mut self.reward_validator,
+            1 => &mut self.reward_era,
+            _ => &mut self.reward_delegator,
+        }
+    }
+
+    pub fn apply_auction(&mut self, auction: Value) {
+        use crate::auction_view::{list_bidders, list_validators};
+        self.validators = list_validators(&auction);
+        self.bidders = list_bidders(&auction);
+        if let Some(detail) = &self.detail {
+            let pk = detail.validator.public_key.clone();
+            self.detail = crate::auction_view::get_validator(&auction, &pk);
+        }
+        self.raw_auction = Some(auction);
+        self.error = None;
+        self.list_selected = 0;
+        self.del_selected = 0;
+    }
+}
+
+impl Default for ValidatorsState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+fn filter_rows<'a>(rows: &'a [ValidatorRow], needle: &str) -> Vec<&'a ValidatorRow> {
+    if needle.is_empty() {
+        return rows.iter().collect();
+    }
+    let n = needle.to_ascii_lowercase();
+    rows.iter()
+        .filter(|r| r.public_key.to_ascii_lowercase().contains(&n))
+        .collect()
 }
 
 /// Contracts screen state.
@@ -865,6 +1019,7 @@ pub struct AppModel {
     pub blocks: BlocksState,
     pub transactions: TransactionsState,
     pub accounts: AccountsState,
+    pub validators: ValidatorsState,
     pub contracts: ContractsState,
     pub writes: WritesState,
     pub wait: WaitState,
@@ -909,6 +1064,7 @@ impl AppModel {
             blocks: BlocksState::new(),
             transactions: TransactionsState::new(),
             accounts: AccountsState::new(),
+            validators: ValidatorsState::new(),
             contracts: ContractsState::new(),
             writes: WritesState::new(),
             wait: WaitState::new(&events_url),
@@ -1131,22 +1287,49 @@ impl AppModel {
             RpcEvent::Account(load) => {
                 self.apply_account_load(load);
             }
+            RpcEvent::ValidatorsAuction(Ok(value)) => {
+                self.validators.apply_auction(value);
+                self.pending = false;
+                self.set_status(format!(
+                    "validators {} | bidders {} | Tab sections | / filter | Enter detail",
+                    self.validators.validators.len(),
+                    self.validators.bidders.len()
+                ));
+                self.clear_error();
+            }
+            RpcEvent::ValidatorsAuction(Err(err)) => {
+                self.pending = false;
+                self.validators.error = Some(err.clone());
+                self.set_error(err);
+                self.set_status("auction load failed");
+            }
             RpcEvent::Reward(Ok(value)) => {
                 let text =
                     serde_json::to_string_pretty(&value).unwrap_or_else(|_| value.to_string());
-                self.accounts.reward_result = Some(value);
-                self.accounts.reward_text = Some(text);
-                self.accounts.scroll = 0;
-                self.accounts.section = AccountsSection::Rewards;
-                self.view = ViewMode::Accounts;
+                if self.view == ViewMode::Validators {
+                    self.validators.reward_result = Some(value);
+                    self.validators.reward_text = Some(text);
+                    self.validators.scroll = 0;
+                    self.validators.section = ValidatorsSection::Rewards;
+                } else {
+                    self.accounts.reward_result = Some(value);
+                    self.accounts.reward_text = Some(text);
+                    self.accounts.scroll = 0;
+                    self.accounts.section = AccountsSection::Rewards;
+                    self.view = ViewMode::Accounts;
+                }
                 self.set_status("reward loaded | scroll with j/k");
                 self.clear_error();
             }
             RpcEvent::Reward(Err(err)) => {
                 self.set_error(err);
                 self.set_status("reward lookup failed | era ghosts withhold");
-                self.view = ViewMode::Accounts;
-                self.accounts.section = AccountsSection::Rewards;
+                if self.view == ViewMode::Validators {
+                    self.validators.section = ValidatorsSection::Rewards;
+                } else {
+                    self.view = ViewMode::Accounts;
+                    self.accounts.section = AccountsSection::Rewards;
+                }
             }
             RpcEvent::Contract(Ok(load)) => {
                 match crate::contract_view::parse_contract_overview(&load.key, &load.raw) {
@@ -1416,6 +1599,34 @@ impl AppModel {
         self.input_mode = InputMode::AccountReward;
         self.accounts.reward_field = 0;
         self.set_status("reward form | Tab fields | Enter fetch | Esc cancel");
+    }
+
+    pub fn open_validator_filter(&mut self) {
+        self.view = ViewMode::Validators;
+        self.input_mode = InputMode::ValidatorFilter;
+        self.set_status("filter public key substring | Enter apply | Esc cancel");
+    }
+
+    pub fn open_validator_reward_form(&mut self) {
+        self.view = ViewMode::Validators;
+        self.validators.section = ValidatorsSection::Rewards;
+        if self.validators.reward_validator.buffer.trim().is_empty() {
+            if let Some(d) = &self.validators.detail {
+                self.validators
+                    .reward_validator
+                    .set(d.validator.public_key.clone());
+            }
+        }
+        self.input_mode = InputMode::AccountReward;
+        self.validators.reward_field = 0;
+        self.set_status("validator reward | Tab fields | Enter fetch | Esc cancel");
+    }
+
+    pub fn begin_validators_job(&mut self, msg: impl Into<String>) {
+        self.pending = true;
+        self.last_refresh = Some(Instant::now());
+        self.clear_error();
+        self.set_status(msg);
     }
 
     pub fn begin_account_job(&mut self, msg: impl Into<String>) {

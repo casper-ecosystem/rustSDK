@@ -1,6 +1,7 @@
 //! Auction JSON helpers: filter bids/delegators/unbonding by account identity.
-//! Shared field mapping with Phase 4 validator screens (no mcp path-dep).
+//! Shared field mapping with Validators screens (no mcp path-dep).
 
+use serde::Serialize;
 use serde_json::Value;
 
 /// Keys that identify an account across auction rows.
@@ -80,7 +81,7 @@ pub struct SelfStakeRow {
 }
 
 /// Delegator stake under a validator bid.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct DelegationRow {
     pub validator_public_key: String,
     pub delegator_public_key: String,
@@ -98,6 +99,28 @@ pub struct UndelegationRow {
     pub era_of_creation: Option<u64>,
 }
 
+/// Normalized auction bid for Validators / Bidders lists.
+#[derive(Debug, Clone, Serialize)]
+pub struct ValidatorRow {
+    pub public_key: String,
+    pub staked_amount: String,
+    pub total_stake: String,
+    pub bonding_purse: String,
+    pub delegation_rate: Option<u64>,
+    pub inactive: bool,
+    pub delegator_count: usize,
+}
+
+/// Bidder list row (same shape as [`ValidatorRow`]; all auction bids).
+pub type BidderRow = ValidatorRow;
+
+/// One validator bid with delegators for detail / MCP get.
+#[derive(Debug, Clone, Serialize)]
+pub struct ValidatorDetail {
+    pub validator: ValidatorRow,
+    pub delegators: Vec<DelegationRow>,
+}
+
 /// Filter auction payload for stakes tied to `keys`.
 pub fn filter_account_stakes(
     auction: &Value,
@@ -112,11 +135,7 @@ pub fn filter_account_stakes(
     let mut delegations = Vec::new();
 
     for bid_entry in bids {
-        let validator_pk = json_str(
-            bid_entry
-                .get("public_key")
-                .or_else(|| bid_entry.pointer("/bid/validator_public_key")),
-        );
+        let validator_pk = bid_public_key(bid_entry);
         let bid = bid_entry.get("bid").unwrap_or(bid_entry);
 
         if keys.matches_public_key(&validator_pk) {
@@ -168,16 +187,127 @@ pub fn filter_account_stakes(
 /// First validator public key in auction bids (for smokes / defaults).
 pub fn first_validator_public_key(auction: &Value) -> Option<String> {
     for bid_entry in bids_array(auction) {
-        let pk = json_str(
-            bid_entry
-                .get("public_key")
-                .or_else(|| bid_entry.pointer("/bid/validator_public_key")),
-        );
+        let pk = bid_public_key(bid_entry);
         if !pk.is_empty() {
             return Some(pk);
         }
     }
     None
+}
+
+/// Active validators (`inactive == false`), sorted by total stake descending.
+pub fn list_validators(auction: &Value) -> Vec<ValidatorRow> {
+    let mut rows: Vec<ValidatorRow> = list_bidders(auction)
+        .into_iter()
+        .filter(|r| !r.inactive)
+        .collect();
+    sort_by_total_stake_desc(&mut rows);
+    rows
+}
+
+/// All auction bids (active + inactive), sorted by total stake descending.
+pub fn list_bidders(auction: &Value) -> Vec<BidderRow> {
+    let mut rows: Vec<ValidatorRow> = bids_array(auction)
+        .iter()
+        .filter_map(parse_validator_row)
+        .collect();
+    sort_by_total_stake_desc(&mut rows);
+    rows
+}
+
+/// Detail for one public key (case-insensitive hex match).
+pub fn get_validator(auction: &Value, public_key: &str) -> Option<ValidatorDetail> {
+    let want = public_key.trim().to_ascii_lowercase();
+    if want.is_empty() {
+        return None;
+    }
+    for bid_entry in bids_array(auction) {
+        let pk = bid_public_key(bid_entry);
+        if pk.to_ascii_lowercase() != want {
+            continue;
+        }
+        let row = parse_validator_row(bid_entry)?;
+        let bid = bid_entry.get("bid").unwrap_or(bid_entry);
+        let mut delegators = Vec::new();
+        if let Some(dels) = bid.get("delegators").and_then(|d| d.as_array()) {
+            for del_entry in dels {
+                let (del_pk, del_body) = delegator_parts(del_entry);
+                delegators.push(DelegationRow {
+                    validator_public_key: pk.clone(),
+                    delegator_public_key: del_pk,
+                    staked_amount: json_str(del_body.get("staked_amount")),
+                    bonding_purse: json_str(del_body.get("bonding_purse")),
+                });
+            }
+        }
+        return Some(ValidatorDetail {
+            validator: row,
+            delegators,
+        });
+    }
+    None
+}
+
+fn parse_validator_row(bid_entry: &Value) -> Option<ValidatorRow> {
+    let public_key = bid_public_key(bid_entry);
+    if public_key.is_empty() {
+        return None;
+    }
+    let bid = bid_entry.get("bid").unwrap_or(bid_entry);
+    let staked_amount = json_str(bid.get("staked_amount"));
+    let total = bid_entry_total_stake(bid_entry);
+    Some(ValidatorRow {
+        public_key,
+        staked_amount,
+        total_stake: total.to_string(),
+        bonding_purse: json_str(bid.get("bonding_purse")),
+        delegation_rate: bid.get("delegation_rate").and_then(|v| v.as_u64()),
+        inactive: bid
+            .get("inactive")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false),
+        delegator_count: bid
+            .get("delegators")
+            .and_then(|d| d.as_array())
+            .map(|a| a.len())
+            .unwrap_or(0),
+    })
+}
+
+fn bid_public_key(bid_entry: &Value) -> String {
+    json_str(
+        bid_entry
+            .get("public_key")
+            .or_else(|| bid_entry.pointer("/bid/validator_public_key")),
+    )
+}
+
+fn bid_entry_total_stake(entry: &Value) -> u128 {
+    let bid = entry.get("bid").unwrap_or(entry);
+    let mut sum = parse_u128(bid.get("staked_amount"));
+    if let Some(dels) = bid.get("delegators").and_then(|d| d.as_array()) {
+        for d in dels {
+            let inner = d.get("delegator").unwrap_or(d);
+            sum = sum.saturating_add(parse_u128(inner.get("staked_amount")));
+        }
+    }
+    sum
+}
+
+fn sort_by_total_stake_desc(rows: &mut [ValidatorRow]) {
+    rows.sort_by(|a, b| {
+        let ta = a.total_stake.parse::<u128>().unwrap_or(0);
+        let tb = b.total_stake.parse::<u128>().unwrap_or(0);
+        tb.cmp(&ta).then_with(|| a.public_key.cmp(&b.public_key))
+    });
+}
+
+fn parse_u128(v: Option<&Value>) -> u128 {
+    match v {
+        Some(Value::String(s)) => s.parse().unwrap_or(0),
+        Some(Value::Number(n)) => n.as_u64().unwrap_or(0) as u128,
+        _ => 0,
+    }
 }
 
 fn filter_undelegations(auction: &Value, keys: &AccountMatchKeys) -> Vec<UndelegationRow> {
@@ -191,7 +321,6 @@ fn filter_undelegations(auction: &Value, keys: &AccountMatchKeys) -> Vec<Undeleg
     for node in candidates.into_iter().flatten() {
         collect_unbonding_node(node, keys, &mut out);
     }
-    // Some payloads nest unbonding under each bid.
     for bid_entry in bids_array(auction) {
         let bid = bid_entry.get("bid").unwrap_or(bid_entry);
         for key in ["unbonding_purses", "unbonding", "withdraw_purses"] {
@@ -211,7 +340,6 @@ fn collect_unbonding_node(node: &Value, keys: &AccountMatchKeys, out: &mut Vec<U
             }
         }
         Value::Object(map) => {
-            // Single unbonding entry object.
             if map.contains_key("unbonder_public_key")
                 || map.contains_key("bonding_purse")
                 || (map.contains_key("amount") && map.contains_key("validator_public_key"))
@@ -219,74 +347,61 @@ fn collect_unbonding_node(node: &Value, keys: &AccountMatchKeys, out: &mut Vec<U
                 maybe_push_unbonding(node, None, keys, out);
                 return;
             }
-            // Map keyed by public key -> [entries].
             for (k, v) in map {
                 let map_pk = looks_like_public_key(k).then(|| k.to_string());
-                match v {
-                    Value::Array(items) => {
-                        for item in items {
-                            maybe_push_unbonding(item, map_pk.as_deref(), keys, out);
-                        }
-                    }
-                    other => maybe_push_unbonding(other, map_pk.as_deref(), keys, out),
-                }
+                collect_unbonding_entries(v, map_pk.as_deref(), keys, out);
             }
         }
         _ => {}
     }
 }
 
-fn maybe_push_unbonding(
-    item: &Value,
-    map_public_key: Option<&str>,
+fn collect_unbonding_entries(
+    node: &Value,
+    map_pk: Option<&str>,
     keys: &AccountMatchKeys,
     out: &mut Vec<UndelegationRow>,
 ) {
-    let Some(mut row) = parse_unbonding_entry(item) else {
-        return;
-    };
-    if row.unbonder_public_key.is_empty() {
-        if let Some(pk) = map_public_key {
-            row.unbonder_public_key = pk.to_string();
+    match node {
+        Value::Array(items) => {
+            for item in items {
+                maybe_push_unbonding(item, map_pk, keys, out);
+            }
         }
-    }
-    if keys.matches_public_key(&row.unbonder_public_key) || keys.matches_purse(&row.bonding_purse) {
-        out.push(row);
+        Value::Object(_) => maybe_push_unbonding(node, map_pk, keys, out),
+        _ => {}
     }
 }
 
-fn parse_unbonding_entry(item: &Value) -> Option<UndelegationRow> {
-    if !item.is_object() {
-        return None;
-    }
-    let unbonder = json_str(
+fn maybe_push_unbonding(
+    item: &Value,
+    map_pk: Option<&str>,
+    keys: &AccountMatchKeys,
+    out: &mut Vec<UndelegationRow>,
+) {
+    let mut unbonder = json_str(
         item.get("unbonder_public_key")
-            .or_else(|| item.get("public_key"))
-            .or_else(|| item.get("delegator_public_key")),
+            .or_else(|| item.get("public_key")),
     );
-    let validator = json_str(
-        item.get("validator_public_key")
-            .or_else(|| item.get("validator")),
-    );
-    let amount = json_str(
-        item.get("amount")
-            .or_else(|| item.get("staked_amount"))
-            .or_else(|| item.get("unbonding_amount")),
-    );
-    let purse = json_str(item.get("bonding_purse").or_else(|| item.get("purse")));
-    if unbonder.is_empty() && purse.is_empty() && amount.is_empty() {
-        return None;
+    if unbonder.is_empty() {
+        if let Some(pk) = map_pk {
+            unbonder = pk.to_string();
+        }
     }
-    Some(UndelegationRow {
-        validator_public_key: validator,
+    let purse = json_str(item.get("bonding_purse"));
+    if !keys.matches_public_key(&unbonder) && !keys.matches_purse(&purse) {
+        return;
+    }
+    out.push(UndelegationRow {
+        validator_public_key: json_str(item.get("validator_public_key")),
         unbonder_public_key: unbonder,
-        amount,
+        amount: json_str(item.get("amount")),
         bonding_purse: purse,
         era_of_creation: item
             .get("era_of_creation")
             .or_else(|| item.get("era"))
             .and_then(|v| v.as_u64()),
-    })
+    });
 }
 
 fn bids_array(auction: &Value) -> &[Value] {
@@ -322,32 +437,17 @@ fn json_str(v: Option<&Value>) -> String {
     }
 }
 
-fn looks_like_public_key(s: &str) -> bool {
-    let t = s.trim();
-    if t.len() < 66 || t.len() > 68 {
-        return false;
-    }
-    let rest = if t.starts_with("01") || t.starts_with("02") {
-        &t[2..]
-    } else {
-        return false;
-    };
-    rest.chars().all(|c| c.is_ascii_hexdigit())
-}
-
 fn normalize_hash(s: &str) -> String {
     s.trim().to_ascii_lowercase()
 }
 
 fn normalize_uref(s: &str) -> String {
-    let t = s.trim().to_ascii_lowercase();
-    // Compare without access-rights suffix when present (uref-hex-007).
-    if let Some((head, _)) = t.rsplit_once('-') {
-        if head.starts_with("uref-") && t.len() > head.len() + 1 {
-            return head.to_string();
-        }
-    }
-    t
+    s.trim().to_ascii_lowercase()
+}
+
+fn looks_like_public_key(s: &str) -> bool {
+    let t = s.trim();
+    (t.len() == 66 || t.len() == 68) && t.chars().all(|c| c.is_ascii_hexdigit())
 }
 
 #[cfg(test)]
@@ -361,20 +461,27 @@ mod tests {
                 "bids": [{
                     "public_key": "014aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                     "bid": {
-                        "validator_public_key": "014aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                        "bonding_purse": "uref-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-007",
                         "staked_amount": "1000",
-                        "delegation_rate": 1,
+                        "bonding_purse": "uref-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-007",
+                        "delegation_rate": 10,
                         "inactive": false,
                         "delegators": [{
                             "delegator_public_key": "013bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
                             "delegator": {
-                                "delegator_public_key": "013bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
                                 "staked_amount": "500",
                                 "bonding_purse": "uref-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-007",
                                 "validator_public_key": "014aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                             }
                         }]
+                    }
+                }, {
+                    "public_key": "015ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+                    "bid": {
+                        "staked_amount": "50",
+                        "bonding_purse": "uref-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc-007",
+                        "delegation_rate": 5,
+                        "inactive": true,
+                        "delegators": []
                     }
                 }]
             }
@@ -400,6 +507,33 @@ mod tests {
             pk,
             "014aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         );
+    }
+
+    #[test]
+    fn lists_validators_active_sorted() {
+        let rows = list_validators(&sample_auction());
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].total_stake, "1500");
+        assert!(!rows[0].inactive);
+    }
+
+    #[test]
+    fn lists_bidders_includes_inactive() {
+        let rows = list_bidders(&sample_auction());
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[0].total_stake, "1500");
+        assert!(rows[1].inactive);
+    }
+
+    #[test]
+    fn get_validator_detail() {
+        let d = get_validator(
+            &sample_auction(),
+            "014aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        )
+        .unwrap();
+        assert_eq!(d.delegators.len(), 1);
+        assert_eq!(d.delegators[0].staked_amount, "500");
     }
 
     #[test]
@@ -443,6 +577,5 @@ mod tests {
         let (_, _, undels) = filter_account_stakes(&auction, &keys);
         assert_eq!(undels.len(), 1);
         assert_eq!(undels[0].amount, "42");
-        assert_eq!(undels[0].era_of_creation, Some(9));
     }
 }

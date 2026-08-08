@@ -1,5 +1,3 @@
-//! View widgets.
-
 mod accounts;
 mod actions;
 mod blocks;
@@ -8,6 +6,7 @@ mod help;
 mod network;
 mod placeholder;
 mod transactions;
+mod validators;
 mod wait;
 mod writes;
 
@@ -19,5 +18,6 @@ pub use help::draw_help;
 pub use network::draw_network;
 pub use placeholder::draw_coming_soon;
 pub use transactions::draw_transactions;
+pub use validators::draw_validators;
 pub use wait::draw_wait;
 pub use writes::draw_writes;

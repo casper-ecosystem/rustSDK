@@ -108,6 +108,9 @@ Compositions over existing RPC (no new node methods). Path: `mcp/src/compose/`.
 | --------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------- | ------ |
 | `sdk_get_latest_blocks`           | `{ count?, verbosity?, rpc_address? }`                                     | tip height then N× `get_block` (default 10)   | no     |
 | `sdk_get_block_transactions`      | `{ block_identifier, expand?, … }`                                         | hashes from block body; `expand` fetches each | no     |
+| `sdk_list_validators`             | `{ verbosity?, rpc_address? }`                                             | active bids (`inactive=false`), stake-sorted  | no     |
+| `sdk_get_validator`               | `{ public_key, verbosity?, rpc_address? }`                                 | one bid + delegators                          | no     |
+| `sdk_list_bidders`                | `{ verbosity?, rpc_address? }`                                             | all auction bids, stake-sorted                | no     |
 | `sdk_make_delegate_transaction`   | `{ delegator, validator, amount, transaction_params_json }`                | unsigned delegate tx JSON                     | no\*   |
 | `sdk_make_undelegate_transaction` | `{ delegator, validator, amount, transaction_params_json }`                | unsigned undelegate tx JSON                   | no\*   |
 | `sdk_make_redelegate_transaction` | `{ delegator, validator, new_validator, amount, transaction_params_json }` | unsigned redelegate tx JSON                   | no\*   |

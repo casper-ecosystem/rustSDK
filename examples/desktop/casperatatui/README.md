@@ -20,14 +20,14 @@ Extra args: `CASPERATATUI_ARGS` or `TUI_ARGS` (e.g. `make run-tui TUI_ARGS='--pr
 
 Presets: `nctl` (default), `testnet`, `mainnet`.
 
-| Flag / env                               | Default (nctl)                                   |
-| ---------------------------------------- | ------------------------------------------------ |
-| `--rpc-url` / `CASPER_RPC_URL`           | `http://127.0.0.1:11101`                         |
-| `--events-url` / `CASPER_EVENTS_URL`     | `http://127.0.0.1:18101/events`                  |
-| `--verbosity` / `CASPER_VERBOSITY`       | `low`                                            |
-| `--enable-writes`                        | off                                              |
-| `--secret-key` / `CASPER_SECRET_KEY`     | unset (PEM path, memory only)                    |
-| `--policy-path` / `CASPER_POLICY_PATH`   | `examples/desktop/casperatatui/policy.sample.json` |
+| Flag / env                             | Default (nctl)                                     |
+| -------------------------------------- | -------------------------------------------------- |
+| `--rpc-url` / `CASPER_RPC_URL`         | `http://127.0.0.1:11101`                           |
+| `--events-url` / `CASPER_EVENTS_URL`   | `http://127.0.0.1:18101/events`                    |
+| `--verbosity` / `CASPER_VERBOSITY`     | `low`                                              |
+| `--enable-writes`                      | off                                                |
+| `--secret-key` / `CASPER_SECRET_KEY`   | unset (PEM path, memory only)                      |
+| `--policy-path` / `CASPER_POLICY_PATH` | `examples/desktop/casperatatui/policy.sample.json` |
 
 Needs a reachable node for `r` / auto-refresh (local NCTL is ideal).
 
@@ -56,12 +56,12 @@ CI: path-filtered [ci-casperatatui](../../../.github/workflows/ci-casperatatui.y
 | ---------------- | ------------------------------------------------- |
 | `q`              | Quit and **restore the terminal**                 |
 | Esc              | Back (detail / form) or quit                      |
-| `r`              | Network seance (5 RPCs, parallel)                 |
+| `r`              | Network seance; on Validators reloads auction     |
 | `e`              | Edit RPC URL (Enter applies + refreshes)          |
 | `1`–`9` / `h`    | Network…Wait / Help                               |
 | `l`              | (Blocks) load latest N blocks                     |
-| `/`              | Focus lookup / Wait form                          |
-| `w`              | (Accounts) reward form; (Wait) start wait/collect |
+| `/`              | Focus lookup / filter / Wait form                 |
+| `w`              | (Accounts/Validators) reward; (Wait) wait/collect |
 | `o` / `x`        | Load / unload session PEM (`--enable-writes`)     |
 | `b` / `s` / `p`  | (Writes) build / sign / put                       |
 | `t`              | (Writes) one-shot transfer                        |
@@ -93,6 +93,12 @@ Requires `--enable-writes`. Load a PEM with `--secret-key` or `o`. Flow: Tab kin
 - `/` public key, `account-hash-…`, or entity id
 - Parallel entity + balances + auction; Tab sections; `w` era reward form
 
+## Validators (key `5`)
+
+- `r` loads `get_auction_info`; Tab: Validators | Bidders | Detail | Rewards
+- `/` filter by pubkey substring; Enter opens detail (self stake + delegators)
+- `w` era reward form (`get_reward`)
+
 ## Contracts (key `6`)
 
 - `/` hash / package / shortcuts `auction` / `mint`
@@ -104,12 +110,12 @@ RPC + helpers catalog; write methods appear when writes enabled and PEM loaded.
 
 ## Command palette (`:`)
 
-| Input                     | Meaning                         |
-| ------------------------- | ------------------------------- |
-| `refresh` / `r`           | Network seance                  |
-| `rpc`                     | Edit RPC URL                    |
-| `help` / `goto <view>`    | Help / jump                     |
-| `quit`                    | Exit                            |
-| Up / Down / Tab           | History / completion            |
+| Input                  | Meaning              |
+| ---------------------- | -------------------- |
+| `refresh` / `r`        | Network seance       |
+| `rpc`                  | Edit RPC URL         |
+| `help` / `goto <view>` | Help / jump          |
+| `quit`                 | Exit                 |
+| Up / Down / Tab        | History / completion |
 
 On exit Casperatatui always leaves raw mode / alternate screen.

@@ -294,6 +294,64 @@ impl CasperSdkMcp {
         }
     }
 
+    #[tool(
+        description = "Compose: active validators from get_auction_info (inactive=false), sorted by total stake"
+    )]
+    async fn sdk_list_validators(
+        &self,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        #[cfg(feature = "rpc")]
+        {
+            compose::auction::list_validators(verbosity, rpc_address).await
+        }
+        #[cfg(not(feature = "rpc"))]
+        {
+            let _ = (verbosity, rpc_address);
+            tools::feature_disabled("rpc")
+        }
+    }
+
+    #[tool(
+        description = "Compose: one validator bid + delegators from get_auction_info by public_key"
+    )]
+    async fn sdk_get_validator(
+        &self,
+        public_key: String,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        #[cfg(feature = "rpc")]
+        {
+            compose::auction::get_validator(public_key, verbosity, rpc_address).await
+        }
+        #[cfg(not(feature = "rpc"))]
+        {
+            let _ = (public_key, verbosity, rpc_address);
+            tools::feature_disabled("rpc")
+        }
+    }
+
+    #[tool(
+        description = "Compose: all auction bids (active + inactive) from get_auction_info, sorted by total stake"
+    )]
+    async fn sdk_list_bidders(
+        &self,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        #[cfg(feature = "rpc")]
+        {
+            compose::auction::list_bidders(verbosity, rpc_address).await
+        }
+        #[cfg(not(feature = "rpc"))]
+        {
+            let _ = (verbosity, rpc_address);
+            tools::feature_disabled("rpc")
+        }
+    }
+
     #[tool(description = "Compose: build unsigned delegate transaction")]
     async fn sdk_make_delegate_transaction(
         &self,
