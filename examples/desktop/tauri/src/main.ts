@@ -19,7 +19,7 @@ let statusText = "";
 let statusKind: "ok" | "err" | "" = "";
 let busy = false;
 let presets: PresetInfo[] = [];
-let theme: Theme = "dark";
+let theme: Theme = "light";
 
 function readStoredTheme(): Theme {
   try {
@@ -28,7 +28,7 @@ function readStoredTheme(): Theme {
   } catch {
     /* ignore */
   }
-  return "dark";
+  return "light";
 }
 
 function applyTheme(next: Theme): void {
@@ -81,6 +81,35 @@ async function withBusy(fn: () => Promise<void>): Promise<void> {
   }
 }
 
+/** File dialogs must not freeze the UI: no busy overlay / full re-render before invoke. */
+async function withDialog(fn: () => Promise<void>): Promise<void> {
+  if (busy) return;
+  busy = true;
+  try {
+    await fn();
+  } catch (e) {
+    const msg =
+      typeof e === "string" ? e : e instanceof Error ? e.message : String(e);
+    if (msg === "cancelled" || msg.includes("cancelled")) {
+      setStatus("Cancelled", "");
+    } else {
+      setStatus(msg, "err");
+    }
+  } finally {
+    busy = false;
+    render();
+  }
+}
+
+const DIALOG_ACTIONS = new Set([
+  "unlock",
+  "keygen-ed25519",
+  "keygen-secp",
+  "open-tx",
+  "save-tx",
+  "pick-policy",
+]);
+
 function presetOptions(selected = "nctl"): string {
   return presets
     .map(
@@ -96,11 +125,10 @@ function shell(body: string): string {
   return `
     <header class="top">
       <div class="brand">
-        <div class="brand-logo-wrap">
-          <img class="brand-logo" src="${logoUrl}" alt="Casper" width="123" height="40" />
-        </div>        <div class="brand-text">
+        <img class="brand-logo" src="${logoUrl}" alt="Casper" width="123" height="40" />
+        <div class="brand-text">
           <h1>Casper Signing Desk</h1>
-          <p>Native PEM · message verify · transfer / stake · multisig · wait</p>
+          <p>Sign messages and transactions with a local PEM. Compose transfers and stake ops, collect cosigner approvals, then wait for finality.</p>
         </div>
       </div>
       <div class="session">
@@ -340,7 +368,8 @@ async function onAction(action: string): Promise<void> {
     toggleTheme();
     return;
   }
-  await withBusy(async () => {
+  const runner = DIALOG_ACTIONS.has(action) ? withDialog : withBusy;
+  await runner(async () => {
     switch (action) {
       case "unlock": {
         publicKey = await api<string>("session_unlock");

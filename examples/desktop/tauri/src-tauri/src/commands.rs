@@ -17,7 +17,78 @@ use serde_json::Value;
 use std::fs;
 use std::path::PathBuf;
 use tauri::State;
-use tauri_plugin_dialog::DialogExt;
+use tauri_plugin_dialog::{DialogExt, FilePath};
+use tokio::sync::oneshot;
+
+async fn pick_file_path(
+    app: &tauri::AppHandle,
+    title: &str,
+    filter_name: &str,
+    exts: &[&str],
+) -> Result<PathBuf, String> {
+    let (tx, rx) = oneshot::channel::<Option<FilePath>>();
+    app.dialog()
+        .file()
+        .add_filter(filter_name, exts)
+        .set_title(title)
+        .pick_file(move |path| {
+            let _ = tx.send(path);
+        });
+    let file = rx
+        .await
+        .map_err(|_| "dialog channel closed".to_string())?
+        .ok_or_else(|| "cancelled".to_string())?;
+    file.into_path()
+        .map_err(|e| format!("resolve path: {e}"))
+}
+
+async fn save_file_path(
+    app: &tauri::AppHandle,
+    title: &str,
+    filter_name: &str,
+    exts: &[&str],
+    default_name: &str,
+) -> Result<PathBuf, String> {
+    let (tx, rx) = oneshot::channel::<Option<FilePath>>();
+    app.dialog()
+        .file()
+        .add_filter(filter_name, exts)
+        .set_file_name(default_name)
+        .set_title(title)
+        .save_file(move |path| {
+            let _ = tx.send(path);
+        });
+    let file = rx
+        .await
+        .map_err(|_| "dialog channel closed".to_string())?
+        .ok_or_else(|| "cancelled".to_string())?;
+    file.into_path()
+        .map_err(|e| format!("resolve path: {e}"))
+}
+
+fn resolve_rpc(preset: &str, rpc: Option<&str>) -> String {
+    rpc.filter(|s| !s.trim().is_empty())
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| Preset::from_label(preset).rpc().to_string())
+}
+
+fn resolve_events(preset: &str, events: Option<&str>) -> String {
+    events
+        .filter(|s| !s.trim().is_empty())
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| Preset::from_label(preset).events().to_string())
+}
+
+fn resolve_chain(preset: &str, chain: Option<&str>) -> String {
+    chain
+        .filter(|s| !s.trim().is_empty())
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| Preset::from_label(preset).chain_name().to_string())
+}
+
+fn default_policy_path() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../policy.sample.json")
+}
 
 #[derive(Debug, Deserialize)]
 pub struct KeygenArgs {
@@ -94,28 +165,10 @@ pub struct TxGetArgs {
     pub hash: String,
 }
 
-fn resolve_rpc(preset: &str, rpc: Option<&str>) -> String {
-    rpc.filter(|s| !s.trim().is_empty())
-        .map(|s| s.to_string())
-        .unwrap_or_else(|| Preset::from_label(preset).rpc().to_string())
-}
-
-fn resolve_events(preset: &str, events: Option<&str>) -> String {
-    events
-        .filter(|s| !s.trim().is_empty())
-        .map(|s| s.to_string())
-        .unwrap_or_else(|| Preset::from_label(preset).events().to_string())
-}
-
-fn resolve_chain(preset: &str, chain: Option<&str>) -> String {
-    chain
-        .filter(|s| !s.trim().is_empty())
-        .map(|s| s.to_string())
-        .unwrap_or_else(|| Preset::from_label(preset).chain_name().to_string())
-}
-
-fn default_policy_path() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../policy.sample.json")
+#[derive(Debug, Deserialize)]
+pub struct SaveJsonArgs {
+    pub contents: String,
+    pub default_name: Option<String>,
 }
 
 #[tauri::command]
@@ -130,27 +183,21 @@ pub fn session_unload(session: State<'_, Session>) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn session_unlock(
+pub async fn session_unlock(
     app: tauri::AppHandle,
     session: State<'_, Session>,
 ) -> Result<String, String> {
-    let path = app
-        .dialog()
-        .file()
-        .add_filter("PEM", &["pem"])
-        .set_title("Unlock secret key PEM")
-        .blocking_pick_file()
-        .ok_or_else(|| "unlock cancelled".to_string())?;
-    let path = path
-        .into_path()
-        .map_err(|e| format!("resolve PEM path: {e}"))?;
+    eprintln!("[signing-desk] unlock: opening PEM dialog");
+    let path = pick_file_path(&app, "Unlock secret key PEM", "PEM", &["pem"]).await?;
+    eprintln!("[signing-desk] unlock: loading {}", path.display());
     let (pem, public_key) = load_pem_file(&path.display().to_string())?;
     session.unlock(pem, public_key.clone());
+    eprintln!("[signing-desk] unlock: ok");
     Ok(public_key)
 }
 
 #[tauri::command]
-pub fn keygen_and_save(
+pub async fn keygen_and_save(
     app: tauri::AppHandle,
     args: KeygenArgs,
 ) -> Result<serde_json::Value, String> {
@@ -162,17 +209,14 @@ pub fn keygen_and_save(
     };
     let pem = sk.to_pem().map_err(|e| format!("to_pem: {e:?}"))?;
     let public_key = public_key_from_secret_key(&pem).map_err(|e| e.to_string())?;
-    let path = app
-        .dialog()
-        .file()
-        .add_filter("PEM", &["pem"])
-        .set_file_name("secret_key.pem")
-        .set_title("Save new secret key PEM")
-        .blocking_save_file()
-        .ok_or_else(|| "save cancelled".to_string())?;
-    let path = path
-        .into_path()
-        .map_err(|e| format!("resolve save path: {e}"))?;
+    let path = save_file_path(
+        &app,
+        "Save new secret key PEM",
+        "PEM",
+        &["pem"],
+        "secret_key.pem",
+    )
+    .await?;
     fs::write(&path, &pem).map_err(|e| format!("write PEM: {e}"))?;
     Ok(serde_json::json!({
         "algorithm": if algo == "secp256k1" { "secp256k1" } else { "ed25519" },
@@ -332,54 +376,32 @@ pub fn presets() -> serde_json::Value {
     ])
 }
 
-#[derive(Debug, Deserialize)]
-pub struct SaveJsonArgs {
-    pub contents: String,
-    pub default_name: Option<String>,
-}
-
 #[tauri::command]
-pub fn tx_open_json(app: tauri::AppHandle) -> Result<String, String> {
-    let path = app
-        .dialog()
-        .file()
-        .add_filter("JSON", &["json"])
-        .set_title("Open transaction JSON")
-        .blocking_pick_file()
-        .ok_or_else(|| "open cancelled".to_string())?;
-    let path = path.into_path().map_err(|e| format!("resolve path: {e}"))?;
+pub async fn tx_open_json(app: tauri::AppHandle) -> Result<String, String> {
+    let path = pick_file_path(&app, "Open transaction JSON", "JSON", &["json"]).await?;
     fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))
 }
 
 #[tauri::command]
-pub fn tx_save_json(app: tauri::AppHandle, args: SaveJsonArgs) -> Result<String, String> {
+pub async fn tx_save_json(app: tauri::AppHandle, args: SaveJsonArgs) -> Result<String, String> {
     let name = args
         .default_name
         .unwrap_or_else(|| "transaction.json".into());
-    let path = app
-        .dialog()
-        .file()
-        .add_filter("JSON", &["json"])
-        .set_file_name(&name)
-        .set_title("Save transaction JSON")
-        .blocking_save_file()
-        .ok_or_else(|| "save cancelled".to_string())?;
-    let path = path.into_path().map_err(|e| format!("resolve path: {e}"))?;
+    let path = save_file_path(
+        &app,
+        "Save transaction JSON",
+        "JSON",
+        &["json"],
+        &name,
+    )
+    .await?;
     fs::write(&path, args.contents.as_bytes()).map_err(|e| format!("write: {e}"))?;
     Ok(path.display().to_string())
 }
 
 #[tauri::command]
-pub fn pick_policy_path(app: tauri::AppHandle) -> Result<String, String> {
-    let path = app
-        .dialog()
-        .file()
-        .add_filter("JSON", &["json"])
-        .set_title("Choose write policy JSON")
-        .blocking_pick_file()
-        .ok_or_else(|| "policy pick cancelled".to_string())?;
-    let path = path.into_path().map_err(|e| format!("resolve path: {e}"))?;
-    // Validate it parses as policy.
+pub async fn pick_policy_path(app: tauri::AppHandle) -> Result<String, String> {
+    let path = pick_file_path(&app, "Choose write policy JSON", "JSON", &["json"]).await?;
     let _ = WritePolicy::load(&path)?;
     Ok(path.display().to_string())
 }
