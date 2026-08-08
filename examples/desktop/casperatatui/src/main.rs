@@ -252,12 +252,12 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
                     .set_status(format!("view | {}", ctx.model.view.title()));
             }
         }
-        KeyCode::Right if ctx.model.view != ViewMode::Actions => {
+        KeyCode::Right => {
             ctx.model.view = ctx.model.view.next();
             ctx.model
                 .set_status(format!("view | {}", ctx.model.view.title()));
         }
-        KeyCode::Left if ctx.model.view != ViewMode::Actions => {
+        KeyCode::Left => {
             ctx.model.view = ctx.model.view.prev();
             ctx.model
                 .set_status(format!("view | {}", ctx.model.view.title()));

@@ -66,7 +66,7 @@ CI: path-filtered [ci-casperatatui](../../../.github/workflows/ci-casperatatui.y
 | `b` / `s` / `p`  | (Writes) build / sign / put                       |
 | `t`              | (Writes) one-shot transfer                        |
 | Space            | (Wait SSE) toggle event name                      |
-| Tab / Left/Right | Cycle views or in-screen sections                 |
+| Tab / Left/Right | Cycle views (Left/Right always leave Actions; Tab cycles Actions panes / in-screen sections) |
 | `j` `k` / arrows | Scroll body / move lists                          |
 | Enter            | Open / fetch / start form action                  |
 | `:`              | Command palette                                   |

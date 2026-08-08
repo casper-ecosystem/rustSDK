@@ -27,7 +27,7 @@ pub fn draw_help(frame: &mut Frame, area: Rect, model: &AppModel) {
         )),
         Line::from("  q           quit and restore the terminal"),
         Line::from("  Esc         back (Actions/Blocks detail) or quit"),
-        Line::from("  Tab / Left/Right  cycle views (Accounts/Contracts/Writes sections)"),
+        Line::from("  Tab / Left/Right  cycle views (Left/Right always leave Actions; Tab cycles Actions panes)"),
         Line::from("  1-9 / h     Network…Wait / Help"),
         Line::from("  r           Network seance (5 RPCs); Validators reloads auction"),
         Line::from("  e           edit RPC URL (rebuild SDK haunt)"),
