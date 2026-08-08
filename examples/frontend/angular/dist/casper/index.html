@@ -12,6 +12,68 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js" integrity="sha512-7Pi/otdlbbCR+LnW+F7PwFcSDJOuUJB3OxtEHbg4vSMvzvJjde4Po1v4BR9Gdc9aXNUNFVUY+SK51wWT8WF0Gg==" crossorigin="anonymous"></script>
   <style>html,body{display:grid;height:100%;margin:0;padding:0}</style><link rel="stylesheet" href="styles.e0867bdad1494f19.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles.e0867bdad1494f19.css"></noscript></head>
   <body>
-    <app-root></app-root>
-  <script src="runtime.6a7b73f5b8c9384a.js" type="module"></script><script src="polyfills.95491d42b6ba0c7d.js" type="module"></script><script src="main.2e4e39fe2b7912b2.js" type="module"></script></body>
+    <script>
+      (function () {
+        try {
+          if (
+            !(
+              window.__APP_CONFIG__ &&
+              window.__APP_CONFIG__.debug_mode === true
+            )
+          ) {
+            return;
+          }
+          window.__bootT0 = performance.now();
+          var ms = performance.now();
+          var d = new Date();
+          function pad(n, w) {
+            w = w || 2;
+            return String(Math.trunc(n)).padStart(w, '0');
+          }
+          var clock =
+            d.getFullYear() +
+            '-' +
+            pad(d.getMonth() + 1) +
+            '-' +
+            pad(d.getDate()) +
+            ' ' +
+            pad(d.getHours()) +
+            ':' +
+            pad(d.getMinutes()) +
+            ':' +
+            pad(d.getSeconds()) +
+            '.' +
+            pad(d.getMilliseconds(), 3);
+          console.log(
+            '%c[wc:boot]%c html_body %c' +
+              clock +
+              '%c %c' +
+              ms.toFixed(1) +
+              'ms%c splash=1',
+            'color:#00ff9c;font-weight:700;background:#0a0a0a;padding:0.1em 0.35em;border-radius:0.2em',
+            'color:#e8f7ff;font-weight:600',
+            'color:#80cbc4;font-weight:600',
+            'color:inherit;font-weight:normal;background:transparent',
+            'color:#ffea00;font-weight:700',
+            'color:inherit;font-weight:normal;background:transparent',
+          );
+        } catch (e) {}
+      })();
+    </script>
+    <app-root>
+      <div style="
+          font-family: system-ui, sans-serif;
+          max-width: 40rem;
+          margin: 2rem auto;
+          padding: 1rem 1.25rem;
+          border-radius: 0.375rem;
+          background: #cff4fc;
+          color: #055160;
+          border: 1px solid #9eeaf9;
+          text-align: center;
+        ">
+        Loading Casper WebClient…
+      </div>
+    </app-root>
+  <script src="runtime.6a7b73f5b8c9384a.js" type="module"></script><script src="polyfills.95491d42b6ba0c7d.js" type="module"></script><script src="main.69b08dbefb50b335.js" type="module"></script></body>
 </html>

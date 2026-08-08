@@ -221,7 +221,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         console.error('Failed to read wasm file.');
         return;
     }
-    const install_result = await sdk.install(transaction_params, casper_rust_wasm_sdk_1.Bytes.fromUint8Array(wasm));
+    const install_result = await sdk.install(transaction_params, casper_rust_wasm_sdk_1.Bytes.fromUint8Array(wasm), undefined, false);
     const install_result_as_json = install_result.toJson();
     console.log(install_result_as_json.transaction_hash);
     const eventParseResult = await sdk.waitTransaction(events_address, install_result_as_json.transaction_hash);
@@ -252,7 +252,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     transaction_params.payment_amount = payment_amount;
     let entity_hash = casper_rust_wasm_sdk_1.AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
     let builder_params = casper_rust_wasm_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
-    const call_entrypoint_result = await sdk.call_entrypoint(builder_params, transaction_params);
+    const call_entrypoint_result = await sdk.call_entrypoint(builder_params, transaction_params, undefined, false);
     const call_entrypoint_result_as_json = call_entrypoint_result.toJson();
     // watch transaction_hash to trigger callback
     const transaction_hash_results = [
