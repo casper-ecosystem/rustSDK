@@ -1,4 +1,4 @@
-# PyO3 / maturin offline smoke for python/**.
+# Offline unit tests for python/** (maturin + cargo test + pytest).
 name: python-bindings
 
 on:
@@ -7,15 +7,17 @@ on:
     paths:
       - "python/**"
       - ".github/workflows/python-bindings.yml"
+      - "Makefile"
   pull_request:
     branches: [dev, "feat*", "release-*"]
     paths:
       - "python/**"
       - ".github/workflows/python-bindings.yml"
+      - "Makefile"
   workflow_dispatch:
 
 jobs:
-  smoke:
+  unit:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -44,10 +46,15 @@ jobs:
         run: |
           python -m venv .venv
           . .venv/bin/activate
-          pip install "maturin>=1.7,<2.0"
+          pip install "maturin>=1.7,<2.0" "pytest>=8,<9"
           maturin develop
 
-      - name: Offline smoke
+      - name: Rust unit (params parsers)
         run: |
           . .venv/bin/activate
-          python tests/smoke_offline.py
+          cargo test --manifest-path Cargo.toml --lib
+
+      - name: Pytest offline unit
+        run: |
+          . .venv/bin/activate
+          pytest tests/test_unit_offline.py -q

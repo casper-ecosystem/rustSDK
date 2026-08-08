@@ -17,3 +17,9 @@ classifiers = [
 manifest-path = "Cargo.toml"
 module-name = "casper_rust_wasm_sdk_py"
 features = ["pyo3/extension-module"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "nctl: needs a reachable Casper JSON-RPC node (and optional PEM for put/wait)",
+]

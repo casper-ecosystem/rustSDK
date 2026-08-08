@@ -84,11 +84,11 @@ Use the venv interpreter (`python` after `source .venv/bin/activate`, or `.venv/
 From the repo root:
 
 ```bash
-make python-test
-make python-test-nctl
+make python-test       # offline unit (cargo test + pytest)
+make python-test-nctl  # live node; skips if RPC unreachable
 ```
 
-`python-test` is offline. `python-test-nctl` needs a local node; optional put/wait via `CASPER_SECRET_KEY_PEM_FILE` and `CASPER_PURSE_ID`.
+Offline unit coverage lives in `tests/test_unit_offline.py`. Live checks are in `tests/test_nctl_integration.py` (marker `nctl`). Optional put/wait via `CASPER_SECRET_KEY_PEM_FILE` and `CASPER_PURSE_ID`.
 
 ## Examples
 

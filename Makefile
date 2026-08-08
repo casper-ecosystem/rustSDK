@@ -209,15 +209,19 @@ python-develop:
 	cd python && \
 		(test -d .venv || uv venv .venv) && \
 		. .venv/bin/activate && \
-		uv pip install 'maturin>=1.7,<2.0' && \
+		uv pip install 'maturin>=1.7,<2.0' 'pytest>=8,<9' && \
 		maturin develop
 
+# Offline unit: Rust params tests + pytest (no node).
 python-test: python-develop
-	cd python && . .venv/bin/activate && python tests/smoke_offline.py
+	cd python && . .venv/bin/activate && \
+		cargo test --manifest-path Cargo.toml --lib && \
+		pytest tests/test_unit_offline.py -q
 
+# Live node integration (skipped automatically if RPC unreachable).
 python-test-nctl: python-develop
 	cd python && . .venv/bin/activate && \
 		CASPER_RPC_URL=$${CASPER_RPC_URL:-http://127.0.0.1:11101/rpc} \
-		python tests/smoke_nctl_wave1.py
+		pytest tests/test_nctl_integration.py -m nctl -q --tb=short
 
 .PHONY: python-develop python-test python-test-nctl
