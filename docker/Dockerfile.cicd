@@ -14,10 +14,11 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src
-# Workspace members only: . and mcp (+ sdk_tests path-dep). Do not COPY python/.
+# Workspace members: ., mcp, casperatatui (+ sdk_tests path-dep). Do not COPY python/.
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 COPY mcp ./mcp
+COPY examples/desktop/casperatatui ./examples/desktop/casperatatui
 COPY tests/integration/rust ./tests/integration/rust
 
 RUN cargo build -p casper-rust-wasm-sdk-mcp --release \

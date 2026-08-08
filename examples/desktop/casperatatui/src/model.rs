@@ -435,12 +435,8 @@ pub enum ValidatorsSection {
 }
 
 impl ValidatorsSection {
-    pub const ALL: [ValidatorsSection; 4] = [
-        Self::Validators,
-        Self::Bidders,
-        Self::Detail,
-        Self::Rewards,
-    ];
+    pub const ALL: [ValidatorsSection; 4] =
+        [Self::Validators, Self::Bidders, Self::Detail, Self::Rewards];
 
     pub fn title(self) -> &'static str {
         match self {
