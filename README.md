@@ -18,7 +18,7 @@ A hosted build of the Angular example — **[Casper WebClient](https://casper-we
 
 - Live demo: https://casper-webclient.interchouette.net/
 - Source: [`examples/frontend/angular`](../examples/frontend/angular)
-- Same UI is also packaged as the [Desktop Electron demo](#desktop-electron-demo-app)
+- Same UI is also packaged as the Electron **[Casper WebClient](#casper-webclient-electron)** under [Desktop examples](#desktop-examples)
 
 Demo / development only — same warning as above.
 
@@ -2656,16 +2656,18 @@ console.log(deploy_hash);
 
 </details>
 
-### Desktop Electron demo app
+### Desktop examples
+
+Three desktop examples: the Electron **Casper WebClient** (Wasm Angular UI), the Tauri **Casper Signing Desk** (native PEM signing), and **Casperatatui** (terminal UI over the native Rust SDK).
 
 <details open>
-  <summary><strong><code>Example of usage of the SDK in a Desktop application</code></strong></summary>
+  <summary><strong>Casper WebClient</strong> (Electron)</summary>
 
 <br>
 
-![Casper Electron App](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/blob/dev/docs/images/get_status-electron.png)
+![Casper WebClient Electron](images/get_status-electron.png)
 
-The Electron based demo app loads the Angular webclient build (the same UI hosted at [casper-webclient.interchouette.net](https://casper-webclient.interchouette.net/)). You can use this app on your computer to test every action the SDK can take.
+**Casper WebClient** packages the Angular Wasm example as an Electron desktop app (same UI as the [hosted WebClient](https://casper-webclient.interchouette.net/)). Use it on your machine to exercise the full Wasm SDK surface against a local or remote node.
 
 ```shell
 $ cd ./examples/desktop/electron
@@ -2674,14 +2676,17 @@ $ npm start
 $ npm build
 ```
 
-Download pre-built desktop demos from the **[GitHub Releases](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases)** page (CI artifacts — Windows portable, Linux AppImage, Snap). Mac build is TODO.
-
-For a terminal UI over the same SDK (not Electron), see [Casperatatui](#casperatatui).
-For a specialized native signing desk (Tauri), see [Casper Signing Desk](#casper-signing-desk).
+- Source: [`examples/desktop/electron`](../examples/desktop/electron)
+- Pre-built demos: **[GitHub Releases](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases)** (Windows portable, Linux AppImage, Snap). Mac build is TODO.
 
 </details>
 
-## Casper Signing Desk
+<details open>
+  <summary><strong>Casper Signing Desk</strong> (Tauri)</summary>
+
+<br>
+
+![Casper Signing Desk](images/signing-desk.jpg)
 
 **Casper Signing Desk** is a Tauri desktop example over the native Rust SDK: message sign/verify, keygen, transfer / stake compose, multisig approvals, and `wait_transaction`. Transaction path only (no deploy).
 
@@ -2691,7 +2696,14 @@ For a specialized native signing desk (Tauri), see [Casper Signing Desk](#casper
 - Make: `make run-tauri`, `make build-tauri`, `make check-lint-tauri`
 - Example README: [`examples/desktop/tauri/README.md`](../examples/desktop/tauri/README.md)
 
-## Casperatatui
+</details>
+
+<details open>
+  <summary><strong>Casperatatui</strong> (TUI)</summary>
+
+<br>
+
+![Casperatatui Actions](images/casperatatui-actions.jpg)
 
 **Casperatatui** is a Casper TUI (terminal UI) based on [ratatui](https://ratatui.rs/), over the native Rust SDK. JSON-RPC and SSE only (no binary port).
 
@@ -2710,6 +2722,8 @@ make run-tui TUI_ARGS='--preset mainnet'
 Writes stay off unless you pass `--enable-writes` and a secret key. Not part of the default SDK crate build or Hub images (unlike MCP).
 
 See [`examples/desktop/casperatatui/README.md`](../examples/desktop/casperatatui/README.md).
+
+</details>
 
 ## Python
 
