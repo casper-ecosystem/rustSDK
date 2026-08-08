@@ -2680,20 +2680,6 @@ For a terminal UI over the same SDK (not Electron), see [Casperatatui](#casperat
 
 </details>
 
----
-
-<br>
-
-## Python
-
-The workspace package [`python/`](../python/) (`casper-rust-wasm-sdk-py`) is a PyO3 / maturin extension over the same native Rust `rlib` (not a Python port).
-
-- Install / develop: see [Python Project](#python-project) under Install above, or [`python/README.md`](../python/README.md)
-- CI: path-filtered `python-bindings` (offline unit + Hub NCTL `:dev`)
-- Make: `make python-test`, `make python-test-nctl`
-
-Initial face: [#117](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/117). Parity waves 1–4: [#121](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/121) (closes [#120](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/120)). Epic [#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9) is **closed**. Deploy APIs, binary-port, and PyPI publish remain out of that epic.
-
 ## Casperatatui
 
 **Casperatatui** is a Casper TUI (terminal UI) based on [ratatui](https://ratatui.rs/), over the native Rust SDK. JSON-RPC and SSE only (no binary port).
@@ -2714,6 +2700,16 @@ make run-tui TUI_ARGS='--preset mainnet'
 Writes stay off unless you pass `--enable-writes` and a secret key. Not part of the default SDK crate build or Hub images (unlike MCP).
 
 See [`examples/desktop/casperatatui/README.md`](../examples/desktop/casperatatui/README.md).
+
+## Python
+
+The workspace package [`python/`](../python/) (`casper-rust-wasm-sdk-py`) is a PyO3 / maturin extension over the same native Rust `rlib` (not a Python port).
+
+- Install / develop: see [Python Project](#python-project) under Install above, or [`python/README.md`](../python/README.md)
+- CI: path-filtered `python-bindings` (offline unit + Hub NCTL `:dev`)
+- Make: `make python-test`, `make python-test-nctl`
+
+Initial face: [#117](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/117). Parity waves 1–4: [#121](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/121) (closes [#120](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/120)). Epic [#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9) is **closed**. Deploy APIs, binary-port, and PyPI publish remain out of that epic.
 
 ## Rust API
 
