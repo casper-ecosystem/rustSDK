@@ -1,0 +1,12 @@
+{
+  "allow_put": true,
+  "max_transfer_motes": "10000000000000",
+  "allowed_targets": ["*"],
+  "allowed_ops": [
+    "transfer",
+    "delegate",
+    "undelegate",
+    "redelegate",
+    "put_transaction"
+  ]
+}

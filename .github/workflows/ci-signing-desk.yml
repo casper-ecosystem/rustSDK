@@ -1,0 +1,56 @@
+# Path-filtered signing desk gate (not default-members / Hub).
+name: ci-signing-desk
+
+on:
+  push:
+    branches: [dev, "feat*", "release-*"]
+    paths:
+      - "examples/desktop/tauri/**"
+      - ".github/workflows/ci-signing-desk.yml"
+  pull_request:
+    branches: [dev, "feat*", "release-*"]
+    paths:
+      - "examples/desktop/tauri/**"
+      - ".github/workflows/ci-signing-desk.yml"
+  workflow_dispatch:
+
+jobs:
+  signing-desk:
+    name: Lint test signing desk
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            pkg-config libssl-dev \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - uses: actions/checkout@v5
+
+      - name: Swatinem cache
+        uses: Swatinem/rust-cache@v2
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: examples/desktop/tauri/package-lock.json
+
+      - name: npm install
+        working-directory: examples/desktop/tauri
+        run: npm ci
+
+      - name: Lint signing desk
+        run: make check-lint-tauri
+
+      - name: Unit tests
+        run: cargo test -p casper-signing-desk --lib

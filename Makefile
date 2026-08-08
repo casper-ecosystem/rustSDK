@@ -228,6 +228,24 @@ check-lint-tui: check-lint-casperatatui
 .PHONY: run-casperatatui build-casperatatui-release check-lint-casperatatui \
 	run-tui build-tui-release check-lint-tui
 
+# --- Signing desk (examples/desktop/tauri) ---
+
+run-tauri:
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		$(MAKE) -C examples/desktop/tauri run
+
+build-tauri:
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		$(MAKE) -C examples/desktop/tauri build
+
+check-lint-tauri:
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		cargo clippy -p casper-signing-desk --all-targets --no-deps -- -D warnings
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		cargo fmt -p casper-signing-desk -- --check
+
+.PHONY: run-tauri build-tauri check-lint-tauri
+
 # --- Python bindings (python/ — maturin) ---
 
 python-develop:

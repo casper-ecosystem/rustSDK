@@ -1,0 +1,41 @@
+[package]
+name = "casper-signing-desk"
+version = "0.1.0"
+description = "Casper signing desk: native PEM sign/verify, transfer/stake, multisig approvals"
+authors = ["casper-ecosystem"]
+edition = "2021"
+rust-version = "1.88"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+name = "casper_signing_desk_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "casper-signing-desk"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+anyhow = "1"
+casper-rust-wasm-sdk = { path = "../../../..", default-features = false, features = [
+  "transaction",
+  "helpers",
+  "watcher",
+  "SSE",
+] }
+casper-types = { version = "7.1.1", default-features = false, features = [
+  "std",
+] }
+hex = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-single-instance = "2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync"] }
+zeroize = "1"
