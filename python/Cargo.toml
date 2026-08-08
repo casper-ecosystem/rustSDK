@@ -16,7 +16,7 @@ casper-rust-wasm-sdk = { path = "..", default-features = false, features = [
   "helpers",
 ] }
 casper-types = { version = "7.1.1", default-features = false }
-pyo3 = { version = "0.25", features = ["extension-module"] }
+pyo3 = { version = "0.29", features = ["extension-module"] }
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 
