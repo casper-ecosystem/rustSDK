@@ -10,9 +10,13 @@ From the repo root (clears Cursor sandbox `CARGO_TARGET_DIR` if set):
 
 ```bash
 make run-casperatatui
+# alias:
+make run-tui
 # or
 env -u CARGO_TARGET_DIR cargo run -p casperatatui -- --preset nctl
 ```
+
+Extra args: `CASPERATATUI_ARGS` or `TUI_ARGS` (e.g. `make run-tui TUI_ARGS='--preset testnet'`).
 
 Presets: `nctl` (default), `testnet`, `mainnet`.
 
@@ -42,9 +46,9 @@ Not part of the default SDK / Hub image build. Linux `x86_64` binaries ship on G
 - Pre-release tip: `casperatatui-dev-preview-linux-x86_64`
 - Stable: `casperatatui-<version>-linux-x86_64`
 
-Local release build: `make build-casperatatui-release` → `target/release/casperatatui`.
+Local release build: `make build-casperatatui-release` (alias `make build-tui-release`) → `target/release/casperatatui`.
 
-CI: path-filtered [ci-casperatatui](../../../.github/workflows/ci-casperatatui.yml) runs lint, tests, and NCTL smokes when `examples/desktop/casperatatui/**` changes.
+CI: path-filtered [ci-casperatatui](../../../.github/workflows/ci-casperatatui.yml) runs lint, tests, and NCTL smokes when `examples/desktop/casperatatui/**` changes. Lint locally: `make check-lint-casperatatui` (alias `make check-lint-tui`).
 
 ## Keys
 

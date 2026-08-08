@@ -207,7 +207,7 @@ mcp-test-live:
 
 run-casperatatui:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo run -p casperatatui -- --preset nctl $(CASPERATATUI_ARGS)
+		cargo run -p casperatatui -- --preset nctl $(CASPERATATUI_ARGS) $(TUI_ARGS)
 
 build-casperatatui-release:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
@@ -220,7 +220,13 @@ check-lint-casperatatui:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
 		cargo fmt -p casperatatui -- --check
 
-.PHONY: run-casperatatui build-casperatatui-release check-lint-casperatatui
+# Short aliases (same recipes).
+run-tui: run-casperatatui
+build-tui-release: build-casperatatui-release
+check-lint-tui: check-lint-casperatatui
+
+.PHONY: run-casperatatui build-casperatatui-release check-lint-casperatatui \
+	run-tui build-tui-release check-lint-tui
 
 # --- Python bindings (python/ — maturin) ---
 
