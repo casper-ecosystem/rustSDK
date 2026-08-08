@@ -1,11 +1,20 @@
 //! Thin PyO3 face over `casper-rust-wasm-sdk` (native cdylib).
 //!
-//! Surface: `get_node_status` RPC read; make + sign transfer (no put).
+//! Spike + Waves 1–4 (RPC reads, helpers/meta, transaction/contract, watcher).
+
+mod contract;
+mod helpers;
+mod meta;
+mod params;
+mod rpc;
+mod transaction;
+mod watcher;
 
 use casper_rust_wasm_sdk::{
-    helpers::{public_key_from_secret_key, secret_key_generate},
+    helpers::public_key_from_secret_key,
     types::{
         transaction::Transaction, transaction_params::transaction_str_params::TransactionStrParams,
+        verbosity::Verbosity,
     },
     SDK,
 };
@@ -14,21 +23,40 @@ use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
-fn runtime() -> Result<tokio::runtime::Runtime, PyErr> {
+pub(crate) fn runtime() -> Result<tokio::runtime::Runtime, PyErr> {
     tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
         .map_err(|e| PyRuntimeError::new_err(format!("tokio runtime: {e}")))
 }
 
-fn py_err(err: impl std::fmt::Display) -> PyErr {
+pub(crate) fn py_err(err: impl std::fmt::Display) -> PyErr {
     PyRuntimeError::new_err(err.to_string())
 }
 
-fn secret_key_to_pem(secret_key: &SecretKey) -> Result<String, PyErr> {
+pub(crate) fn secret_key_to_pem(secret_key: &SecretKey) -> Result<String, PyErr> {
     secret_key
         .to_pem()
         .map_err(|e| py_err(format!("secret key to pem: {e}")))
+}
+
+pub(crate) fn parse_verbosity(raw: &str) -> PyResult<Verbosity> {
+    match raw.to_lowercase().as_str() {
+        "low" | "0" => Ok(Verbosity::Low),
+        "medium" | "1" => Ok(Verbosity::Medium),
+        "high" | "2" => Ok(Verbosity::High),
+        other => Err(PyRuntimeError::new_err(format!(
+            "invalid verbosity '{other}' (low|medium|high)"
+        ))),
+    }
+}
+
+pub(crate) fn verbosity_label(v: Verbosity) -> &'static str {
+    match v {
+        Verbosity::Low => "low",
+        Verbosity::Medium => "medium",
+        Verbosity::High => "high",
+    }
 }
 
 /// Call `info_get_status`. Returns chainspec name, build version, and full result JSON.
@@ -53,14 +81,14 @@ fn get_node_status(py: Python<'_>, rpc_address: Option<String>) -> PyResult<Boun
     Ok(dict)
 }
 
-/// Generate an ed25519 secret key PEM (Casper format).
+/// Spike alias for `secret_key_generate`.
 #[pyfunction]
 fn generate_secret_key_pem() -> PyResult<String> {
-    let sk = secret_key_generate().map_err(py_err)?;
+    let sk = casper_rust_wasm_sdk::helpers::secret_key_generate().map_err(py_err)?;
     secret_key_to_pem(&sk)
 }
 
-/// Public key hex for a Casper secret key PEM.
+/// Spike alias for `public_key_from_secret_key`.
 #[pyfunction]
 fn public_key_hex(secret_key_pem: String) -> PyResult<String> {
     public_key_from_secret_key(&secret_key_pem).map_err(py_err)
@@ -105,5 +133,11 @@ fn casper_rust_wasm_sdk_py(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(generate_secret_key_pem, m)?)?;
     m.add_function(wrap_pyfunction!(public_key_hex, m)?)?;
     m.add_function(wrap_pyfunction!(version, m)?)?;
+    rpc::register(m)?;
+    helpers::register(m)?;
+    meta::register(m)?;
+    transaction::register(m)?;
+    contract::register(m)?;
+    watcher::register(m)?;
     Ok(())
 }

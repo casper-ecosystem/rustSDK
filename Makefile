@@ -215,4 +215,9 @@ python-develop:
 python-test: python-develop
 	cd python && . .venv/bin/activate && python tests/smoke_offline.py
 
-.PHONY: python-develop python-test
+python-test-nctl: python-develop
+	cd python && . .venv/bin/activate && \
+		CASPER_RPC_URL=$${CASPER_RPC_URL:-http://127.0.0.1:11101/rpc} \
+		python tests/smoke_nctl_wave1.py
+
+.PHONY: python-develop python-test python-test-nctl

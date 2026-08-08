@@ -499,6 +499,7 @@ dependencies = [
  "casper-rust-wasm-sdk",
  "casper-types",
  "pyo3",
+ "serde",
  "serde_json",
  "tokio",
 ]
