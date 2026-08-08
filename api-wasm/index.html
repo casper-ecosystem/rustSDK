@@ -9,11 +9,12 @@
 <div class="tsd-page-title">
 <h1>api-wasm</h1></div>
 <div class="tsd-panel tsd-typography"><h1 id="casper-rustwasm-sdk-222" class="tsd-anchor-link">Casper Rust/Wasm SDK 2.2.2<a href="#casper-rustwasm-sdk-222" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1>
-<p>The Rust/Wasm SDK allows developers and users to interact with the Casper Blockchain using Rust or TypeScript. It provides a way to embed the <a href="https://github.com/casper-ecosystem/casper-client-rs">casper-client-rs</a> into another application without the CLI interface. The SDK exposes a list of types and methods from a subset of the Casper client.</p>
-<p>You can use the Casper Rust/Wasm SDK in two ways:</p>
+<p>The Rust/Wasm SDK allows developers and users to interact with the Casper Blockchain using Rust, TypeScript, or Python. It provides a way to embed the <a href="https://github.com/casper-ecosystem/casper-client-rs">casper-client-rs</a> into another application without the CLI interface. The SDK exposes a list of types and methods from a subset of the Casper client.</p>
+<p>You can use the Casper Rust/Wasm SDK in these ways:</p>
 <ul>
 <li>In a <strong>Rust application</strong> by importing the SDK crate.</li>
 <li>In a <strong>Typescript application</strong> by importing the SDK Wasm file and the Typescript interfaces.</li>
+<li>In a <strong>Python application</strong> via the PyO3 / maturin package <a href="media/python"><code>python/</code></a> (<code>casper-rust-wasm-sdk-py</code>).</li>
 </ul>
 <p>This page covers different examples of using the SDK.</p>
 <p>⚠ WARNING: This application is for testing and development purposes. Do NOT use private keys or perform real transactions on mainnet unless you fully understand the security risks.</p>
@@ -191,7 +192,31 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
 
 </details>
 </details>
+<details>
+  <summary><strong><code>Python Project</code></strong></summary>
+<h2 id="python-project" class="tsd-anchor-link">Python Project<a href="#python-project" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>The workspace package <a href="media/python"><code>python/</code></a> (<code>casper-rust-wasm-sdk-py</code>) is a PyO3 / maturin extension over the same native Rust <code>rlib</code> (not a Python port). Full surface and helpers: <a href="media/README-1.md"><code>python/README.md</code></a>.</p>
+<p>Requires CPython 3.10+ and a Rust toolchain.</p>
+<pre><code class="bash"><span class="hl-0">cd</span><span class="hl-1"> </span><span class="hl-2">python</span><br/><span class="hl-0">uv</span><span class="hl-1"> </span><span class="hl-2">venv</span><span class="hl-1"> </span><span class="hl-2">.venv</span><br/><span class="hl-0">source</span><span class="hl-1"> </span><span class="hl-2">.venv/bin/activate</span><br/><span class="hl-0">uv</span><span class="hl-1"> </span><span class="hl-2">pip</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-2">maturin</span><br/><span class="hl-0">maturin</span><span class="hl-1"> </span><span class="hl-2">develop</span>
+</code><button type="button">Copy</button></pre>
+
+<p>From the repo root you can also run <code>make python-test</code> (offline unit) or <code>make python-test-nctl</code> (live node). The <code>python-bindings</code> workflow runs both against Hub NCTL <code>:dev</code>.</p>
 <h2 id="usage-2" class="tsd-anchor-link">Usage<a href="#usage-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<pre><code class="python">import casper_rust_wasm_sdk_py as casper
+
+RPC = "https://node.testnet.casper.network/rpc"
+
+status = casper.get_node_status(RPC)
+print(status["chainspec_name"], status["build_version"])
+
+# Optional session wrapper for addresses / verbosity
+sdk = casper.Sdk(RPC, verbosity="low")
+print(sdk.get_rpc_address(), sdk.get_verbosity())
+</code><button type="button">Copy</button></pre>
+
+<p>Deploy APIs and binary-port are not wrapped. Transaction V1 and Runtime V1 / V2 are supported on the transaction / contract helpers.</p>
+</details>
+<h2 id="usage-3" class="tsd-anchor-link">Usage<a href="#usage-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <h3 id="rpc-call-examples" class="tsd-anchor-link">RPC call examples<a href="#rpc-call-examples" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <details>
   <summary><strong><code>Rust</code></strong></summary>
@@ -245,6 +270,48 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
 
 <p>You can find more examples in <a href="media/index.ts">NodeJs examples</a>, the <a href="media/app.component.ts">Angular example app</a> (live at <a href="https://casper-webclient.interchouette.net/">casper-webclient.interchouette.net</a>), the <a href="media/App.tsx">React example app</a>, or by reading <a href="media/tests.spec.ts">Puppeteer e2e tests</a>.</p>
 </details>
+<details>
+  <summary><strong><code>Python</code></strong></summary>
+<br>
+<p>Python bindings return JSON strings for most RPC results (parse with <code>json.loads</code>). Full list: <a href="media/README-1.md"><code>python/README.md</code></a>. Examples below use Testnet-style URLs; swap in your node as needed.</p>
+<pre><code class="python">import json
+import casper_rust_wasm_sdk_py as casper
+
+RPC = "https://node.testnet.casper.network/rpc"
+</code><button type="button">Copy</button></pre>
+
+<h4 id="get-transaction-by-transaction-hash-2" class="tsd-anchor-link">Get transaction by transaction hash<a href="#get-transaction-by-transaction-hash-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="python">raw = casper.get_transaction(
+    "94b3e6253a4448138fb8b637bd0ca0604270d2f5664f7c221d67eae568fcd668",
+    True,
+    RPC,
+)
+result = json.loads(raw)
+print(list(result.keys()))
+</code><button type="button">Copy</button></pre>
+
+<h4 id="get-auction-state-information-2" class="tsd-anchor-link">Get auction state information<a href="#get-auction-state-information-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="python">auction = json.loads(casper.get_auction_info(None, RPC))
+print(list(auction.keys()))
+</code><button type="button">Copy</button></pre>
+
+<h4 id="get-peers-from-the-network-2" class="tsd-anchor-link">Get peers from the network<a href="#get-peers-from-the-network-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="python">peers = json.loads(casper.get_peers(RPC))
+print(len(peers.get("peers") or []))
+</code><button type="button">Copy</button></pre>
+
+<h4 id="get-the-latest-block-information-2" class="tsd-anchor-link">Get the latest block information<a href="#get-the-latest-block-information-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="python">block = json.loads(casper.get_block(None, RPC))
+print(list(block.keys()))
+</code><button type="button">Copy</button></pre>
+
+<h4 id="get-node-status" class="tsd-anchor-link">Get node status<a href="#get-node-status" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="python">status = casper.get_node_status(RPC)
+print(status["chainspec_name"], status["build_version"])
+</code><button type="button">Copy</button></pre>
+
+<p><code>get_deploy</code> / <code>get_account</code> / <code>get_era_info</code> are not wrapped (prefer <code>get_transaction</code>, <code>get_entity</code>, <code>get_era_summary</code>). More examples: <a href="media/README-1.md"><code>python/README.md</code></a>, <code>make python-test</code>, <code>make python-test-nctl</code>.</p>
+</details>
 <h3 id="more-examples" class="tsd-anchor-link">More examples<a href="#more-examples" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <details>
   <summary><strong><code>Transactions and Transfers</code></strong></summary>
@@ -259,6 +326,30 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
 <pre><code class="ts"><span class="hl-9">import</span><span class="hl-1"> { </span><span class="hl-4">TransactionStrParams</span><span class="hl-1"> } </span><span class="hl-9">from</span><span class="hl-1"> </span><span class="hl-2">&quot;casper-rust-wasm-sdk&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">chain_name</span><span class="hl-1"> = </span><span class="hl-2">&quot;integration-test&quot;</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">public_key</span><span class="hl-1"> =</span><br/><span class="hl-1">  </span><span class="hl-2">&quot;0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129&quot;</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">secret_key</span><span class="hl-1"> = </span><span class="hl-5">undefined</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">timestamp</span><span class="hl-1"> = </span><span class="hl-0">getTimestamp</span><span class="hl-1">(); </span><span class="hl-3">// or Date.now().toString(); // or undefined</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">ttl</span><span class="hl-1"> = </span><span class="hl-2">&quot;1h&quot;</span><span class="hl-1">; </span><span class="hl-3">// or undefined</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">payment_amount</span><span class="hl-1"> = </span><span class="hl-2">&quot;100000000&quot;</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">transfer_amount</span><span class="hl-1"> = </span><span class="hl-2">&quot;2500000000&quot;</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">target_account</span><span class="hl-1"> =</span><br/><span class="hl-1">  </span><span class="hl-2">&quot;0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">transaction_params</span><span class="hl-1"> = </span><span class="hl-5">new</span><span class="hl-1"> </span><span class="hl-0">TransactionStrParams</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-4">chain_name</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">public_key</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">secret_key</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">timestamp</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">ttl</span><span class="hl-1">,</span><br/><span class="hl-1">);</span><br/><br/><span class="hl-4">transaction_params</span><span class="hl-1">.</span><span class="hl-4">payment_amount</span><span class="hl-1"> = </span><span class="hl-4">payment_amount</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">make_transfer_transaction</span><span class="hl-1"> = </span><span class="hl-4">sdk</span><span class="hl-1">.</span><span class="hl-0">make_transfer_transaction</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-5">undefined</span><span class="hl-1">, </span><span class="hl-3">// Optional maybe_source</span><br/><span class="hl-1">  </span><span class="hl-4">target_account</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">transfer_amount</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">transaction_params</span><span class="hl-1">,</span><br/><span class="hl-1">);</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">make_transfer_transaction_as_json</span><span class="hl-1"> = </span><span class="hl-4">make_transfer_transaction</span><span class="hl-1">.</span><span class="hl-0">toJson</span><span class="hl-1">();</span><br/><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-4">make_transfer_transaction_as_json</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
+<h4 id="python" class="tsd-anchor-link">Python<a href="#python" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="python">import json
+import casper_rust_wasm_sdk_py as casper
+
+chain_name = "integration-test"
+payment_amount = "100000000"
+transfer_amount = "2500000000"
+target_account = (
+    "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54"
+)
+pem = casper.secret_key_generate()  # treat as secret
+
+params = json.dumps(
+    {
+        "chain_name": chain_name,
+        "payment_amount": payment_amount,
+        "secret_key": pem,
+    }
+)
+unsigned = casper.make_transfer_transaction(target_account, transfer_amount, params)
+signed = casper.sign_transaction(unsigned, pem)
+print(signed[:120], "...")
+</code><button type="button">Copy</button></pre>
+
 </details>
 <details>
     <summary>Sending a <strong>Transfer</strong> transaction (alias for: make + put)</summary>
@@ -270,6 +361,40 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
 
 <h4 id="typescript-1" class="tsd-anchor-link">Typescript<a href="#typescript-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
 <pre><code class="ts"><span class="hl-9">import</span><span class="hl-1"> { </span><span class="hl-4">TransactionStrParams</span><span class="hl-1">, </span><span class="hl-4">getTimestamp</span><span class="hl-1"> } </span><span class="hl-9">from</span><span class="hl-1"> </span><span class="hl-2">&quot;casper-rust-wasm-sdk&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">chain_name</span><span class="hl-1"> = </span><span class="hl-2">&quot;casper-net-1&quot;</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">public_key</span><span class="hl-1"> =</span><br/><span class="hl-1">  </span><span class="hl-2">&quot;0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129&quot;</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">secret_key</span><span class="hl-1"> = </span><span class="hl-2">`-----BEGIN PRIVATE KEY-----</span><br/><span class="hl-2">-----END PRIVATE KEY-----`</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">timestamp</span><span class="hl-1"> = </span><span class="hl-0">getTimestamp</span><span class="hl-1">(); </span><span class="hl-3">// or Date.now().toString(); // or undefined</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">ttl</span><span class="hl-1"> = </span><span class="hl-2">&quot;1h&quot;</span><span class="hl-1">; </span><span class="hl-3">// or undefined</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">payment_amount</span><span class="hl-1"> = </span><span class="hl-2">&quot;100000000&quot;</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">transfer_amount</span><span class="hl-1"> = </span><span class="hl-2">&quot;2500000000&quot;</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">target_account</span><span class="hl-1"> =</span><br/><span class="hl-1">  </span><span class="hl-2">&quot;0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">transaction_params</span><span class="hl-1"> = </span><span class="hl-5">new</span><span class="hl-1"> </span><span class="hl-0">TransactionStrParams</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-4">chain_name</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">public_key</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">secret_key</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">timestamp</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">ttl</span><span class="hl-1">,</span><br/><span class="hl-1">);</span><br/><br/><span class="hl-4">transaction_params</span><span class="hl-1">.</span><span class="hl-4">payment_amount</span><span class="hl-1"> = </span><span class="hl-4">payment_amount</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">transfer_transaction_result</span><span class="hl-1"> = </span><span class="hl-9">await</span><span class="hl-1"> </span><span class="hl-4">sdk</span><span class="hl-1">.</span><span class="hl-0">transfer_transaction</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-5">undefined</span><span class="hl-1">, </span><span class="hl-3">// Optional maybe_source</span><br/><span class="hl-1">  </span><span class="hl-4">target_account</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">transfer_amount</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">transaction_params</span><span class="hl-1">,</span><br/><span class="hl-1">);</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">transfer_transaction_result_as_json</span><span class="hl-1"> =</span><br/><span class="hl-1">  </span><span class="hl-4">transfer_transaction_result</span><span class="hl-1">.</span><span class="hl-0">toJson</span><span class="hl-1">();</span><br/><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-4">transfer_transaction_result_as_json</span><span class="hl-1">);</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">transaction_hash</span><span class="hl-1"> =</span><br/><span class="hl-1">  </span><span class="hl-4">transfer_transaction_result</span><span class="hl-1">.</span><span class="hl-4">transaction_hash</span><span class="hl-1">.</span><span class="hl-0">toString</span><span class="hl-1">();</span><br/><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-4">transaction_hash</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+<h4 id="python-1" class="tsd-anchor-link">Python<a href="#python-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="python">import json
+import casper_rust_wasm_sdk_py as casper
+
+RPC = "http://127.0.0.1:11101/rpc"
+chain_name = "casper-net-1"
+payment_amount = "100000000"
+transfer_amount = "2500000000"
+target_account = (
+    "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54"
+)
+# Load a funded secret key PEM (do not commit real secrets)
+pem = open("secret_key.pem", encoding="utf-8").read()
+
+params = json.dumps(
+    {
+        "chain_name": chain_name,
+        "payment_amount": payment_amount,
+        "secret_key": pem,
+    }
+)
+put = json.loads(
+    casper.transfer_transaction(
+        target_account,
+        transfer_amount,
+        params,
+        None,
+        None,
+        RPC,
+    )
+)
+print(put.get("transaction_hash") or put)
 </code><button type="button">Copy</button></pre>
 
 </details>
@@ -375,6 +500,21 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
 <h4 id="typescript-6" class="tsd-anchor-link">Typescript<a href="#typescript-6" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
 <p>In TypeScript, the waitTransaction function provides a similar capability to wait for a specific transaction event. Developers can leverage this function by specifying the event address, transaction hash, and an optional timeout duration. The received EventParseResult object can then be processed to extract valuable information, such as the cost of the transaction.</p>
 <pre><code class="ts"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">events_address</span><span class="hl-1"> = </span><span class="hl-2">&quot;http://127.0.0.1:18101/events&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">transaction_hash</span><span class="hl-1"> =</span><br/><span class="hl-1">  </span><span class="hl-2">&quot;c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">timeout_duration</span><span class="hl-1"> = </span><span class="hl-5">undefined</span><span class="hl-1">; </span><span class="hl-3">// 30000 for 30s instead of default timeout duration of 60s</span><br/><br/><span class="hl-3">// Wait for transaction</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">eventParseResult</span><span class="hl-1">: </span><span class="hl-6">EventParseResult</span><span class="hl-1"> = </span><span class="hl-9">await</span><span class="hl-1"> </span><span class="hl-4">sdk</span><span class="hl-1">.</span><span class="hl-0">waitTransaction</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-4">events_address</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">transaction_hash</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">timeout_duration</span><span class="hl-1">,</span><br/><span class="hl-1">);</span><br/><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-4">eventParseResult</span><span class="hl-1">.</span><span class="hl-4">body</span><span class="hl-1">.</span><span class="hl-4">transaction_processed</span><span class="hl-1">);</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-10">cost</span><span class="hl-1"> =</span><br/><span class="hl-1">  </span><span class="hl-4">eventParseResult</span><span class="hl-1">.</span><span class="hl-4">body</span><span class="hl-1">?.</span><span class="hl-4">transaction_processed</span><span class="hl-1">?.</span><span class="hl-4">execution_result</span><span class="hl-1">.</span><span class="hl-4">Success</span><span class="hl-1">?.</span><span class="hl-4">cost</span><span class="hl-1">;</span><br/><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">`transaction cost </span><span class="hl-5">${</span><span class="hl-4">cost</span><span class="hl-5">}</span><span class="hl-2">`</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+<h4 id="python-2" class="tsd-anchor-link">Python<a href="#python-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<pre><code class="python">import json
+import casper_rust_wasm_sdk_py as casper
+
+events_url = "http://127.0.0.1:18101/events"
+transaction_hash = (
+    "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4"
+)
+timeout_ms = None  # or 30_000 for 30s; default is 60s when omitted
+
+waited = casper.wait_transaction(events_url, transaction_hash, timeout_ms)
+body = json.loads(waited)
+print(body.get("body"))
 </code><button type="button">Copy</button></pre>
 
 </details>
@@ -588,9 +728,27 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
 </code><button type="button">Copy</button></pre>
 
 <p>Download pre-built desktop demos from the <strong><a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases">GitHub Releases</a></strong> page (CI artifacts — Windows portable, Linux AppImage, Snap). Mac build is TODO.</p>
+<p>For a terminal UI over the same SDK (not Electron), see <a href="#casperatatui">Casperatatui</a>.</p>
 </details>
-<hr>
-<br>
+<h2 id="casperatatui" class="tsd-anchor-link">Casperatatui<a href="#casperatatui" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p><strong>Casperatatui</strong> is a Casper TUI (terminal UI) based on <a href="https://ratatui.rs/">ratatui</a>, over the native Rust SDK. JSON-RPC and SSE only (no binary port).</p>
+<ul>
+<li>Source: <a href="media/casperatatui"><code>examples/desktop/casperatatui</code></a></li>
+<li>GitHub Releases / Pre-release <a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases"><code>dev-preview</code></a>: linux binary <code>casperatatui-&lt;label&gt;-linux-x86_64</code></li>
+</ul>
+<pre><code class="bash"><span class="hl-0">make</span><span class="hl-1"> </span><span class="hl-2">run-casperatatui</span><br/><span class="hl-3"># alias</span><br/><span class="hl-0">make</span><span class="hl-1"> </span><span class="hl-2">run-tui</span><br/><br/><span class="hl-0">make</span><span class="hl-1"> </span><span class="hl-2">run-tui</span><span class="hl-1"> </span><span class="hl-2">TUI_ARGS=&#39;--preset testnet&#39;</span><br/><span class="hl-0">make</span><span class="hl-1"> </span><span class="hl-2">run-tui</span><span class="hl-1"> </span><span class="hl-2">TUI_ARGS=&#39;--preset mainnet&#39;</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Writes stay off unless you pass <code>--enable-writes</code> and a secret key. Not part of the default SDK crate build or Hub images (unlike MCP).</p>
+<p>See <a href="media/README-2.md"><code>examples/desktop/casperatatui/README.md</code></a>.</p>
+<h2 id="python-3" class="tsd-anchor-link">Python<a href="#python-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>The workspace package <a href="media/python"><code>python/</code></a> (<code>casper-rust-wasm-sdk-py</code>) is a PyO3 / maturin extension over the same native Rust <code>rlib</code> (not a Python port).</p>
+<ul>
+<li>Install / develop: see <a href="#python-project">Python Project</a> under Install above, or <a href="media/README-1.md"><code>python/README.md</code></a></li>
+<li>CI: path-filtered <code>python-bindings</code> (offline unit + Hub NCTL <code>:dev</code>)</li>
+<li>Make: <code>make python-test</code>, <code>make python-test-nctl</code></li>
+</ul>
+<p>Initial face: <a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/117">#117</a>. Parity waves 1–4: <a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/121">#121</a> (closes <a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/120">#120</a>). Epic <a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9">#9</a> is <strong>closed</strong>. Deploy APIs, binary-port, and PyPI publish remain out of that epic.</p>
 <h2 id="rust-api" class="tsd-anchor-link">Rust API<a href="#rust-api" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <p>Published rustdoc: <a href="https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/">crate root</a> · <a href="https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/all.html">all items</a></p>
 <p>Cargo features (see <code>Cargo.toml</code>): <code>transaction</code>, <code>deploy</code>, <code>contract</code>, <code>binary-port</code>, <code>watcher</code>, <code>SSE</code> (includes <code>watcher</code> + <code>SSEClient</code> / <code>CESParser</code>), <code>helpers</code>. Default bundle is <code>full</code> (not the same as enabling <code>SSE</code>).</p>
@@ -628,6 +786,8 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
 </ul>
 <h3 id="mcp-agents" class="tsd-anchor-link">MCP (agents)<a href="#mcp-agents" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <p>Not part of the Rust crate root: sibling package <a href="media/mcp"><code>mcp/</code></a> wraps the same SDK as MCP tools. See <a href="#mcp">MCP</a> above and <a href="media/TOOLS.md"><code>mcp/TOOLS.md</code></a>.</p>
+<h3 id="python-4" class="tsd-anchor-link">Python<a href="#python-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Not part of the Rust crate root: sibling package <a href="media/python"><code>python/</code></a> wraps the same SDK as a PyO3 extension. See <a href="#python">Python</a> above and <a href="media/README-1.md"><code>python/README.md</code></a>.</p>
 <h2 id="typescript-api" class="tsd-anchor-link">Typescript API<a href="#typescript-api" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <p>Published typedoc: <a href="https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/index.html">index</a></p>
 <p>Same surface as Rust, via the Wasm pack (<code>pkg</code> / <code>pkg-nodejs</code>). Notable entry points:</p>
@@ -705,9 +865,10 @@ Two ways to sign a transaction, either signTransaction</p>
 <h2 id="todo" class="tsd-anchor-link">Todo<a href="#todo" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <p>Open tracking (not a full roadmap):</p>
 <ul>
-<li><a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9">#9</a> — Python / PyO3 bindings</li>
 <li><a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/36">#36</a> — first <a href="http://crates.io">crates.io</a> publish</li>
 <li><a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/96">#96</a> — explainer for node core: AE-off <code>entity-contract-…</code> vs <code>hash-…</code> on <code>query_global_state</code> (SDK remaps; permanent fix is upstream)</li>
+<li><a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/118">#118</a> — C bindings (cdylib / cbindgen)</li>
+<li><a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/119">#119</a> — Go bindings (cgo / native)</li>
 </ul>
 <p>Mac desktop Electron build is still TODO (Windows / Linux demos ship on releases).</p>
 <p>⚠ <strong>Reminder</strong>: Do not use private keys or perform real transactions on mainnet unless you are fully aware of the security risks.</p>
@@ -759,7 +920,9 @@ Two ways to sign a transaction, either signTransaction</p>
 <li>
 <ul>
 <li><a href="#desktop-node-example"><span>Desktop <wbr/>Node example</span></a></li></ul></li></ul></li>
+<li><a href="#python-project"><span>Python <wbr/>Project</span></a></li>
 <li><a href="#usage-2"><span>Usage</span></a></li>
+<li><a href="#usage-3"><span>Usage</span></a></li>
 <li>
 <ul>
 <li><a href="#rpc-call-examples"><span>RPC call examples</span></a></li>
@@ -774,14 +937,21 @@ Two ways to sign a transaction, either signTransaction</p>
 <li><a href="#get-deploy-by-deploy-hash-legacy-1"><span>Get deploy by deploy hash (legacy)</span></a></li>
 <li><a href="#get-auction-state-information-1"><span>Get auction state information</span></a></li>
 <li><a href="#get-peers-from-the-network-1"><span>Get peers from the network</span></a></li>
-<li><a href="#get-the-latest-block-information-1"><span>Get the latest block information</span></a></li></ul></li>
+<li><a href="#get-the-latest-block-information-1"><span>Get the latest block information</span></a></li>
+<li><a href="#get-transaction-by-transaction-hash-2"><span>Get transaction by transaction hash</span></a></li>
+<li><a href="#get-auction-state-information-2"><span>Get auction state information</span></a></li>
+<li><a href="#get-peers-from-the-network-2"><span>Get peers from the network</span></a></li>
+<li><a href="#get-the-latest-block-information-2"><span>Get the latest block information</span></a></li>
+<li><a href="#get-node-status"><span>Get node status</span></a></li></ul></li>
 <li><a href="#more-examples"><span>More examples</span></a></li>
 <li>
 <ul>
 <li><a href="#rust"><span>Rust</span></a></li>
 <li><a href="#typescript"><span>Typescript</span></a></li>
+<li><a href="#python"><span>Python</span></a></li>
 <li><a href="#rust-1"><span>Rust</span></a></li>
 <li><a href="#typescript-1"><span>Typescript</span></a></li>
+<li><a href="#python-1"><span>Python</span></a></li>
 <li><a href="#rust-2"><span>Rust</span></a></li>
 <li><a href="#typescript-2"><span>Typescript</span></a></li>
 <li><a href="#rust-3"><span>Rust</span></a></li>
@@ -796,6 +966,7 @@ Two ways to sign a transaction, either signTransaction</p>
 <li><a href="#typescript-cesparser"><span>Type<wbr/>Script — <wbr/>CES<wbr/>Parser</span></a></li>
 <li><a href="#rust-6"><span>Rust</span></a></li>
 <li><a href="#typescript-6"><span>Typescript</span></a></li>
+<li><a href="#python-2"><span>Python</span></a></li>
 <li><a href="#rust-7"><span>Rust</span></a></li>
 <li><a href="#typescript-7"><span>Typescript</span></a></li>
 <li><a href="#install-1"><span>Install</span></a></li>
@@ -822,6 +993,8 @@ Two ways to sign a transaction, either signTransaction</p>
 <li><a href="#install-2"><span>Install</span></a></li>
 <li><a href="#mint-1"><span>Mint</span></a></li></ul></li>
 <li><a href="#desktop-electron-demo-app"><span>Desktop <wbr/>Electron demo app</span></a></li></ul></li>
+<li><a href="#casperatatui"><span>Casperatatui</span></a></li>
+<li><a href="#python-3"><span>Python</span></a></li>
 <li><a href="#rust-api"><span>Rust <wbr/>API</span></a></li>
 <li>
 <ul>
@@ -832,7 +1005,8 @@ Two ways to sign a transaction, either signTransaction</p>
 <li><a href="#watcher-and-sse"><span>Watcher and <wbr/>SSE</span></a></li>
 <li><a href="#types-and-helpers"><span>Types and helpers</span></a></li>
 <li><a href="#binary-port-feature-"><span>Binary <wbr/>Port (feature )</span></a></li>
-<li><a href="#mcp-agents"><span>MCP (agents)</span></a></li></ul></li>
+<li><a href="#mcp-agents"><span>MCP (agents)</span></a></li>
+<li><a href="#python-4"><span>Python</span></a></li></ul></li>
 <li><a href="#typescript-api"><span>Typescript <wbr/>API</span></a></li>
 <li>
 <ul>
