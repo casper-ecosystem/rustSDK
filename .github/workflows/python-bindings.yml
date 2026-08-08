@@ -137,6 +137,7 @@ jobs:
         run: |
           echo "SECRET_KEY_USER_1=$(sed -n '2p' ./assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
           echo "SECRET_KEY_USER_2=$(sed -n '2p' ./assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
+          echo "ENABLE_ADDRESSABLE_ENTITY=false" >> $GITHUB_ENV
 
       - name: Pytest NCTL integration
         working-directory: python

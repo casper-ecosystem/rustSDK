@@ -48,6 +48,18 @@ requires_rpc = pytest.mark.skipif(
 )
 
 
+def _addressable_entity_enabled() -> bool:
+    """Match tip ci-test / e2e: ENABLE_ADDRESSABLE_ENTITY (default false on Hub :dev)."""
+    flag = os.environ.get("ENABLE_ADDRESSABLE_ENTITY", "false").strip().lower()
+    return flag in ("true", "1", "yes")
+
+
+requires_ae = pytest.mark.skipif(
+    not _addressable_entity_enabled(),
+    reason="get_entity needs ENABLE_ADDRESSABLE_ENTITY=true (AE on)",
+)
+
+
 def require_secret_pem() -> str:
     """Resolve funded key like e2e: SECRET_KEY_USER_1 body, else PEM file path."""
     body = os.environ.get("SECRET_KEY_USER_1", "").strip()
@@ -143,18 +155,12 @@ def test_query_balance() -> None:
 
 
 @requires_rpc
+@requires_ae
 def test_get_entity() -> None:
-    """get_entity for the same purse (xfail while Account serde gap remains)."""
+    """get_entity for the same purse (AE on only; skipped when AE off like e2e)."""
     purse = require_purse_id()
-    try:
-        entity = json.loads(casper.get_entity(purse, None, RPC))
-        assert entity
-    except Exception as exc:
-        msg = str(exc)
-        # Known SDK serde gap for entity.Account (not AddressableEntity / LegacyAccount).
-        if "unknown variant `Account`" in msg or "LegacyAccount" in msg:
-            pytest.xfail("get_entity rejects Account variant (SDK serde gap)")
-        raise
+    entity = json.loads(casper.get_entity(purse, None, RPC))
+    assert entity
 
 
 @requires_rpc

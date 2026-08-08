@@ -101,7 +101,7 @@ NCTL cases (`pytest -v`):
 | --- | --- |
 | `test_node_status_and_reads` | status, peers, block, state root, auction, era, validators, chainspec, list_rpcs, block transfers |
 | `test_query_balance` | `query_balance` for user-1 pubkey |
-| `test_get_entity` | `get_entity` (xfail while Account serde gap remains) |
+| `test_get_entity` | `get_entity` (skipped when `ENABLE_ADDRESSABLE_ENTITY=false`, same as e2e) |
 | `test_put_and_wait` | `make_transfer_transaction` → `sign_transaction` → `put_transaction` → `wait_transaction` |
 
 ## Examples
