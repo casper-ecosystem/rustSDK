@@ -1,4 +1,4 @@
-//! Composition helpers built on top of SDK RPC (not new node methods).
+//! Composition helpers for Casperatatui / desktop tooling (not new node methods).
 
 #[cfg(feature = "rpc")]
 pub mod blocks;

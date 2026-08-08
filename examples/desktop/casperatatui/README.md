@@ -1,31 +1,29 @@
 # Casperatatui
 
-Desktop TUI explorer over [`casper-rust-wasm-sdk`](../../..) using [ratatui](https://ratatui.rs/).
+Casper TUI over [`casper-rust-wasm-sdk`](../../..) using [ratatui](https://ratatui.rs/).
 
-Friendly neighborhood blockchain ghost. JSON-RPC only (no binary-port). See [COVERAGE.md](./COVERAGE.md) for screen → SDK map.
-
-Lives next to the Electron / Node desktop examples under `examples/desktop/`.
+Desktop example beside Electron / Node under `examples/desktop/`. JSON-RPC only (no binary-port). See [COVERAGE.md](./COVERAGE.md) for screen → SDK map.
 
 ## Run
 
 From the repo root (clears Cursor sandbox `CARGO_TARGET_DIR` if set):
 
 ```bash
-make run-tui
+make run-casperatatui
 # or
 env -u CARGO_TARGET_DIR cargo run -p casperatatui -- --preset nctl
 ```
 
 Presets: `nctl` (default), `testnet`, `mainnet`.
 
-| Flag / env                             | Default (nctl)                            |
-| -------------------------------------- | ----------------------------------------- |
-| `--rpc-url` / `CASPER_RPC_URL`         | `http://127.0.0.1:11101`                  |
-| `--events-url` / `CASPER_EVENTS_URL`   | `http://127.0.0.1:18101/events`           |
-| `--verbosity` / `CASPER_VERBOSITY`     | `low`                                     |
-| `--enable-writes`                      | off                                       |
-| `--secret-key` / `CASPER_SECRET_KEY`   | unset (PEM path, memory only)             |
-| `--policy-path` / `CASPER_POLICY_PATH` | `examples/desktop/tui/policy.sample.json` |
+| Flag / env                               | Default (nctl)                                   |
+| ---------------------------------------- | ------------------------------------------------ |
+| `--rpc-url` / `CASPER_RPC_URL`           | `http://127.0.0.1:11101`                         |
+| `--events-url` / `CASPER_EVENTS_URL`     | `http://127.0.0.1:18101/events`                  |
+| `--verbosity` / `CASPER_VERBOSITY`       | `low`                                            |
+| `--enable-writes`                        | off                                              |
+| `--secret-key` / `CASPER_SECRET_KEY`     | unset (PEM path, memory only)                    |
+| `--policy-path` / `CASPER_POLICY_PATH`   | `examples/desktop/casperatatui/policy.sample.json` |
 
 Needs a reachable node for `r` / auto-refresh (local NCTL is ideal).
 
@@ -44,9 +42,9 @@ Not part of the default SDK / Hub image build. Linux `x86_64` binaries ship on G
 - Pre-release tip: `casperatatui-dev-preview-linux-x86_64`
 - Stable: `casperatatui-<version>-linux-x86_64`
 
-Local release build: `make build-tui-release` → `target/release/casperatatui`.
+Local release build: `make build-casperatatui-release` → `target/release/casperatatui`.
 
-CI: path-filtered [ci-tui](../../../.github/workflows/ci-tui.yml) runs lint, tests, and NCTL smokes when `examples/desktop/tui/**` changes.
+CI: path-filtered [ci-casperatatui](../../../.github/workflows/ci-casperatatui.yml) runs lint, tests, and NCTL smokes when `examples/desktop/casperatatui/**` changes.
 
 ## Keys
 
@@ -110,4 +108,4 @@ RPC + helpers catalog; write methods appear when writes enabled and PEM loaded.
 | `quit`                    | Exit                            |
 | Up / Down / Tab           | History / completion            |
 
-On exit the TUI always leaves raw mode / alternate screen.
+On exit Casperatatui always leaves raw mode / alternate screen.

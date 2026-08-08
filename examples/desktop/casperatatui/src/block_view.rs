@@ -1,4 +1,4 @@
-//! Parse block / transfer JSON into TUI rows (ASCII-friendly).
+//! Parse block / transfer JSON into Casperatatui rows (ASCII-friendly).
 
 use serde_json::Value;
 

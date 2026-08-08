@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "mcp", "examples/desktop/tui"]
+members = [".", "mcp", "examples/desktop/casperatatui"]
 exclude = ["python"]
 # Keep the root package as the only default member so `cargo clippy --lib` /
 # CI do not build mcp / examples. python/ is a standalone maturin crate (path-dep

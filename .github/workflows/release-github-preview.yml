@@ -51,7 +51,7 @@ jobs:
 
           Overwritten on each successful [nightly-test](https://github.com/${{ github.repository }}/actions/workflows/nightly-test.yml). Not Latest — that remains the node-aligned semver release (e.g. v2.2.2).
 
-          ## Desktop / MCP / TUI assets
+          ## Desktop / MCP / Casperatatui assets
           - \`Casper.Webclient.dev-preview.exe\`
           - \`Casper.Webclient-dev-preview.AppImage\`
           - \`casper-webclient_dev-preview_amd64.snap\`
@@ -72,7 +72,7 @@ jobs:
             --target "$SHA"
 
   upload-assets:
-    name: Upload Electron + MCP + TUI assets
+    name: Upload Electron + MCP + Casperatatui assets
     needs: overwrite-prerelease
     if: needs.overwrite-prerelease.result == 'success'
     uses: ./.github/workflows/release-github-assets.yml

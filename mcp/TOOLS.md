@@ -100,7 +100,7 @@ Common optional args: `verbosity?`, `rpc_address?`.
 
 ---
 
-## compose — feature `rpc` (TUI / explorer helpers)
+## compose — feature `rpc` (Casperatatui / desktop helpers)
 
 Compositions over existing RPC (no new node methods). Path: `mcp/src/compose/`.
 

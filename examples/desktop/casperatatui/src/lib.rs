@@ -1,6 +1,6 @@
-//! Casperatatui: Casper SDK terminal explorer (example TUI).
+//! Casperatatui: Casper TUI over casper-rust-wasm-sdk (ratatui).
 //!
-//! Network, Blocks/Txs, Accounts, Contracts, Actions, Writes, Wait/SSE over casper-rust-wasm-sdk (ratatui).
+//! Network, Blocks/Txs, Accounts, Contracts, Actions, Writes, Wait/SSE.
 
 pub mod account_view;
 pub mod actions_catalog;

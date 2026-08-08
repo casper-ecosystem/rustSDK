@@ -203,24 +203,24 @@ mcp-test-live:
 .PHONY: mcp-build mcp-http mcp-http-stop \
 	run-mcp run-mcp-http mcp-test mcp-test-live
 
-# --- Casperatatui TUI explorer (examples/desktop/tui) ---
+# --- Casperatatui (examples/desktop/casperatatui) ---
 
-run-tui:
+run-casperatatui:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo run -p casperatatui -- --preset nctl $(TUI_ARGS)
+		cargo run -p casperatatui -- --preset nctl $(CASPERATATUI_ARGS)
 
-build-tui-release:
+build-casperatatui-release:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
 		cargo build -p casperatatui --release
 
-# Example package lint (not part of root wasm clippy matrix).
-check-lint-tui:
+# Not part of root wasm clippy matrix.
+check-lint-casperatatui:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
 		cargo clippy -p casperatatui --all-targets --no-deps -- -D warnings
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
 		cargo fmt -p casperatatui -- --check
 
-.PHONY: run-tui build-tui-release check-lint-tui
+.PHONY: run-casperatatui build-casperatatui-release check-lint-casperatatui
 
 # --- Python bindings (python/ — maturin) ---
 

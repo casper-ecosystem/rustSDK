@@ -1,22 +1,22 @@
-# Path-filtered TUI explorer gate. Opt-in package (not default-members / Hub).
-name: ci-tui
+# Path-filtered Casperatatui gate. Opt-in package (not default-members / Hub).
+name: ci-casperatatui
 
 on:
   push:
     branches: [dev, "feat*", "release-*"]
     paths:
-      - "examples/desktop/tui/**"
-      - ".github/workflows/ci-tui.yml"
+      - "examples/desktop/casperatatui/**"
+      - ".github/workflows/ci-casperatatui.yml"
   pull_request:
     branches: [dev, "feat*", "release-*"]
     paths:
-      - "examples/desktop/tui/**"
-      - ".github/workflows/ci-tui.yml"
+      - "examples/desktop/casperatatui/**"
+      - ".github/workflows/ci-casperatatui.yml"
   workflow_dispatch:
 
 jobs:
-  tui:
-    name: Lint test smoke TUI
+  casperatatui:
+    name: Lint test smoke Casperatatui
     runs-on: ubuntu-latest
 
     steps:
@@ -34,14 +34,14 @@ jobs:
         with:
           components: rustfmt, clippy
 
-      - name: Lint TUI
-        run: make check-lint-tui
+      - name: Lint Casperatatui
+        run: make check-lint-casperatatui
 
       - name: Unit tests
         run: cargo test -p casperatatui --lib
 
       - name: Release binary
-        run: make build-tui-release
+        run: make build-casperatatui-release
 
       - name: Start Casper NCTL Service
         run: |

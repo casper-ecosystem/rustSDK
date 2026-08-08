@@ -6,12 +6,12 @@ on:
     branches: [dev, "feat*", "release-*"]
     paths-ignore:
       - "**.md"
-      - "examples/desktop/tui/**"
+      - "examples/desktop/casperatatui/**"
   pull_request:
     branches: [dev, "feat*", "release-*"]
     paths-ignore:
       - "**.md"
-      - "examples/desktop/tui/**"
+      - "examples/desktop/casperatatui/**"
 
 jobs:
   build_and_test:

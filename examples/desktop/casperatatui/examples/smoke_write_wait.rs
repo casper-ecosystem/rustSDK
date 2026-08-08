@@ -47,9 +47,11 @@ async fn main() -> Result<()> {
             payment: DEFAULT_PAYMENT_MOTES.into(),
             policy: {
                 use std::path::Path;
-                WritePolicy::load(Path::new("examples/desktop/tui/policy.sample.json"))
-                    .or_else(|_| WritePolicy::load(Path::new("policy.sample.json")))
-                    .map_err(|e| anyhow::anyhow!(e))?
+                WritePolicy::load(Path::new(
+                    "examples/desktop/casperatatui/policy.sample.json",
+                ))
+                .or_else(|_| WritePolicy::load(Path::new("policy.sample.json")))
+                .map_err(|e| anyhow::anyhow!(e))?
             },
         },
         tx.clone(),
