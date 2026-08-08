@@ -515,7 +515,7 @@ fn request_account_load(ctx: &mut KeyCtx<'_>) {
     }
     ctx.model.accounts.identity.set(identity.clone());
     ctx.model
-        .begin_account_job("summoning entity + balances + auction...");
+        .begin_account_job("summoning account + balances + auction...");
     ctx.client.spawn_account_load(identity, ctx.rpc_tx.clone());
 }
 

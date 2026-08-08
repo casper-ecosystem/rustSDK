@@ -26,8 +26,13 @@ pub struct EntityOverview {
     pub associated_keys: Vec<AssociatedKeyRow>,
 }
 
-/// Parse `state_get_entity` result JSON into overview fields.
+/// Parse `state_get_entity` or normalized `get_account` JSON into overview fields.
 pub fn parse_entity_overview(value: &Value) -> Result<EntityOverview, String> {
+    // Legacy `state_get_account_info` shape (before TUI wrap, or raw paste).
+    if let Some(account) = value.get("account") {
+        return Ok(parse_account_like(account, "Account"));
+    }
+
     let entity = value
         .get("entity")
         .ok_or_else(|| "entity payload missing `entity`".to_string())?;
@@ -172,5 +177,21 @@ mod tests {
         assert_eq!(o.account_hash.as_deref(), Some("account-hash-abc"));
         assert_eq!(o.named_keys.len(), 1);
         assert_eq!(o.associated_keys[0].weight, 1);
+    }
+
+    #[test]
+    fn parses_legacy_get_account_shape() {
+        let v = json!({
+            "account": {
+                "account_hash": "account-hash-legacy",
+                "main_purse": "uref-purse-007",
+                "named_keys": [],
+                "associated_keys": []
+            }
+        });
+        let o = parse_entity_overview(&v).unwrap();
+        assert_eq!(o.kind, "Account");
+        assert_eq!(o.account_hash.as_deref(), Some("account-hash-legacy"));
+        assert_eq!(o.main_purse.as_deref(), Some("uref-purse-007"));
     }
 }

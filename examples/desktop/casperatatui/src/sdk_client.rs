@@ -317,28 +317,30 @@ impl SdkClient {
         });
     }
 
-    /// Parallel entity + balances + auction for Accounts.
+    /// Entity (or legacy account) + balances + auction for Accounts.
+    ///
+    /// Prefers `get_entity` (AE on). On AE-off / missing entity, falls back to
+    /// `get_account` and normalizes into the same overview JSON. Balance queries
+    /// use `main_purse` when present, else the identity string.
     pub fn spawn_account_load(&self, identity: String, tx: mpsc::UnboundedSender<RpcEvent>) {
         let rpc = self.rpc_url.clone();
         let verbosity = self.verbosity;
         tokio::spawn(async move {
             let id = identity.trim().to_string();
+            let entity = fetch_entity_value(&rpc, verbosity, id.clone()).await;
+            let purse = entity
+                .as_ref()
+                .ok()
+                .and_then(|v| crate::account_view::parse_entity_overview(v).ok())
+                .and_then(|o| o.main_purse)
+                .unwrap_or_else(|| id.clone());
+
             let bal_sdk = Self::sdk_at(&rpc, verbosity);
             let details_sdk = Self::sdk_at(&rpc, verbosity);
             let auction_sdk = Self::sdk_at(&rpc, verbosity);
-
-            let (entity, balance, balance_details, auction) = tokio::join!(
-                fetch_entity_value(&rpc, verbosity, id.clone()),
-                bal_sdk.query_balance(None, Some(id.clone()), None, None, None, None, None),
-                details_sdk.query_balance_details(
-                    None,
-                    Some(id.clone()),
-                    None,
-                    None,
-                    None,
-                    None,
-                    None
-                ),
+            let (balance, balance_details, auction) = tokio::join!(
+                bal_sdk.query_balance(None, Some(purse.clone()), None, None, None, None, None),
+                details_sdk.query_balance_details(None, Some(purse), None, None, None, None, None),
                 auction_sdk.get_auction_info(None, None, None),
             );
 
@@ -545,24 +547,53 @@ fn ok_json<T: Serialize, E: std::fmt::Display>(result: Result<T, E>) -> Result<V
     }
 }
 
-/// Load entity JSON for Accounts.
+/// Load account overview JSON for Accounts (AE on and AE off).
 ///
-/// Typed `get_entity` fails on NCTL legacy nodes that serialize `Account`
-/// while casper-client expects `LegacyAccount`. Recover the RPC body from the
-/// error when the node still returned a valid `state_get_entity` result.
+/// 1. Prefer `get_entity` (SDK default when addressable entities are enabled).
+/// 2. If the typed decode fails but the node returned a result body, recover it
+///    (legacy `Account` vs `LegacyAccount` mismatch).
+/// 3. If the RPC errors (typical AE-off: "No such addressable entity"), fall
+///    back to deprecated `get_account` and wrap as `{ entity: { Account: … } }`
+///    so `parse_entity_overview` stays one path.
 async fn fetch_entity_value(rpc: &str, verbosity: Verbosity, id: String) -> Result<Value, String> {
     let sdk = SdkClient::sdk_at(rpc, verbosity);
-    match sdk.get_entity(None, Some(id), None, None, None).await {
+    match sdk
+        .get_entity(None, Some(id.clone()), None, None, None)
+        .await
+    {
         Ok(resp) => serde_json::to_value(&resp.result).map_err(|e| e.to_string()),
         Err(err) => {
             let err_text = err.to_string();
             if let Some(recovered) = recover_entity_result_from_error(&err_text) {
-                Ok(recovered)
-            } else {
-                Err(err_text)
+                return Ok(recovered);
+            }
+            match fetch_account_as_entity(rpc, verbosity, id).await {
+                Ok(value) => Ok(value),
+                Err(account_err) => Err(format!(
+                    "get_entity failed ({err_text}); get_account fallback failed ({account_err})"
+                )),
             }
         }
     }
+}
+
+#[allow(deprecated)]
+async fn fetch_account_as_entity(
+    rpc: &str,
+    verbosity: Verbosity,
+    id: String,
+) -> Result<Value, String> {
+    let sdk = SdkClient::sdk_at(rpc, verbosity);
+    let resp = sdk
+        .get_account(None, Some(id), None, None, None)
+        .await
+        .map_err(|e| e.to_string())?;
+    let value = serde_json::to_value(&resp.result).map_err(|e| e.to_string())?;
+    let account = value
+        .get("account")
+        .cloned()
+        .ok_or_else(|| "get_account result missing `account`".to_string())?;
+    Ok(json!({ "entity": { "Account": account } }))
 }
 
 fn recover_entity_result_from_error(err: &str) -> Option<Value> {

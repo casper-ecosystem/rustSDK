@@ -82,7 +82,7 @@ async fn main() -> Result<()> {
     }
 
     let account = std::env::var("CASPER_SMOKE_ACCOUNT").unwrap_or_else(|_| {
-        // NCTL faucet (dev profile); override with CASPER_SMOKE_ACCOUNT when needed.
+        // NCTL faucet (dev profile); CI sets CASPER_SMOKE_ACCOUNT from assets after boot.
         "0107514b42acc9be064bca097321530af97d4bb7f9b965b45efbf73e474df2690f".into()
     });
     client.spawn_account_load(account.clone(), tx.clone());
@@ -100,6 +100,9 @@ async fn main() -> Result<()> {
             );
             if let Err(err) = &load.entity {
                 println!("  entity err: {err}");
+            }
+            if let Err(err) = &load.balance {
+                println!("  balance err: {err}");
             }
             if let Ok(entity) = &load.entity {
                 if let Ok(overview) = casperatatui::account_view::parse_entity_overview(entity) {
@@ -121,8 +124,9 @@ async fn main() -> Result<()> {
                     println!("  balance motes={}", &motes[..motes.len().min(24)]);
                 }
             }
+            // AE on: get_entity; AE off: get_account fallback. Both must yield overview + balance.
             if !entity_ok || !balance_ok {
-                anyhow::bail!("account load needs entity+balance");
+                anyhow::bail!("account load needs entity/account + balance (AE on or off)");
             }
         }
         other => anyhow::bail!("account unexpected: {other:?}"),

@@ -47,6 +47,7 @@ jobs:
         run: |
           # Hub :dev — compose pins BRANCH_NODE=v2.2.2 (same as :2.2) until
           # casper-node branch dev advances past package 2.2.0; matches SDK types pin.
+          mkdir -p assets/users assets/faucet
           docker run -d \
             --name casper-nctl \
             -p 11101-11105:11101-11105 \
@@ -92,10 +93,22 @@ jobs:
             exit 1
           fi
 
+      - name: Smoke keys from NCTL assets
+        run: |
+          test -f ./assets/faucet/public_key_hex
+          echo "CASPER_SMOKE_ACCOUNT=$(tr -d '[:space:]' < ./assets/faucet/public_key_hex)" >> "$GITHUB_ENV"
+          if [ -f ./assets/users/user-1/public_key_hex ]; then
+            echo "CASPER_SMOKE_TARGET=$(tr -d '[:space:]' < ./assets/users/user-1/public_key_hex)" >> "$GITHUB_ENV"
+          fi
+
       - name: Smoke status
         run: cargo run -p casperatatui --example smoke_status
+        env:
+          CASPER_RPC_URL: http://127.0.0.1:11101/rpc
 
       - name: Smoke write + wait + SSE
         run: |
           CASPER_SECRET_KEY=./assets/users/user-1/secret_key.pem \
             cargo run -p casperatatui --example smoke_write_wait
+        env:
+          CASPER_RPC_URL: http://127.0.0.1:11101/rpc
