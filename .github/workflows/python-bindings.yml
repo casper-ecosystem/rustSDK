@@ -1,0 +1,50 @@
+# Lightweight PyO3 / maturin smoke. Separate from ci-test (no NCTL, no Wasm).
+name: python-bindings
+
+on:
+  push:
+    branches: [dev, "feat*", "release-*"]
+    paths:
+      - "python/**"
+      - ".github/workflows/python-bindings.yml"
+  pull_request:
+    branches: [dev, "feat*", "release-*"]
+    paths:
+      - "python/**"
+      - ".github/workflows/python-bindings.yml"
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install native deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev
+        working-directory: ${{ github.workspace }}
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Swatinem cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install maturin
+        run: pip install "maturin>=1.7,<2.0"
+
+      - name: maturin develop
+        run: maturin develop
+
+      - name: Offline smoke
+        run: python tests/smoke_offline.py

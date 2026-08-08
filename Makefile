@@ -202,3 +202,17 @@ mcp-test-live:
 
 .PHONY: mcp-build mcp-http mcp-http-stop \
 	run-mcp run-mcp-http mcp-test mcp-test-live
+
+# --- Python bindings (python/ — maturin; not part of ci-test) ---
+
+python-develop:
+	cd python && \
+		(test -d .venv || uv venv .venv) && \
+		. .venv/bin/activate && \
+		uv pip install 'maturin>=1.7,<2.0' && \
+		maturin develop
+
+python-test: python-develop
+	cd python && . .venv/bin/activate && python tests/smoke_offline.py
+
+.PHONY: python-develop python-test

@@ -60,7 +60,7 @@ maturin develop
 python -c "import casper_rust_wasm_sdk_py as m; print(m.get_node_status('http://127.0.0.1:11101/rpc'))"
 ```
 
-Build is local via maturin (not part of `make pack` / CI Wasm jobs). See [`python/README.md`](../python/README.md).
+Build is local via maturin (`make python-test` for an offline smoke). Separate Actions workflow `python-bindings` (not part of `ci-test` / `make pack`). See [`python/README.md`](../python/README.md).
 
 ## Install
 

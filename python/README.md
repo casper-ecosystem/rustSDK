@@ -20,6 +20,7 @@ Async SDK calls use an owned tokio multi-thread runtime and `block_on` inside th
 - Package lives under [`python/`](./); path-depends on the repo root crate with `default-features = false` and `transaction` + `helpers` only.
 - Not part of the default Cargo build / CI clippy matrix for the Wasm SDK (build via maturin in this directory).
 - No change to default features or Wasm packs.
+- CI: separate workflow [`python-bindings`](../.github/workflows/python-bindings.yml) (path-filtered on `python/**`). Does not run inside `ci-test`. Offline smoke only (no NCTL).
 
 ## Build (local)
 
@@ -37,6 +38,12 @@ python -c "import casper_rust_wasm_sdk_py as m; print(m.get_node_status('http://
 Returns a dict (`chainspec_name`, `build_version`, `api_version`, `json`). Print the whole dict for a smoke check; pick fields only when you need them (e.g. `chain_name` for a transfer).
 
 Use the venv interpreter (`python` after `source .venv/bin/activate`, or `.venv/bin/python`). System `python3` will not see the wheel.
+
+From the repo root (same offline smoke as CI):
+
+```bash
+make python-test
+```
 
 ## Example
 
