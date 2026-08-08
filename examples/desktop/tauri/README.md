@@ -45,13 +45,13 @@ Presets: `nctl` (default), `testnet`, `mainnet`. Override RPC / events in the fo
 
 ## Screens
 
-| Screen | What it does |
-|--------|----------------|
-| Keys | Generate Ed25519 / Secp256k1, save PEM; unlock / unload session |
-| Message | Sign / verify free-form messages (casper-sign-verify parity) |
-| Compose | Build unsigned transfer / delegate / undelegate / redelegate JSON |
-| Approvals | Open/save JSON, add approval, verify, put (policy) |
-| Watch | `wait_transaction` + `get_transaction` |
+| Screen    | What it does                                                      |
+| --------- | ----------------------------------------------------------------- |
+| Keys      | Generate Ed25519 / Secp256k1, save PEM; unlock / unload session   |
+| Message   | Sign / verify free-form messages (casper-sign-verify parity)      |
+| Compose   | Build unsigned transfer / delegate / undelegate / redelegate JSON |
+| Approvals | Open/save JSON, add approval, verify, put (policy)                |
+| Watch     | `wait_transaction` + `get_transaction`                            |
 
 Native menu: File (Open/Save JSON, Unlock/Unload), Edit, View (reload/zoom/devtools), Help.
 

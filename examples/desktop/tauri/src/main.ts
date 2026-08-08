@@ -1,12 +1,16 @@
 import "./styles.css";
 import { listen } from "@tauri-apps/api/event";
 import { api, type PresetInfo } from "./api";
+import logoUrl from "./assets/logo.svg";
 
 type Tab = "keys" | "message" | "compose" | "approvals" | "watch";
+type Theme = "dark" | "light";
 
+const THEME_KEY = "casper-signing-desk-theme";
 const root = document.querySelector("#app")!;
 
-let tab: Tab = "keys";
+/** Start on Message: no keygen prompt on launch. Unlock only when you need to sign. */
+let tab: Tab = "message";
 let publicKey: string | null = null;
 let lastTxJson = "";
 let lastHash = "";
@@ -15,6 +19,32 @@ let statusText = "";
 let statusKind: "ok" | "err" | "" = "";
 let busy = false;
 let presets: PresetInfo[] = [];
+let theme: Theme = "dark";
+
+function readStoredTheme(): Theme {
+  try {
+    const v = localStorage.getItem(THEME_KEY);
+    if (v === "light" || v === "dark") return v;
+  } catch {
+    /* ignore */
+  }
+  return "dark";
+}
+
+function applyTheme(next: Theme): void {
+  theme = next;
+  document.documentElement.setAttribute("data-theme", next);
+  try {
+    localStorage.setItem(THEME_KEY, next);
+  } catch {
+    /* ignore */
+  }
+}
+
+function toggleTheme(): void {
+  applyTheme(theme === "dark" ? "light" : "dark");
+  render();
+}
 
 function truncate(s: string, n = 22): string {
   if (s.length <= n * 2 + 1) return s;
@@ -42,7 +72,8 @@ async function withBusy(fn: () => Promise<void>): Promise<void> {
   try {
     await fn();
   } catch (e) {
-    const msg = typeof e === "string" ? e : e instanceof Error ? e.message : String(e);
+    const msg =
+      typeof e === "string" ? e : e instanceof Error ? e.message : String(e);
     setStatus(msg, "err");
   } finally {
     busy = false;
@@ -61,13 +92,18 @@ function presetOptions(selected = "nctl"): string {
 
 function shell(body: string): string {
   const unlocked = Boolean(publicKey);
+  const themeLabel = theme === "dark" ? "Light" : "Dark";
   return `
     <header class="top">
       <div class="brand">
-        <h1>Casper Signing Desk</h1>
-        <p>Native PEM · message verify · transfer / stake · multisig · wait</p>
+        <img class="brand-logo" src="${logoUrl}" alt="Casper" width="123" height="40" />
+        <div class="brand-text">
+          <h1>Casper Signing Desk</h1>
+          <p>Native PEM · message verify · transfer / stake · multisig · wait</p>
+        </div>
       </div>
       <div class="session">
+        <button type="button" class="btn ghost" data-action="toggle-theme" title="Switch theme">${themeLabel}</button>
         <span class="badge ${unlocked ? "on" : ""}"><span class="dot"></span>${unlocked ? "unlocked" : "locked"}</span>
         <code class="pk ${unlocked ? "unlocked" : ""}">${unlocked ? truncate(publicKey!) : "no key in session"}</code>
         <button type="button" class="btn primary" data-action="unlock" ${busy ? "disabled" : ""}>Unlock PEM</button>
@@ -75,7 +111,7 @@ function shell(body: string): string {
       </div>
     </header>
     <nav class="tabs">
-      ${(["keys", "message", "compose", "approvals", "watch"] as Tab[])
+      ${(["message", "compose", "approvals", "watch", "keys"] as Tab[])
         .map(
           (id) =>
             `<button type="button" data-tab="${id}" class="${tab === id ? "active" : ""}">${id[0]!.toUpperCase()}${id.slice(1)}</button>`,
@@ -92,10 +128,11 @@ function viewKeys(): string {
   return shell(`
     <section class="panel">
       <h2>Keys</h2>
-      <p class="hint">Generate a key and save the PEM via the OS dialog. Rust writes the file; the secret is never shown here. Unlock a PEM into the session to sign.</p>
+      <p class="hint">Optional. Unlock an existing validator or account PEM to sign. Generate only when you need a new key; nothing is created on app start.</p>
       <div class="row">
-        <button type="button" class="btn primary" data-action="keygen-ed25519" ${busy ? "disabled" : ""}>Generate Ed25519</button>
-        <button type="button" class="btn" data-action="keygen-secp" ${busy ? "disabled" : ""}>Generate Secp256k1</button>
+        <button type="button" class="btn primary" data-action="unlock" ${busy ? "disabled" : ""}>Unlock existing PEM</button>
+        <button type="button" class="btn" data-action="keygen-ed25519" ${busy ? "disabled" : ""}>Generate Ed25519…</button>
+        <button type="button" class="btn" data-action="keygen-secp" ${busy ? "disabled" : ""}>Generate Secp256k1…</button>
       </div>
     </section>
   `);
@@ -105,7 +142,7 @@ function viewMessage(): string {
   return shell(`
     <section class="panel">
       <h2>Message sign / verify</h2>
-      <p class="hint">casper-sign-verify parity: sign with the unlocked PEM, or verify against a public key hex (01 / 02 prefix).</p>
+      <p class="hint">casper-sign-verify parity: sign with an unlocked PEM, or verify against a public key hex (01 / 02 prefix). Unlock only when you want to sign.</p>
       <div class="grid two">
         <div class="grid">
           <label class="field"><span>Message</span>
@@ -184,7 +221,7 @@ function viewApprovals(): string {
   return shell(`
     <section class="panel">
       <h2>Approvals desk</h2>
-      <p class="hint">Load JSON (File → Open or button), add an approval with the unlocked PEM, verify, save for the next cosigner, put when policy allows.</p>
+      <p class="hint">Why load JSON: cosigners pass the same unsigned or partly signed transaction file around. Open it here, add your approval with Unlock PEM, verify, then Save for the next signer or Put when ready. No key is required just to inspect JSON.</p>
       <label class="field"><span>Transaction JSON</span>
         <textarea class="tall" id="a-json" placeholder='{"Version1":…}'>${escapeHtml(lastTxJson)}</textarea>
       </label>
@@ -267,13 +304,18 @@ function render(): void {
 }
 
 function readJsonArea(): unknown {
-  const raw = (document.querySelector("#a-json") as HTMLTextAreaElement | null)?.value ?? lastTxJson;
+  const raw =
+    (document.querySelector("#a-json") as HTMLTextAreaElement | null)?.value ??
+    lastTxJson;
   return JSON.parse(raw);
 }
 
 function currentTxText(): string {
   if (tab === "approvals") {
-    return (document.querySelector("#a-json") as HTMLTextAreaElement | null)?.value ?? lastTxJson;
+    return (
+      (document.querySelector("#a-json") as HTMLTextAreaElement | null)
+        ?.value ?? lastTxJson
+    );
   }
   return lastTxJson;
 }
@@ -293,6 +335,10 @@ function bind(): void {
 }
 
 async function onAction(action: string): Promise<void> {
+  if (action === "toggle-theme") {
+    toggleTheme();
+    return;
+  }
   await withBusy(async () => {
     switch (action) {
       case "unlock": {
@@ -309,10 +355,11 @@ async function onAction(action: string): Promise<void> {
       case "keygen-ed25519":
       case "keygen-secp": {
         const algo = action === "keygen-secp" ? "secp256k1" : "ed25519";
-        const res = await api<{ public_key: string; path: string; algorithm: string }>(
-          "keygen_and_save",
-          { args: { algo } },
-        );
+        const res = await api<{
+          public_key: string;
+          path: string;
+          algorithm: string;
+        }>("keygen_and_save", { args: { algo } });
         setStatus(
           `Saved ${res.algorithm} key → ${res.path}\nPublic key: ${res.public_key}`,
           "ok",
@@ -320,38 +367,76 @@ async function onAction(action: string): Promise<void> {
         break;
       }
       case "msg-sign": {
-        const message = (document.querySelector("#msg-body") as HTMLTextAreaElement).value;
-        const res = await api<{ public_key: string; signature: string }>("message_sign", {
-          args: { message },
-        });
-        const pkEl = document.querySelector("#msg-pk") as HTMLInputElement | null;
-        const sigEl = document.querySelector("#msg-sig") as HTMLInputElement | null;
+        const message = (
+          document.querySelector("#msg-body") as HTMLTextAreaElement
+        ).value;
+        const res = await api<{ public_key: string; signature: string }>(
+          "message_sign",
+          {
+            args: { message },
+          },
+        );
+        const pkEl = document.querySelector(
+          "#msg-pk",
+        ) as HTMLInputElement | null;
+        const sigEl = document.querySelector(
+          "#msg-sig",
+        ) as HTMLInputElement | null;
         if (pkEl) pkEl.value = res.public_key;
         if (sigEl) sigEl.value = res.signature;
-        setStatus(`Signed.\nPublic Key:\n ${res.public_key}\nSignature:\n ${res.signature}`, "ok");
+        setStatus(
+          `Signed.\nPublic Key:\n ${res.public_key}\nSignature:\n ${res.signature}`,
+          "ok",
+        );
         break;
       }
       case "msg-verify": {
-        const message = (document.querySelector("#msg-body") as HTMLTextAreaElement).value;
-        const public_key_hex = (document.querySelector("#msg-pk") as HTMLInputElement).value;
-        const signature_hex = (document.querySelector("#msg-sig") as HTMLInputElement).value;
+        const message = (
+          document.querySelector("#msg-body") as HTMLTextAreaElement
+        ).value;
+        const public_key_hex = (
+          document.querySelector("#msg-pk") as HTMLInputElement
+        ).value;
+        const signature_hex = (
+          document.querySelector("#msg-sig") as HTMLInputElement
+        ).value;
         const res = await api<{ verified: boolean }>("message_verify", {
           args: { message, public_key_hex, signature_hex },
         });
-        setStatus(res.verified ? "Verified!" : "Verification failed!", res.verified ? "ok" : "err");
+        setStatus(
+          res.verified ? "Verified!" : "Verification failed!",
+          res.verified ? "ok" : "err",
+        );
         break;
       }
       case "compose": {
-        const preset = (document.querySelector("#c-preset") as HTMLSelectElement).value;
-        const kind = (document.querySelector("#c-kind") as HTMLSelectElement).value;
-        const rpc = (document.querySelector("#c-rpc") as HTMLInputElement).value.trim() || null;
-        const initiator = (document.querySelector("#c-init") as HTMLInputElement).value.trim();
-        const target = (document.querySelector("#c-target") as HTMLInputElement).value.trim();
+        const preset = (
+          document.querySelector("#c-preset") as HTMLSelectElement
+        ).value;
+        const kind = (document.querySelector("#c-kind") as HTMLSelectElement)
+          .value;
+        const rpc =
+          (document.querySelector("#c-rpc") as HTMLInputElement).value.trim() ||
+          null;
+        const initiator = (
+          document.querySelector("#c-init") as HTMLInputElement
+        ).value.trim();
+        const target = (
+          document.querySelector("#c-target") as HTMLInputElement
+        ).value.trim();
         const new_validator =
-          (document.querySelector("#c-newval") as HTMLInputElement).value.trim() || null;
-        const amount = (document.querySelector("#c-amount") as HTMLInputElement).value.trim();
-        const payment = (document.querySelector("#c-payment") as HTMLInputElement).value.trim();
-        const ttl = (document.querySelector("#c-ttl") as HTMLInputElement).value.trim();
+          (
+            document.querySelector("#c-newval") as HTMLInputElement
+          ).value.trim() || null;
+        const amount = (
+          document.querySelector("#c-amount") as HTMLInputElement
+        ).value.trim();
+        const payment = (
+          document.querySelector("#c-payment") as HTMLInputElement
+        ).value.trim();
+        const ttl = (
+          document.querySelector("#c-ttl") as HTMLInputElement
+        ).value.trim();
         const tx =
           kind === "transfer"
             ? await api("tx_make_transfer", {
@@ -405,8 +490,12 @@ async function onAction(action: string): Promise<void> {
       }
       case "a-sign": {
         const transaction_json = readJsonArea();
-        const preset = (document.querySelector("#a-preset") as HTMLSelectElement).value;
-        const rpc = (document.querySelector("#a-rpc") as HTMLInputElement).value.trim() || null;
+        const preset = (
+          document.querySelector("#a-preset") as HTMLSelectElement
+        ).value;
+        const rpc =
+          (document.querySelector("#a-rpc") as HTMLInputElement).value.trim() ||
+          null;
         const signed = await api("tx_sign_add_approval", {
           args: { transaction_json, preset, rpc },
         });
@@ -416,9 +505,12 @@ async function onAction(action: string): Promise<void> {
       }
       case "a-verify": {
         const transaction_json = readJsonArea();
-        const res = await api<{ verified: boolean; approvals: unknown }>("tx_verify", {
-          args: { transaction_json },
-        });
+        const res = await api<{ verified: boolean; approvals: unknown }>(
+          "tx_verify",
+          {
+            args: { transaction_json },
+          },
+        );
         setStatus(
           `${res.verified ? "Verified" : "Not verified"}\nApprovals:\n${JSON.stringify(res.approvals, null, 2)}`,
           res.verified ? "ok" : "err",
@@ -432,12 +524,21 @@ async function onAction(action: string): Promise<void> {
       }
       case "a-put": {
         const transaction_json = readJsonArea();
-        const preset = (document.querySelector("#a-preset") as HTMLSelectElement).value;
-        const rpc = (document.querySelector("#a-rpc") as HTMLInputElement).value.trim() || null;
+        const preset = (
+          document.querySelector("#a-preset") as HTMLSelectElement
+        ).value;
+        const rpc =
+          (document.querySelector("#a-rpc") as HTMLInputElement).value.trim() ||
+          null;
         const op = (document.querySelector("#a-op") as HTMLSelectElement).value;
         const policy_path =
-          (document.querySelector("#a-policy") as HTMLInputElement).value.trim() || null;
-        const res = await api<{ result: unknown; transaction_hash: string | null }>("tx_put", {
+          (
+            document.querySelector("#a-policy") as HTMLInputElement
+          ).value.trim() || null;
+        const res = await api<{
+          result: unknown;
+          transaction_hash: string | null;
+        }>("tx_put", {
           args: { transaction_json, preset, rpc, op, policy_path },
         });
         if (res.transaction_hash) lastHash = res.transaction_hash;
@@ -448,23 +549,39 @@ async function onAction(action: string): Promise<void> {
         break;
       }
       case "w-wait": {
-        const preset = (document.querySelector("#w-preset") as HTMLSelectElement).value;
+        const preset = (
+          document.querySelector("#w-preset") as HTMLSelectElement
+        ).value;
         const events_url =
-          (document.querySelector("#w-events") as HTMLInputElement).value.trim() || null;
-        const hash = (document.querySelector("#w-hash") as HTMLInputElement).value.trim();
+          (
+            document.querySelector("#w-events") as HTMLInputElement
+          ).value.trim() || null;
+        const hash = (
+          document.querySelector("#w-hash") as HTMLInputElement
+        ).value.trim();
         const timeout_ms = Number(
-          (document.querySelector("#w-timeout") as HTMLInputElement).value.trim() || "90000",
+          (
+            document.querySelector("#w-timeout") as HTMLInputElement
+          ).value.trim() || "90000",
         );
         setStatus("Waiting on events…", "");
-        const res = await api("tx_wait", { args: { preset, events_url, hash, timeout_ms } });
+        const res = await api("tx_wait", {
+          args: { preset, events_url, hash, timeout_ms },
+        });
         lastHash = hash;
         setStatus(JSON.stringify(res, null, 2), "ok");
         break;
       }
       case "w-get": {
-        const preset = (document.querySelector("#w-preset") as HTMLSelectElement).value;
-        const rpc = (document.querySelector("#w-rpc") as HTMLInputElement).value.trim() || null;
-        const hash = (document.querySelector("#w-hash") as HTMLInputElement).value.trim();
+        const preset = (
+          document.querySelector("#w-preset") as HTMLSelectElement
+        ).value;
+        const rpc =
+          (document.querySelector("#w-rpc") as HTMLInputElement).value.trim() ||
+          null;
+        const hash = (
+          document.querySelector("#w-hash") as HTMLInputElement
+        ).value.trim();
         const res = await api("tx_get", { args: { preset, rpc, hash } });
         lastHash = hash;
         setStatus(JSON.stringify(res, null, 2), "ok");
@@ -484,6 +601,7 @@ async function onAction(action: string): Promise<void> {
 }
 
 async function boot(): Promise<void> {
+  applyTheme(readStoredTheme());
   presets = await api<PresetInfo[]>("presets");
   policyPath = await api<string>("default_policy");
   publicKey = await api<string | null>("session_status");

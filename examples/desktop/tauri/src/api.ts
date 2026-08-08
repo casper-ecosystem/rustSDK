@@ -1,6 +1,9 @@
 import { invoke } from "@tauri-apps/api/core";
 
-export async function api<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
+export async function api<T>(
+  cmd: string,
+  args?: Record<string, unknown>,
+): Promise<T> {
   return invoke<T>(cmd, args);
 }
 
