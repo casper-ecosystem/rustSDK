@@ -1,5 +1,6 @@
 //! MCP sidecar library for `casper-rust-wasm-sdk`.
 
+pub mod compose;
 pub mod format;
 pub mod sdk_handle;
 pub mod server;

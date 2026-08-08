@@ -6,7 +6,7 @@ use mcpkit::prelude::*;
 use mcpkit::transport::stdio::StdioTransport;
 use mcpkit_axum::McpRouter;
 
-use crate::{format, sdk_handle, tools};
+use crate::{compose, format, sdk_handle, tools};
 
 /// MCP server handle exposing Casper SDK tools.
 pub struct CasperSdkMcp;
@@ -245,6 +245,133 @@ impl CasperSdkMcp {
         rpc_address: Option<String>,
     ) -> ToolOutput {
         tools::rpc::get_block_transfers(maybe_block_identifier, verbosity, rpc_address).await
+    }
+
+    #[tool(
+        description = "Compose: tip height then N latest blocks via get_block (default count=10, max 50)"
+    )]
+    async fn sdk_get_latest_blocks(
+        &self,
+        count: Option<u32>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        #[cfg(feature = "rpc")]
+        {
+            compose::blocks::get_latest_blocks(count, verbosity, rpc_address).await
+        }
+        #[cfg(not(feature = "rpc"))]
+        {
+            let _ = (count, verbosity, rpc_address);
+            tools::feature_disabled("rpc")
+        }
+    }
+
+    #[tool(
+        description = "Compose: transaction hashes in a block; optional expand fetches each get_transaction"
+    )]
+    async fn sdk_get_block_transactions(
+        &self,
+        block_identifier: String,
+        expand: Option<bool>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        #[cfg(feature = "rpc")]
+        {
+            compose::blocks::get_block_transactions(
+                block_identifier,
+                expand,
+                verbosity,
+                rpc_address,
+            )
+            .await
+        }
+        #[cfg(not(feature = "rpc"))]
+        {
+            let _ = (block_identifier, expand, verbosity, rpc_address);
+            tools::feature_disabled("rpc")
+        }
+    }
+
+    #[tool(description = "Compose: build unsigned delegate transaction")]
+    async fn sdk_make_delegate_transaction(
+        &self,
+        delegator: String,
+        validator: String,
+        amount: String,
+        transaction_params_json: String,
+    ) -> ToolOutput {
+        #[cfg(feature = "transaction")]
+        {
+            compose::stake::make_delegate_transaction(
+                delegator,
+                validator,
+                amount,
+                transaction_params_json,
+            )
+        }
+        #[cfg(not(feature = "transaction"))]
+        {
+            let _ = (delegator, validator, amount, transaction_params_json);
+            tools::feature_disabled("transaction")
+        }
+    }
+
+    #[tool(description = "Compose: build unsigned undelegate transaction")]
+    async fn sdk_make_undelegate_transaction(
+        &self,
+        delegator: String,
+        validator: String,
+        amount: String,
+        transaction_params_json: String,
+    ) -> ToolOutput {
+        #[cfg(feature = "transaction")]
+        {
+            compose::stake::make_undelegate_transaction(
+                delegator,
+                validator,
+                amount,
+                transaction_params_json,
+            )
+        }
+        #[cfg(not(feature = "transaction"))]
+        {
+            let _ = (delegator, validator, amount, transaction_params_json);
+            tools::feature_disabled("transaction")
+        }
+    }
+
+    #[tool(description = "Compose: build unsigned redelegate transaction")]
+    async fn sdk_make_redelegate_transaction(
+        &self,
+        delegator: String,
+        validator: String,
+        new_validator: String,
+        amount: String,
+        transaction_params_json: String,
+    ) -> ToolOutput {
+        #[cfg(feature = "transaction")]
+        {
+            compose::stake::make_redelegate_transaction(
+                delegator,
+                validator,
+                new_validator,
+                amount,
+                transaction_params_json,
+            )
+        }
+        #[cfg(not(feature = "transaction"))]
+        {
+            let _ = (
+                delegator,
+                validator,
+                new_validator,
+                amount,
+                transaction_params_json,
+            );
+            tools::feature_disabled("transaction")
+        }
     }
 
     #[tool(description = "JSON-RPC state_get_auction_info")]

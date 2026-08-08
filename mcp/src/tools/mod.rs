@@ -20,7 +20,10 @@ pub fn enabled_tool_groups() -> Vec<&'static str> {
     #[cfg(feature = "helpers")]
     groups.push("helpers");
     #[cfg(feature = "rpc")]
-    groups.push("rpc");
+    {
+        groups.push("rpc");
+        groups.push("compose");
+    }
     #[cfg(feature = "binary-port")]
     groups.push("binary-port");
     #[cfg(feature = "transaction")]
@@ -49,7 +52,10 @@ pub fn registered_tool_names() -> Vec<&'static str> {
     #[cfg(feature = "helpers")]
     names.extend_from_slice(helpers::tool_names());
     #[cfg(feature = "rpc")]
-    names.extend_from_slice(rpc::tool_names());
+    {
+        names.extend_from_slice(rpc::tool_names());
+        names.extend_from_slice(crate::compose::tool_names());
+    }
     #[cfg(feature = "binary-port")]
     names.extend_from_slice(binary_port::tool_names());
     #[cfg(feature = "transaction")]

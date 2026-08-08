@@ -100,6 +100,22 @@ Common optional args: `verbosity?`, `rpc_address?`.
 
 ---
 
+## compose — feature `rpc` (TUI / explorer helpers)
+
+Compositions over existing RPC (no new node methods). Path: `mcp/src/compose/`.
+
+| MCP tool                          | Args                                                                       | Behavior                                      | write? |
+| --------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------- | ------ |
+| `sdk_get_latest_blocks`           | `{ count?, verbosity?, rpc_address? }`                                     | tip height then N× `get_block` (default 10)   | no     |
+| `sdk_get_block_transactions`      | `{ block_identifier, expand?, … }`                                         | hashes from block body; `expand` fetches each | no     |
+| `sdk_make_delegate_transaction`   | `{ delegator, validator, amount, transaction_params_json }`                | unsigned delegate tx JSON                     | no\*   |
+| `sdk_make_undelegate_transaction` | `{ delegator, validator, amount, transaction_params_json }`                | unsigned undelegate tx JSON                   | no\*   |
+| `sdk_make_redelegate_transaction` | `{ delegator, validator, new_validator, amount, transaction_params_json }` | unsigned redelegate tx JSON                   | no\*   |
+
+\*Builders only (no put). Sign/put stay on existing write tools (`sdk_sign_transaction`, `sdk_put_transaction`, …).
+
+---
+
 ## binary-port — feature `binary-port` (reads + speculative)
 
 Common optional: `node_address?`. Path: `sdk/binary_port/mod.rs`.

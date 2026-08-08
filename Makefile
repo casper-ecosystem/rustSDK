@@ -203,6 +203,21 @@ mcp-test-live:
 .PHONY: mcp-build mcp-http mcp-http-stop \
 	run-mcp run-mcp-http mcp-test mcp-test-live
 
+# --- TUI explorer example (examples/tui) ---
+
+run-tui:
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		cargo run -p casper-sdk-tui -- --preset nctl $(TUI_ARGS)
+
+# Example package lint (not part of root wasm clippy matrix).
+check-lint-tui:
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		cargo clippy -p casper-sdk-tui --all-targets --no-deps -- -D warnings
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		cargo fmt -p casper-sdk-tui -- --check
+
+.PHONY: run-tui check-lint-tui
+
 # --- Python bindings (python/ — maturin) ---
 
 python-develop:
