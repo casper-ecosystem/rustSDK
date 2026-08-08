@@ -7,13 +7,11 @@ on:
     paths:
       - "python/**"
       - ".github/workflows/python-bindings.yml"
-      - "Makefile"
   pull_request:
     branches: [dev, "feat*", "release-*"]
     paths:
       - "python/**"
       - ".github/workflows/python-bindings.yml"
-      - "Makefile"
   workflow_dispatch:
 
 jobs:
