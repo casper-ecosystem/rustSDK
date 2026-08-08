@@ -43,27 +43,6 @@ make mcp-test-live  # against a live local node
 
 See [`mcp/README.md`](../mcp/README.md), tool inventory [`mcp/TOOLS.md`](../mcp/TOOLS.md), and Cursor sample [`mcp/mcp.json.example`](../mcp/mcp.json.example).
 
-## Casperatatui
-
-**Casperatatui** is a Casper TUI (terminal UI) based on [ratatui](https://ratatui.rs/), over the native Rust SDK. JSON-RPC and SSE only (no binary port).
-
-- Source: [`examples/desktop/casperatatui`](../examples/desktop/casperatatui)
-- Issue: [#123](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/123)
-- GitHub Releases / Pre-release [`dev-preview`](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases): linux binary `casperatatui-<label>-linux-x86_64`
-
-```bash
-make run-casperatatui
-# alias
-make run-tui
-
-make run-tui TUI_ARGS='--preset testnet'
-make run-tui TUI_ARGS='--preset mainnet'
-```
-
-Writes stay off unless you pass `--enable-writes` and a secret key. Not part of the default SDK crate build or Hub images (unlike MCP).
-
-See [`examples/desktop/casperatatui/README.md`](../examples/desktop/casperatatui/README.md).
-
 ## Install
 
 <details>
@@ -124,11 +103,11 @@ This will create a `pkg` and `pkg-nodejs` containing the Typescript interfaces. 
 
 Default is `full` (today's API) for both the wasm package and the Rust `rlib`. Slim builds drop optional surfaces:
 
-| Profile                 | Make target                  | Cargo flags                                                    |
-| ----------------------- | ---------------------------- | -------------------------------------------------------------- |
-| full + SSE (wasm packs) | `make web` / `make nodejs`   | default features + `--features SSE` (SSEClient + CESParser)    |
-| read-only               | `make web-read-only`         | `--no-default-features`                                        |
-| transaction (no deploy) | `make web-transaction`       | `--no-default-features --features transaction,helpers,watcher` |
+| Profile                 | Make target                | Cargo flags                                                    |
+| ----------------------- | -------------------------- | -------------------------------------------------------------- |
+| full + SSE (wasm packs) | `make web` / `make nodejs` | default features + `--features SSE` (SSEClient + CESParser)    |
+| read-only               | `make web-read-only`       | `--no-default-features`                                        |
+| transaction (no deploy) | `make web-transaction`     | `--no-default-features --features transaction,helpers,watcher` |
 
 Optional features: `transaction`, `deploy`, `contract`, `binary-port`, `watcher` (wait/watch), `SSE` (node SSE client + CES; enables `watcher`), `helpers`. Core JSON-RPC reads stay available without them. `binary-port` pulls optional `casper-binary-port*` crates.
 
@@ -2701,9 +2680,35 @@ For a terminal UI over the same SDK (not Electron), see [Casperatatui](#casperat
 
 </details>
 
----
+## Casperatatui
 
-<br>
+**Casperatatui** is a Casper TUI (terminal UI) based on [ratatui](https://ratatui.rs/), over the native Rust SDK. JSON-RPC and SSE only (no binary port).
+
+- Source: [`examples/desktop/casperatatui`](../examples/desktop/casperatatui)
+- GitHub Releases / Pre-release [`dev-preview`](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases): linux binary `casperatatui-<label>-linux-x86_64`
+
+```bash
+make run-casperatatui
+# alias
+make run-tui
+
+make run-tui TUI_ARGS='--preset testnet'
+make run-tui TUI_ARGS='--preset mainnet'
+```
+
+Writes stay off unless you pass `--enable-writes` and a secret key. Not part of the default SDK crate build or Hub images (unlike MCP).
+
+See [`examples/desktop/casperatatui/README.md`](../examples/desktop/casperatatui/README.md).
+
+## Python
+
+The workspace package [`python/`](../python/) (`casper-rust-wasm-sdk-py`) is a PyO3 / maturin extension over the same native Rust `rlib` (not a Python port).
+
+- Install / develop: see [Python Project](#python-project) under Install above, or [`python/README.md`](../python/README.md)
+- CI: path-filtered `python-bindings` (offline unit + Hub NCTL `:dev`)
+- Make: `make python-test`, `make python-test-nctl`
+
+Initial face: [#117](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/117). Parity waves 1–4: [#121](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/121) (closes [#120](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/120)). Epic [#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9) is **closed**. Deploy APIs, binary-port, and PyPI publish remain out of that epic.
 
 ## Rust API
 
@@ -2862,9 +2867,10 @@ SECRET_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
 
 Open tracking (not a full roadmap):
 
-- [#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9): Python / PyO3 bindings (initial face in [`python/`](../python/); expand surface)
 - [#36](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/36) — first crates.io publish
 - [#96](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/96) — explainer for node core: AE-off `entity-contract-…` vs `hash-…` on `query_global_state` (SDK remaps; permanent fix is upstream)
+- [#118](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/118) — C bindings (cdylib / cbindgen)
+- [#119](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/119) — Go bindings (cgo / native)
 
 Mac desktop Electron build is still TODO (Windows / Linux demos ship on releases).
 
