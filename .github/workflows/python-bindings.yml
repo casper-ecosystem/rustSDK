@@ -1,4 +1,4 @@
-# Offline unit tests for python/** (maturin + cargo test + pytest).
+# Python bindings: offline unit + NCTL integration (Hub :dev).
 name: python-bindings
 
 on:
@@ -58,3 +58,88 @@ jobs:
         run: |
           . .venv/bin/activate
           pytest tests/test_unit_offline.py -q
+
+  nctl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install native deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Swatinem cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Start Casper NCTL
+        run: |
+          mkdir -p assets/users assets/faucet
+          # Hub :dev — same pin story as ci-test (BRANCH_NODE=v2.2.2 until node/dev advances).
+          docker run -d \
+            --name casper-nctl \
+            -p 11101-11105:11101-11105 \
+            -p 14101-14105:14101-14105 \
+            -p 18101-18105:18101-18105 \
+            -p 25101-25105:25101-25105 \
+            -p 28101-28105:28101-28105 \
+            -v $PWD/assets/users:/app/casper-nctl/assets/net-1/users/ \
+            -v $PWD/assets/faucet:/app/casper-nctl/assets/net-1/faucet/ \
+            interchouette/casper-nctl-2-docker:dev
+
+      - name: Wait for RPC and SSE
+        run: |
+          echo "Waiting for RPC on port 11101..."
+          for i in {1..30}; do
+            if nc -z localhost 11101; then
+              echo "RPC port up; waiting 45s for keys"
+              sleep 45
+              break
+            fi
+            sleep 1
+          done
+          if ! nc -z localhost 11101; then
+            echo "RPC did not start in time"
+            exit 1
+          fi
+
+          echo "Waiting for SSE on http://127.0.0.1:18101/events..."
+          for i in {1..30}; do
+            if curl --silent --max-time 2 http://127.0.0.1:18101/events | grep -q "ApiVersion"; then
+              echo "SSE up"
+              break
+            fi
+            sleep 1
+          done
+          if ! curl --silent --max-time 2 http://127.0.0.1:18101/events | grep -q "ApiVersion"; then
+            echo "SSE did not start in time"
+            exit 1
+          fi
+
+      - name: venv + maturin develop
+        working-directory: python
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install "maturin>=1.7,<2.0" "pytest>=8,<9"
+          maturin develop
+
+      # WARNING: NCTL fixture keys on the runner are publicly known (same as ci-test).
+      - name: Pytest NCTL integration
+        working-directory: python
+        env:
+          CASPER_RPC_URL: http://127.0.0.1:11101/rpc
+          CASPER_EVENTS_URL: http://127.0.0.1:18101/events
+          CASPER_SECRET_KEY_PEM_FILE: ${{ github.workspace }}/assets/users/user-1/secret_key.pem
+        run: |
+          . .venv/bin/activate
+          export CASPER_PURSE_ID="$(tr -d '[:space:]' < "${{ github.workspace }}/assets/users/user-1/public_key_hex")"
+          pytest tests/test_nctl_integration.py -m nctl -q --tb=short

@@ -348,7 +348,7 @@ uv pip install maturin
 maturin develop
 ```
 
-From the repo root you can also run `make python-test` (offline unit) or `make python-test-nctl` (needs a local JSON-RPC node).
+From the repo root you can also run `make python-test` (offline unit) or `make python-test-nctl` (live node). The `python-bindings` workflow runs both against Hub NCTL `:dev`.
 
 ## Usage
 
