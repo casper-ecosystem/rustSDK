@@ -21,5 +21,5 @@ features = ["pyo3/extension-module"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [
-  "nctl: needs a reachable Casper JSON-RPC node (and optional PEM for put/wait)",
+  "nctl: needs a reachable Casper JSON-RPC node plus CASPER_PURSE_ID and CASPER_SECRET_KEY_PEM_FILE",
 ]

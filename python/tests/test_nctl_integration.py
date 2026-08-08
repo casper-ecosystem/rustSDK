@@ -3,11 +3,11 @@
 Run with: `make python-test-nctl` or
 `pytest tests/test_nctl_integration.py -m nctl`
 
-Env:
-  CASPER_RPC_URL     default http://127.0.0.1:11101/rpc
-  CASPER_EVENTS_URL  default http://127.0.0.1:18101/events
-  CASPER_PURSE_ID    optional pubkey for query_balance / get_entity
-  CASPER_SECRET_KEY_PEM_FILE  optional path to PEM for put+wait
+Required env for this suite:
+  CASPER_RPC_URL              default http://127.0.0.1:11101/rpc
+  CASPER_EVENTS_URL           default http://127.0.0.1:18101/events
+  CASPER_PURSE_ID             pubkey / account-hash / uref for query_balance
+  CASPER_SECRET_KEY_PEM_FILE  path to funded secret key PEM for put + wait
 """
 
 from __future__ import annotations
@@ -47,16 +47,19 @@ requires_rpc = pytest.mark.skipif(
 )
 
 
-def load_secret_pem() -> str | None:
-    path = os.environ.get("CASPER_SECRET_KEY_PEM_FILE")
-    if path and os.path.isfile(path):
-        return open(path, encoding="utf-8").read()
-    raw = os.environ.get("CASPER_SECRET_KEY_PEM")
-    if raw and "BEGIN" in raw:
-        return raw
-    if raw and os.path.isfile(raw):
-        return open(raw, encoding="utf-8").read()
-    return None
+def require_purse_id() -> str:
+    purse = os.environ.get("CASPER_PURSE_ID", "").strip()
+    assert purse, "CASPER_PURSE_ID is required for NCTL integration"
+    return purse
+
+
+def require_secret_pem() -> str:
+    path = os.environ.get("CASPER_SECRET_KEY_PEM_FILE", "").strip()
+    assert path, "CASPER_SECRET_KEY_PEM_FILE is required for NCTL integration"
+    assert os.path.isfile(path), f"CASPER_SECRET_KEY_PEM_FILE not found: {path}"
+    pem = open(path, encoding="utf-8").read()
+    assert "BEGIN" in pem and "PRIVATE KEY" in pem, "PEM file is not a Casper secret key"
+    return pem
 
 
 def extract_tx_hash(put: dict, signed: str) -> str:
@@ -118,10 +121,8 @@ def test_node_status_and_reads() -> None:
 
 
 @requires_rpc
-def test_query_balance_optional() -> None:
-    purse = os.environ.get("CASPER_PURSE_ID")
-    if not purse:
-        pytest.skip("set CASPER_PURSE_ID")
+def test_query_balance() -> None:
+    purse = require_purse_id()
     bal = json.loads(casper.query_balance(purse, None, None, RPC))
     assert "balance" in bal or bal
     try:
@@ -129,16 +130,15 @@ def test_query_balance_optional() -> None:
         assert entity
     except Exception as exc:
         msg = str(exc)
+        # Known SDK serde gap for entity.Account (not AddressableEntity / LegacyAccount).
         if "unknown variant `Account`" in msg or "LegacyAccount" in msg:
-            pytest.skip("get_entity Account variant not deserializable")
+            pytest.xfail("get_entity rejects Account variant (SDK serde gap)")
         raise
 
 
 @requires_rpc
-def test_put_and_wait_optional() -> None:
-    pem = load_secret_pem()
-    if not pem:
-        pytest.skip("set CASPER_SECRET_KEY_PEM_FILE")
+def test_put_and_wait() -> None:
+    pem = require_secret_pem()
     status = casper.get_node_status(RPC)
     chain = status["chainspec_name"]
     sender = casper.public_key_from_secret_key(pem)

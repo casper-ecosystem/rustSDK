@@ -218,9 +218,11 @@ python-test: python-develop
 		cargo test --manifest-path Cargo.toml --lib && \
 		pytest tests/test_unit_offline.py -q
 
-# Live node integration (skipped automatically if RPC unreachable).
+# Live node integration. Requires CASPER_PURSE_ID and CASPER_SECRET_KEY_PEM_FILE.
 python-test-nctl: python-develop
 	cd python && . .venv/bin/activate && \
+		test -n "$${CASPER_PURSE_ID}" && \
+		test -n "$${CASPER_SECRET_KEY_PEM_FILE}" && \
 		CASPER_RPC_URL=$${CASPER_RPC_URL:-http://127.0.0.1:11101/rpc} \
 		pytest tests/test_nctl_integration.py -m nctl -q --tb=short
 

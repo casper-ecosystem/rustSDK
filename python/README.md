@@ -45,7 +45,7 @@ PEM inputs are secrets. `secret_key_from_pem` validates and does not echo the ke
 
 ### Transaction and contract
 
-Params are JSON strings. Builder JSON may set `"runtime": "v1"|"v2"`. `install` / `call_entrypoint` also take optional `runtime_v2` (None/true → V2 on install; call leaves builder unless set).
+Params are JSON strings. Builder JSON may set `"runtime": "v1"|"v2"`. `install` / `call_entrypoint` also take `runtime_v2` (`None`/`true` → V2 on install; call leaves builder unless set).
 
 | Function | Behavior |
 | --- | --- |
@@ -85,7 +85,7 @@ From the repo root:
 
 ```bash
 make python-test       # offline unit (cargo test + pytest)
-make python-test-nctl  # live node reads + optional put/wait
+make python-test-nctl  # live node: reads, query_balance, put + wait
 ```
 
 | Suite | Path | Needs node |
@@ -93,7 +93,7 @@ make python-test-nctl  # live node reads + optional put/wait
 | Unit | `tests/test_unit_offline.py` (+ Rust `params` tests) | no |
 | Integration | `tests/test_nctl_integration.py` (`-m nctl`) | yes |
 
-The `python-bindings` workflow runs both: unit offline, then NCTL via Hub image `interchouette/casper-nctl-2-docker:dev` (same approach as tip `ci-test`). For local put/wait set `CASPER_SECRET_KEY_PEM_FILE` and `CASPER_PURSE_ID`.
+The `python-bindings` workflow runs both: unit offline, then NCTL via Hub image `interchouette/casper-nctl-2-docker:dev` (same approach as tip `ci-test`). NCTL requires `CASPER_SECRET_KEY_PEM_FILE` and `CASPER_PURSE_ID`.
 
 ## Examples
 

@@ -8,5 +8,5 @@ import pytest
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
         "markers",
-        "nctl: needs a reachable Casper JSON-RPC node (and optional PEM for put/wait)",
+        "nctl: needs a reachable Casper JSON-RPC node plus CASPER_PURSE_ID and CASPER_SECRET_KEY_PEM_FILE",
     )

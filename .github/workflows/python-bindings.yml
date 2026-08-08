@@ -83,7 +83,7 @@ jobs:
       - name: Start Casper NCTL
         run: |
           mkdir -p assets/users assets/faucet
-          # Hub :dev — same pin story as ci-test (BRANCH_NODE=v2.2.2 until node/dev advances).
+          # Hub :dev - same pin story as ci-test (BRANCH_NODE=v2.2.2 until node/dev advances).
           docker run -d \
             --name casper-nctl \
             -p 11101-11105:11101-11105 \
@@ -133,6 +133,13 @@ jobs:
           maturin develop
 
       # WARNING: NCTL fixture keys on the runner are publicly known (same as ci-test).
+      - name: Require NCTL fixtures
+        run: |
+          test -f assets/users/user-1/secret_key.pem
+          test -f assets/users/user-1/public_key_hex
+          test -s assets/users/user-1/secret_key.pem
+          test -s assets/users/user-1/public_key_hex
+
       - name: Pytest NCTL integration
         working-directory: python
         env:
