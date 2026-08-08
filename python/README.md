@@ -93,7 +93,16 @@ make python-test-nctl  # live node: reads, query_balance, put + wait
 | Unit | `tests/test_unit_offline.py` (+ Rust `params` tests) | no |
 | Integration | `tests/test_nctl_integration.py` (`-m nctl`) | yes |
 
-The `python-bindings` workflow runs both: unit offline, then NCTL via Hub image `interchouette/casper-nctl-2-docker:dev` (same approach as tip `ci-test`). NCTL requires `CASPER_SECRET_KEY_PEM_FILE` and `CASPER_PURSE_ID`.
+The `python-bindings` workflow runs both: unit offline, then NCTL via Hub image `interchouette/casper-nctl-2-docker:dev`. Keys match tip `ci-test` / e2e: `SECRET_KEY_USER_1` from `assets/users/user-1/secret_key.pem` (local make may set `CASPER_SECRET_KEY_PEM_FILE` instead).
+
+NCTL cases (`pytest -v`):
+
+| Test | What it exercises |
+| --- | --- |
+| `test_node_status_and_reads` | status, peers, block, state root, auction, era, validators, chainspec, list_rpcs, block transfers |
+| `test_query_balance` | `query_balance` for user-1 pubkey |
+| `test_get_entity` | `get_entity` (xfail while Account serde gap remains) |
+| `test_put_and_wait` | `make_transfer_transaction` → `sign_transaction` → `put_transaction` → `wait_transaction` |
 
 ## Examples
 

@@ -1,13 +1,14 @@
 """NCTL integration tests (requires a reachable JSON-RPC node).
 
 Run with: `make python-test-nctl` or
-`pytest tests/test_nctl_integration.py -m nctl`
+`pytest tests/test_nctl_integration.py -m nctl -v`
 
-Required env for this suite:
-  CASPER_RPC_URL              default http://127.0.0.1:11101/rpc
-  CASPER_EVENTS_URL           default http://127.0.0.1:18101/events
-  CASPER_PURSE_ID             pubkey / account-hash / uref for query_balance
-  CASPER_SECRET_KEY_PEM_FILE  path to funded secret key PEM for put + wait
+Required env (same key material as tip ci-test / e2e):
+  CASPER_RPC_URL       default http://127.0.0.1:11101/rpc
+  CASPER_EVENTS_URL    default http://127.0.0.1:18101/events
+  SECRET_KEY_USER_1    PEM body line (ci-test / e2e), or
+  CASPER_SECRET_KEY_PEM_FILE  path to a full funded PEM (local make)
+  CASPER_PURSE_ID      pubkey / account-hash / uref; defaults to pubkey from secret
 """
 
 from __future__ import annotations
@@ -47,19 +48,31 @@ requires_rpc = pytest.mark.skipif(
 )
 
 
-def require_purse_id() -> str:
-    purse = os.environ.get("CASPER_PURSE_ID", "").strip()
-    assert purse, "CASPER_PURSE_ID is required for NCTL integration"
-    return purse
-
-
 def require_secret_pem() -> str:
+    """Resolve funded key like e2e: SECRET_KEY_USER_1 body, else PEM file path."""
+    body = os.environ.get("SECRET_KEY_USER_1", "").strip()
+    if body:
+        if "BEGIN" in body:
+            return body
+        return f"-----BEGIN PRIVATE KEY-----\n{body}\n-----END PRIVATE KEY-----"
+
     path = os.environ.get("CASPER_SECRET_KEY_PEM_FILE", "").strip()
-    assert path, "CASPER_SECRET_KEY_PEM_FILE is required for NCTL integration"
+    assert path, (
+        "SECRET_KEY_USER_1 or CASPER_SECRET_KEY_PEM_FILE is required for NCTL integration"
+    )
     assert os.path.isfile(path), f"CASPER_SECRET_KEY_PEM_FILE not found: {path}"
     pem = open(path, encoding="utf-8").read()
     assert "BEGIN" in pem and "PRIVATE KEY" in pem, "PEM file is not a Casper secret key"
     return pem
+
+
+def require_purse_id(pem: str | None = None) -> str:
+    purse = os.environ.get("CASPER_PURSE_ID", "").strip()
+    if purse:
+        return purse
+    if pem is None:
+        pem = require_secret_pem()
+    return casper.public_key_from_secret_key(pem)
 
 
 def extract_tx_hash(put: dict, signed: str) -> str:
@@ -89,6 +102,7 @@ def extract_tx_hash(put: dict, signed: str) -> str:
 
 @requires_rpc
 def test_node_status_and_reads() -> None:
+    """RPC smoke: status, peers, block, SRH, auction, era, validators, chainspec, list_rpcs, transfers."""
     status = casper.get_node_status(RPC)
     assert status["chainspec_name"]
 
@@ -122,9 +136,16 @@ def test_node_status_and_reads() -> None:
 
 @requires_rpc
 def test_query_balance() -> None:
+    """query_balance for SECRET_KEY_USER_1 / CASPER_PURSE_ID pubkey."""
     purse = require_purse_id()
     bal = json.loads(casper.query_balance(purse, None, None, RPC))
     assert "balance" in bal or bal
+
+
+@requires_rpc
+def test_get_entity() -> None:
+    """get_entity for the same purse (xfail while Account serde gap remains)."""
+    purse = require_purse_id()
     try:
         entity = json.loads(casper.get_entity(purse, None, RPC))
         assert entity
@@ -138,6 +159,7 @@ def test_query_balance() -> None:
 
 @requires_rpc
 def test_put_and_wait() -> None:
+    """make_transfer_transaction → sign → put_transaction → wait_transaction (90s)."""
     pem = require_secret_pem()
     status = casper.get_node_status(RPC)
     chain = status["chainspec_name"]

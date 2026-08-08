@@ -132,21 +132,17 @@ jobs:
           pip install "maturin>=1.7,<2.0" "pytest>=8,<9"
           maturin develop
 
-      # WARNING: NCTL fixture keys on the runner are publicly known (same as ci-test).
-      - name: Require NCTL fixtures
+      # WARNING: These accounts, and their private keys, are now publicly known.
+      - name: Set SECRET_KEY_USER_1 and SECRET_KEY_USER_2 environment variables
         run: |
-          test -f assets/users/user-1/secret_key.pem
-          test -f assets/users/user-1/public_key_hex
-          test -s assets/users/user-1/secret_key.pem
-          test -s assets/users/user-1/public_key_hex
+          echo "SECRET_KEY_USER_1=$(sed -n '2p' ./assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
+          echo "SECRET_KEY_USER_2=$(sed -n '2p' ./assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
 
       - name: Pytest NCTL integration
         working-directory: python
         env:
           CASPER_RPC_URL: http://127.0.0.1:11101/rpc
           CASPER_EVENTS_URL: http://127.0.0.1:18101/events
-          CASPER_SECRET_KEY_PEM_FILE: ${{ github.workspace }}/assets/users/user-1/secret_key.pem
         run: |
           . .venv/bin/activate
-          export CASPER_PURSE_ID="$(tr -d '[:space:]' < "${{ github.workspace }}/assets/users/user-1/public_key_hex")"
-          pytest tests/test_nctl_integration.py -m nctl -q --tb=short
+          pytest tests/test_nctl_integration.py -m nctl -v --tb=short
