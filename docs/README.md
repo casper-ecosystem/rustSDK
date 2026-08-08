@@ -2872,8 +2872,6 @@ Open tracking (not a full roadmap):
 - [#118](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/118) — C bindings (cdylib / cbindgen)
 - [#119](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/119) — Go bindings (cgo / native)
 
-Done (removed from this list): [#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9) Python / PyO3 face + parity ([#117](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/117), [#121](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/121)). See [Python](#python).
-
 Mac desktop Electron build is still TODO (Windows / Linux demos ship on releases).
 
 ⚠ **Reminder**: Do not use private keys or perform real transactions on mainnet unless you are fully aware of the security risks.
