@@ -1,4 +1,4 @@
-//! Wave 2: SDK session meta (rpc / node / verbosity).
+//! SDK session meta (rpc / node / verbosity).
 
 use casper_rust_wasm_sdk::SDK;
 use pyo3::prelude::*;

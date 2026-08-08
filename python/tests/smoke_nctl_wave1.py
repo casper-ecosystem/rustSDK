@@ -1,4 +1,4 @@
-"""NCTL smoke: Wave 1 reads + optional Wave 3 put + Wave 4 wait.
+"""NCTL smoke: RPC reads + optional put + wait_transaction.
 
 Env:
   CASPER_RPC_URL     default http://127.0.0.1:11101/rpc

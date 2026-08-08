@@ -1,4 +1,4 @@
-//! Wave 1: non-deprecated JSON-RPC reads (JSON string results).
+//! Non-deprecated JSON-RPC reads (JSON string results).
 
 use casper_rust_wasm_sdk::{
     rpcs::{

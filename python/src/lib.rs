@@ -1,6 +1,6 @@
 //! Thin PyO3 face over `casper-rust-wasm-sdk` (native cdylib).
 //!
-//! Spike + Waves 1–4 (RPC reads, helpers/meta, transaction/contract, watcher).
+//! RPC reads, helpers/session meta, transaction/contract, and wait_transaction.
 
 mod contract;
 mod helpers;
@@ -81,14 +81,14 @@ fn get_node_status(py: Python<'_>, rpc_address: Option<String>) -> PyResult<Boun
     Ok(dict)
 }
 
-/// Spike alias for `secret_key_generate`.
+/// Alias for `secret_key_generate`.
 #[pyfunction]
 fn generate_secret_key_pem() -> PyResult<String> {
     let sk = casper_rust_wasm_sdk::helpers::secret_key_generate().map_err(py_err)?;
     secret_key_to_pem(&sk)
 }
 
-/// Spike alias for `public_key_from_secret_key`.
+/// Alias for `public_key_from_secret_key`.
 #[pyfunction]
 fn public_key_hex(secret_key_pem: String) -> PyResult<String> {
     public_key_from_secret_key(&secret_key_pem).map_err(py_err)

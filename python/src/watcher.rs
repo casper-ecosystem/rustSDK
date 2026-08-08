@@ -1,4 +1,4 @@
-//! Wave 4: wait_transaction (feature `watcher`).
+//! wait_transaction (feature `watcher`).
 
 use casper_rust_wasm_sdk::SDK;
 use pyo3::exceptions::PyRuntimeError;

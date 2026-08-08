@@ -1,4 +1,4 @@
-//! Wave 3: contract query / install / call_entrypoint (transaction path only).
+//! Contract query / install / call_entrypoint (transaction path only).
 
 use casper_rust_wasm_sdk::{
     helpers as sdk_helpers,

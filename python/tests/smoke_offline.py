@@ -73,7 +73,7 @@ def main() -> None:
     for name in WAVE1_EXPORTS + WAVE2_EXPORTS + WAVE3_EXPORTS + WAVE4_EXPORTS:
         assert hasattr(casper, name), name
 
-    # --- Wave 2 helpers (offline) ---
+    # Helpers (offline)
     ts = casper.get_current_timestamp()
     assert "T" in ts or ts.isdigit(), ts
 
@@ -118,7 +118,7 @@ def main() -> None:
     sdk.set_node_address("127.0.0.1:28101")
     assert "28101" in sdk.get_node_address()
 
-    # --- Wave 3 make + sign (no put) ---
+    # Make + sign (no put)
     params = json.dumps(
         {
             "chain_name": "casper-net-1",

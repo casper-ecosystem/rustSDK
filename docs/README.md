@@ -44,13 +44,7 @@ See [`mcp/README.md`](../mcp/README.md), tool inventory [`mcp/TOOLS.md`](../mcp/
 
 ## Python
 
-The workspace package [`python/`](../python/) (`casper-rust-wasm-sdk-py`) exposes the same native Rust SDK as a PyO3 / maturin extension ([#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9)). Not a Python port: one `rlib`, thin language face (same idea as Wasm and MCP).
-
-Initial surface (grow incrementally; not full Wasm/TS parity):
-
-- `get_node_status(rpc_address=None)`: JSON-RPC status dict
-- `make_signed_transfer(...)`: make + sign transfer (no put)
-- `generate_secret_key_pem()` / `public_key_hex(pem)` / `version()`
+The workspace package [`python/`](../python/) (`casper-rust-wasm-sdk-py`) exposes the native Rust SDK as a PyO3 / maturin extension. Not a Python port: one `rlib`, thin language face (same idea as Wasm and MCP). Surface: RPC reads, helpers, transaction/contract, and `wait_transaction` (see [`python/README.md`](../python/README.md)).
 
 ```bash
 cd python
@@ -60,7 +54,7 @@ maturin develop
 python -c "import casper_rust_wasm_sdk_py as m; print(m.get_node_status('http://127.0.0.1:11101/rpc'))"
 ```
 
-Build is local via maturin (`make python-test` for an offline smoke). Separate Actions workflow `python-bindings` (not part of `ci-test` / `make pack`). See [`python/README.md`](../python/README.md).
+Build with maturin locally (`make python-test` for an offline smoke). See [`python/README.md`](../python/README.md).
 
 ## Install
 

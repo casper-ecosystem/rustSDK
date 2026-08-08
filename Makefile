@@ -203,7 +203,7 @@ mcp-test-live:
 .PHONY: mcp-build mcp-http mcp-http-stop \
 	run-mcp run-mcp-http mcp-test mcp-test-live
 
-# --- Python bindings (python/ — maturin; not part of ci-test) ---
+# --- Python bindings (python/ — maturin) ---
 
 python-develop:
 	cd python && \

@@ -1,4 +1,4 @@
-//! Wave 2: helpers (feature `helpers`; offline-friendly).
+//! Helpers (feature `helpers`; offline-friendly).
 
 use casper_rust_wasm_sdk::{
     helpers,

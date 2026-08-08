@@ -1,4 +1,4 @@
-//! Wave 3: transaction make / sign / put / high-level / speculative.
+//! Transaction make / sign / put / high-level / speculative.
 
 use casper_rust_wasm_sdk::{types::transaction::Transaction, SDK};
 use pyo3::prelude::*;

@@ -1,4 +1,4 @@
-# Lightweight PyO3 / maturin smoke. Separate from ci-test (no NCTL, no Wasm).
+# PyO3 / maturin offline smoke for python/**.
 name: python-bindings
 
 on:
