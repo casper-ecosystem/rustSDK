@@ -40,11 +40,14 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install maturin
-        run: pip install "maturin>=1.7,<2.0"
-
-      - name: maturin develop
-        run: maturin develop
+      - name: venv + maturin develop
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install "maturin>=1.7,<2.0"
+          maturin develop
 
       - name: Offline smoke
-        run: python tests/smoke_offline.py
+        run: |
+          . .venv/bin/activate
+          python tests/smoke_offline.py
