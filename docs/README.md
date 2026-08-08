@@ -43,6 +43,27 @@ make mcp-test-live  # against a live local node
 
 See [`mcp/README.md`](../mcp/README.md), tool inventory [`mcp/TOOLS.md`](../mcp/TOOLS.md), and Cursor sample [`mcp/mcp.json.example`](../mcp/mcp.json.example).
 
+## Casperatatui
+
+**Casperatatui** is a Casper TUI (terminal UI) based on [ratatui](https://ratatui.rs/), over the native Rust SDK. JSON-RPC and SSE only (no binary port).
+
+- Source: [`examples/desktop/casperatatui`](../examples/desktop/casperatatui)
+- Issue: [#123](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/123)
+- GitHub Releases / Pre-release [`dev-preview`](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases): linux binary `casperatatui-<label>-linux-x86_64`
+
+```bash
+make run-casperatatui
+# alias
+make run-tui
+
+make run-tui TUI_ARGS='--preset testnet'
+make run-tui TUI_ARGS='--preset mainnet'
+```
+
+Writes stay off unless you pass `--enable-writes` and a secret key. Not part of the default SDK crate build or Hub images (unlike MCP).
+
+See [`examples/desktop/casperatatui/README.md`](../examples/desktop/casperatatui/README.md).
+
 ## Install
 
 <details>
@@ -2675,6 +2696,8 @@ $ npm build
 ```
 
 Download pre-built desktop demos from the **[GitHub Releases](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases)** page (CI artifacts — Windows portable, Linux AppImage, Snap). Mac build is TODO.
+
+For a terminal UI over the same SDK (not Electron), see [Casperatatui](#casperatatui).
 
 </details>
 

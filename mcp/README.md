@@ -96,7 +96,7 @@ Complex inputs use JSON strings — see [TOOLS.md](TOOLS.md) and `tools/params.r
 
 ## MCP client config
 
-Hub tags: **`dev`** (tip), **`latest`** = current stable semver (e.g. **`2.2.2`**). GitHub Pre-release **`dev-preview`** is overwritten after green `nightly-test` and attaches tip Electron (exe / AppImage / snap) plus the MCP linux binary (not Latest).
+Hub tags: **`dev`** (tip), **`latest`** = current stable semver (e.g. **`2.2.2`**). GitHub Pre-release **`dev-preview`** is overwritten after green `nightly-test` and attaches tip Electron (exe / AppImage / snap), the MCP linux binary, and the Casperatatui linux binary (not Latest).
 
 | Server name (example)       | Mode  | Backing                                                       |
 | --------------------------- | ----- | ------------------------------------------------------------- |
