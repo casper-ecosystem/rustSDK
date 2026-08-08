@@ -86,7 +86,7 @@ async fn main() -> Result<()> {
         "0107514b42acc9be064bca097321530af97d4bb7f9b965b45efbf73e474df2690f".into()
     });
     client.spawn_account_load(account.clone(), tx.clone());
-    match timeout(Duration::from_secs(30), rx.recv()).await {
+    let auction_snapshot = match timeout(Duration::from_secs(30), rx.recv()).await {
         Ok(Some(RpcEvent::Account(load))) => {
             let entity_ok = load.entity.is_ok();
             let balance_ok = load.balance.is_ok();
@@ -128,14 +128,19 @@ async fn main() -> Result<()> {
             if !entity_ok || !balance_ok {
                 anyhow::bail!("account load needs entity/account + balance (AE on or off)");
             }
+            load.auction
+                .map_err(|e| anyhow::anyhow!("auction for validator pick failed: {e}"))?
         }
         other => anyhow::bail!("account unexpected: {other:?}"),
-    }
+    };
 
-    // Validator pubkey: expect self-stake row from auction filter.
-    let validator = std::env::var("CASPER_SMOKE_VALIDATOR").unwrap_or_else(|_| {
-        "014a3339473ad5cfc87346e7a3d6ca7ca85997386c7a03520bb8549650f4c1de10".into()
-    });
+    // Validator pubkey: env override, else first bid in auction (avoids stale hardcoded NCTL keys).
+    let validator = match std::env::var("CASPER_SMOKE_VALIDATOR") {
+        Ok(v) if !v.trim().is_empty() => v.trim().to_string(),
+        _ => casperatatui::auction_view::first_validator_public_key(&auction_snapshot)
+            .ok_or_else(|| anyhow::anyhow!("auction has no validator bids"))?,
+    };
+    println!("validator pick | {}", &validator[..16.min(validator.len())]);
     client.spawn_account_load(validator.clone(), tx.clone());
     match timeout(Duration::from_secs(30), rx.recv()).await {
         Ok(Some(RpcEvent::Account(load))) => {

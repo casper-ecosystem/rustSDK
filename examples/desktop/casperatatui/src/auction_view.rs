@@ -165,6 +165,21 @@ pub fn filter_account_stakes(
     (self_stake, delegations, undelegations)
 }
 
+/// First validator public key in auction bids (for smokes / defaults).
+pub fn first_validator_public_key(auction: &Value) -> Option<String> {
+    for bid_entry in bids_array(auction) {
+        let pk = json_str(
+            bid_entry
+                .get("public_key")
+                .or_else(|| bid_entry.pointer("/bid/validator_public_key")),
+        );
+        if !pk.is_empty() {
+            return Some(pk);
+        }
+    }
+    None
+}
+
 fn filter_undelegations(auction: &Value, keys: &AccountMatchKeys) -> Vec<UndelegationRow> {
     let mut out = Vec::new();
     let candidates = [
@@ -376,6 +391,15 @@ mod tests {
         assert_eq!(self_stake.unwrap().staked_amount, "1000");
         assert!(dels.is_empty());
         assert!(undels.is_empty());
+    }
+
+    #[test]
+    fn first_validator_from_sample() {
+        let pk = first_validator_public_key(&sample_auction()).unwrap();
+        assert_eq!(
+            pk,
+            "014aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        );
     }
 
     #[test]
