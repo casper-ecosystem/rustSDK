@@ -18,6 +18,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src
+# Workspace members only: . and mcp (+ sdk_tests path-dep). Do not COPY python/.
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 COPY mcp ./mcp
