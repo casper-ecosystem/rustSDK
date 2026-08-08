@@ -13,7 +13,7 @@ use crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyModifiers};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use tokio::sync::mpsc;
 
 struct KeyCtx<'a> {
@@ -59,7 +59,7 @@ async fn main() -> Result<()> {
         client.spawn_network_refresh(rpc_tx.clone());
     }
 
-    let mut tip_ticks: u64 = 0;
+    let mut last_tip = Instant::now();
 
     while !stop.load(Ordering::SeqCst) {
         while let Ok(ev) = rpc_rx.try_recv() {
@@ -89,9 +89,9 @@ async fn main() -> Result<()> {
         }
 
         model.tick = model.tick.wrapping_add(1);
-        tip_ticks += 1;
-        if tip_ticks.is_multiple_of(25) {
+        if last_tip.elapsed() >= Duration::from_secs(5) {
             model.tip_index = model.tip_index.wrapping_add(1);
+            last_tip = Instant::now();
         }
     }
 
@@ -128,6 +128,10 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
     }
 
     if code == KeyCode::Esc {
+        if modifiers.contains(KeyModifiers::CONTROL) {
+            ctx.stop.store(true, Ordering::SeqCst);
+            return Ok(true);
+        }
         return handle_escape(ctx);
     }
 
@@ -313,8 +317,10 @@ fn handle_escape(ctx: &mut KeyCtx<'_>) -> Result<bool> {
         ctx.model.set_status("back to the brick pile");
         return Ok(false);
     }
-    ctx.stop.store(true, Ordering::SeqCst);
-    Ok(true)
+    // Esc never quits: stay put and hint how to leave.
+    ctx.model
+        .set_status("nowhere to go back | Ctrl+Esc (or q / Ctrl-C) to quit");
+    Ok(false)
 }
 
 fn request_latest_blocks(ctx: &mut KeyCtx<'_>) {

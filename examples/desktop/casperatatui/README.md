@@ -55,7 +55,8 @@ CI: path-filtered [ci-casperatatui](../../../.github/workflows/ci-casperatatui.y
 | Key              | Action                                            |
 | ---------------- | ------------------------------------------------- |
 | `q`              | Quit and **restore the terminal**                 |
-| Esc              | Back (detail / form) or quit                      |
+| Esc              | Back (detail / form); never quits                 |
+| Ctrl+Esc         | Quit (same as `q`)                                |
 | `r`              | Network seance; on Validators reloads auction     |
 | `e`              | Edit RPC URL (Enter applies + refreshes)          |
 | `1`–`9` / `h`    | Network…Wait / Help                               |

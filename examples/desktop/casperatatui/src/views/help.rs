@@ -25,8 +25,8 @@ pub fn draw_help(frame: &mut Frame, area: Rect, model: &AppModel) {
                 .fg(Color::Cyan)
                 .add_modifier(Modifier::BOLD),
         )),
-        Line::from("  q           quit and restore the terminal"),
-        Line::from("  Esc         back (Actions/Blocks detail) or quit"),
+        Line::from("  q / Ctrl+Esc  quit and restore the terminal"),
+        Line::from("  Esc           back (Actions/Blocks detail); never quits"),
         Line::from("  Tab / Left/Right  cycle views (Left/Right always leave Actions; Tab cycles Actions panes)"),
         Line::from("  1-9 / h     Network…Wait / Help"),
         Line::from("  r           Network seance (5 RPCs); Validators reloads auction"),

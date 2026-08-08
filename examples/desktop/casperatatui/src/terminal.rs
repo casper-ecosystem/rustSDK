@@ -12,7 +12,7 @@ use std::panic;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-/// Shared stop flag: Ctrl-C / SIGTERM or `q` / Esc.
+/// Shared stop flag: Ctrl-C / SIGTERM or `q` / Ctrl+Esc.
 pub type StopFlag = Arc<AtomicBool>;
 
 /// Owns terminal modes; Drop always restores the shell.
