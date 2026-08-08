@@ -2683,7 +2683,7 @@ For a specialized native signing desk (Tauri), see [Casper Signing Desk](#casper
 
 ## Casper Signing Desk
 
-**Casper Signing Desk** is a Tauri desktop example over the native Rust SDK: message sign/verify, keygen, transfer / stake compose, multisig approvals, and `wait_transaction`. Secrets stay in the Rust process (PEM via OS dialogs). No Casper Wallet. Transaction path only (no deploy).
+**Casper Signing Desk** is a Tauri desktop example over the native Rust SDK: message sign/verify, keygen, transfer / stake compose, multisig approvals, and `wait_transaction`. Secrets stay in the Rust process (PEM via OS dialogs). Transaction path only (no deploy).
 
 - Source: [`examples/desktop/tauri`](../examples/desktop/tauri)
 - Make: `make run-tauri`, `make build-tauri`, `make check-lint-tauri`

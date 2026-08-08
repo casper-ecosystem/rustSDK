@@ -9,9 +9,7 @@ Specialized signing desk for validators and cosigners. Not the Angular WebClient
 - Secret keys never enter the webview
 - PEM unlock / keygen save use OS dialogs; Rust holds session PEM until Unload (zeroized on drop)
 - Put is fail-closed via [`policy.sample.json`](./policy.sample.json) (or a policy you pick)
-- No Casper Wallet (browser extensions do not run in packaged Tauri)
 - Transaction path only (no deploy)
-- Not a custody wallet
 
 ## Prerequisites (Linux)
 
@@ -43,11 +41,13 @@ env -u CARGO_TARGET_DIR npm run tauri -- dev
 
 Presets: `nctl` (default), `testnet`, `mainnet`. Override RPC / events in the forms when needed.
 
+Closing the window exits the process (no orphan `casper-signing-desk` after `make`/Vite stops).
+
 ## Screens
 
 | Screen    | What it does                                                      |
 | --------- | ----------------------------------------------------------------- |
-| Keys      | Generate Ed25519 / Secp256k1, save PEM; unlock / unload session   |
+| Keys      | Unlock existing PEM (optional generate); unload session           |
 | Message   | Sign / verify free-form messages (casper-sign-verify parity)      |
 | Compose   | Build unsigned transfer / delegate / undelegate / redelegate JSON |
 | Approvals | Open/save JSON, add approval, verify, put (policy)                |
@@ -63,4 +63,4 @@ make build-tauri
 
 ## Honest scope
 
-This is a focused SDK example, not a product shell like OpenTrading’s Tauri (no splash, no sidecars, no updater). Craft borrowed: native menus, single-instance focus, CSP, file dialogs, busy UI, apt prerequisites in the README.
+This is a focused SDK example, not a product shell like OpenTrading’s Tauri (no splash, no sidecars, no updater). Craft borrowed: native menus, CSP, file dialogs, busy UI, apt prerequisites in the README.

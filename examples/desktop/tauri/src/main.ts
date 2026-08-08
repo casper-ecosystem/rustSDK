@@ -96,8 +96,9 @@ function shell(body: string): string {
   return `
     <header class="top">
       <div class="brand">
-        <img class="brand-logo" src="${logoUrl}" alt="Casper" width="123" height="40" />
-        <div class="brand-text">
+        <div class="brand-logo-wrap">
+          <img class="brand-logo" src="${logoUrl}" alt="Casper" width="123" height="40" />
+        </div>        <div class="brand-text">
           <h1>Casper Signing Desk</h1>
           <p>Native PEM · message verify · transfer / stake · multisig · wait</p>
         </div>
@@ -120,7 +121,7 @@ function shell(body: string): string {
     </nav>
     <main class="${busy ? "busy" : ""}">${body}</main>
     ${statusText ? `<div class="out ${statusKind}" style="margin:0 1.25rem 1rem">${escapeHtml(statusText)}</div>` : ""}
-    <footer class="note">Secrets never enter the webview. Put uses fail-closed policy. File menu: Open/Save JSON · Unlock. No Casper Wallet · transaction path only.</footer>
+    <footer class="note">Secrets never enter the webview. Put uses fail-closed policy. File menu: Open/Save JSON · Unlock. Transaction path only.</footer>
   `;
 }
 
@@ -589,7 +590,7 @@ async function onAction(action: string): Promise<void> {
       }
       case "about": {
         setStatus(
-          "Casper Signing Desk\nNative PEM signing desk over casper-rust-wasm-sdk.\nNot a custody wallet.",
+          "Casper Signing Desk\nNative PEM signing desk over casper-rust-wasm-sdk.\nLocal tool for validators and cosigners.",
           "ok",
         );
         break;

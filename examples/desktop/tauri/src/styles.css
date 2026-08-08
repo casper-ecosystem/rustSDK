@@ -79,15 +79,21 @@ header.top {
   gap: 0.85rem;
 }
 
-.brand-logo {
-  height: 2rem;
-  width: auto;
+.brand-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.35rem 0.55rem;
   flex-shrink: 0;
-  display: block;
 }
 
-html[data-theme="dark"] .brand-logo {
-  filter: invert(1);
+.brand-logo {
+  height: 1.75rem;
+  width: auto;
+  display: block;
 }
 
 .brand-text {
