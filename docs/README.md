@@ -14,11 +14,11 @@ This page covers different examples of using the SDK.
 
 ## Try the Wasm webclient
 
-A hosted build of the Angular example — **[Casper WebClient](https://casper-webclient.interchouette.net/)** — lets you exercise the Wasm SDK in the browser against public networks (testnet / mainnet).
+A hosted build of the Angular **frontend** example — **[Casper WebClient](https://casper-webclient.interchouette.net/)** — lets you exercise the Wasm SDK in the browser against public networks (testnet / mainnet).
 
 - Live demo: https://casper-webclient.interchouette.net/
-- Source: [`examples/frontend/angular`](../examples/frontend/angular)
-- Same UI is also packaged as the Electron **[Casper WebClient](#casper-webclient-electron)** under [Desktop examples](#desktop-examples)
+- Source: [`examples/frontend/angular`](../examples/frontend/angular) (see also React under [Usage](#usage))
+- Optional desktop shell for that same UI: [Electron](#electron-desktop-shell) under [Desktop examples](#desktop-examples)
 
 Demo / development only — same warning as above.
 
@@ -2658,16 +2658,16 @@ console.log(deploy_hash);
 
 ### Desktop examples
 
-Three desktop examples: the Electron **Casper WebClient** (Wasm Angular UI), the Tauri **Casper Signing Desk** (native PEM signing), and **Casperatatui** (terminal UI over the native Rust SDK).
+Under [`examples/desktop/`](../examples/desktop/): native or packaged desktop apps. **Casper WebClient** itself lives under [`examples/frontend/`](../examples/frontend/) (Angular / React); Electron below is only a desktop shell for that Angular UI.
 
 <details open>
-  <summary><strong>Casper WebClient</strong> (Electron)</summary>
+  <summary><strong>Electron</strong> (desktop shell for Casper WebClient)</summary>
 
 <br>
 
-![Casper WebClient Electron](images/get_status-electron.png)
+![Electron shell running Casper WebClient](images/get_status-electron.png)
 
-**Casper WebClient** packages the Angular Wasm example as an Electron desktop app (same UI as the [hosted WebClient](https://casper-webclient.interchouette.net/)). Use it on your machine to exercise the full Wasm SDK surface against a local or remote node.
+**Electron** loads the Angular **Casper WebClient** Wasm build in a desktop window (same UI as the [hosted WebClient](https://casper-webclient.interchouette.net/)). It is not a separate product: frontend = WebClient; this package wraps it for local desktop installs.
 
 ```shell
 $ cd ./examples/desktop/electron
@@ -2677,6 +2677,7 @@ $ npm build
 ```
 
 - Source: [`examples/desktop/electron`](../examples/desktop/electron)
+- Frontend source: [`examples/frontend/angular`](../examples/frontend/angular)
 - Pre-built demos: **[GitHub Releases](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases)** (Windows portable, Linux AppImage, Snap). Mac build is TODO.
 
 </details>
@@ -2688,7 +2689,7 @@ $ npm build
 
 ![Casper Signing Desk](images/signing-desk.jpg)
 
-**Casper Signing Desk** is a Tauri desktop example over the native Rust SDK: message sign/verify, keygen, transfer / stake compose, multisig approvals, and `wait_transaction`. Transaction path only (no deploy).
+**Casper Signing Desk** is a Tauri desktop example over the native Rust SDK: message sign/verify, keygen, transfer / stake compose, multisig approvals, and `wait_transaction`. Transaction path only (no deploy). Specialized signing desk; not the WebClient catalog.
 
 **Native PEM unlock:** pick a secret-key `.pem` with the OS file dialog; Rust holds it in a session for signing. The webview only sees the public key. Unload (or quit) clears the session. Compose can build unsigned JSON without unlocking; sign / add approval need an unlocked PEM. Details: [Native PEM unlock](../examples/desktop/tauri/README.md#native-pem-unlock) in the example README.
 
