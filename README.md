@@ -2677,8 +2677,19 @@ $ npm build
 Download pre-built desktop demos from the **[GitHub Releases](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases)** page (CI artifacts — Windows portable, Linux AppImage, Snap). Mac build is TODO.
 
 For a terminal UI over the same SDK (not Electron), see [Casperatatui](#casperatatui).
+For a specialized native signing desk (Tauri), see [Casper Signing Desk](#casper-signing-desk).
 
 </details>
+
+## Casper Signing Desk
+
+**Casper Signing Desk** is a Tauri desktop example over the native Rust SDK: message sign/verify, keygen, transfer / stake compose, multisig approvals, and `wait_transaction`. Transaction path only (no deploy).
+
+**Native PEM unlock:** pick a secret-key `.pem` with the OS file dialog; Rust holds it in a session for signing. The webview only sees the public key. Unload (or quit) clears the session. Compose can build unsigned JSON without unlocking; sign / add approval need an unlocked PEM. Details: [Native PEM unlock](../examples/desktop/tauri/README.md#native-pem-unlock) in the example README.
+
+- Source: [`examples/desktop/tauri`](../examples/desktop/tauri)
+- Make: `make run-tauri`, `make build-tauri`, `make check-lint-tauri`
+- Example README: [`examples/desktop/tauri/README.md`](../examples/desktop/tauri/README.md)
 
 ## Casperatatui
 
