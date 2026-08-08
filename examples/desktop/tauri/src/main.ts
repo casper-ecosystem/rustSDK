@@ -201,7 +201,7 @@ function viewCompose(): string {
   return shell(`
     <section class="panel">
       <h2>Compose transaction</h2>
-      <p class="hint">Build unsigned transfer or stake JSON. Sign under Approvals. Override RPC when the preset host is wrong.</p>
+      <p class="hint">Build unsigned transfer or stake JSON. Sign under Approvals. Transfer target must be a full public key hex (01…/02…, ~66 chars), <code>account-hash-&lt;64 hex&gt;</code>, or <code>uref-…</code> — not a truncated placeholder.</p>
       <div class="grid two">
         <label class="field"><span>Preset</span>
           <select id="c-preset">${presetOptions()}</select>
@@ -218,10 +218,10 @@ function viewCompose(): string {
           <input id="c-rpc" placeholder="leave empty for preset" />
         </label>
         <label class="field"><span>Initiator public key</span>
-          <input id="c-init" value="${publicKey ?? ""}" placeholder="01…" />
+          <input id="c-init" value="${publicKey ?? ""}" placeholder="01… (66 hex chars)" />
         </label>
         <label class="field"><span>Target / validator</span>
-          <input id="c-target" placeholder="01…" />
+          <input id="c-target" placeholder="recipient 01… or account-hash-…" />
         </label>
         <label class="field"><span>New validator (redelegate)</span>
           <input id="c-newval" placeholder="01…" />

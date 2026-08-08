@@ -38,8 +38,7 @@ async fn pick_file_path(
         .await
         .map_err(|_| "dialog channel closed".to_string())?
         .ok_or_else(|| "cancelled".to_string())?;
-    file.into_path()
-        .map_err(|e| format!("resolve path: {e}"))
+    file.into_path().map_err(|e| format!("resolve path: {e}"))
 }
 
 async fn save_file_path(
@@ -62,8 +61,7 @@ async fn save_file_path(
         .await
         .map_err(|_| "dialog channel closed".to_string())?
         .ok_or_else(|| "cancelled".to_string())?;
-    file.into_path()
-        .map_err(|e| format!("resolve path: {e}"))
+    file.into_path().map_err(|e| format!("resolve path: {e}"))
 }
 
 fn resolve_rpc(preset: &str, rpc: Option<&str>) -> String {
@@ -387,14 +385,7 @@ pub async fn tx_save_json(app: tauri::AppHandle, args: SaveJsonArgs) -> Result<S
     let name = args
         .default_name
         .unwrap_or_else(|| "transaction.json".into());
-    let path = save_file_path(
-        &app,
-        "Save transaction JSON",
-        "JSON",
-        &["json"],
-        &name,
-    )
-    .await?;
+    let path = save_file_path(&app, "Save transaction JSON", "JSON", &["json"], &name).await?;
     fs::write(&path, args.contents.as_bytes()).map_err(|e| format!("write: {e}"))?;
     Ok(path.display().to_string())
 }

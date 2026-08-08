@@ -43,6 +43,57 @@ pub struct StakeBuild<'a> {
     pub ttl: &'a str,
 }
 
+/// Trim, strip optional `0x`, drop internal whitespace.
+fn normalize_hexish(s: &str) -> String {
+    let t = s.trim();
+    let t = t
+        .strip_prefix("0x")
+        .or_else(|| t.strip_prefix("0X"))
+        .unwrap_or(t);
+    t.chars().filter(|c| !c.is_whitespace()).collect()
+}
+
+fn require_public_key_hex(label: &str, raw: &str) -> Result<String, String> {
+    let n = normalize_hexish(raw);
+    if n.is_empty() {
+        return Err(format!("{label} is empty"));
+    }
+    PublicKey::new(&n).map_err(|_| {
+        format!(
+            "{label}: need a hex public key (01… Ed25519 or 02… Secp256k1, typically 66 hex chars). Got {} chars.",
+            n.len()
+        )
+    })?;
+    Ok(n)
+}
+
+/// Transfer target: public key hex, `account-hash-…`, or `uref-…` (casper-client parse).
+fn require_transfer_target(raw: &str) -> Result<String, String> {
+    let n = normalize_hexish(raw);
+    if n.is_empty() {
+        return Err(
+            "target is empty: paste recipient public key hex (01…/02…), account-hash-<64 hex>, or uref-…"
+                .into(),
+        );
+    }
+    if PublicKey::new(&n).is_ok() {
+        return Ok(n);
+    }
+    if n.starts_with("account-hash-") || n.starts_with("uref-") {
+        return Ok(n);
+    }
+    if n.len() == 64 && n.chars().all(|c| c.is_ascii_hexdigit()) {
+        return Err(
+            "target looks like a bare 64-hex account hash. Prefix it as account-hash-<hex>, or use a full public key (01…/02…)."
+                .into(),
+        );
+    }
+    Err(format!(
+        "target is not a public key, account-hash-…, or uref-… ({} chars after trim). Placeholder text like \"01…\" is not valid.",
+        n.len()
+    ))
+}
+
 fn base_params(
     chain_name: &str,
     initiator: &str,
@@ -73,35 +124,48 @@ pub fn load_pem_file(path: &str) -> Result<(String, String), String> {
 }
 
 pub fn build_transfer(args: TransferBuild<'_>) -> Result<Value, String> {
+    let initiator = require_public_key_hex("initiator", args.initiator)?;
+    let target = require_transfer_target(args.target)?;
+    let amount = args.amount.trim();
+    if amount.is_empty() {
+        return Err("amount is empty".into());
+    }
     let sdk = SDK::new(Some(args.rpc.to_string()), None, Some(Verbosity::Low));
-    let params = base_params(args.chain_name, args.initiator, args.payment, args.ttl);
+    let params = base_params(args.chain_name, &initiator, args.payment, args.ttl);
     let tx = sdk
-        .make_transfer_transaction(None, args.target, args.amount, params, None)
+        .make_transfer_transaction(None, &target, amount, params, None)
         .map_err(|e| e.to_string())?;
     tx_to_value(&tx)
 }
 
 pub fn build_stake(args: StakeBuild<'_>) -> Result<Value, String> {
+    let initiator = require_public_key_hex("initiator", args.initiator)?;
+    let validator = require_public_key_hex("validator", args.validator)?;
+    let amount = args.amount.trim();
+    if amount.is_empty() {
+        return Err("amount is empty".into());
+    }
     let sdk = SDK::new(Some(args.rpc.to_string()), None, Some(Verbosity::Low));
-    let delegator = PublicKey::new(args.initiator).map_err(|e| e.to_string())?;
-    let validator_pk = PublicKey::new(args.validator).map_err(|e| e.to_string())?;
+    let delegator = PublicKey::new(&initiator).map_err(|e| e.to_string())?;
+    let validator_pk = PublicKey::new(&validator).map_err(|e| e.to_string())?;
     let builder = match args.kind {
         WriteKind::Delegate => {
-            TransactionBuilderParams::new_delegate(delegator, validator_pk, args.amount)
+            TransactionBuilderParams::new_delegate(delegator, validator_pk, amount)
         }
         WriteKind::Undelegate => {
-            TransactionBuilderParams::new_undelegate(delegator, validator_pk, args.amount)
+            TransactionBuilderParams::new_undelegate(delegator, validator_pk, amount)
         }
         WriteKind::Redelegate => {
             let new_v = args
                 .new_validator
                 .ok_or_else(|| "redelegate needs new_validator".to_string())?;
-            let new_pk = PublicKey::new(new_v).map_err(|e| e.to_string())?;
-            TransactionBuilderParams::new_redelegate(delegator, validator_pk, new_pk, args.amount)
+            let new_hex = require_public_key_hex("new_validator", new_v)?;
+            let new_pk = PublicKey::new(&new_hex).map_err(|e| e.to_string())?;
+            TransactionBuilderParams::new_redelegate(delegator, validator_pk, new_pk, amount)
         }
         WriteKind::Transfer => return Err("use build_transfer for Transfer".into()),
     };
-    let params = base_params(args.chain_name, args.initiator, args.payment, args.ttl);
+    let params = base_params(args.chain_name, &initiator, args.payment, args.ttl);
     let tx = sdk
         .make_transaction(builder, params)
         .map_err(|e| e.to_string())?;
@@ -179,4 +243,106 @@ pub async fn get_tx(rpc: &str, hash: &str) -> Result<Value, String> {
         .await
         .map_err(|e| e.to_string())?;
     serde_json::to_value(&resp.result).map_err(|e| e.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INITIATOR: &str = "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6";
+    const TARGET: &str = "01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6";
+    const FAUCET: &str = "0107514b42acc9be064bca097321530af97d4bb7f9b965b45efbf73e474df2690f";
+
+    #[test]
+    fn build_transfer_accepts_valid_public_keys() {
+        let v = build_transfer(TransferBuild {
+            rpc: "http://127.0.0.1:11101/rpc",
+            chain_name: "casper-net-1",
+            initiator: INITIATOR,
+            target: TARGET,
+            amount: "2500000000",
+            payment: DEFAULT_PAYMENT_MOTES,
+            ttl: DEFAULT_TTL,
+        })
+        .expect("compose transfer");
+        assert!(
+            v.get("Version1").is_some() || v.get("hash").is_some(),
+            "unexpected tx shape: {v}"
+        );
+    }
+
+    #[test]
+    fn build_transfer_trims_whitespace_and_0x() {
+        let spaced = format!("  0x{}\n", TARGET);
+        build_transfer(TransferBuild {
+            rpc: "http://127.0.0.1:11101/rpc",
+            chain_name: "casper-net-1",
+            initiator: INITIATOR,
+            target: &spaced,
+            amount: "1000000000",
+            payment: DEFAULT_PAYMENT_MOTES,
+            ttl: DEFAULT_TTL,
+        })
+        .expect("trimmed target");
+    }
+
+    #[test]
+    fn build_transfer_rejects_empty_and_placeholder() {
+        let err = build_transfer(TransferBuild {
+            rpc: "http://127.0.0.1:11101/rpc",
+            chain_name: "casper-net-1",
+            initiator: INITIATOR,
+            target: "",
+            amount: "1",
+            payment: DEFAULT_PAYMENT_MOTES,
+            ttl: DEFAULT_TTL,
+        })
+        .unwrap_err();
+        assert!(err.contains("empty"), "{err}");
+
+        let err = build_transfer(TransferBuild {
+            rpc: "http://127.0.0.1:11101/rpc",
+            chain_name: "casper-net-1",
+            initiator: INITIATOR,
+            target: "01…",
+            amount: "1",
+            payment: DEFAULT_PAYMENT_MOTES,
+            ttl: DEFAULT_TTL,
+        })
+        .unwrap_err();
+        assert!(err.contains("target"), "{err}");
+    }
+
+    #[test]
+    fn build_transfer_hints_bare_account_hash() {
+        let bare = "a".repeat(64);
+        let err = build_transfer(TransferBuild {
+            rpc: "http://127.0.0.1:11101/rpc",
+            chain_name: "casper-net-1",
+            initiator: INITIATOR,
+            target: &bare,
+            amount: "1",
+            payment: DEFAULT_PAYMENT_MOTES,
+            ttl: DEFAULT_TTL,
+        })
+        .unwrap_err();
+        assert!(err.contains("account-hash-"), "{err}");
+    }
+
+    #[test]
+    fn build_delegate_accepts_valid_keys() {
+        let v = build_stake(StakeBuild {
+            rpc: "http://127.0.0.1:11101/rpc",
+            kind: WriteKind::Delegate,
+            chain_name: "casper-net-1",
+            initiator: FAUCET,
+            validator: TARGET,
+            new_validator: None,
+            amount: "1000000000000",
+            payment: DEFAULT_PAYMENT_MOTES,
+            ttl: DEFAULT_TTL,
+        })
+        .expect("compose delegate");
+        assert!(v.get("Version1").is_some() || v.get("hash").is_some());
+    }
 }
