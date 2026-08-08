@@ -42,6 +42,26 @@ make mcp-test-live  # against a live local node
 
 See [`mcp/README.md`](../mcp/README.md), tool inventory [`mcp/TOOLS.md`](../mcp/TOOLS.md), and Cursor sample [`mcp/mcp.json.example`](../mcp/mcp.json.example).
 
+## Python
+
+The workspace package [`python/`](../python/) (`casper-rust-wasm-sdk-py`) exposes the same native Rust SDK as a PyO3 / maturin extension ([#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9)). Not a Python port: one `rlib`, thin language face (same idea as Wasm and MCP).
+
+Initial surface (grow incrementally; not full Wasm/TS parity):
+
+- `get_node_status(rpc_address=None)`: JSON-RPC status dict
+- `make_signed_transfer(...)`: make + sign transfer (no put)
+- `generate_secret_key_pem()` / `public_key_hex(pem)` / `version()`
+
+```bash
+cd python
+uv venv .venv && source .venv/bin/activate
+uv pip install maturin
+maturin develop
+python -c "import casper_rust_wasm_sdk_py as m; print(m.get_node_status('http://127.0.0.1:11101/rpc'))"
+```
+
+Build is local via maturin (`make python-test` for an offline smoke). Separate Actions workflow `python-bindings` (not part of `ci-test` / `make pack`). See [`python/README.md`](../python/README.md).
+
 ## Install
 
 <details>
@@ -2551,6 +2571,10 @@ High-level install / entrypoint / dictionary / key query helpers on `SDK` (see r
 
 Not part of the Rust crate root: sibling package [`mcp/`](../mcp/) wraps the same SDK as MCP tools. See [MCP](#mcp) above and [`mcp/TOOLS.md`](../mcp/TOOLS.md).
 
+### Python
+
+Not part of the Rust crate root: sibling package [`python/`](../python/) wraps the same SDK as a PyO3 extension. See [Python](#python) above and [`python/README.md`](../python/README.md).
+
 ## Typescript API
 
 Published typedoc: [index](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/index.html)
@@ -2660,7 +2684,7 @@ SECRET_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
 
 Open tracking (not a full roadmap):
 
-- [#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9) — Python / PyO3 bindings
+- [#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9): Python / PyO3 bindings (initial face in [`python/`](../python/); expand surface)
 - [#36](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/36) — first crates.io publish
 - [#96](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/96) — explainer for node core: AE-off `entity-contract-…` vs `hash-…` on `query_global_state` (SDK remaps; permanent fix is upstream)
 
