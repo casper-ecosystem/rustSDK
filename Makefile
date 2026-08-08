@@ -209,6 +209,10 @@ run-tui:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
 		cargo run -p casper-sdk-tui -- --preset nctl $(TUI_ARGS)
 
+build-tui-release:
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		cargo build -p casper-sdk-tui --release
+
 # Example package lint (not part of root wasm clippy matrix).
 check-lint-tui:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
@@ -216,7 +220,7 @@ check-lint-tui:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
 		cargo fmt -p casper-sdk-tui -- --check
 
-.PHONY: run-tui check-lint-tui
+.PHONY: run-tui build-tui-release check-lint-tui
 
 # --- Python bindings (python/ — maturin) ---
 

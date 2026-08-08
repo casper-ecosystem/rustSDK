@@ -1,4 +1,4 @@
-# Attach Electron + MCP to a stable (non-prerelease) GitHub Release.
+# Attach Electron + MCP + TUI to a stable (non-prerelease) GitHub Release.
 # Trigger: Release published via UI/PAT (not GITHUB_TOKEN). No Pages here.
 name: release-github-stable
 

@@ -35,6 +35,17 @@ cargo run -p casper-sdk-tui --example smoke_status
 cargo run -p casper-sdk-tui --example smoke_write_wait
 ```
 
+## Release binary
+
+Not part of the default SDK / Hub image build. Linux `x86_64` binaries ship on GitHub Releases:
+
+- Pre-release tip: `casper-sdk-tui-dev-preview-linux-x86_64`
+- Stable: `casper-sdk-tui-<version>-linux-x86_64`
+
+Local release build: `make build-tui-release` → `target/release/casper-sdk-tui`.
+
+CI: path-filtered [ci-tui](../../.github/workflows/ci-tui.yml) runs lint, tests, and NCTL smokes when `examples/tui/**` changes.
+
 ## Keys
 
 | Key              | Action                                            |

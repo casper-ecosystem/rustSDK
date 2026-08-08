@@ -1,4 +1,4 @@
-# Build Electron demos + MCP binary and attach them to a GitHub Release.
+# Build Electron demos + MCP + TUI binaries and attach them to a GitHub Release.
 # Callers: release-github-stable (Latest) and release-github-preview (tip Pre-release).
 name: release-github-assets
 
@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   desktop-and-mcp:
-    name: Build and upload desktop + MCP assets
+    name: Build and upload desktop + MCP + TUI assets
     runs-on: ubuntu-latest
 
     steps:
@@ -68,6 +68,9 @@ jobs:
       - name: Build MCP release binary
         run: cargo build -p casper-rust-wasm-sdk-mcp --release
 
+      - name: Build TUI release binary
+        run: make build-tui-release
+
       - name: Upload assets to release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -90,8 +93,10 @@ jobs:
           SNAP="$RELEASE_DIR/casper-webclient_${PKG_VERSION}_amd64.snap"
           MCP_SRC="target/release/casper-rust-wasm-sdk-mcp"
           MCP_DST="casper-rust-wasm-sdk-mcp-${ASSET_LABEL}-linux-x86_64"
+          TUI_SRC="target/release/casper-sdk-tui"
+          TUI_DST="casper-sdk-tui-${ASSET_LABEL}-linux-x86_64"
 
-          for f in "$EXE" "$APPIMAGE" "$SNAP" "$MCP_SRC"; do
+          for f in "$EXE" "$APPIMAGE" "$SNAP" "$MCP_SRC" "$TUI_SRC"; do
             if [[ ! -f "$f" ]]; then
               echo "Missing asset: $f"
               ls -la "$RELEASE_DIR" || true
@@ -102,10 +107,13 @@ jobs:
 
           cp "$MCP_SRC" "$MCP_DST"
           chmod +x "$MCP_DST"
+          cp "$TUI_SRC" "$TUI_DST"
+          chmod +x "$TUI_DST"
 
           gh release upload "$TAG" \
             "$EXE#Casper.Webclient.${ASSET_LABEL}.exe" \
             "$APPIMAGE#Casper.Webclient-${ASSET_LABEL}.AppImage" \
             "$SNAP#casper-webclient_${ASSET_LABEL}_amd64.snap" \
             "$MCP_DST" \
+            "$TUI_DST" \
             --clobber
