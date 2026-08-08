@@ -2,8 +2,8 @@
 
 use anyhow::Result;
 use casper_rust_wasm_sdk::types::verbosity::Verbosity;
-use casper_sdk_tui::model::RpcEvent;
-use casper_sdk_tui::sdk_client::SdkClient;
+use casperatatui::model::RpcEvent;
+use casperatatui::sdk_client::SdkClient;
 use std::collections::HashMap;
 use tokio::sync::mpsc;
 use tokio::time::{timeout, Duration};
@@ -48,8 +48,7 @@ async fn main() -> Result<()> {
                                 .unwrap_or(0)
                         );
                         if let Ok(b) = &block {
-                            if let Ok(parsed) = casper_sdk_tui::block_view::block_row_from_value(b)
-                            {
+                            if let Ok(parsed) = casperatatui::block_view::block_row_from_value(b) {
                                 println!(
                                     "  parsed height={} txs={}",
                                     parsed.height,
@@ -103,7 +102,7 @@ async fn main() -> Result<()> {
                 println!("  entity err: {err}");
             }
             if let Ok(entity) = &load.entity {
-                if let Ok(overview) = casper_sdk_tui::account_view::parse_entity_overview(entity) {
+                if let Ok(overview) = casperatatui::account_view::parse_entity_overview(entity) {
                     println!(
                         "  entity kind={} hash={}",
                         overview.kind,
@@ -137,10 +136,9 @@ async fn main() -> Result<()> {
     match timeout(Duration::from_secs(30), rx.recv()).await {
         Ok(Some(RpcEvent::Account(load))) => {
             if let Ok(auction) = &load.auction {
-                let keys =
-                    casper_sdk_tui::auction_view::AccountMatchKeys::from_identity(&validator);
+                let keys = casperatatui::auction_view::AccountMatchKeys::from_identity(&validator);
                 let (self_stake, dels, undels) =
-                    casper_sdk_tui::auction_view::filter_account_stakes(auction, &keys);
+                    casperatatui::auction_view::filter_account_stakes(auction, &keys);
                 println!(
                     "validator stakes OK | self={} dels={} undels={}",
                     self_stake.is_some(),
@@ -175,7 +173,7 @@ async fn main() -> Result<()> {
     let auction_key = match timeout(Duration::from_secs(30), rx.recv()).await {
         Ok(Some(RpcEvent::Contract(Ok(load)))) => {
             let overview =
-                casper_sdk_tui::contract_view::parse_contract_overview(&load.key, &load.raw)
+                casperatatui::contract_view::parse_contract_overview(&load.key, &load.raw)
                     .map_err(|e| anyhow::anyhow!(e))?;
             println!(
                 "contract OK | key={} kind={} entry_points={} named_keys={}",

@@ -3,10 +3,10 @@
 use anyhow::{bail, Result};
 use casper_rust_wasm_sdk::helpers::public_key_from_secret_key;
 use casper_rust_wasm_sdk::types::verbosity::Verbosity;
-use casper_sdk_tui::model::RpcEvent;
-use casper_sdk_tui::policy::WritePolicy;
-use casper_sdk_tui::sdk_client::{OneShotTransferOwned, SdkClient};
-use casper_sdk_tui::write_flow::{DEFAULT_PAYMENT_MOTES, DEFAULT_TRANSFER_MOTES};
+use casperatatui::model::RpcEvent;
+use casperatatui::policy::WritePolicy;
+use casperatatui::sdk_client::{OneShotTransferOwned, SdkClient};
+use casperatatui::write_flow::{DEFAULT_PAYMENT_MOTES, DEFAULT_TRANSFER_MOTES};
 use tokio::sync::mpsc;
 use tokio::time::{timeout, Duration};
 
@@ -47,7 +47,7 @@ async fn main() -> Result<()> {
             payment: DEFAULT_PAYMENT_MOTES.into(),
             policy: {
                 use std::path::Path;
-                WritePolicy::load(Path::new("examples/tui/policy.sample.json"))
+                WritePolicy::load(Path::new("examples/desktop/tui/policy.sample.json"))
                     .or_else(|_| WritePolicy::load(Path::new("policy.sample.json")))
                     .map_err(|e| anyhow::anyhow!(e))?
             },
@@ -60,7 +60,7 @@ async fn main() -> Result<()> {
         Ok(Some(RpcEvent::WritePut(Err(e)))) => bail!("put failed: {e}"),
         other => bail!("put unexpected: {other:?}"),
     };
-    let hash = casper_sdk_tui::write_flow::extract_tx_hash(&put)
+    let hash = casperatatui::write_flow::extract_tx_hash(&put)
         .ok_or_else(|| anyhow::anyhow!("no hash in put result: {put}"))?;
     println!("put OK | hash={}", &hash[..16.min(hash.len())]);
 

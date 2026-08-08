@@ -1,13 +1,13 @@
-//! `casper-sdk-tui` binary: clap + async UI loop.
+//! `casperatatui` binary: clap + async UI loop.
 
 use anyhow::Result;
-use casper_sdk_tui::command::ParsedCommand;
-use casper_sdk_tui::config::Cli;
-use casper_sdk_tui::draw;
-use casper_sdk_tui::model::{ActionLaunch, ActionsPane, AppModel, InputMode, RpcEvent, ViewMode};
-use casper_sdk_tui::sdk_client::{ActionWriteCtx, OneShotTransferOwned, SdkClient, WriteBuildJob};
-use casper_sdk_tui::terminal::{StopFlag, TerminalGuard};
-use casper_sdk_tui::write_flow::{chain_name_for_preset, WriteKind};
+use casperatatui::command::ParsedCommand;
+use casperatatui::config::Cli;
+use casperatatui::draw;
+use casperatatui::model::{ActionLaunch, ActionsPane, AppModel, InputMode, RpcEvent, ViewMode};
+use casperatatui::sdk_client::{ActionWriteCtx, OneShotTransferOwned, SdkClient, WriteBuildJob};
+use casperatatui::terminal::{StopFlag, TerminalGuard};
+use casperatatui::write_flow::{chain_name_for_preset, WriteKind};
 use clap::Parser;
 use crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyModifiers};
 use std::path::{Path, PathBuf};
@@ -97,7 +97,7 @@ async fn main() -> Result<()> {
 
     guard.restore()?;
     eprintln!(
-        "casper-sdk-tui: terminal restored. The ghost has left the building (RPC was {}).",
+        "Casperatatui: terminal restored. The ghost has left the building (RPC was {}).",
         client.rpc_url()
     );
     Ok(())
@@ -164,7 +164,7 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
         }
         KeyCode::Char('w') if ctx.model.view == ViewMode::Wait => request_wait_or_collect(ctx),
         KeyCode::Char(' ') if ctx.model.view == ViewMode::Wait => {
-            if ctx.model.wait.pane == casper_sdk_tui::model::WaitPane::SseCollect {
+            if ctx.model.wait.pane == casperatatui::model::WaitPane::SseCollect {
                 ctx.model.wait.toggle_selected_name();
             }
         }
@@ -261,7 +261,7 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
             ViewMode::Contracts => contracts_enter(ctx),
             ViewMode::Writes => ctx.model.open_write_form(),
             ViewMode::Wait => {
-                if ctx.model.wait.pane == casper_sdk_tui::model::WaitPane::SseCollect
+                if ctx.model.wait.pane == casperatatui::model::WaitPane::SseCollect
                     && ctx.model.input_mode == InputMode::Normal
                 {
                     // Prefer starting collect when form looks filled.
@@ -278,7 +278,7 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
 }
 
 fn handle_escape(ctx: &mut KeyCtx<'_>) -> Result<bool> {
-    use casper_sdk_tui::model::BlocksPane;
+    use casperatatui::model::BlocksPane;
     if ctx.model.view == ViewMode::Actions && ctx.model.actions.pane != ActionsPane::List {
         ctx.model.actions.close_form();
         ctx.model.actions.pane = ActionsPane::List;
@@ -307,7 +307,7 @@ fn request_latest_blocks(ctx: &mut KeyCtx<'_>) {
 }
 
 fn blocks_enter(ctx: &mut KeyCtx<'_>) {
-    use casper_sdk_tui::model::BlocksPane;
+    use casperatatui::model::BlocksPane;
     match ctx.model.blocks.pane {
         BlocksPane::List => {
             if ctx.model.blocks.rows.is_empty() {
@@ -479,7 +479,7 @@ fn handle_account_reward_key(code: KeyCode, ctx: &mut KeyCtx<'_>) -> Result<bool
 }
 
 fn accounts_enter(ctx: &mut KeyCtx<'_>) {
-    use casper_sdk_tui::model::AccountsSection;
+    use casperatatui::model::AccountsSection;
     match ctx.model.accounts.section {
         AccountsSection::Rewards => {
             if ctx.model.accounts.reward_validator.buffer.trim().is_empty() {
@@ -642,7 +642,7 @@ fn handle_contract_query_dict_key(code: KeyCode, ctx: &mut KeyCtx<'_>) -> Result
 }
 
 fn contracts_enter(ctx: &mut KeyCtx<'_>) {
-    use casper_sdk_tui::model::ContractsSection;
+    use casperatatui::model::ContractsSection;
     match ctx.model.contracts.section {
         ContractsSection::QueryKey => {
             if ctx.model.input_mode == InputMode::ContractQueryKey {
@@ -755,10 +755,10 @@ fn cycle_actions_pane(model: &mut AppModel) {
 }
 
 fn scroll_or_list(model: &mut AppModel, delta: i32) {
-    use casper_sdk_tui::model::BlocksPane;
+    use casperatatui::model::BlocksPane;
     match model.view {
         ViewMode::Actions if model.actions.pane == ActionsPane::List => {
-            let len = casper_sdk_tui::actions_catalog::visible_actions(
+            let len = casperatatui::actions_catalog::visible_actions(
                 model.enable_writes,
                 model.has_pem(),
             )
@@ -803,7 +803,7 @@ fn scroll_or_list(model: &mut AppModel, delta: i32) {
         }
         ViewMode::Transactions => adjust_u16(&mut model.transactions.scroll, delta),
         ViewMode::Accounts => {
-            use casper_sdk_tui::model::AccountsSection;
+            use casperatatui::model::AccountsSection;
             let list_len = model.accounts.list_len();
             match model.accounts.section {
                 AccountsSection::NamedKeys
@@ -823,7 +823,7 @@ fn scroll_or_list(model: &mut AppModel, delta: i32) {
             }
         }
         ViewMode::Contracts => {
-            use casper_sdk_tui::model::ContractsSection;
+            use casperatatui::model::ContractsSection;
             let list_len = model.contracts.list_len();
             match model.contracts.section {
                 ContractsSection::NamedKeys | ContractsSection::EntryPoints if list_len > 0 => {
@@ -840,7 +840,7 @@ fn scroll_or_list(model: &mut AppModel, delta: i32) {
         }
         ViewMode::Writes => adjust_u16(&mut model.writes.scroll, delta),
         ViewMode::Wait => {
-            use casper_sdk_tui::model::WaitPane;
+            use casperatatui::model::WaitPane;
             if model.wait.pane == WaitPane::SseCollect && model.input_mode == InputMode::Normal {
                 let len = model.wait.event_names.len().max(1);
                 if delta > 0 {
@@ -1263,7 +1263,7 @@ fn handle_wait_form_key(code: KeyCode, ctx: &mut KeyCtx<'_>) -> Result<bool> {
 }
 
 fn request_wait_or_collect(ctx: &mut KeyCtx<'_>) {
-    use casper_sdk_tui::model::WaitPane;
+    use casperatatui::model::WaitPane;
     if ctx.model.wait.waiting || !ctx.model.can_refresh() {
         ctx.model
             .set_status("still listening · wait for the previous haunt");

@@ -60,7 +60,7 @@ fn draw_title(frame: &mut Frame, area: Rect, model: &AppModel) {
         .collect();
 
     let mut line = vec![Span::styled(
-        " casper-sdk-tui ",
+        " Casperatatui ",
         Style::default()
             .fg(Color::Magenta)
             .add_modifier(Modifier::BOLD),
@@ -256,7 +256,11 @@ mod tests {
         terminal.draw(|f| draw(f, &model)).expect("draw");
         let buffer = terminal.backend().buffer().clone();
         let flat: String = buffer.content().iter().map(|c| c.symbol()).collect();
-        assert!(flat.contains("Network") || flat.contains("casper-sdk-tui"));
+        assert!(
+            flat.contains("Network")
+                || flat.contains("Casperatatui")
+                || flat.contains("casperatatui")
+        );
     }
 
     #[test]

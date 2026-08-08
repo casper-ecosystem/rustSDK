@@ -13,7 +13,7 @@ use crate::model::AppModel;
 pub fn draw_help(frame: &mut Frame, area: Rect, model: &AppModel) {
     let mut lines: Vec<Line> = vec![
         Line::from(Span::styled(
-            "Casper SDK TUI - friendly neighborhood blockchain ghost",
+            "Casperatatui - friendly neighborhood blockchain ghost",
             Style::default()
                 .fg(Color::Magenta)
                 .add_modifier(Modifier::BOLD),

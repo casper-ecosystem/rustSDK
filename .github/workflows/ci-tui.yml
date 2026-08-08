@@ -5,12 +5,12 @@ on:
   push:
     branches: [dev, "feat*", "release-*"]
     paths:
-      - "examples/tui/**"
+      - "examples/desktop/tui/**"
       - ".github/workflows/ci-tui.yml"
   pull_request:
     branches: [dev, "feat*", "release-*"]
     paths:
-      - "examples/tui/**"
+      - "examples/desktop/tui/**"
       - ".github/workflows/ci-tui.yml"
   workflow_dispatch:
 
@@ -38,7 +38,7 @@ jobs:
         run: make check-lint-tui
 
       - name: Unit tests
-        run: cargo test -p casper-sdk-tui --lib
+        run: cargo test -p casperatatui --lib
 
       - name: Release binary
         run: make build-tui-release
@@ -93,9 +93,9 @@ jobs:
           fi
 
       - name: Smoke status
-        run: cargo run -p casper-sdk-tui --example smoke_status
+        run: cargo run -p casperatatui --example smoke_status
 
       - name: Smoke write + wait + SSE
         run: |
           CASPER_SECRET_KEY=./assets/users/user-1/secret_key.pem \
-            cargo run -p casper-sdk-tui --example smoke_write_wait
+            cargo run -p casperatatui --example smoke_write_wait

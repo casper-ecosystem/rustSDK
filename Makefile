@@ -203,22 +203,22 @@ mcp-test-live:
 .PHONY: mcp-build mcp-http mcp-http-stop \
 	run-mcp run-mcp-http mcp-test mcp-test-live
 
-# --- TUI explorer example (examples/tui) ---
+# --- Casperatatui TUI explorer (examples/desktop/tui) ---
 
 run-tui:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo run -p casper-sdk-tui -- --preset nctl $(TUI_ARGS)
+		cargo run -p casperatatui -- --preset nctl $(TUI_ARGS)
 
 build-tui-release:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo build -p casper-sdk-tui --release
+		cargo build -p casperatatui --release
 
 # Example package lint (not part of root wasm clippy matrix).
 check-lint-tui:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo clippy -p casper-sdk-tui --all-targets --no-deps -- -D warnings
+		cargo clippy -p casperatatui --all-targets --no-deps -- -D warnings
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo fmt -p casper-sdk-tui -- --check
+		cargo fmt -p casperatatui -- --check
 
 .PHONY: run-tui build-tui-release check-lint-tui
 

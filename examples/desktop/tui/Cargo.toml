@@ -1,24 +1,24 @@
 [package]
-name = "casper-sdk-tui"
+name = "casperatatui"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.88"
 license = "Apache-2.0"
-description = "Terminal explorer example over casper-rust-wasm-sdk (ratatui)"
+description = "Casperatatui: terminal explorer over casper-rust-wasm-sdk (ratatui)"
 publish = false
 readme = "README.md"
 
 [[bin]]
-name = "casper-sdk-tui"
+name = "casperatatui"
 path = "src/main.rs"
 
 [lib]
-name = "casper_sdk_tui"
+name = "casperatatui"
 path = "src/lib.rs"
 
 [dependencies]
 anyhow = "1"
-casper-rust-wasm-sdk = { path = "../..", default-features = false, features = [
+casper-rust-wasm-sdk = { path = "../../..", default-features = false, features = [
   "transaction",
   "contract",
   "helpers",

@@ -6,12 +6,12 @@ on:
     branches: [dev, "feat*", "release-*"]
     paths-ignore:
       - "**.md"
-      - "examples/tui/**"
+      - "examples/desktop/tui/**"
   pull_request:
     branches: [dev, "feat*", "release-*"]
     paths-ignore:
       - "**.md"
-      - "examples/tui/**"
+      - "examples/desktop/tui/**"
 
 jobs:
   build_and_test:

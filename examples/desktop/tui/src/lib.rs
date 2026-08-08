@@ -1,4 +1,4 @@
-//! Casper SDK terminal explorer (example).
+//! Casperatatui: Casper SDK terminal explorer (example TUI).
 //!
 //! Network, Blocks/Txs, Accounts, Contracts, Actions, Writes, Wait/SSE over casper-rust-wasm-sdk (ratatui).
 

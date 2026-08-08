@@ -93,8 +93,8 @@ jobs:
           SNAP="$RELEASE_DIR/casper-webclient_${PKG_VERSION}_amd64.snap"
           MCP_SRC="target/release/casper-rust-wasm-sdk-mcp"
           MCP_DST="casper-rust-wasm-sdk-mcp-${ASSET_LABEL}-linux-x86_64"
-          TUI_SRC="target/release/casper-sdk-tui"
-          TUI_DST="casper-sdk-tui-${ASSET_LABEL}-linux-x86_64"
+          TUI_SRC="target/release/casperatatui"
+          TUI_DST="casperatatui-${ASSET_LABEL}-linux-x86_64"
 
           for f in "$EXE" "$APPIMAGE" "$SNAP" "$MCP_SRC" "$TUI_SRC"; do
             if [[ ! -f "$f" ]]; then

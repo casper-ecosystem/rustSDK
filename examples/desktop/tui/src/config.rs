@@ -17,9 +17,9 @@ const MAINNET_EVENTS: &str = "https://events.mainnet.casper.network/events";
 /// Friendly neighborhood Casper explorer.
 #[derive(Debug, Parser)]
 #[command(
-    name = "casper-sdk-tui",
-    about = "Casper SDK terminal explorer (boo!)",
-    long_about = "Browse a Casper node from your terminal via casper-rust-wasm-sdk.\n\
+    name = "casperatatui",
+    about = "Casperatatui: Casper SDK terminal explorer (boo!)",
+    long_about = "Casperatatui browses a Casper node from your terminal via casper-rust-wasm-sdk.\n\
                   Press h for help, : for the command palette, q to restore your shell."
 )]
 pub struct Cli {
@@ -47,7 +47,7 @@ pub struct Cli {
     #[arg(long, env = "CASPER_SECRET_KEY")]
     pub secret_key: Option<PathBuf>,
 
-    /// Write policy JSON (default: examples/tui/policy.sample.json relative to CWD or crate).
+    /// Write policy JSON (default: examples/desktop/tui/policy.sample.json relative to CWD or crate).
     #[arg(long, env = "CASPER_POLICY_PATH")]
     pub policy_path: Option<PathBuf>,
 }
@@ -122,9 +122,9 @@ impl Cli {
 }
 
 fn default_policy_path() -> PathBuf {
-    // Prefer crate-relative sample when run from repo root or examples/tui.
+    // Prefer crate-relative sample when run from repo root or examples/desktop/tui.
     let candidates = [
-        PathBuf::from("examples/tui/policy.sample.json"),
+        PathBuf::from("examples/desktop/tui/policy.sample.json"),
         PathBuf::from("policy.sample.json"),
     ];
     for c in candidates {
@@ -132,7 +132,7 @@ fn default_policy_path() -> PathBuf {
             return c;
         }
     }
-    PathBuf::from("examples/tui/policy.sample.json")
+    PathBuf::from("examples/desktop/tui/policy.sample.json")
 }
 
 fn parse_verbosity(raw: &str) -> Result<Verbosity> {

@@ -1,8 +1,10 @@
-# casper-sdk-tui
+# Casperatatui
 
-Terminal explorer example over [`casper-rust-wasm-sdk`](../..) using [ratatui](https://ratatui.rs/).
+Desktop TUI explorer over [`casper-rust-wasm-sdk`](../../..) using [ratatui](https://ratatui.rs/).
 
 Friendly neighborhood blockchain ghost. JSON-RPC only (no binary-port). See [COVERAGE.md](./COVERAGE.md) for screen → SDK map.
+
+Lives next to the Electron / Node desktop examples under `examples/desktop/`.
 
 ## Run
 
@@ -11,40 +13,40 @@ From the repo root (clears Cursor sandbox `CARGO_TARGET_DIR` if set):
 ```bash
 make run-tui
 # or
-env -u CARGO_TARGET_DIR cargo run -p casper-sdk-tui -- --preset nctl
+env -u CARGO_TARGET_DIR cargo run -p casperatatui -- --preset nctl
 ```
 
 Presets: `nctl` (default), `testnet`, `mainnet`.
 
-| Flag / env                             | Default (nctl)                    |
-| -------------------------------------- | --------------------------------- |
-| `--rpc-url` / `CASPER_RPC_URL`         | `http://127.0.0.1:11101`          |
-| `--events-url` / `CASPER_EVENTS_URL`   | `http://127.0.0.1:18101/events`   |
-| `--verbosity` / `CASPER_VERBOSITY`     | `low`                             |
-| `--enable-writes`                      | off                               |
-| `--secret-key` / `CASPER_SECRET_KEY`   | unset (PEM path, memory only)     |
-| `--policy-path` / `CASPER_POLICY_PATH` | `examples/tui/policy.sample.json` |
+| Flag / env                             | Default (nctl)                            |
+| -------------------------------------- | ----------------------------------------- |
+| `--rpc-url` / `CASPER_RPC_URL`         | `http://127.0.0.1:11101`                  |
+| `--events-url` / `CASPER_EVENTS_URL`   | `http://127.0.0.1:18101/events`           |
+| `--verbosity` / `CASPER_VERBOSITY`     | `low`                                     |
+| `--enable-writes`                      | off                                       |
+| `--secret-key` / `CASPER_SECRET_KEY`   | unset (PEM path, memory only)             |
+| `--policy-path` / `CASPER_POLICY_PATH` | `examples/desktop/tui/policy.sample.json` |
 
 Needs a reachable node for `r` / auto-refresh (local NCTL is ideal).
 
 Non-interactive smoke:
 
 ```bash
-cargo run -p casper-sdk-tui --example smoke_status
+cargo run -p casperatatui --example smoke_status
 # SSE collect always; put+wait when CASPER_SECRET_KEY is set:
-cargo run -p casper-sdk-tui --example smoke_write_wait
+cargo run -p casperatatui --example smoke_write_wait
 ```
 
 ## Release binary
 
 Not part of the default SDK / Hub image build. Linux `x86_64` binaries ship on GitHub Releases:
 
-- Pre-release tip: `casper-sdk-tui-dev-preview-linux-x86_64`
-- Stable: `casper-sdk-tui-<version>-linux-x86_64`
+- Pre-release tip: `casperatatui-dev-preview-linux-x86_64`
+- Stable: `casperatatui-<version>-linux-x86_64`
 
-Local release build: `make build-tui-release` → `target/release/casper-sdk-tui`.
+Local release build: `make build-tui-release` → `target/release/casperatatui`.
 
-CI: path-filtered [ci-tui](../../.github/workflows/ci-tui.yml) runs lint, tests, and NCTL smokes when `examples/tui/**` changes.
+CI: path-filtered [ci-tui](../../../.github/workflows/ci-tui.yml) runs lint, tests, and NCTL smokes when `examples/desktop/tui/**` changes.
 
 ## Keys
 
@@ -100,12 +102,12 @@ RPC + helpers catalog; write methods appear when writes enabled and PEM loaded.
 
 ## Command palette (`:`)
 
-| Input                  | Meaning              |
-| ---------------------- | -------------------- |
-| `refresh` / `r`        | Network seance       |
-| `rpc`                  | Edit RPC URL         |
-| `help` / `goto <view>` | Help / jump          |
-| `quit`                 | Exit                 |
-| Up / Down / Tab        | History / completion |
+| Input                     | Meaning                         |
+| ------------------------- | ------------------------------- |
+| `refresh` / `r`           | Network seance                  |
+| `rpc`                     | Edit RPC URL                    |
+| `help` / `goto <view>`    | Help / jump                     |
+| `quit`                    | Exit                            |
+| Up / Down / Tab           | History / completion            |
 
 On exit the TUI always leaves raw mode / alternate screen.

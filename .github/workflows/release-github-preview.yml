@@ -56,7 +56,7 @@ jobs:
           - \`Casper.Webclient-dev-preview.AppImage\`
           - \`casper-webclient_dev-preview_amd64.snap\`
           - \`casper-rust-wasm-sdk-mcp-dev-preview-linux-x86_64\`
-          - \`casper-sdk-tui-dev-preview-linux-x86_64\`
+          - \`casperatatui-dev-preview-linux-x86_64\`
           "
 
           if gh release view "$TAG" >/dev/null 2>&1; then

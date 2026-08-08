@@ -1,6 +1,6 @@
-# TUI coverage map
+# Casperatatui coverage map
 
-Screen to SDK / MCP symbols used by `casper-sdk-tui` today. Phase 4 (Validators) is not shipped yet.
+Screen to SDK / MCP symbols used by the Casperatatui TUI today. Phase 4 (Validators) is not shipped yet.
 
 | Screen       | Keys                          | SDK / helpers                                                                                                          | MCP compose (related)                                                                                 |
 | ------------ | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -24,7 +24,7 @@ Screen to SDK / MCP symbols used by `casper-sdk-tui` today. Phase 4 (Validators)
 ## Smoke
 
 ```bash
-cargo run -p casper-sdk-tui --example smoke_status
+cargo run -p casperatatui --example smoke_status
 # optional write+wait (needs PEM path in env, never commit keys):
-# CASPER_SECRET_KEY=/path/to/secret_key.pem cargo run -p casper-sdk-tui --example smoke_write_wait
+# CASPER_SECRET_KEY=/path/to/secret_key.pem cargo run -p casperatatui --example smoke_write_wait
 ```

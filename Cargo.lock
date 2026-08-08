@@ -514,21 +514,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "casper-sdk-tui"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "casper-rust-wasm-sdk",
- "clap",
- "crossterm",
- "ctrlc",
- "ratatui",
- "serde",
- "serde_json",
- "tokio",
-]
-
-[[package]]
 name = "casper-types"
 version = "7.1.1"
 source = "git+https://github.com/casper-network/casper-node?tag=v2.2.2#bbb2890df7ccdcb1aabe6c1a4cf16f5f2a4805c3"
@@ -565,6 +550,21 @@ dependencies = [
  "tracing",
  "uint",
  "untrusted 0.7.1",
+]
+
+[[package]]
+name = "casperatatui"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "casper-rust-wasm-sdk",
+ "clap",
+ "crossterm",
+ "ctrlc",
+ "ratatui",
+ "serde",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]
