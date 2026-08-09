@@ -1,14 +1,15 @@
 use casper_types::{
     addressable_entity::EntryPointType as _EntryPointType, contracts::EntryPoint as _EntryPoint,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::contracts::EntryPoint`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct EntryPoint(_EntryPoint);
 
 impl EntryPoint {
@@ -29,21 +30,21 @@ impl EntryPoint {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl EntryPoint {
-    #[wasm_bindgen(js_name = "name")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "name"))]
     pub fn name_js(&self) -> String {
         self.name()
     }
 
-    #[wasm_bindgen(js_name = "entryPointType")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "entryPointType"))]
     pub fn entry_point_type_js(&self) -> String {
         self.entry_point_type()
     }
 
     /// Nested args / access / return type as JSON for escape-hatch parsing.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

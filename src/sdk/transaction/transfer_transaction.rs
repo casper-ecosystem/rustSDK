@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::transaction::transaction::PutTransactionResult;
 use crate::{
     make_transfer_transaction,
@@ -11,11 +11,11 @@ use crate::{
 use casper_client::{
     rpcs::results::PutTransactionResult as _PutTransactionResult, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// JS function for transaction transferring funds.
     ///
@@ -32,8 +32,9 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the result of the transfer or a `JsError` in case of an error.
-    #[wasm_bindgen(js_name = "transfer_transaction")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "transfer_transaction"))]
     #[allow(clippy::too_many_arguments)]
+    #[cfg(feature = "js")]
     pub async fn transfer_transactionjs_alias(
         &self,
         maybe_source: Option<URef>,

@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
@@ -11,51 +11,54 @@ use casper_client::{
     cli::get_auction_info as get_auction_info_cli, get_auction_info as get_auction_info_lib,
     rpcs::results::GetAuctionInfoResult as _GetAuctionInfoResult, JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetAuctionInfoResult
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetAuctionInfoResult(_GetAuctionInfoResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<GetAuctionInfoResult> for _GetAuctionInfoResult {
     fn from(result: GetAuctionInfoResult) -> Self {
         result.0
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_GetAuctionInfoResult> for GetAuctionInfoResult {
     fn from(result: _GetAuctionInfoResult) -> Self {
         GetAuctionInfoResult(result)
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetAuctionInfoResult {
     /// Gets the API version as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the auction state as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn auction_state(&self) -> JsValue {
         JsValue::from_serde(&self.0.auction_state).unwrap()
     }
 
     /// Converts the GetAuctionInfoResult to a JsValue.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -63,8 +66,11 @@ impl GetAuctionInfoResult {
 
 /// Options for the `get_auction_info` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getAuctionInfoOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getAuctionInfoOptions", getter_with_clone)
+)]
 pub struct GetAuctionInfoOptions {
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
@@ -72,8 +78,8 @@ pub struct GetAuctionInfoOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Parses auction info options from a JsValue.
     ///
@@ -85,6 +91,7 @@ impl SDK {
     ///
     /// Result containing parsed auction info options as a `GetAuctionInfoOptions` struct,
     /// or a `JsError` if deserialization fails.
+    #[cfg(feature = "js")]
     pub fn get_auction_info_options(
         &self,
         options: JsValue,
@@ -107,7 +114,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[wasm_bindgen(js_name = "get_auction_info")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_auction_info"))]
+    #[cfg(feature = "js")]
     pub async fn get_auction_info_js_alias(
         &self,
         options: Option<GetAuctionInfoOptions>,
@@ -140,7 +148,11 @@ impl SDK {
     }
 
     // JavaScript alias for `get_auction_info`
-    #[wasm_bindgen(js_name = "state_get_auction_info_js_alias")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "state_get_auction_info_js_alias")
+    )]
+    #[cfg(feature = "js")]
     pub async fn state_get_auction_info(
         &self,
         options: Option<GetAuctionInfoOptions>,

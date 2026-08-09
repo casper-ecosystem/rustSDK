@@ -4,6 +4,7 @@ use crate::{
 };
 use casper_client::cli::SessionStrParams as _SessionStrParams;
 use once_cell::sync::OnceCell;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Legacy deploy session params. Prefer [`crate::types::transaction_params::transaction_str_params::TransactionStrParams`].
@@ -14,7 +15,7 @@ use wasm_bindgen::prelude::*;
 /// - [`Self::set_session_args`] — typed [`RuntimeArgs`]
 #[deprecated(note = "prefer TransactionStrParams")]
 #[allow(deprecated)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Default, Debug, Clone)]
 pub struct SessionStrParams {
     session_hash: OnceCell<String>,
@@ -30,10 +31,10 @@ pub struct SessionStrParams {
     is_session_transfer: OnceCell<bool>,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[allow(deprecated)]
 impl SessionStrParams {
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         session_hash: Option<String>,
@@ -87,34 +88,34 @@ impl SessionStrParams {
     }
 
     // Getter and setter for session_hash field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn session_hash(&self) -> Option<String> {
         self.session_hash.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_session_hash(&self, session_hash: &str) {
         self.session_hash.set(session_hash.to_string()).unwrap();
     }
 
     // Getter and setter for session_name field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn session_name(&self) -> Option<String> {
         self.session_name.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_session_name(&self, session_name: &str) {
         self.session_name.set(session_name.to_string()).unwrap();
     }
 
     // Getter and setter for session_package_hash field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn session_package_hash(&self) -> Option<String> {
         self.session_package_hash.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_session_package_hash(&self, session_package_hash: &str) {
         self.session_package_hash
             .set(session_package_hash.to_string())
@@ -122,12 +123,12 @@ impl SessionStrParams {
     }
 
     // Getter and setter for session_package_name field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn session_package_name(&self) -> Option<String> {
         self.session_package_name.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_session_package_name(&self, session_package_name: &str) {
         self.session_package_name
             .set(session_package_name.to_string())
@@ -135,48 +136,48 @@ impl SessionStrParams {
     }
 
     // Getter and setter for session_path field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn session_path(&self) -> Option<String> {
         self.session_path.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_session_path(&self, session_path: &str) {
         self.session_path.set(session_path.to_string()).unwrap();
     }
 
     // Getter and setter for session_bytes field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn session_bytes(&self) -> Option<Bytes> {
         self.session_bytes.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_session_bytes(&self, session_bytes: Bytes) {
         self.session_bytes.set(session_bytes).unwrap();
     }
 
     // Getter and setter for session_args_simple field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn session_args_simple(&self) -> Option<ArgsSimple> {
         self.session_args_simple.get().cloned()
     }
 
     /// CLI-style simple args (`name:Type='value'`).
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_session_args_simple(&mut self, session_args_simple: Vec<String>) {
         let args_simple = ArgsSimple::from(session_args_simple);
         self.session_args_simple.set(args_simple).unwrap();
     }
 
     // Getter and setter for session_args_json field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn session_args_json(&self) -> Option<String> {
         self.session_args_json.get().cloned()
     }
 
     /// JSON session args string (human-typed or ByteArray bridge encoding).
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_session_args_json(&self, session_args_json: &str) {
         self.session_args_json
             .set(session_args_json.to_string())
@@ -192,12 +193,12 @@ impl SessionStrParams {
     }
 
     // Getter and setter for session_version field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn session_version(&self) -> Option<String> {
         self.session_version.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_session_version(&self, session_version: &str) {
         self.session_version
             .set(session_version.to_string())
@@ -205,12 +206,12 @@ impl SessionStrParams {
     }
 
     // Getter and setter for session_entry_point field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn session_entry_point(&self) -> Option<String> {
         self.session_entry_point.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_session_entry_point(&self, session_entry_point: &str) {
         self.session_entry_point
             .set(session_entry_point.to_string())
@@ -218,12 +219,12 @@ impl SessionStrParams {
     }
 
     // Getter and setter for is_session_transfer field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn is_session_transfer(&self) -> Option<bool> {
         self.is_session_transfer.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_is_session_transfer(&self, is_session_transfer: bool) {
         self.is_session_transfer.set(is_session_transfer).unwrap();
     }

@@ -13,9 +13,10 @@ use crate::types::{
     transfer::Transfer,
 };
 use casper_types::StoredValue as _StoredValue;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::StoredValue`].
@@ -24,7 +25,7 @@ use wasm_bindgen::prelude::*;
 /// (`Bid`, `BidKind`, `Withdraw`, `Unbonding`, `MessageTopic`, `Message`,
 /// `Prepayment`) expose `variant` and `toJson` only.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct StoredValue(_StoredValue);
 
 impl StoredValue {
@@ -130,85 +131,85 @@ impl StoredValue {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl StoredValue {
-    #[wasm_bindgen(js_name = "variant")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "variant"))]
     pub fn variant_js(&self) -> String {
         self.variant().to_string()
     }
 
-    #[wasm_bindgen(js_name = "asClValue")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asClValue"))]
     pub fn as_cl_value_js(&self) -> Option<CLValue> {
         self.as_cl_value()
     }
 
-    #[wasm_bindgen(js_name = "asAccount")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asAccount"))]
     pub fn as_account_js(&self) -> Option<Account> {
         self.as_account()
     }
 
-    #[wasm_bindgen(js_name = "asContract")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asContract"))]
     pub fn as_contract_js(&self) -> Option<Contract> {
         self.as_contract()
     }
 
-    #[wasm_bindgen(js_name = "asContractPackage")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asContractPackage"))]
     pub fn as_contract_package_js(&self) -> Option<ContractPackage> {
         self.as_contract_package()
     }
 
-    #[wasm_bindgen(js_name = "asAddressableEntity")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asAddressableEntity"))]
     pub fn as_addressable_entity_js(&self) -> Option<AddressableEntity> {
         self.as_addressable_entity()
     }
 
-    #[wasm_bindgen(js_name = "asSmartContract")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asSmartContract"))]
     pub fn as_smart_contract_js(&self) -> Option<Package> {
         self.as_smart_contract()
     }
 
-    #[wasm_bindgen(js_name = "asNamedKey")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asNamedKey"))]
     pub fn as_named_key_js(&self) -> Option<NamedKeyValue> {
         self.as_named_key()
     }
 
-    #[wasm_bindgen(js_name = "asEntryPoint")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asEntryPoint"))]
     pub fn as_entry_point_js(&self) -> Option<EntryPointValue> {
         self.as_entry_point()
     }
 
-    #[wasm_bindgen(js_name = "asContractWasm")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asContractWasm"))]
     pub fn as_contract_wasm_js(&self) -> Option<ContractWasm> {
         self.as_contract_wasm()
     }
 
-    #[wasm_bindgen(js_name = "asByteCode")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asByteCode"))]
     pub fn as_byte_code_js(&self) -> Option<ByteCode> {
         self.as_byte_code()
     }
 
-    #[wasm_bindgen(js_name = "asTransfer")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asTransfer"))]
     pub fn as_transfer_js(&self) -> Option<Transfer> {
         self.as_transfer()
     }
 
-    #[wasm_bindgen(js_name = "asDeployInfo")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asDeployInfo"))]
     pub fn as_deploy_info_js(&self) -> Option<DeployInfo> {
         self.as_deploy_info()
     }
 
-    #[wasm_bindgen(js_name = "asEraInfo")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asEraInfo"))]
     pub fn as_era_info_js(&self) -> Option<EraInfo> {
         self.as_era_info()
     }
 
-    #[wasm_bindgen(js_name = "asRawBytes")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asRawBytes"))]
     pub fn as_raw_bytes_js(&self) -> Option<Vec<u8>> {
         self.as_raw_bytes()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

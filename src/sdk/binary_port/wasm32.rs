@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::{
     types::{
         digest::Digest,
@@ -12,15 +12,19 @@ use crate::{
     },
     SDK,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
-    #[wasm_bindgen(js_name = "get_binary_latest_switch_block_header")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_latest_switch_block_header")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_latest_switch_block_header_js_alias(
         &self,
         node_address: Option<String>,
@@ -34,7 +38,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_latest_block_header")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_latest_block_header")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_latest_block_header_js_alias(
         &self,
         node_address: Option<String>,
@@ -45,7 +53,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_block_header_by_height")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_block_header_by_height")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_block_header_by_height_js_alias(
         &self,
         height: u64,
@@ -59,7 +71,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_block_header_by_hash")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_block_header_by_hash")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_block_header_by_hash_js_alias(
         &self,
         block_hash: BlockHash,
@@ -73,7 +89,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_latest_block_with_signatures")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_latest_block_with_signatures")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_latest_block_with_signatures_js_alias(
         &self,
         node_address: Option<String>,
@@ -86,7 +106,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_block_with_signatures_by_height")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_block_with_signatures_by_height")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_block_with_signatures_by_height_js_alias(
         &self,
         height: u64,
@@ -100,7 +124,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_block_with_signatures_by_hash")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_block_with_signatures_by_hash")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_block_with_signatures_by_hash_js_alias(
         &self,
         block_hash: BlockHash,
@@ -114,7 +142,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_transaction_by_hash")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_transaction_by_hash")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_transaction_by_hash_js_alias(
         &self,
         hash: TransactionHash,
@@ -129,7 +161,8 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_peers")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_binary_peers"))]
+    #[cfg(feature = "js")]
     pub async fn get_binary_peers_js_alias(
         &self,
         node_address: Option<String>,
@@ -140,7 +173,8 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_uptime")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_binary_uptime"))]
+    #[cfg(feature = "js")]
     pub async fn get_binary_uptime_js_alias(
         &self,
         node_address: Option<String>,
@@ -151,7 +185,8 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_last_progress")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_binary_last_progress"))]
+    #[cfg(feature = "js")]
     pub async fn get_binary_last_progress_js_alias(
         &self,
         node_address: Option<String>,
@@ -162,7 +197,8 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_reactor_state")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_binary_reactor_state"))]
+    #[cfg(feature = "js")]
     pub async fn get_binary_reactor_state_js_alias(
         &self,
         node_address: Option<String>,
@@ -173,7 +209,8 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_network_name")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_binary_network_name"))]
+    #[cfg(feature = "js")]
     pub async fn get_binary_network_name_js_alias(
         &self,
         node_address: Option<String>,
@@ -184,7 +221,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_consensus_validator_changes")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_consensus_validator_changes")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_consensus_validator_changes_js_alias(
         &self,
         node_address: Option<String>,
@@ -197,7 +238,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_block_synchronizer_status")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_block_synchronizer_status")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_block_synchronizer_status_js_alias(
         &self,
         node_address: Option<String>,
@@ -210,7 +255,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_available_block_range")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_available_block_range")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_available_block_range_js_alias(
         &self,
         node_address: Option<String>,
@@ -221,7 +270,8 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_next_upgrade")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_binary_next_upgrade"))]
+    #[cfg(feature = "js")]
     pub async fn get_binary_next_upgrade_js_alias(
         &self,
         node_address: Option<String>,
@@ -232,7 +282,8 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_consensus_status")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_binary_consensus_status"))]
+    #[cfg(feature = "js")]
     pub async fn get_binary_consensus_status_js_alias(
         &self,
         node_address: Option<String>,
@@ -243,7 +294,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_chainspec_raw_bytes")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_chainspec_raw_bytes")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_chainspec_raw_bytes_js_alias(
         &self,
         node_address: Option<String>,
@@ -254,7 +309,8 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_node_status")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_binary_node_status"))]
+    #[cfg(feature = "js")]
     pub async fn get_binary_node_status_js_alias(
         &self,
         node_address: Option<String>,
@@ -265,7 +321,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_validator_reward_by_era")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_validator_reward_by_era")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_validator_reward_by_era_js_alias(
         &self,
         validator_key: PublicKey,
@@ -280,7 +340,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_validator_reward_by_block_height")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_validator_reward_by_block_height")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_validator_reward_by_block_height_js_alias(
         &self,
         validator_key: PublicKey,
@@ -299,7 +363,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_validator_reward_by_block_hash")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_validator_reward_by_block_hash")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_validator_reward_by_block_hash_js_alias(
         &self,
         validator_key: PublicKey,
@@ -318,7 +386,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_delegator_reward_by_era")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_delegator_reward_by_era")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_delegator_reward_by_era_js_alias(
         &self,
         validator_key: PublicKey,
@@ -339,7 +411,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_delegator_reward_by_block_height")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_delegator_reward_by_block_height")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_delegator_reward_by_block_height_js_alias(
         &self,
         validator_key: PublicKey,
@@ -360,7 +436,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_delegator_reward_by_block_hash")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_delegator_reward_by_block_hash")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_delegator_reward_by_block_hash_js_alias(
         &self,
         validator_key: PublicKey,
@@ -381,7 +461,8 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_read_record")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_binary_read_record"))]
+    #[cfg(feature = "js")]
     pub async fn get_binary_read_record_js_alias(
         &self,
         record_id: RecordId,
@@ -396,7 +477,8 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_global_state_item")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_binary_global_state_item"))]
+    #[cfg(feature = "js")]
     pub async fn get_binary_global_state_item_js_alias(
         &self,
         key: Key,
@@ -411,7 +493,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_global_state_item_by_state_root_hash")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_global_state_item_by_state_root_hash")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_global_state_item_by_state_root_hash_js_alias(
         &self,
         state_root_hash: Digest,
@@ -432,7 +518,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_global_state_item_by_block_hash")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_global_state_item_by_block_hash")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_global_state_item_by_block_hash_js_alias(
         &self,
         block_hash: BlockHash,
@@ -453,7 +543,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_global_state_item_by_block_height")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_global_state_item_by_block_height")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_global_state_item_by_block_height_js_alias(
         &self,
         block_height: u64,
@@ -474,7 +568,11 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_try_accept_transaction")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_try_accept_transaction")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_try_accept_transaction_js_alias(
         &self,
         transaction: Transaction,
@@ -490,7 +588,11 @@ impl SDK {
         }
     }
 
-    #[wasm_bindgen(js_name = "get_binary_try_speculative_execution")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(js_name = "get_binary_try_speculative_execution")
+    )]
+    #[cfg(feature = "js")]
     pub async fn get_binary_try_speculative_execution_js_alias(
         &self,
         transaction: Transaction,
@@ -504,7 +606,8 @@ impl SDK {
             .map_err(|err| JsError::new(&format!("Error occurred: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "get_binary_protocol_version")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_binary_protocol_version"))]
+    #[cfg(feature = "js")]
     pub async fn get_binary_protocol_version_js_alias(
         &self,
         node_address: Option<String>,

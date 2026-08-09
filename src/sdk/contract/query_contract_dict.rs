@@ -1,8 +1,8 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::rpcs::get_dictionary_item::GetDictionaryItemResult;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::digest::Digest;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::{
     deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
     identifier::dictionary_item_identifier::DictionaryItemIdentifier,
@@ -15,16 +15,19 @@ use crate::{types::sdk_error::SdkError, SDK};
 use casper_client::{
     rpcs::results::GetDictionaryItemResult as _GetDictionaryItemResult, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 #[derive(Default, Debug, Deserialize, Clone, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "queryContractDictOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "queryContractDictOptions", getter_with_clone)
+)]
 pub struct QueryContractDictOptions {
     // Not supported by get_dictionary_item
     // pub global_state_identifier: Option<GlobalStateIdentifier>,
@@ -36,11 +39,12 @@ pub struct QueryContractDictOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Deserialize query_contract_dict_options from a JavaScript object.
-    #[wasm_bindgen(js_name = "query_contract_dict_options")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "query_contract_dict_options"))]
+    #[cfg(feature = "js")]
     pub fn query_contract_dict_state_options(
         &self,
         options: JsValue,
@@ -51,7 +55,8 @@ impl SDK {
     }
 
     /// JavaScript function for query_contract_dict with deserialized options.
-    #[wasm_bindgen(js_name = "query_contract_dict")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "query_contract_dict"))]
+    #[cfg(feature = "js")]
     pub async fn query_contract_dict_js_alias(
         &self,
         options: Option<QueryContractDictOptions>,

@@ -1,13 +1,14 @@
 use crate::types::addr::entity_addr::EntityAddr;
 use casper_types::Package as _Package;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::Package`] (`StoredValue::SmartContract`).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct Package(_Package);
 
 impl Package {
@@ -24,20 +25,20 @@ impl Package {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl Package {
-    #[wasm_bindgen(js_name = "isLocked")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isLocked"))]
     pub fn is_locked_js(&self) -> bool {
         self.is_locked()
     }
 
-    #[wasm_bindgen(js_name = "currentEntityHash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "currentEntityHash"))]
     pub fn current_entity_hash_js(&self) -> Option<EntityAddr> {
         self.current_entity_hash()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

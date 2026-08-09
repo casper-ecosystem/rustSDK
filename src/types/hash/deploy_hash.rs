@@ -1,13 +1,14 @@
 use crate::types::{digest::Digest, sdk_error::SdkError};
 use casper_types::{DeployHash as _DeployHash, Digest as _Digest};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use std::fmt;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct DeployHash(_DeployHash);
 
 impl DeployHash {
@@ -27,25 +28,28 @@ impl DeployHash {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl DeployHash {
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
+    #[cfg(feature = "js")]
     pub fn new_js_alias(deploy_hash_hex_str: &str) -> Result<DeployHash, JsError> {
         Self::new(deploy_hash_hex_str).map_err(Into::into)
     }
 
-    #[wasm_bindgen(js_name = "fromDigest")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromDigest"))]
+    #[cfg(feature = "js")]
     pub fn from_digest_js_alias(digest: Digest) -> Result<DeployHash, JsError> {
         Self::from_digest(digest).map_err(Into::into)
     }
 
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 
-    #[wasm_bindgen(js_name = "toString")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toString"))]
     pub fn to_string_js_alias(&self) -> String {
         self.to_string()
     }

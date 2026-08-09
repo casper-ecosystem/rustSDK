@@ -1,12 +1,13 @@
 use crate::types::{key::Key, sdk_error::SdkError};
 use casper_client::rpcs::DictionaryItemIdentifier as _DictionaryItemIdentifier;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct DictionaryItemIdentifier(_DictionaryItemIdentifier);
 
 impl DictionaryItemIdentifier {
@@ -99,10 +100,11 @@ impl DictionaryItemIdentifier {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl DictionaryItemIdentifier {
     // static context
-    #[wasm_bindgen(js_name = "newFromAccountInfo")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newFromAccountInfo"))]
+    #[cfg(feature = "js")]
     pub fn new_from_account_info_js_alias(
         account_hash: &str,
         dictionary_name: &str,
@@ -113,7 +115,8 @@ impl DictionaryItemIdentifier {
     }
 
     // static context
-    #[wasm_bindgen(js_name = "newFromContractInfo")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newFromContractInfo"))]
+    #[cfg(feature = "js")]
     pub fn new_from_contract_info_js_alias(
         contract_addr: &str,
         dictionary_name: &str,
@@ -123,7 +126,8 @@ impl DictionaryItemIdentifier {
             .map_err(Into::into)
     }
 
-    #[wasm_bindgen(js_name = "newFromEntityInfo")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newFromEntityInfo"))]
+    #[cfg(feature = "js")]
     pub fn new_from_entity_info_js_alias(
         entity_addr: &str,
         dictionary_name: &str,
@@ -134,7 +138,8 @@ impl DictionaryItemIdentifier {
     }
 
     // static context
-    #[wasm_bindgen(js_name = "newFromSeedUref")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newFromSeedUref"))]
+    #[cfg(feature = "js")]
     pub fn new_from_seed_uref_js_alias(
         seed_uref: &str,
         dictionary_item_key: &str,
@@ -143,15 +148,16 @@ impl DictionaryItemIdentifier {
     }
 
     // static context
-    #[wasm_bindgen(js_name = "newFromDictionaryKey")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newFromDictionaryKey"))]
+    #[cfg(feature = "js")]
     pub fn new_from_dictionary_key_js_alias(
         dictionary_key: &str,
     ) -> Result<DictionaryItemIdentifier, JsError> {
         Self::new_from_dictionary_key(dictionary_key).map_err(Into::into)
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }

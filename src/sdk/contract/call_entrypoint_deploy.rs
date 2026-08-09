@@ -1,6 +1,6 @@
 #![allow(deprecated)]
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::deploy::deploy::PutDeployResult;
 use crate::types::deploy_params::{
     deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -11,12 +11,12 @@ use crate::{types::sdk_error::SdkError, SDK};
 use casper_client::{
     cli::deploy::make_deploy, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// A set of functions for working with smart contract entry points.
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Calls a smart contract entry point with the specified parameters and returns the result.
     ///
@@ -34,9 +34,10 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the call.
-    #[wasm_bindgen(js_name = "call_entrypoint_deploy")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "call_entrypoint_deploy"))]
     #[deprecated(note = "prefer 'call_entrypoint' with transaction")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn call_entrypoint_deploy_js_alias(
         &self,
         deploy_params: DeployStrParams,

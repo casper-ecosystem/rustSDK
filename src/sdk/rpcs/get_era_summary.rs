@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
@@ -11,51 +11,54 @@ use casper_client::{
     cli::get_era_summary as get_era_summary_cli, get_era_summary as get_era_summary_lib,
     rpcs::results::GetEraSummaryResult as _GetEraSummaryResult, JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// Wrapper struct for the `GetEraSummaryResult` from casper_client.
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetEraSummaryResult(_GetEraSummaryResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<GetEraSummaryResult> for _GetEraSummaryResult {
     fn from(result: GetEraSummaryResult) -> Self {
         result.0
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_GetEraSummaryResult> for GetEraSummaryResult {
     fn from(result: _GetEraSummaryResult) -> Self {
         GetEraSummaryResult(result)
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetEraSummaryResult {
     /// Gets the API version as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the era summary as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn era_summary(&self) -> JsValue {
         JsValue::from_serde(&self.0.era_summary).unwrap()
     }
 
     /// Converts the GetEraSummaryResult to a JsValue.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -63,8 +66,11 @@ impl GetEraSummaryResult {
 
 /// Options for the `get_era_summary` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getEraSummaryOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getEraSummaryOptions", getter_with_clone)
+)]
 pub struct GetEraSummaryOptions {
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
@@ -72,8 +78,8 @@ pub struct GetEraSummaryOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Parses era summary options from a JsValue.
     ///
@@ -84,6 +90,7 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed era summary options as a `GetEraSummaryOptions` struct.
+    #[cfg(feature = "js")]
     pub fn get_era_summary_options(
         &self,
         options: JsValue,
@@ -106,7 +113,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[wasm_bindgen(js_name = "get_era_summary")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_era_summary"))]
+    #[cfg(feature = "js")]
     pub async fn get_era_summary_js_alias(
         &self,
         options: Option<GetEraSummaryOptions>,
@@ -139,9 +147,10 @@ impl SDK {
     }
 
     // JavaScript alias for `get_era_summary`
-    #[wasm_bindgen(js_name = "chain_get_era_summary")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "chain_get_era_summary"))]
     #[deprecated(note = "This function is an alias. Please use `get_era_summary` instead.")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn chain_get_era_summary(
         &self,
         options: Option<GetEraSummaryOptions>,

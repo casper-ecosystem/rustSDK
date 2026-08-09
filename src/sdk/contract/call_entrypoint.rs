@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::transaction::transaction::PutTransactionResult;
 use crate::{
     types::{
@@ -13,12 +13,12 @@ use crate::{
 use casper_client::{
     rpcs::results::PutTransactionResult as _PutTransactionResult, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// A set of functions for working with smart contract entry points.
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Calls a smart contract entry point with the specified parameters and returns the result.
     ///
@@ -35,7 +35,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the call.
-    #[wasm_bindgen(js_name = "call_entrypoint")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "call_entrypoint"))]
+    #[cfg(feature = "js")]
     pub async fn call_entrypoint_js_alias(
         &self,
         builder_params: TransactionBuilderParams,

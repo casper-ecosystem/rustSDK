@@ -1,14 +1,15 @@
 use casper_types::{HashAddr as _HashAddr, KEY_HASH_LENGTH};
 use core::fmt::{Display, Formatter};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct HashAddr(_HashAddr);
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl HashAddr {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(bytes: Vec<u8>) -> Result<HashAddr, JsError> {
         if bytes.len() != KEY_HASH_LENGTH {
             return Err(JsError::new("Invalid HashAddr length"));
@@ -18,14 +19,14 @@ impl HashAddr {
         Ok(HashAddr(array))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toBytes")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toBytes"))]
     pub fn to_bytes_js_alias(&self) -> Vec<u8> {
         self.to_bytes()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toHexString")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toHexString"))]
     pub fn to_hex_string_js_alias(&self) -> String {
         self.to_string()
     }

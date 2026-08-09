@@ -4,9 +4,10 @@ use casper_types::{
     PackageAddr, PackageHash as _PackageHash,
 };
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Debug, Deserialize, Clone, Serialize, Copy)]
 pub struct PackageHash(_PackageHash);
 
@@ -27,10 +28,10 @@ impl PackageHash {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl PackageHash {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new_js_alias(package_hash_hex_str: &str) -> Result<PackageHash, JsError> {
         Self::new(package_hash_hex_str).map_err(|err| {
             JsError::new(&format!(
@@ -39,8 +40,8 @@ impl PackageHash {
         })
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromFormattedStr")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromFormattedStr"))]
     pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<PackageHash, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
             JsError::new(&format!(
@@ -49,12 +50,12 @@ impl PackageHash {
         })
     }
 
-    #[wasm_bindgen(js_name = "toFormattedString")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toFormattedString"))]
     pub fn to_formatted_string(&self) -> String {
         self.0.to_formatted_string()
     }
 
-    #[wasm_bindgen(js_name = "fromUint8Array")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromUint8Array"))]
     pub fn from_bytes(bytes: Vec<u8>) -> PackageHash {
         let package_hash =
             _PackageHash::try_from(&bytes).expect("Failed to convert bytes to PackageHash");

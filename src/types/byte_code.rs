@@ -1,12 +1,13 @@
 use casper_types::{ByteCode as _ByteCode, ByteCodeKind as _ByteCodeKind};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::ByteCode`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct ByteCode(_ByteCode);
 
 impl ByteCode {
@@ -35,30 +36,30 @@ impl ByteCode {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl ByteCode {
-    #[wasm_bindgen(js_name = "kind")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "kind"))]
     pub fn kind_js(&self) -> String {
         self.kind()
     }
 
-    #[wasm_bindgen(js_name = "bytes")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "bytes"))]
     pub fn bytes_js(&self) -> Vec<u8> {
         self.bytes()
     }
 
-    #[wasm_bindgen(js_name = "len")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "len"))]
     pub fn len_js(&self) -> usize {
         self.len()
     }
 
-    #[wasm_bindgen(js_name = "isEmpty")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isEmpty"))]
     pub fn is_empty_js(&self) -> bool {
         self.is_empty()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

@@ -1,4 +1,6 @@
+#[cfg(feature = "js")]
 use js_sys::Promise;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Logs a message, prefixing it with "log wasm" and sends it to the console in JavaScript when running in a WebAssembly environment.
@@ -13,7 +15,7 @@ extern "C" {
 /// When running outside WebAssembly, it prints the message to the standard output.
 pub fn log(s: &str) {
     let prefixed_s = format!("log wasm {s}");
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
     log_with_prefix(&prefixed_s);
     #[cfg(not(target_arch = "wasm32"))]
     println!("{prefixed_s}");
@@ -31,7 +33,7 @@ extern "C" {
 /// When running outside WebAssembly, it prints the error message to the standard output.
 pub fn error(s: &str) {
     let prefixed_s = format!("error wasm {s}");
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
     error_with_prefix(&prefixed_s);
     #[cfg(not(target_arch = "wasm32"))]
     println!("{prefixed_s}");

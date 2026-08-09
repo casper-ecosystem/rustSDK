@@ -1,15 +1,17 @@
 use crate::types::sdk_error::SdkError;
 use casper_binary_port::RecordId as _RecordId;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 
 pub struct RecordId(_RecordId);
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl RecordId {
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
+    #[cfg(feature = "js")]
     pub fn new_js_alias(value: u16) -> Result<RecordId, JsError> {
         Self::new(value).map_err(|err| JsError::new(&err.to_string()))
     }

@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::deploy::deploy::PutDeployResult;
 use crate::{
     types::{
@@ -15,11 +15,11 @@ use casper_client::{
     cli::deploy::make_transfer, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
 };
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// JS function for transferring funds.
     ///
@@ -36,9 +36,10 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the result of the transfer or a `JsError` in case of an error.
-    #[wasm_bindgen(js_name = "transfer")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "transfer"))]
     #[deprecated(note = "prefer transfer_transaction")]
     #[allow(clippy::too_many_arguments, deprecated)]
+    #[cfg(feature = "js")]
     pub async fn transfer_js_alias(
         &self,
         amount: &str,

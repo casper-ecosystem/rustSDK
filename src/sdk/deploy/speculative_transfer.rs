@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::rpcs::speculative_exec_deploy::SpeculativeExecResult;
 use crate::{
     types::{
@@ -16,11 +16,11 @@ use casper_client::{
     SuccessResponse,
 };
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// JS function for speculative transfer.
     ///
@@ -37,9 +37,10 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-    #[wasm_bindgen(js_name = "speculative_transfer")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "speculative_transfer"))]
     #[allow(clippy::too_many_arguments, deprecated)]
     #[deprecated(note = "prefer speculative_transfer_transaction")]
+    #[cfg(feature = "js")]
     pub async fn speculative_transfer_js_alias(
         &self,
         amount: &str,

@@ -1,13 +1,14 @@
 use casper_types::{TransferAddr as _TransferAddr, TRANSFER_ADDR_LENGTH};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct TransferAddr(_TransferAddr);
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl TransferAddr {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(bytes: Vec<u8>) -> Result<TransferAddr, JsError> {
         if bytes.len() != TRANSFER_ADDR_LENGTH {
             return Err(JsError::new("Invalid TransferAddr length"));

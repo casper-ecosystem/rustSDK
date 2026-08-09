@@ -17,15 +17,16 @@ use casper_client::{
     get_dictionary_item as get_dictionary_item_lib,
     rpcs::results::GetDictionaryItemResult as _GetDictionaryItemResult, JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetDictionaryItemResult
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetDictionaryItemResult(_GetDictionaryItemResult);
 
 impl From<GetDictionaryItemResult> for _GetDictionaryItemResult {
@@ -46,41 +47,44 @@ impl GetDictionaryItemResult {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetDictionaryItemResult {
     /// Gets the API version as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the dictionary key as a String.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn dictionary_key(&self) -> String {
         self.0.dictionary_key.clone()
     }
 
     /// Gets the stored value as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn stored_value(&self) -> JsValue {
         JsValue::from_serde(&self.0.stored_value).unwrap()
     }
 
     /// Gets the typed stored value wrapper.
-    #[wasm_bindgen(js_name = "storedValueTyped")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "storedValueTyped"))]
     pub fn stored_value_typed_js(&self) -> StoredValue {
         self.stored_value_typed()
     }
 
     /// Gets the merkle proof as a String.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn merkle_proof(&self) -> String {
         self.0.merkle_proof.clone()
     }
 
     /// Converts the GetDictionaryItemResult to a JsValue.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -88,8 +92,11 @@ impl GetDictionaryItemResult {
 
 /// Options for the `get_dictionary_item` method.
 #[derive(Default, Debug, Deserialize, Clone, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getDictionaryItemOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getDictionaryItemOptions", getter_with_clone)
+)]
 pub struct GetDictionaryItemOptions {
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
@@ -99,8 +106,8 @@ pub struct GetDictionaryItemOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Parses dictionary item options from a JsValue.
     ///
@@ -111,6 +118,7 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed dictionary item options as a `GetDictionaryItemOptions` struct.
+    #[cfg(feature = "js")]
     pub fn get_dictionary_item_options(
         &self,
         options: JsValue,
@@ -133,7 +141,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[wasm_bindgen(js_name = "get_dictionary_item")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_dictionary_item"))]
+    #[cfg(feature = "js")]
     pub async fn get_dictionary_item_js_alias(
         &self,
         options: Option<GetDictionaryItemOptions>,
@@ -179,6 +188,7 @@ impl SDK {
     /// JavaScript Alias for `get_dictionary_item`
     #[deprecated(note = "This function is an alias. Please use `get_dictionary_item` instead.")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn state_get_dictionary_item(
         &self,
         options: Option<GetDictionaryItemOptions>,

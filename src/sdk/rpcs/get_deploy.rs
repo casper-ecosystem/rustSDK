@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::deploy::Deploy;
 use crate::types::hash::deploy_hash::DeployHash;
 use crate::{types::verbosity::Verbosity, SDK};
@@ -6,56 +6,59 @@ use casper_client::{
     get_deploy, rpcs::results::GetDeployResult as _GetDeployResult, Error, JsonRpcId,
     SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetDeployResult
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetDeployResult(_GetDeployResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<GetDeployResult> for _GetDeployResult {
     fn from(result: GetDeployResult) -> Self {
         result.0
     }
 }
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_GetDeployResult> for GetDeployResult {
     fn from(result: _GetDeployResult) -> Self {
         GetDeployResult(result)
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetDeployResult {
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     /// Gets the API version as a JavaScript value.
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     /// Gets the deploy information.
     pub fn deploy(&self) -> Deploy {
         self.0.deploy.clone().into()
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     /// Gets the execution info as a JavaScript value.
+    #[cfg(feature = "js")]
     pub fn execution_info(&self) -> JsValue {
         JsValue::from_serde(&self.0.execution_info).unwrap()
     }
 
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     /// Converts the result to a JSON JavaScript value.
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -63,8 +66,11 @@ impl GetDeployResult {
 
 /// Options for the `get_deploy` method.
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getDeployOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getDeployOptions", getter_with_clone)
+)]
 pub struct GetDeployOptions {
     pub deploy_hash_as_string: Option<String>,
     pub deploy_hash: Option<DeployHash>,
@@ -73,8 +79,8 @@ pub struct GetDeployOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Parses deploy options from a JsValue.
     ///
@@ -87,6 +93,7 @@ impl SDK {
     /// Parsed deploy options as a `GetDeployOptions` struct.
     #[deprecated(note = "prefer 'get_transaction_options'")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub fn get_deploy_options(&self, options: JsValue) -> Result<GetDeployOptions, JsError> {
         let mut options: GetDeployOptions = options.into_serde()?;
 
@@ -110,7 +117,8 @@ impl SDK {
     /// A `Result` containing either a `GetDeployResult` or an error.
     #[deprecated(note = "prefer 'get_transaction'")]
     #[allow(deprecated)]
-    #[wasm_bindgen(js_name = "get_deploy")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_deploy"))]
+    #[cfg(feature = "js")]
     pub async fn get_deploy_js_alias(
         &self,
         options: Option<GetDeployOptions>,
@@ -148,6 +156,7 @@ impl SDK {
     /// Retrieves deploy information using the provided options, alias for `get_deploy`.
     #[deprecated(note = "This function is an alias. Please use `get_transaction` instead.")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn info_get_deploy(
         &self,
         options: Option<GetDeployOptions>,

@@ -11,12 +11,12 @@ use crate::{
 };
 use casper_client::cli::deploy::make_transfer as client_make_transfer;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// Exposes the `make_transfer` function to JavaScript with an alias.
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// JS function for `make_transfer`.
     ///
@@ -31,9 +31,10 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the created `Deploy` or a `JsError` in case of an error.
-    #[wasm_bindgen(js_name = "make_transfer")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "make_transfer"))]
     #[deprecated(note = "prefer 'make_transfer_transaction'")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub fn make_transfer_js_alias(
         &self,
         amount: &str,

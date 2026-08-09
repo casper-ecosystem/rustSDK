@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::deploy::deploy::PutDeployResult;
 use crate::types::deploy::Deploy;
 use crate::{types::verbosity::Verbosity, SDK};
@@ -8,12 +8,12 @@ use casper_client::{
     SuccessResponse,
 };
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// SDK methods for putting a deploy.
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Puts a deploy using the provided options.
     ///
@@ -30,8 +30,9 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the deploy process.
-    #[wasm_bindgen(js_name = "put_deploy")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "put_deploy"))]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn put_deploy_js_alias(
         &self,
         deploy: Deploy,
@@ -51,6 +52,7 @@ impl SDK {
     /// JavaScript Alias for `put_deploy`.
     #[deprecated(note = "This function is an alias. Please use `put_deploy` instead.")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn account_put_deploy(
         &self,
         deploy: Deploy,

@@ -9,9 +9,10 @@ use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
 };
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Debug, Deserialize, Clone, Serialize, Copy, PartialEq, Eq)]
 pub struct AddressableEntityHash(_AddressableEntityHash);
 
@@ -32,10 +33,10 @@ impl AddressableEntityHash {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl AddressableEntityHash {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new_js_alias(
         addressable_entity_hex_str: &str,
     ) -> Result<AddressableEntityHash, JsError> {
@@ -46,8 +47,8 @@ impl AddressableEntityHash {
         })
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromFormattedStr")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromFormattedStr"))]
     pub fn from_formatted_str_js_alias(
         formatted_str: &str,
     ) -> Result<AddressableEntityHash, JsError> {
@@ -58,12 +59,12 @@ impl AddressableEntityHash {
         })
     }
 
-    #[wasm_bindgen(js_name = "toFormattedString")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toFormattedString"))]
     pub fn to_formatted_string(&self) -> String {
         self.0.to_formatted_string()
     }
 
-    #[wasm_bindgen(js_name = "fromUint8Array")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromUint8Array"))]
     pub fn from_bytes(bytes: Vec<u8>) -> AddressableEntityHash {
         let addressable_entity_hash = _AddressableEntityHash::try_from(&bytes)
             .expect("Failed to convert bytes to AddressableEntityHash");

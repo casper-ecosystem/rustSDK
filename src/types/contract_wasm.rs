@@ -1,12 +1,13 @@
 use casper_types::ContractWasm as _ContractWasm;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::ContractWasm`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct ContractWasm(_ContractWasm);
 
 impl ContractWasm {
@@ -27,25 +28,25 @@ impl ContractWasm {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl ContractWasm {
-    #[wasm_bindgen(js_name = "bytes")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "bytes"))]
     pub fn bytes_js(&self) -> Vec<u8> {
         self.bytes()
     }
 
-    #[wasm_bindgen(js_name = "len")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "len"))]
     pub fn len_js(&self) -> usize {
         self.len()
     }
 
-    #[wasm_bindgen(js_name = "isEmpty")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isEmpty"))]
     pub fn is_empty_js(&self) -> bool {
         self.is_empty()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

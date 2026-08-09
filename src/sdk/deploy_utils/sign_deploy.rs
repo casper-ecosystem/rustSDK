@@ -1,10 +1,10 @@
 use crate::{types::deploy::Deploy, SDK};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// Exposes the `sign_deploy` function to JavaScript with an alias.
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// JS function for `sign_deploy`.
     ///
@@ -18,7 +18,7 @@ impl SDK {
     /// The signed `Deploy`.
     #[deprecated(note = "prefer sign_transaction")]
     #[allow(deprecated)]
-    #[wasm_bindgen(js_name = "sign_deploy")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "sign_deploy"))]
     pub fn sign_deploy_js_alias(&self, deploy: Deploy, secret_key: &str) -> Deploy {
         sign_deploy(deploy, secret_key)
     }

@@ -5,8 +5,11 @@ use crate::{
         wallet::signature_response::SignatureResponse,
     },
 };
+#[cfg(feature = "js")]
 use gloo_utils::format::JsValueSerdeExt;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
+#[cfg(feature = "js")]
 use wasm_bindgen_futures::JsFuture;
 
 #[wasm_bindgen]
@@ -358,6 +361,7 @@ impl CasperWallet {
         Ok(true)
     }
 
+    #[cfg(feature = "js")]
     async fn get_public_or_active_key(
         &self,
         provided_public_key: Option<String>,

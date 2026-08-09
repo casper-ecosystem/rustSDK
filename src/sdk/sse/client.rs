@@ -5,9 +5,10 @@ use super::framing::{extract_frames, url_with_start_from};
 use crate::SDK;
 use futures_util::StreamExt;
 use std::sync::{Arc, Mutex};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 
 /// HTTP client for native SSE. Disables idle keep-alive so a dropped tokio
@@ -28,16 +29,16 @@ fn sse_http_client() -> Result<reqwest::Client, String> {
 }
 
 /// Native event handler.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(all(feature = "js", target_arch = "wasm32")))]
 pub type SSEHandlerFn = Arc<Mutex<dyn Fn(RawEvent) + Send + Sync>>;
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(all(feature = "js", target_arch = "wasm32")))]
 fn call_handler(handler: &SSEHandlerFn, event: RawEvent) {
     let f = handler.lock().unwrap();
     f(event);
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 fn call_handler(handler: &js_sys::Function, event: RawEvent) {
     let this = JsValue::null();
     let args = js_sys::Array::new();
@@ -47,15 +48,15 @@ fn call_handler(handler: &js_sys::Function, event: RawEvent) {
 
 struct Subscription {
     event_name: EventName,
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(not(all(feature = "js", target_arch = "wasm32")))]
     handler: SSEHandlerFn,
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
     handler: js_sys::Function,
 }
 
 /// Node SSE client: subscribe by [`EventName`], start/stop stream.
 #[derive(Clone)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct SSEClient {
     events_url: String,
     subscriptions: Arc<Mutex<Vec<Subscription>>>,
@@ -82,18 +83,18 @@ impl SDK {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "SSE_client")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "SSE_client"))]
     #[allow(non_snake_case)]
     pub fn SSE_client_js(&self, events_url: &str) -> SSEClient {
         self.SSE_client(events_url)
     }
 
     /// Build a [`CESParser`] for `contract_hashes` (JS array of hex / `hash-…` strings).
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "CES_parser")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "CES_parser"))]
     #[allow(non_snake_case)]
     pub async fn CES_parser_js(
         &self,
@@ -110,9 +111,9 @@ impl SDK {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SSEClient {
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(events_url: String) -> Self {
         Self {
             events_url,
@@ -122,7 +123,7 @@ impl SSEClient {
     }
 
     /// Stop the running stream loop.
-    #[wasm_bindgen]
+    #[cfg_attr(feature = "js", wasm_bindgen)]
     pub fn stop(&self) {
         if let Ok(mut active) = self.active.lock() {
             *active = false;
@@ -130,8 +131,8 @@ impl SSEClient {
     }
 
     /// Unsubscribe by event name string (wasm).
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "unsubscribe")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "unsubscribe"))]
     pub fn unsubscribe_js(&self, event_name: &str) -> Result<(), String> {
         let name =
             EventName::parse(event_name).ok_or_else(|| format!("unknown event: {event_name}"))?;
@@ -139,8 +140,8 @@ impl SSEClient {
     }
 
     /// Subscribe with a JS function handler (wasm).
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "subscribe")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "subscribe"))]
     pub fn subscribe_js(&self, event_name: &str, handler: js_sys::Function) -> Result<(), String> {
         let name =
             EventName::parse(event_name).ok_or_else(|| format!("unknown event: {event_name}"))?;
@@ -156,8 +157,8 @@ impl SSEClient {
     }
 
     /// Start streaming (wasm). Resolves when stopped, errored, or stream ends.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "start")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "start"))]
     pub async fn start_js(&self, start_from: Option<u64>) -> Result<(), JsError> {
         self.start(start_from).await.map_err(|e| JsError::new(&e))
     }
@@ -165,7 +166,7 @@ impl SSEClient {
 
 impl SSEClient {
     /// Subscribe to one event name (native).
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(not(all(feature = "js", target_arch = "wasm32")))]
     pub fn subscribe<F>(&self, event_name: EventName, handler: F) -> Result<(), String>
     where
         F: Fn(RawEvent) + Send + Sync + 'static,

@@ -101,17 +101,17 @@ This will create a `pkg` and `pkg-nodejs` containing the Typescript interfaces. 
 
 ### Cargo features
 
-Default is `full` (today's API) for both the wasm package and the Rust `rlib`. Slim builds drop optional surfaces:
+Default is `full` + `js` (today's JS/wasm API) for both the wasm package and the Rust `rlib`. Slim builds drop optional surfaces. Omit `js` for Rust-only consumers so wasm-bindgen exports are not linked into a foreign pack.
 
-| Profile                 | Make target                | Cargo flags                                                    |
-| ----------------------- | -------------------------- | -------------------------------------------------------------- |
-| full + SSE (wasm packs) | `make web` / `make nodejs` | default features + `--features SSE` (SSEClient + CESParser)    |
-| read-only               | `make web-read-only`       | `--no-default-features`                                        |
-| transaction (no deploy) | `make web-transaction`     | `--no-default-features --features transaction,helpers,watcher` |
+| Profile                 | Make target                | Cargo flags                                                              |
+| ----------------------- | -------------------------- | ------------------------------------------------------------------------ |
+| full + SSE (wasm packs) | `make web` / `make nodejs` | default features + `--features SSE` (SSEClient + CESParser; `js` on)     |
+| read-only               | `make web-read-only`       | `--no-default-features --features js`                                    |
+| transaction (no deploy) | `make web-transaction`     | `--no-default-features --features transaction,helpers,watcher,js`        |
 
-Optional features: `transaction`, `deploy`, `contract`, `binary-port`, `watcher` (wait/watch), `SSE` (node SSE client + CES; enables `watcher`), `helpers`. Core JSON-RPC reads stay available without them. `binary-port` pulls optional `casper-binary-port*` crates.
+Optional features: `js` (wasm-bindgen / js-sys surface; default on), `transaction`, `deploy`, `contract`, `binary-port`, `watcher` (wait/watch), `SSE` (node SSE client + CES; enables `watcher`), `helpers`. Core JSON-RPC reads stay available without them. `binary-port` pulls optional `casper-binary-port*` crates. Domain feature `full` does not include `js`.
 
-Cargo crate `default`/`full` includes `watcher` only. Browser `pkg` and Node `pkg-nodejs` packs from `make web` / `make nodejs` also enable `SSE` so demos and e2e harnesses get the full SDK surface.
+Cargo crate `default` includes `full` and `js`. Browser `pkg` and Node `pkg-nodejs` packs from `make web` / `make nodejs` also enable `SSE` so demos and e2e harnesses get the full SDK surface. A dependent crate's own wasm-pack must not enable this SDK's `js` feature if it wants a private export surface (no SDK `SDK` / `Key` / `Transaction` classes in its `.d.ts`).
 
 This folder contains a Wasm binary, a JS wrapper file, Typescript types definitions, and a package.json file that you can load in your project.
 

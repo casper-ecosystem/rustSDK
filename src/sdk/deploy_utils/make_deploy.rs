@@ -11,12 +11,12 @@ use crate::{
     SDK,
 };
 use casper_client::cli::deploy::make_deploy as client_make_deploy;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// Exposes the `make_deploy` function to JavaScript with an alias.
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// JS function for `make_deploy`.
     ///
@@ -29,9 +29,10 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the created `Deploy` or a `JsError` in case of an error.
-    #[wasm_bindgen(js_name = "make_deploy")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "make_deploy"))]
     #[deprecated(note = "prefer 'make_transaction'")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub fn make_deploy_js_alias(
         &self,
         deploy_params: DeployStrParams,

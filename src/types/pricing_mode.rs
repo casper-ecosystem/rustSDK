@@ -1,8 +1,9 @@
 use casper_types::PricingMode as _PricingMode;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub enum PricingMode {
     #[default]
     Fixed,

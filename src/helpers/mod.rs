@@ -15,12 +15,12 @@ use casper_types::{
     TimeDiff, Timestamp,
 };
 use chrono::{DateTime, SecondsFormat, Utc};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::Serialize;
 use serde_json::Value;
 use std::str::FromStr;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::{JsCast, JsValue};
 
 pub const BLAKE2B_DIGEST_LENGTH: usize = 32;
@@ -468,7 +468,7 @@ where
 /// # Returns
 ///
 /// The modified `RuntimeArgs` map.
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 pub fn insert_js_value_arg(
     args: &mut RuntimeArgs,
     js_value_arg: JsValue,

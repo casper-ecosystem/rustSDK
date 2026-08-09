@@ -1,13 +1,14 @@
 use crate::types::{hash::contract_hash::ContractHash, uref::URef};
 use casper_types::contracts::ContractPackage as _ContractPackage;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::contracts::ContractPackage`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct ContractPackage(_ContractPackage);
 
 impl ContractPackage {
@@ -28,26 +29,26 @@ impl ContractPackage {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl ContractPackage {
-    #[wasm_bindgen(js_name = "accessKey")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "accessKey"))]
     pub fn access_key_js(&self) -> URef {
         self.access_key()
     }
 
-    #[wasm_bindgen(js_name = "isLocked")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isLocked"))]
     pub fn is_locked_js(&self) -> bool {
         self.is_locked()
     }
 
-    #[wasm_bindgen(js_name = "currentContractHash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "currentContractHash"))]
     pub fn current_contract_hash_js(&self) -> Option<ContractHash> {
         self.current_contract_hash()
     }
 
     /// Versions / groups / lock metadata as JSON for escape-hatch parsing.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

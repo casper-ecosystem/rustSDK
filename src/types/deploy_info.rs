@@ -1,13 +1,14 @@
 use crate::types::{hash::account_hash::AccountHash, uref::URef};
 use casper_types::DeployInfo as _DeployInfo;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::DeployInfo`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct DeployInfo(_DeployInfo);
 
 impl DeployInfo {
@@ -44,40 +45,40 @@ impl DeployInfo {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl DeployInfo {
-    #[wasm_bindgen(js_name = "deployHash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "deployHash"))]
     pub fn deploy_hash_js(&self) -> String {
         self.deploy_hash()
     }
 
-    #[wasm_bindgen(js_name = "fromAccount")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromAccount"))]
     pub fn from_account_js(&self) -> AccountHash {
         self.from_account()
     }
 
-    #[wasm_bindgen(js_name = "source")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "source"))]
     pub fn source_js(&self) -> URef {
         self.source()
     }
 
-    #[wasm_bindgen(js_name = "gas")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "gas"))]
     pub fn gas_js(&self) -> String {
         self.gas()
     }
 
-    #[wasm_bindgen(js_name = "transferCount")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "transferCount"))]
     pub fn transfer_count_js(&self) -> usize {
         self.transfer_count()
     }
 
-    #[wasm_bindgen(js_name = "transferAddrs")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "transferAddrs"))]
     pub fn transfer_addrs_js(&self) -> Vec<String> {
         self.transfer_addrs()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

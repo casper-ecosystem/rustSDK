@@ -1,10 +1,10 @@
 use crate::{helpers::get_str_or_default, types::deploy_params::args_simple::ArgsSimple};
 use casper_client::cli::PaymentStrParams as _PaymentStrParams;
-use js_sys::Array;
 use once_cell::sync::OnceCell;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Default, Debug, Clone)]
 pub struct PaymentStrParams {
     payment_amount: OnceCell<String>,
@@ -19,10 +19,10 @@ pub struct PaymentStrParams {
     payment_entry_point: OnceCell<String>,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl PaymentStrParams {
     #[allow(clippy::too_many_arguments)]
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(
         payment_amount: Option<String>,
         payment_hash: Option<String>,
@@ -30,7 +30,7 @@ impl PaymentStrParams {
         payment_package_hash: Option<String>,
         payment_package_name: Option<String>,
         payment_path: Option<String>,
-        payment_args_simple: Option<Array>,
+        payment_args_simple: Option<Vec<String>>,
         payment_args_json: Option<String>,
         payment_version: Option<String>,
         payment_entry_point: Option<String>,
@@ -70,113 +70,111 @@ impl PaymentStrParams {
         payment_params
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn payment_amount(&self) -> Option<String> {
         self.payment_amount.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_payment_amount(&self, payment_amount: &str) {
         self.payment_amount.set(payment_amount.to_string()).unwrap();
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn payment_hash(&self) -> Option<String> {
         self.payment_hash.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_payment_hash(&self, payment_hash: &str) {
         self.payment_hash.set(payment_hash.to_string()).unwrap();
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn payment_name(&self) -> Option<String> {
         self.payment_name.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_payment_name(&self, payment_name: &str) {
         self.payment_name.set(payment_name.to_string()).unwrap();
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn payment_package_hash(&self) -> Option<String> {
         self.payment_package_hash.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_payment_package_hash(&self, payment_package_hash: &str) {
         self.payment_package_hash
             .set(payment_package_hash.to_string())
             .unwrap();
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn payment_package_name(&self) -> Option<String> {
         self.payment_package_name.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_payment_package_name(&self, payment_package_name: &str) {
         self.payment_package_name
             .set(payment_package_name.to_string())
             .unwrap();
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn payment_path(&self) -> Option<String> {
         self.payment_path.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_payment_path(&self, payment_path: &str) {
         self.payment_path.set(payment_path.to_string()).unwrap();
     }
 
-    #[wasm_bindgen(getter)]
-    pub fn payment_args_simple(&self) -> Option<Array> {
-        let args_simple = self.payment_args_simple.get()?;
-        let array: Array = args_simple.args().iter().map(JsValue::from).collect();
-        Some(array)
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    pub fn payment_args_simple(&self) -> Option<ArgsSimple> {
+        self.payment_args_simple.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
-    pub fn set_payment_args_simple(&self, payment_args_simple: Array) {
-        let args_simple: ArgsSimple = payment_args_simple.into_iter().collect();
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
+    pub fn set_payment_args_simple(&self, payment_args_simple: Vec<String>) {
+        let args_simple = ArgsSimple::from(payment_args_simple);
         self.payment_args_simple.set(args_simple).unwrap();
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn payment_args_json(&self) -> Option<String> {
         self.payment_args_json.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_payment_args_json(&self, payment_args_json: &str) {
         self.payment_args_json
             .set(payment_args_json.to_string())
             .unwrap();
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn payment_version(&self) -> Option<String> {
         self.payment_version.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_payment_version(&self, payment_version: &str) {
         self.payment_version
             .set(payment_version.to_string())
             .unwrap();
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn payment_entry_point(&self) -> Option<String> {
         self.payment_entry_point.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_payment_entry_point(&self, payment_entry_point: &str) {
         self.payment_entry_point
             .set(payment_entry_point.to_string())

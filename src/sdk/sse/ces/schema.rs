@@ -6,7 +6,7 @@ use casper_types::{
 };
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 const CL_TYPE_TAG_BOOL: u8 = 0;
@@ -202,10 +202,16 @@ pub fn parse_schemas_from_hex(hex_str: &str) -> Result<Schemas, String> {
 
 /// JSON-friendly schema field for wasm / MCP.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
+#[cfg_attr(
+    all(feature = "js", target_arch = "wasm32"),
+    wasm_bindgen(getter_with_clone)
+)]
 pub struct SchemaFieldJson {
     pub name: String,
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "clType"))]
+    #[cfg_attr(
+        all(feature = "js", target_arch = "wasm32"),
+        wasm_bindgen(js_name = "clType")
+    )]
     pub cl_type: String,
 }
 

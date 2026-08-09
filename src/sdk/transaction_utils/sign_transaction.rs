@@ -1,10 +1,10 @@
 use crate::{types::transaction::Transaction, SDK};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// Exposes the `sign_transaction` function to JavaScript with an alias.
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// JS function for `sign_transaction`.
     ///
@@ -16,7 +16,7 @@ impl SDK {
     /// # Returns
     ///
     /// The signed `Transaction`.
-    #[wasm_bindgen(js_name = "sign_transaction")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "sign_transaction"))]
     pub fn sign_transaction_js_alias(
         &self,
         transaction: Transaction,

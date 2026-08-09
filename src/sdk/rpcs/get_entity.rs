@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
@@ -15,15 +15,16 @@ use casper_client::{
     rpcs::results::GetAddressableEntityResult as _GetAddressableEntityResult,
     JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wrapper around Casper Client `GetAddressableEntityResult`.
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetAddressableEntityResult(_GetAddressableEntityResult);
 
 impl From<GetAddressableEntityResult> for _GetAddressableEntityResult {
@@ -45,31 +46,34 @@ impl GetAddressableEntityResult {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetAddressableEntityResult {
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn entity_result(&self) -> JsValue {
         JsValue::from_serde(&self.0.entity_result).unwrap()
     }
 
     /// Typed `entity_result` (`AddressableEntity` or legacy `Account`).
-    #[wasm_bindgen(js_name = "entityResultTyped")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "entityResultTyped"))]
     pub fn entity_result_typed_js(&self) -> EntityOrAccount {
         self.entity_result_typed()
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn merkle_proof(&self) -> String {
         self.0.merkle_proof.clone()
     }
 
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -77,8 +81,11 @@ impl GetAddressableEntityResult {
 
 // Define options for the `get_entity` function
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getEntityOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getEntityOptions", getter_with_clone)
+)]
 pub struct GetEntityOptions {
     pub entity_identifier: Option<EntityIdentifier>,
     pub entity_identifier_as_string: Option<String>,
@@ -88,10 +95,11 @@ pub struct GetEntityOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     // Deserialize options for `get_entity` from a JavaScript object
+    #[cfg(feature = "js")]
     pub fn get_entity_options(&self, options: JsValue) -> Result<GetEntityOptions, JsError> {
         options
             .into_serde::<GetEntityOptions>()
@@ -120,7 +128,8 @@ impl SDK {
     ///
     /// Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
     /// ```
-    #[wasm_bindgen(js_name = "get_entity")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_entity"))]
+    #[cfg(feature = "js")]
     pub async fn get_entity_js_alias(
         &self,
         options: Option<GetEntityOptions>,
@@ -161,7 +170,8 @@ impl SDK {
     }
 
     // JavaScript alias for `get_entity`
-    #[wasm_bindgen(js_name = "state_get_entity")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "state_get_entity"))]
+    #[cfg(feature = "js")]
     pub async fn state_get_entity(
         &self,
         options: Option<GetEntityOptions>,

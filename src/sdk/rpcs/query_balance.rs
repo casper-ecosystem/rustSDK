@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::digest::Digest;
 use crate::{
     types::{
@@ -16,51 +16,54 @@ use casper_client::{
     rpcs::results::QueryBalanceResult as _QueryBalanceResult,
     JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the QueryBalanceResult
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct QueryBalanceResult(_QueryBalanceResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<QueryBalanceResult> for _QueryBalanceResult {
     fn from(result: QueryBalanceResult) -> Self {
         result.0
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_QueryBalanceResult> for QueryBalanceResult {
     fn from(result: _QueryBalanceResult) -> Self {
         QueryBalanceResult(result)
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl QueryBalanceResult {
     /// Gets the API version as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the balance as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn balance(&self) -> JsValue {
         JsValue::from_serde(&self.0.balance).unwrap()
     }
 
     /// Converts the QueryBalanceResult to a JsValue.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -68,8 +71,11 @@ impl QueryBalanceResult {
 
 /// Options for the `query_balance` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "queryBalanceOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "queryBalanceOptions", getter_with_clone)
+)]
 pub struct QueryBalanceOptions {
     pub purse_identifier_as_string: Option<String>,
     pub purse_identifier: Option<PurseIdentifier>,
@@ -81,8 +87,8 @@ pub struct QueryBalanceOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Parses query balance options from a JsValue.
     ///
@@ -93,6 +99,7 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed query balance options as a `QueryBalanceOptions` struct.
+    #[cfg(feature = "js")]
     pub fn query_balance_options(&self, options: JsValue) -> Result<QueryBalanceOptions, JsError> {
         options
             .into_serde::<QueryBalanceOptions>()
@@ -112,7 +119,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[wasm_bindgen(js_name = "query_balance")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "query_balance"))]
+    #[cfg(feature = "js")]
     pub async fn query_balance_js_alias(
         &self,
         options: Option<QueryBalanceOptions>,

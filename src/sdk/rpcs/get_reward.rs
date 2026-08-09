@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity},
@@ -9,71 +9,76 @@ use casper_client::{
     rpcs::results::GetRewardResult as _GetRewardResult, rpcs::EraIdentifier, JsonRpcId,
     SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use casper_types::EraId;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// Wrapper struct for the `GetRewardResult` from casper_client.
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetRewardResult(_GetRewardResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<GetRewardResult> for _GetRewardResult {
     fn from(result: GetRewardResult) -> Self {
         result.0
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_GetRewardResult> for GetRewardResult {
     fn from(result: _GetRewardResult) -> Self {
         GetRewardResult(result)
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetRewardResult {
     /// Gets the API version as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the reward amount as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn reward_amount(&self) -> JsValue {
         JsValue::from_serde(&self.0.reward_amount).unwrap()
     }
 
     /// Gets the era id as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn era_id(&self) -> JsValue {
         JsValue::from_serde(&self.0.era_id).unwrap()
     }
 
     /// Gets the delegation rate.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn delegation_rate(&self) -> u8 {
         self.0.delegation_rate
     }
 
     /// Gets the switch block hash as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn switch_block_hash(&self) -> JsValue {
         JsValue::from_serde(&self.0.switch_block_hash).unwrap()
     }
 
     /// Converts the GetRewardResult to a JsValue.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -81,8 +86,11 @@ impl GetRewardResult {
 
 /// Options for the `get_reward` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getRewardOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getRewardOptions", getter_with_clone)
+)]
 pub struct GetRewardOptions {
     pub validator_public_key: Option<PublicKey>,
     pub validator_public_key_as_string: Option<String>,
@@ -95,10 +103,11 @@ pub struct GetRewardOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Parses reward options from a JsValue.
+    #[cfg(feature = "js")]
     pub fn get_reward_options(&self, options: JsValue) -> Result<GetRewardOptions, JsError> {
         options
             .into_serde::<GetRewardOptions>()
@@ -106,7 +115,8 @@ impl SDK {
     }
 
     /// Retrieves validator/delegator reward via JSON-RPC `info_get_reward`.
-    #[wasm_bindgen(js_name = "get_reward")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_reward"))]
+    #[cfg(feature = "js")]
     pub async fn get_reward_js_alias(
         &self,
         options: Option<GetRewardOptions>,
@@ -175,9 +185,10 @@ impl SDK {
     }
 
     /// JavaScript alias for `get_reward`.
-    #[wasm_bindgen(js_name = "info_get_reward")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "info_get_reward"))]
     #[deprecated(note = "This function is an alias. Please use `get_reward` instead.")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn info_get_reward(
         &self,
         options: Option<GetRewardOptions>,

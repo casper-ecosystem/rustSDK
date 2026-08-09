@@ -16,9 +16,10 @@ use casper_types::{
     contracts::ProtocolVersionMajor, TransactionRuntimeParams, TransferTarget as _TransferTarget,
     U512,
 };
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Clone, Copy, Debug)]
 pub enum TransferTargetKind {
     PublicKey,
@@ -26,7 +27,7 @@ pub enum TransferTargetKind {
     URef,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Clone, Debug)]
 pub struct TransferTarget {
     kind: TransferTargetKind,
@@ -35,9 +36,9 @@ pub struct TransferTarget {
     uref: Option<URef>,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl TransferTarget {
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(
         kind: TransferTargetKind,
         public_key: Option<PublicKey>,
@@ -53,7 +54,7 @@ impl TransferTarget {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Clone, Debug, Default)]
 pub struct TransactionBuilderParams {
     kind: TransactionKind,
@@ -83,7 +84,7 @@ pub struct TransactionBuilderParams {
     runtime: Option<TransactionRuntimeParams>,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Clone, Copy, Debug, Default)]
 pub enum TransactionKind {
     InvocableEntity,
@@ -100,9 +101,9 @@ pub enum TransactionKind {
     WithdrawBid,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl TransactionBuilderParams {
-    #[wasm_bindgen(js_name = "newSession")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newSession"))]
     pub fn new_session(
         transaction_bytes: Option<Bytes>,
         is_install_upgrade: Option<bool>,
@@ -134,7 +135,7 @@ impl TransactionBuilderParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "newTransfer")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newTransfer"))]
     pub fn new_transfer(
         maybe_source: Option<URef>,
         target: TransferTarget,
@@ -169,7 +170,7 @@ impl TransactionBuilderParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "newInvocableEntity")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newInvocableEntity"))]
     pub fn new_invocable_entity(
         entity_hash: AddressableEntityHash,
         entry_point: &str,
@@ -201,7 +202,7 @@ impl TransactionBuilderParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "newInvocableEntityAlias")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newInvocableEntityAlias"))]
     pub fn new_invocable_entity_alias(
         entity_alias: &str,
         entry_point: &str,
@@ -233,7 +234,7 @@ impl TransactionBuilderParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "newPackage")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newPackage"))]
     pub fn new_package(
         package_hash: PackageHash,
         entry_point: &str,
@@ -242,7 +243,7 @@ impl TransactionBuilderParams {
         Self::new_package_with_major(package_hash, entry_point, maybe_entity_version, None)
     }
 
-    #[wasm_bindgen(js_name = "newPackageWithMajor")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newPackageWithMajor"))]
     pub fn new_package_with_major(
         package_hash: PackageHash,
         entry_point: &str,
@@ -278,7 +279,7 @@ impl TransactionBuilderParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "newPackageAlias")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newPackageAlias"))]
     pub fn new_package_alias(
         package_alias: &str,
         entry_point: &str,
@@ -287,7 +288,7 @@ impl TransactionBuilderParams {
         Self::new_package_alias_with_major(package_alias, entry_point, maybe_entity_version, None)
     }
 
-    #[wasm_bindgen(js_name = "newPackageAliasWithMajor")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newPackageAliasWithMajor"))]
     pub fn new_package_alias_with_major(
         package_alias: &str,
         entry_point: &str,
@@ -322,7 +323,7 @@ impl TransactionBuilderParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "newAddBid")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newAddBid"))]
     pub fn new_add_bid(
         public_key: PublicKey,
         delegation_rate: u8,
@@ -359,7 +360,7 @@ impl TransactionBuilderParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "newDelegate")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newDelegate"))]
     pub fn new_delegate(
         delegator: PublicKey,
         validator: PublicKey,
@@ -393,7 +394,7 @@ impl TransactionBuilderParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "newUndelegate")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newUndelegate"))]
     pub fn new_undelegate(
         delegator: PublicKey,
         validator: PublicKey,
@@ -428,7 +429,7 @@ impl TransactionBuilderParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "newRedelegate")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newRedelegate"))]
     pub fn new_redelegate(
         delegator: PublicKey,
         validator: PublicKey,
@@ -463,7 +464,7 @@ impl TransactionBuilderParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "newWithdrawBid")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "newWithdrawBid"))]
     pub fn new_withdraw_bid(public_key: PublicKey, amount: &str) -> TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
@@ -493,199 +494,199 @@ impl TransactionBuilderParams {
         }
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn kind(&self) -> TransactionKind {
         self.kind
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_kind(&mut self, kind: TransactionKind) {
         self.kind = kind;
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn transaction_bytes(&self) -> Option<Bytes> {
         self.transaction_bytes.clone()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_transaction_bytes(&mut self, transaction_bytes: Bytes) {
         self.transaction_bytes = Some(transaction_bytes);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn maybe_source(&self) -> Option<URef> {
         self.maybe_source.clone()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_maybe_source(&mut self, maybe_source: URef) {
         self.maybe_source = Some(maybe_source);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn target(&self) -> Option<TransferTarget> {
         self.target.clone()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_target(&mut self, target: TransferTarget) {
         self.target = Some(target);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn amount(&self) -> Option<String> {
         self.amount.map(|amount| amount.to_string())
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_amount(&mut self, amount: &str) {
         let amount = convert_amount(amount);
         self.amount = amount;
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn maybe_id(&self) -> Option<u64> {
         self.maybe_id
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_maybe_id(&mut self, id: u64) {
         self.maybe_id = Some(id);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn entity_hash(&self) -> Option<AddressableEntityHash> {
         self.entity_hash
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_entity_hash(&mut self, entity_hash: AddressableEntityHash) {
         self.entity_hash = Some(entity_hash);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn entity_alias(&self) -> Option<String> {
         self.entity_alias.clone()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_entity_alias(&mut self, entity_alias: &str) {
         self.entity_alias = Some(entity_alias.to_string());
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn entry_point(&self) -> Option<String> {
         self.entry_point.clone()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_entry_point(&mut self, entry_point: &str) {
         self.entry_point = Some(entry_point.to_string());
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn package_hash(&self) -> Option<PackageHash> {
         self.package_hash
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_package_hash(&mut self, package_hash: PackageHash) {
         self.package_hash = Some(package_hash);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn package_alias(&self) -> Option<String> {
         self.package_alias.clone()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_package_alias(&mut self, package_alias: &str) {
         self.package_alias = Some(package_alias.to_string());
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn public_key(&self) -> Option<PublicKey> {
         self.public_key.clone()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_public_key(&mut self, public_key: PublicKey) {
         self.public_key = Some(public_key);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn delegation_rate(&self) -> Option<u8> {
         self.delegation_rate
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_delegation_rate(&mut self, delegation_rate: u8) {
         self.delegation_rate = Some(delegation_rate);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn delegator(&self) -> Option<PublicKey> {
         self.delegator.clone()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_delegator(&mut self, delegator: PublicKey) {
         self.delegator = Some(delegator);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn validator(&self) -> Option<PublicKey> {
         self.validator.clone()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_validator(&mut self, validator: PublicKey) {
         self.validator = Some(validator);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn new_validator(&self) -> Option<PublicKey> {
         self.new_validator.clone()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_new_validator(&mut self, new_validator: PublicKey) {
         self.new_validator = Some(new_validator);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn minimum_delegation_amount(&self) -> Option<u64> {
         self.minimum_delegation_amount.unwrap_or(None)
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_minimum_delegation_amount(&mut self, minimum_delegation_amount: Option<u64>) {
         self.minimum_delegation_amount = Some(minimum_delegation_amount);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn maximum_delegation_amount(&self) -> Option<u64> {
         self.maximum_delegation_amount.unwrap_or(None)
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_maximum_delegation_amount(&mut self, maximum_delegation_amount: Option<u64>) {
         self.maximum_delegation_amount = Some(maximum_delegation_amount);
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn is_install_upgrade(&self) -> Option<bool> {
         self.is_install_upgrade
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_is_install_upgrade(&mut self, is_install_upgrade: bool) {
         self.is_install_upgrade = Some(is_install_upgrade);
     }
 
     /// True when runtime resolves to VmCasperV1.
-    #[wasm_bindgen(getter, js_name = "isRuntimeV1")]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter, js_name = "isRuntimeV1"))]
     pub fn is_runtime_v1(&self) -> bool {
         matches!(
             self.resolved_runtime(),
@@ -694,7 +695,7 @@ impl TransactionBuilderParams {
     }
 
     /// True when runtime resolves to VmCasperV2.
-    #[wasm_bindgen(getter, js_name = "isRuntimeV2")]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter, js_name = "isRuntimeV2"))]
     pub fn is_runtime_v2(&self) -> bool {
         matches!(
             self.resolved_runtime(),
@@ -703,7 +704,10 @@ impl TransactionBuilderParams {
     }
 
     /// V2 `transferred_value`, or 0 for V1.
-    #[wasm_bindgen(getter, js_name = "runtimeTransferredValue")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(getter, js_name = "runtimeTransferredValue")
+    )]
     pub fn runtime_transferred_value(&self) -> u64 {
         match self.resolved_runtime() {
             TransactionRuntimeParams::VmCasperV2 {
@@ -714,7 +718,7 @@ impl TransactionBuilderParams {
     }
 
     /// V2 installer seed bytes, if set.
-    #[wasm_bindgen(getter, js_name = "runtimeSeed")]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter, js_name = "runtimeSeed"))]
     pub fn runtime_seed(&self) -> Option<Vec<u8>> {
         match self.resolved_runtime() {
             TransactionRuntimeParams::VmCasperV2 {
@@ -725,13 +729,13 @@ impl TransactionBuilderParams {
     }
 
     /// Force VmCasperV1 (legacy).
-    #[wasm_bindgen(js_name = "setRuntimeV1")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "setRuntimeV1"))]
     pub fn set_runtime_v1(&mut self) {
         self.runtime = Some(TransactionRuntimeParams::VmCasperV1);
     }
 
     /// Set VmCasperV2. `seed` must be absent or exactly 32 bytes (invalid length is ignored).
-    #[wasm_bindgen(js_name = "setRuntimeV2")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "setRuntimeV2"))]
     pub fn set_runtime_v2(&mut self, transferred_value: u64, seed: Option<Vec<u8>>) {
         self.runtime = Some(runtime_v2(transferred_value, seed));
     }

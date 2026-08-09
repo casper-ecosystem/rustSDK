@@ -14,12 +14,12 @@ use crate::{
     SDK,
 };
 use casper_client::cli::make_transaction as client_make_transaction;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// Exposes the `make_transaction` function to JavaScript with an alias.
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// JS function for `make_transaction`.
     ///
@@ -31,7 +31,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the created `Transaction` or a `JsError` in case of an error.
-    #[wasm_bindgen(js_name = "make_transaction")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "make_transaction"))]
+    #[cfg(feature = "js")]
     pub fn make_transaction_js_alias(
         &self,
         builder_params: TransactionBuilderParams,

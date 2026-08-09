@@ -11,57 +11,60 @@ use casper_client::{
     cli::get_balance as get_balance_cli, get_balance as get_balance_lib,
     rpcs::results::GetBalanceResult as _GetBalanceResult, JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetBalanceResult
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetBalanceResult(_GetBalanceResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<GetBalanceResult> for _GetBalanceResult {
     fn from(result: GetBalanceResult) -> Self {
         result.0
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_GetBalanceResult> for GetBalanceResult {
     fn from(result: _GetBalanceResult) -> Self {
         GetBalanceResult(result)
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetBalanceResult {
     /// Gets the API version as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the balance value as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn balance_value(&self) -> JsValue {
         JsValue::from_serde(&self.0.balance_value).unwrap()
     }
 
     /// Gets the Merkle proof as a string.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn merkle_proof(&self) -> String {
         self.0.merkle_proof.clone()
     }
 
     /// Converts the GetBalanceResult to a JsValue.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -69,8 +72,11 @@ impl GetBalanceResult {
 
 /// Options for the `get_balance` method.
 #[derive(Default, Debug, Deserialize, Clone, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getBalanceOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getBalanceOptions", getter_with_clone)
+)]
 pub struct GetBalanceOptions {
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
@@ -80,8 +86,8 @@ pub struct GetBalanceOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Parses balance options from a JsValue.
     ///
@@ -92,6 +98,7 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed balance options as a `GetBalanceOptions` struct.
+    #[cfg(feature = "js")]
     pub fn get_balance_options(&self, options: JsValue) -> Result<GetBalanceOptions, JsError> {
         options
             .into_serde::<GetBalanceOptions>()
@@ -111,7 +118,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[wasm_bindgen(js_name = "get_balance")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_balance"))]
+    #[cfg(feature = "js")]
     pub async fn get_balance_js_alias(
         &self,
         options: Option<GetBalanceOptions>,
@@ -171,9 +179,10 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
-    #[wasm_bindgen(js_name = "state_get_balance")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "state_get_balance"))]
     #[deprecated(note = "This function is an alias. Please use `get_balance` instead.")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn state_get_balance(
         &self,
         options: Option<GetBalanceOptions>,

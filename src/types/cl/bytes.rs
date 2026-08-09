@@ -1,19 +1,21 @@
 use casper_types::{bytesrepr::Bytes as _Bytes, CLType, CLTyped};
 use core::ops::Deref;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Clone, Ord, PartialOrd, Eq, PartialEq, Debug, Default, Hash)]
 pub struct Bytes(Vec<u8>);
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl Bytes {
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new() -> Self {
         Bytes(Vec::new())
     }
 
-    #[wasm_bindgen(js_name = "fromUint8Array")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromUint8Array"))]
+    #[cfg(feature = "js")]
     pub fn from_uint8_array(uint8_array: js_sys::Uint8Array) -> Self {
         let length = uint8_array.length() as usize;
         let mut bytes_vec = Vec::with_capacity(length);

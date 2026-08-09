@@ -4,16 +4,17 @@ use crate::types::{
 };
 // Client's RPC wrapper type is also named AddressableEntity (entity + named_keys + entry_points).
 use casper_client::rpcs::{AddressableEntity as _EntityInfo, EntityOrAccount as _EntityOrAccount};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Typed view of `state_get_entity` payload for addressable-entity mode.
 ///
 /// Contains the entity body plus named keys and entry points returned by the RPC.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct AddressableEntityInfo(_EntityInfo);
 
 impl AddressableEntityInfo {
@@ -39,25 +40,25 @@ impl AddressableEntityInfo {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl AddressableEntityInfo {
-    #[wasm_bindgen(js_name = "entity")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "entity"))]
     pub fn entity_js(&self) -> AddressableEntity {
         self.entity()
     }
 
-    #[wasm_bindgen(js_name = "namedKeys")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "namedKeys"))]
     pub fn named_keys_js(&self) -> NamedKeys {
         self.named_keys()
     }
 
-    #[wasm_bindgen(js_name = "entryPoints")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "entryPoints"))]
     pub fn entry_points_js(&self) -> Vec<EntryPointValue> {
         self.entry_points()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -80,7 +81,7 @@ impl From<_EntityInfo> for AddressableEntityInfo {
 /// - Addressable-entity mode (`enable_addressable_entity = true`): `AddressableEntity`
 /// - Legacy mode (default in NCTL/CI): `LegacyAccount` (node may serialize as `Account`)
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct EntityOrAccount(_EntityOrAccount);
 
 impl EntityOrAccount {
@@ -107,25 +108,25 @@ impl EntityOrAccount {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl EntityOrAccount {
-    #[wasm_bindgen(js_name = "variant")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "variant"))]
     pub fn variant_js(&self) -> String {
         self.variant().to_string()
     }
 
-    #[wasm_bindgen(js_name = "asAddressableEntity")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asAddressableEntity"))]
     pub fn as_addressable_entity_js(&self) -> Option<AddressableEntityInfo> {
         self.as_addressable_entity()
     }
 
-    #[wasm_bindgen(js_name = "asLegacyAccount")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "asLegacyAccount"))]
     pub fn as_legacy_account_js(&self) -> Option<Account> {
         self.as_legacy_account()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

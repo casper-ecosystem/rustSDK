@@ -1,6 +1,6 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::identifier::block_identifier::BlockIdentifier;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::{rpcs::query_global_state::QueryGlobalStateResult, types::path::Path};
 use crate::{
     rpcs::query_global_state::{KeyIdentifierInput, PathIdentifierInput, QueryGlobalStateParams},
@@ -14,16 +14,19 @@ use crate::{
 use casper_client::{
     rpcs::results::QueryGlobalStateResult as _QueryGlobalStateResult, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 #[derive(Deserialize, Default, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "queryContractKeyOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "queryContractKeyOptions", getter_with_clone)
+)]
 pub struct QueryContractKeyOptions {
     pub entity_identifier: Option<EntityIdentifier>,
     pub entity_identifier_as_string: Option<String>,
@@ -35,11 +38,12 @@ pub struct QueryContractKeyOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Deserialize query_contract_key_options from a JavaScript object.
-    #[wasm_bindgen(js_name = "query_contract_key_options")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "query_contract_key_options"))]
+    #[cfg(feature = "js")]
     pub fn query_contract_key_state_options(
         &self,
         options: JsValue,
@@ -50,7 +54,8 @@ impl SDK {
     }
 
     /// JavaScript function for query_contract_key with deserialized options.
-    #[wasm_bindgen(js_name = "query_contract_key")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "query_contract_key"))]
+    #[cfg(feature = "js")]
     pub async fn query_contract_key_js_alias(
         &self,
         options: Option<QueryContractKeyOptions>,

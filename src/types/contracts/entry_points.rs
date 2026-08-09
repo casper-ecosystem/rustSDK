@@ -1,13 +1,14 @@
 use crate::types::contracts::entry_point::EntryPoint;
 use casper_types::contracts::EntryPoints as _EntryPoints;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::contracts::EntryPoints`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct EntryPoints(_EntryPoints);
 
 impl EntryPoints {
@@ -36,35 +37,35 @@ impl EntryPoints {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl EntryPoints {
-    #[wasm_bindgen(js_name = "len")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "len"))]
     pub fn len_js(&self) -> usize {
         self.len()
     }
 
-    #[wasm_bindgen(js_name = "isEmpty")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isEmpty"))]
     pub fn is_empty_js(&self) -> bool {
         self.is_empty()
     }
 
-    #[wasm_bindgen(js_name = "hasEntryPoint")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "hasEntryPoint"))]
     pub fn has_entry_point_js(&self, name: &str) -> bool {
         self.has_entry_point(name)
     }
 
-    #[wasm_bindgen(js_name = "get")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get"))]
     pub fn get_js(&self, name: &str) -> Option<EntryPoint> {
         self.get(name)
     }
 
-    #[wasm_bindgen(js_name = "names")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "names"))]
     pub fn names_js(&self) -> Vec<String> {
         self.names()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

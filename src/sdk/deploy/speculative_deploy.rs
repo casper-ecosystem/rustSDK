@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::rpcs::speculative_exec_deploy::SpeculativeExecResult;
 use crate::{
     types::{
@@ -16,11 +16,11 @@ use casper_client::{
     cli::deploy::make_deploy, rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
     SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// This function allows executing a deploy speculatively.
     ///
@@ -35,9 +35,10 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
-    #[wasm_bindgen(js_name = "speculative_deploy")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "speculative_deploy"))]
     #[allow(clippy::too_many_arguments, deprecated)]
     #[deprecated(note = "prefer speculative_transaction")]
+    #[cfg(feature = "js")]
     pub async fn speculative_deploy_js_alias(
         &self,
         deploy_params: DeployStrParams,

@@ -9,13 +9,14 @@ use casper_types::{
     account::AccountHash as _AccountHash,
     bytesrepr::{self, FromBytes, ToBytes},
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Serialize, Ord, PartialOrd, Eq, PartialEq)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct AccountHash(_AccountHash);
 
 impl AccountHash {
@@ -63,10 +64,10 @@ impl AccountHash {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl AccountHash {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new_js_alias(account_hash_hex_str: &str) -> Result<AccountHash, JsError> {
         Self::new(account_hash_hex_str).map_err(|err| {
             JsError::new(&format!(
@@ -75,8 +76,8 @@ impl AccountHash {
         })
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromFormattedStr")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromFormattedStr"))]
     pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<AccountHash, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
             JsError::new(&format!(
@@ -85,32 +86,32 @@ impl AccountHash {
         })
     }
 
-    #[wasm_bindgen(js_name = "fromPublicKey")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromPublicKey"))]
     pub fn from_public_key(public_key: PublicKey) -> AccountHash {
         let account_hash =
             _AccountHash::from_public_key(&(public_key.into()), Self::custom_blake2b);
         Self(account_hash)
     }
 
-    #[wasm_bindgen(js_name = "toFormattedString")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toFormattedString"))]
     pub fn to_formatted_string(&self) -> String {
         self.0.to_formatted_string()
     }
 
-    #[wasm_bindgen(js_name = "toHexString")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toHexString"))]
     pub fn to_hex_string(&self) -> String {
         self.0.to_string()
     }
 
-    #[wasm_bindgen(js_name = "fromUint8Array")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromUint8Array"))]
     pub fn from_bytes(bytes: Vec<u8>) -> AccountHash {
         let account_hash =
             _AccountHash::try_from(&bytes).expect("Failed to convert bytes to AccountHash");
         Self(account_hash)
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }

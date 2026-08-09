@@ -22,6 +22,7 @@ use casper_types::{
     Transaction, TransactionHash,
 };
 
+#[cfg(feature = "js")]
 pub mod wasm32;
 
 impl SDK {

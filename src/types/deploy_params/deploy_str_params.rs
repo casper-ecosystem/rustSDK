@@ -3,9 +3,10 @@ use crate::helpers::get_str_or_default;
 use crate::helpers::get_ttl_or_default;
 use casper_client::cli::DeployStrParams as _DeployStrParams;
 use once_cell::sync::OnceCell;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Debug, Clone)]
 pub struct DeployStrParams {
     secret_key: OnceCell<String>,
@@ -29,9 +30,9 @@ impl Default for DeployStrParams {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl DeployStrParams {
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(
         chain_name: &str,
         session_account: &str,
@@ -58,23 +59,23 @@ impl DeployStrParams {
     }
 
     // Getter and setter for secret_key field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn secret_key(&self) -> Option<String> {
         self.secret_key.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_secret_key(&self, secret_key: &str) {
         self.secret_key.set(secret_key.to_string()).unwrap();
     }
 
     // Getter and setter for timestamp field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn timestamp(&self) -> Option<String> {
         self.timestamp.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_timestamp(&self, timestamp: Option<String>) {
         if let Some(mut timestamp) = timestamp {
             if timestamp.is_empty() {
@@ -87,19 +88,19 @@ impl DeployStrParams {
         };
     }
 
-    #[wasm_bindgen(js_name = "setDefaultTimestamp")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "setDefaultTimestamp"))]
     pub fn set_default_timestamp(&self) {
         let current_timestamp = get_current_timestamp(None);
         self.timestamp.set(current_timestamp).unwrap();
     }
 
     // Getter and setter for ttl field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn ttl(&self) -> Option<String> {
         self.ttl.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_ttl(&self, ttl: Option<String>) {
         if let Some(mut ttl) = ttl {
             if ttl.is_empty() {
@@ -112,30 +113,30 @@ impl DeployStrParams {
         };
     }
 
-    #[wasm_bindgen(js_name = "setDefaultTTL")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "setDefaultTTL"))]
     pub fn set_default_ttl(&self) {
         let ttl = get_ttl_or_default(None);
         self.ttl.set(ttl).unwrap();
     }
 
     // Getter and setter for chain_name field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn chain_name(&self) -> Option<String> {
         self.chain_name.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_chain_name(&self, chain_name: &str) {
         self.chain_name.set(chain_name.to_string()).unwrap();
     }
 
     // Getter and setter for session_account field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn session_account(&self) -> Option<String> {
         self.session_account.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_session_account(&self, session_account: &str) {
         self.session_account
             .set(session_account.to_string())
@@ -143,12 +144,12 @@ impl DeployStrParams {
     }
 
     // Getter and setter for gas_price_tolerance field
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn gas_price_tolerance(&self) -> Option<String> {
         self.gas_price_tolerance.get().cloned()
     }
 
-    #[wasm_bindgen(setter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(setter))]
     pub fn set_gas_price_tolerance(&self, gas_price_tolerance: String) {
         self.gas_price_tolerance.set(gas_price_tolerance).unwrap();
     }

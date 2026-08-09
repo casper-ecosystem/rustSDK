@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::hash::transaction_hash::TransactionHash;
 use crate::{
     types::{
@@ -20,27 +20,27 @@ use casper_client::{
     cli::make_transaction, rpcs::results::PutTransactionResult as _PutTransactionResult,
     SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the result of a transaction.
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct PutTransactionResult(_PutTransactionResult);
 
 /// Implement conversions between PutTransactionResult and _PutTransactionResult.
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<PutTransactionResult> for _PutTransactionResult {
     fn from(result: PutTransactionResult) -> Self {
         result.0
     }
 }
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_PutTransactionResult> for PutTransactionResult {
     fn from(result: _PutTransactionResult) -> Self {
         PutTransactionResult(result)
@@ -48,30 +48,32 @@ impl From<_PutTransactionResult> for PutTransactionResult {
 }
 
 /// Implement JavaScript bindings for PutTransactionResult.
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl PutTransactionResult {
     /// Gets the API version as a JavaScript value.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the transaction hash associated with this result.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn transaction_hash(&self) -> TransactionHash {
         self.0.transaction_hash.into()
     }
 
     /// Converts PutTransactionResult to a JavaScript object.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// JavaScript function for transactioning with deserialized parameters.
     ///
@@ -85,7 +87,8 @@ impl SDK {
     /// # Returns
     ///
     /// A result containing PutTransactionResult or a JsError.
-    #[wasm_bindgen(js_name = "transaction")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "transaction"))]
+    #[cfg(feature = "js")]
     pub async fn transaction_js_alias(
         &self,
         builder_params: TransactionBuilderParams,

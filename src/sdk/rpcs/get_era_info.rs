@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
@@ -12,54 +12,60 @@ use casper_client::{
     cli::get_era_info as get_era_info_cli, get_era_info as get_era_info_lib,
     rpcs::results::GetEraInfoResult as _GetEraInfoResult, JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetEraInfoResult(_GetEraInfoResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<GetEraInfoResult> for _GetEraInfoResult {
     fn from(result: GetEraInfoResult) -> Self {
         result.0
     }
 }
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_GetEraInfoResult> for GetEraInfoResult {
     fn from(result: _GetEraInfoResult) -> Self {
         GetEraInfoResult(result)
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetEraInfoResult {
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn era_summary(&self) -> JsValue {
         JsValue::from_serde(&self.0.era_summary).unwrap()
     }
 
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getEraInfoOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getEraInfoOptions", getter_with_clone)
+)]
 pub struct GetEraInfoOptions {
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
@@ -67,11 +73,12 @@ pub struct GetEraInfoOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     #[deprecated(note = "prefer 'get_era_summary' as it doesn't require a switch block")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub fn get_era_info_options(&self, options: JsValue) -> Result<GetEraInfoOptions, JsError> {
         options
             .into_serde::<GetEraInfoOptions>()
@@ -80,7 +87,8 @@ impl SDK {
 
     #[deprecated(note = "prefer 'get_era_summary' as it doesn't require a switch block")]
     #[allow(deprecated)]
-    #[wasm_bindgen(js_name = "get_era_info")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_era_info"))]
+    #[cfg(feature = "js")]
     pub async fn get_era_info_js_alias(
         &self,
         options: Option<GetEraInfoOptions>,
@@ -115,6 +123,7 @@ impl SDK {
     // JavaScript alias for `get_era_summary`
     #[deprecated(note = "This function is an alias. Please use `get_era_info` instead.")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn chain_get_era_info_by_switch_block(
         &self,
         options: Option<GetEraInfoOptions>,

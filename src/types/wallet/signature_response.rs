@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SignatureResponse {
     cancelled: bool,
@@ -11,7 +12,7 @@ pub struct SignatureResponse {
     signature: Option<HashMap<String, u8>>,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SignatureResponse {
     pub fn is_cancelled(&self) -> bool {
         self.cancelled

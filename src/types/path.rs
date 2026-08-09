@@ -1,19 +1,21 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use js_sys::Array;
 use serde::{Deserialize, Deserializer, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Default)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct Path {
     path: Vec<String>,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl Path {
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
+    #[cfg(feature = "js")]
     pub fn new(path: JsValue) -> Self {
         let path_string: String = if path.is_null() {
             String::from("")
@@ -23,8 +25,8 @@ impl Path {
         Path::from(path_string)
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromArray")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromArray"))]
     pub fn from_js_array(path: JsValue) -> Self {
         let path: Array = path.into();
         let path: Vec<String> = path
@@ -39,14 +41,14 @@ impl Path {
         Path { path }
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.path).unwrap_or(JsValue::null())
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toString")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toString"))]
     pub fn to_string_js_alias(&self) -> String {
         self.to_string()
     }

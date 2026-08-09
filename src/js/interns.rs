@@ -10,7 +10,9 @@ use crate::{
     types::verbosity::Verbosity,
 };
 use casper_types::U256;
+#[cfg(feature = "js")]
 use gloo_utils::format::JsValueSerdeExt;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Converts a hexadecimal string to a regular string.

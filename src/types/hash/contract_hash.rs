@@ -6,9 +6,10 @@ use casper_types::{
     AddressableEntityHash as _AddressableEntityHash,
 };
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Debug, Deserialize, Clone, Serialize, Copy)]
 pub struct ContractHash(_ContractHash);
 
@@ -29,10 +30,10 @@ impl ContractHash {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl ContractHash {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new_js_alias(contract_hash_hex_str: &str) -> Result<ContractHash, JsError> {
         Self::new(contract_hash_hex_str).map_err(|err| {
             JsError::new(&format!(
@@ -41,8 +42,8 @@ impl ContractHash {
         })
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromFormattedStr")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromFormattedStr"))]
     pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<ContractHash, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
             JsError::new(&format!(
@@ -51,12 +52,12 @@ impl ContractHash {
         })
     }
 
-    #[wasm_bindgen(js_name = "toFormattedString")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toFormattedString"))]
     pub fn to_formatted_string(&self) -> String {
         self.0.to_formatted_string()
     }
 
-    #[wasm_bindgen(js_name = "fromUint8Array")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromUint8Array"))]
     pub fn from_bytes(bytes: Vec<u8>) -> ContractHash {
         let contract_hash =
             _ContractHash::try_from(&bytes).expect("Failed to convert bytes to ContractHash");

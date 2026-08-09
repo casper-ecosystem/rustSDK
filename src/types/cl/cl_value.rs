@@ -1,21 +1,22 @@
 use crate::types::sdk_error::SdkError;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::{cl::bytes::Bytes, key::Key, public_key::PublicKey, uref::URef};
 use casper_types::{
     bytesrepr::{FromBytes, ToBytes},
     CLTyped, CLValue as _CLValue,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use casper_types::{U128, U256, U512};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::CLValue`].
 ///
 /// Minimal surface for building [`crate::types::runtime_args::RuntimeArgs`].
 /// This wrapper currently focuses on runtime-args construction.
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CLValue(_CLValue);
 
@@ -31,110 +32,110 @@ impl CLValue {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl CLValue {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromBool")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromBool"))]
     pub fn from_bool_js(value: bool) -> Result<CLValue, JsError> {
         Self::from_t(value).map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromI32")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromI32"))]
     pub fn from_i32_js(value: i32) -> Result<CLValue, JsError> {
         Self::from_t(value).map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromI64")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromI64"))]
     pub fn from_i64_js(value: i64) -> Result<CLValue, JsError> {
         Self::from_t(value).map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromU8")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromU8"))]
     pub fn from_u8_js(value: u8) -> Result<CLValue, JsError> {
         Self::from_t(value).map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromU32")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromU32"))]
     pub fn from_u32_js(value: u32) -> Result<CLValue, JsError> {
         Self::from_t(value).map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromU64")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromU64"))]
     pub fn from_u64_js(value: u64) -> Result<CLValue, JsError> {
         Self::from_t(value).map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromU128")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromU128"))]
     pub fn from_u128_js(value: &str) -> Result<CLValue, JsError> {
         let parsed = U128::from_dec_str(value)
             .map_err(|err| JsError::new(&format!("Invalid U128: {err:?}")))?;
         Self::from_t(parsed).map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromU256")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromU256"))]
     pub fn from_u256_js(value: &str) -> Result<CLValue, JsError> {
         let parsed = U256::from_dec_str(value)
             .map_err(|err| JsError::new(&format!("Invalid U256: {err:?}")))?;
         Self::from_t(parsed).map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromU512")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromU512"))]
     pub fn from_u512_js(value: &str) -> Result<CLValue, JsError> {
         let parsed = U512::from_dec_str(value)
             .map_err(|err| JsError::new(&format!("Invalid U512: {err:?}")))?;
         Self::from_t(parsed).map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromString")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromString"))]
     pub fn from_string_js(value: &str) -> Result<CLValue, JsError> {
         Self::from_t(value.to_string()).map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromUnit")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromUnit"))]
     pub fn from_unit_js() -> Result<CLValue, JsError> {
         Self::from_t(()).map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromKey")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromKey"))]
     pub fn from_key_js(key: &Key) -> Result<CLValue, JsError> {
         Self::from_t(casper_types::Key::from(key.clone()))
             .map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromURef")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromURef"))]
     pub fn from_uref_js(uref: &URef) -> Result<CLValue, JsError> {
         Self::from_t(casper_types::URef::from(uref.clone()))
             .map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromPublicKey")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromPublicKey"))]
     pub fn from_public_key_js(public_key: &PublicKey) -> Result<CLValue, JsError> {
         Self::from_t(casper_types::PublicKey::from(public_key.clone()))
             .map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromBytes")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromBytes"))]
     pub fn from_bytes_js(bytes: &Bytes) -> Result<CLValue, JsError> {
         Self::from_t(casper_types::bytesrepr::Bytes::from(bytes.clone()))
             .map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

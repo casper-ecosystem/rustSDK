@@ -10,15 +10,16 @@ use casper_client::{
     query_global_state as query_global_state_lib,
     rpcs::results::QueryGlobalStateResult as _QueryGlobalStateResult, JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the QueryGlobalStateResult
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct QueryGlobalStateResult(_QueryGlobalStateResult);
 
 impl From<QueryGlobalStateResult> for _QueryGlobalStateResult {
@@ -40,41 +41,45 @@ impl QueryGlobalStateResult {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl QueryGlobalStateResult {
     /// Gets the API version as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the block header as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn block_header(&self) -> JsValue {
         JsValue::from_serde(&self.0.block_header).unwrap()
     }
 
     /// Gets the stored value as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn stored_value(&self) -> JsValue {
         JsValue::from_serde(&self.0.stored_value).unwrap()
     }
 
     /// Gets the typed stored value wrapper.
-    #[wasm_bindgen(js_name = "storedValueTyped")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "storedValueTyped"))]
     pub fn stored_value_typed_js(&self) -> StoredValue {
         self.stored_value_typed()
     }
 
     /// Gets the Merkle proof as a string.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn merkle_proof(&self) -> String {
         self.0.merkle_proof.clone()
     }
 
     /// Converts the QueryGlobalStateResult to a JsValue.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -82,7 +87,10 @@ impl QueryGlobalStateResult {
 
 /// Options for the `query_global_state` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[wasm_bindgen(js_name = "queryGlobalStateOptions", getter_with_clone)]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "queryGlobalStateOptions", getter_with_clone)
+)]
 pub struct QueryGlobalStateOptions {
     pub global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash_as_string: Option<String>,
@@ -96,8 +104,8 @@ pub struct QueryGlobalStateOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Parses query global state options from a JsValue.
     ///
@@ -108,6 +116,7 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed query global state options as a `QueryGlobalStateOptions` struct.
+    #[cfg(feature = "js")]
     pub fn query_global_state_options(
         &self,
         options: JsValue,
@@ -130,7 +139,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[wasm_bindgen(js_name = "query_global_state")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "query_global_state"))]
+    #[cfg(feature = "js")]
     pub async fn query_global_state_js_alias(
         &self,
         options: Option<QueryGlobalStateOptions>,
@@ -154,7 +164,7 @@ impl SDK {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl SDK {
     /// Builds parameters for querying global state based on the provided options.
     ///

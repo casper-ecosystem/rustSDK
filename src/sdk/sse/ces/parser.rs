@@ -12,9 +12,10 @@ use casper_types::{
 };
 use serde_json::Value;
 use std::collections::HashMap;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 
 pub const EVENTS_SCHEMA_NAMED_KEY: &str = "__events_schema";
@@ -34,14 +35,14 @@ pub struct ContractMetadata {
 
 /// CES consume parser (ces-js-parser `Parser` parity).
 #[derive(Debug, Clone, Default)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct CESParser {
     contracts_metadata: HashMap<String, ContractMetadata>,
 }
 
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
+#[cfg_attr(all(feature = "js", target_arch = "wasm32"), wasm_bindgen)]
 impl CESParser {
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(constructor))]
+    #[cfg_attr(all(feature = "js", target_arch = "wasm32"), wasm_bindgen(constructor))]
     pub fn new() -> Self {
         Self {
             contracts_metadata: HashMap::new(),
@@ -49,13 +50,19 @@ impl CESParser {
     }
 
     /// Number of contracts loaded into this parser.
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "contractCount"))]
+    #[cfg_attr(
+        all(feature = "js", target_arch = "wasm32"),
+        wasm_bindgen(js_name = "contractCount")
+    )]
     pub fn contract_count(&self) -> usize {
         self.contracts_metadata.len()
     }
 
     /// JSON schemas for all loaded contracts (keyed by events uref).
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "schemasJson"))]
+    #[cfg_attr(
+        all(feature = "js", target_arch = "wasm32"),
+        wasm_bindgen(js_name = "schemasJson")
+    )]
     pub fn schemas_json(&self) -> Result<String, String> {
         let mut root = serde_json::Map::new();
         for (uref, meta) in &self.contracts_metadata {
@@ -503,10 +510,11 @@ async fn query_stored_value_json(
     Ok(stored)
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl CESParser {
-    #[wasm_bindgen(js_name = "parseExecutionResultJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "parseExecutionResultJson"))]
+    #[cfg(feature = "js")]
     pub fn parse_execution_result_json_js(
         &self,
         execution_result_json: &str,

@@ -6,13 +6,14 @@ use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     PublicKey as _PublicKey, ED25519_TAG, SECP256K1_TAG, SYSTEM_TAG,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Debug, Deserialize, Clone, Serialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PublicKey(_PublicKey);
 
@@ -52,10 +53,10 @@ impl PublicKey {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl PublicKey {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new_js_alias(public_key_hex_str: &str) -> Result<PublicKey, JsError> {
         Self::new(public_key_hex_str).map_err(|err| {
             JsError::new(&format!(
@@ -64,26 +65,26 @@ impl PublicKey {
         })
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromUint8Array")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromUint8Array"))]
     pub fn from_bytes_js_alias(bytes: Vec<u8>) -> Result<PublicKey, JsError> {
         Self::from_bytes(&bytes)
             .map(|(public_key, _)| public_key)
             .map_err(|err| JsError::new(&format!("Failed to parse PublicKey: {err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "toAccountHash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toAccountHash"))]
     pub fn to_account_hash(&self) -> AccountHash {
         AccountHash::from_public_key(self.0.clone().into())
     }
 
-    #[wasm_bindgen(js_name = "toPurseUref")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toPurseUref"))]
     pub fn to_purse_uref(&self) -> URef {
         PurseIdentifier::from_main_purse_under_public_key(self.0.clone().into()).into()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }

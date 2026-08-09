@@ -1,14 +1,15 @@
 use crate::types::{hash::account_hash::AccountHash, public_key::PublicKey, sdk_error::SdkError};
 use casper_client::rpcs::AccountIdentifier as _AccountIdentifier;
 use casper_types::account::ACCOUNT_HASH_FORMATTED_STRING_PREFIX;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use std::fmt;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct AccountIdentifier(_AccountIdentifier);
 
 #[deprecated(note = "prefer 'EntityIdentifier'")]
@@ -25,18 +26,18 @@ impl AccountIdentifier {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[deprecated(note = "prefer 'EntityIdentifier'")]
 #[allow(deprecated)]
 impl AccountIdentifier {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(formatted_str: &str) -> Result<AccountIdentifier, JsError> {
         Self::from_formatted_str_js_alias(formatted_str)
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromFormattedStr")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromFormattedStr"))]
     pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<AccountIdentifier, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
             JsError::new(&format!(
@@ -45,18 +46,18 @@ impl AccountIdentifier {
         })
     }
 
-    #[wasm_bindgen(js_name = "fromPublicKey")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromPublicKey"))]
     pub fn from_account_under_public_key(key: PublicKey) -> Self {
         Self(_AccountIdentifier::PublicKey(key.into()))
     }
 
-    #[wasm_bindgen(js_name = "fromAccountHash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromAccountHash"))]
     pub fn from_account_under_account_hash(account_hash: AccountHash) -> Self {
         Self(_AccountIdentifier::AccountHash(account_hash.into()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }

@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::helpers::insert_js_value_arg;
 #[cfg(feature = "deploy")]
 #[allow(deprecated)]
@@ -32,15 +32,16 @@ use casper_types::{
     RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
 };
 use chrono::{DateTime, Utc};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use num_traits::cast::FromPrimitive;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct Deploy(_Deploy);
 
 #[derive(Default)]
@@ -54,12 +55,12 @@ struct BuildParams {
     account: Option<PublicKey>,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[deprecated(note = "prefer Transaction type")]
 #[allow(deprecated)]
 impl Deploy {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(deploy: JsValue) -> Deploy {
         let deploy: _Deploy = deploy
             .into_serde()
@@ -75,8 +76,8 @@ impl Deploy {
         deploy.into()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.0) {
             Ok(json) => json,
@@ -89,7 +90,7 @@ impl Deploy {
 
     // static context
     #[cfg(feature = "deploy")]
-    #[wasm_bindgen(js_name = "withPaymentAndSession")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withPaymentAndSession"))]
     pub fn with_payment_and_session(
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
@@ -103,7 +104,7 @@ impl Deploy {
 
     // static context
     #[cfg(feature = "deploy")]
-    #[wasm_bindgen(js_name = "withTransfer")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withTransfer"))]
     pub fn with_transfer(
         amount: &str,
         target_account: &str,
@@ -121,7 +122,7 @@ impl Deploy {
         .map_err(|err| format!("Error creating transfer deploy: {err}"))
     }
 
-    #[wasm_bindgen(js_name = "withTTL")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withTTL"))]
     pub fn with_ttl(&self, ttl: &str, secret_key: Option<String>) -> Deploy {
         let mut ttl = parse_ttl(ttl);
         if let Err(err) = &ttl {
@@ -135,7 +136,7 @@ impl Deploy {
         })
     }
 
-    #[wasm_bindgen(js_name = "withTimestamp")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withTimestamp"))]
     pub fn with_timestamp(&self, timestamp: &str, secret_key: Option<String>) -> Deploy {
         let mut timestamp = parse_timestamp(timestamp);
         if let Err(err) = &timestamp {
@@ -149,7 +150,7 @@ impl Deploy {
         })
     }
 
-    #[wasm_bindgen(js_name = "withChainName")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withChainName"))]
     pub fn with_chain_name(&self, chain_name: &str, secret_key: Option<String>) -> Deploy {
         self.build(BuildParams {
             secret_key,
@@ -158,7 +159,7 @@ impl Deploy {
         })
     }
 
-    #[wasm_bindgen(js_name = "withAccount")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withAccount"))]
     pub fn with_account(&self, account: PublicKey, secret_key: Option<String>) -> Deploy {
         self.build(BuildParams {
             secret_key,
@@ -167,7 +168,7 @@ impl Deploy {
         })
     }
 
-    #[wasm_bindgen(js_name = "withEntryPointName")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withEntryPointName"))]
     pub fn with_entry_point_name(
         &self,
         entry_point_name: &str,
@@ -189,7 +190,7 @@ impl Deploy {
         })
     }
 
-    #[wasm_bindgen(js_name = "withHash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withHash"))]
     pub fn with_hash(&self, hash: ContractHash, secret_key: Option<String>) -> Deploy {
         let deploy = self.0.clone();
         let session = deploy.session();
@@ -207,7 +208,7 @@ impl Deploy {
         })
     }
 
-    #[wasm_bindgen(js_name = "withPackageHash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withPackageHash"))]
     pub fn with_package_hash(
         &self,
         package_hash: ContractPackageHash,
@@ -229,7 +230,7 @@ impl Deploy {
         })
     }
 
-    #[wasm_bindgen(js_name = "withModuleBytes")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withModuleBytes"))]
     pub fn with_module_bytes(&self, module_bytes: Bytes, secret_key: Option<String>) -> Deploy {
         let deploy = self.0.clone();
         let session = deploy.session();
@@ -247,7 +248,7 @@ impl Deploy {
         })
     }
 
-    #[wasm_bindgen(js_name = "withSecretKey")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withSecretKey"))]
     pub fn with_secret_key(&self, secret_key: Option<String>) -> Deploy {
         self.build(BuildParams {
             secret_key,
@@ -255,7 +256,7 @@ impl Deploy {
         })
     }
 
-    #[wasm_bindgen(js_name = "withStandardPayment")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withStandardPayment"))]
     pub fn with_standard_payment(&self, amount: &str, secret_key: Option<String>) -> Deploy {
         let cloned_amount = amount.to_string();
         let amount = U512::from_dec_str(&cloned_amount);
@@ -271,8 +272,8 @@ impl Deploy {
     }
 
     // Load payment from json
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "withPayment")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withPayment"))]
     pub fn with_payment(&self, payment: JsValue, secret_key: Option<String>) -> Deploy {
         let payment_item_result = payment.into_serde();
 
@@ -290,8 +291,8 @@ impl Deploy {
     }
 
     // Load session from json
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "withSession")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "withSession"))]
     pub fn with_session(&self, session: JsValue, secret_key: Option<String>) -> Deploy {
         let session_item_result = session.into_serde();
 
@@ -308,7 +309,7 @@ impl Deploy {
         }
     }
 
-    #[wasm_bindgen(js_name = "validateDeploySize")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "validateDeploySize"))]
     pub fn validate_deploy_size(&self) -> bool {
         let deploy: _Deploy = self.0.clone();
         match deploy.is_valid_size(MAX_SERIALIZED_SIZE_OF_DEPLOY) {
@@ -320,7 +321,7 @@ impl Deploy {
         }
     }
 
-    #[wasm_bindgen(js_name = "isValid")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isValid"))]
     pub fn is_valid(&self) -> bool {
         let deploy: _Deploy = self.0.clone();
         match deploy.is_valid() {
@@ -332,13 +333,13 @@ impl Deploy {
         }
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn hash(&self) -> DeployHash {
         let deploy: _Deploy = self.0.clone();
         (*deploy.hash()).into()
     }
 
-    #[wasm_bindgen(js_name = "hasValidHash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "hasValidHash"))]
     pub fn has_valid_hash(&self) -> bool {
         let deploy: _Deploy = self.0.clone();
         match deploy.has_valid_hash() {
@@ -350,7 +351,7 @@ impl Deploy {
         }
     }
 
-    #[wasm_bindgen(js_name = "isExpired")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isExpired"))]
     pub fn expired(&self) -> bool {
         let deploy: _Deploy = self.0.clone();
         let now: DateTime<Utc> = Utc::now();
@@ -365,7 +366,7 @@ impl Deploy {
         }
     }
 
-    #[wasm_bindgen(js_name = "sign")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "sign"))]
     pub fn sign(&mut self, secret_key: &str) -> Deploy {
         let mut deploy: _Deploy = self.0.clone();
         let secret_key_from_pem = secret_key_from_pem(secret_key);
@@ -380,8 +381,8 @@ impl Deploy {
         deploy.into()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "approvalsHash")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "approvalsHash"))]
     pub fn compute_approvals_hash_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.compute_approvals_hash()) {
             Ok(json) => json,
@@ -394,8 +395,8 @@ impl Deploy {
         }
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "approvals")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "approvals"))]
     pub fn approvals_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.approvals()) {
             Ok(json) => json,
@@ -406,12 +407,12 @@ impl Deploy {
         }
     }
 
-    #[wasm_bindgen(js_name = "isTransfer")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isTransfer"))]
     pub fn is_transfer(&self) -> bool {
         self.0.clone().session().is_transfer()
     }
 
-    #[wasm_bindgen(js_name = "isStandardPayment")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isStandardPayment"))]
     pub fn is_standard_payment(&self, phase: u8) -> bool {
         if let Some(phase_enum) = Phase::from_u8(phase) {
             self.0.clone().session().is_standard_payment(phase_enum)
@@ -420,37 +421,37 @@ impl Deploy {
         }
     }
 
-    #[wasm_bindgen(js_name = "isStoredContract")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isStoredContract"))]
     pub fn is_stored_contract(&self) -> bool {
         self.0.clone().session().is_stored_contract()
     }
 
-    #[wasm_bindgen(js_name = "isStoredContractPackage")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isStoredContractPackage"))]
     pub fn is_stored_contract_package(&self) -> bool {
         self.0.clone().session().is_stored_contract_package()
     }
 
-    #[wasm_bindgen(js_name = "isModuleBytes")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isModuleBytes"))]
     pub fn is_module_bytes(&self) -> bool {
         self.0.clone().session().is_module_bytes()
     }
 
-    #[wasm_bindgen(js_name = "isByName")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "isByName"))]
     pub fn is_by_name(&self) -> bool {
         self.0.clone().session().is_by_name()
     }
 
-    #[wasm_bindgen(js_name = "byName")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "byName"))]
     pub fn by_name(&self) -> Option<String> {
         self.0.clone().session().by_name()
     }
 
-    #[wasm_bindgen(js_name = "entryPointName")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "entryPointName"))]
     pub fn entry_point_name(&self) -> String {
         self.0.clone().session().entry_point_name().to_string()
     }
 
-    #[wasm_bindgen(js_name = "addSignature")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "addSignature"))]
     pub fn add_signature(&self, public_key: &str, signature: &str) -> Deploy {
         // Serialize the existing approvals to JSON
         let casper_deploy: _Deploy = self.0.clone();
@@ -492,28 +493,28 @@ impl Deploy {
         updated_deploy
     }
 
-    #[wasm_bindgen(js_name = "TTL")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "TTL"))]
     pub fn ttl(&self) -> String {
         self.0.clone().header().ttl().to_string()
     }
 
-    #[wasm_bindgen(js_name = "timestamp")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "timestamp"))]
     pub fn timestamp(&self) -> String {
         self.0.clone().header().timestamp().to_string()
     }
 
-    #[wasm_bindgen(js_name = "chainName")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "chainName"))]
     pub fn chain_name(&self) -> String {
         self.0.clone().header().chain_name().to_string()
     }
 
-    #[wasm_bindgen(js_name = "account")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "account"))]
     pub fn account(&self) -> String {
         let public_key: PublicKey = self.0.clone().header().account().clone().into();
         public_key.to_string()
     }
 
-    #[wasm_bindgen(js_name = "paymentAmount")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "paymentAmount"))]
     pub fn payment_amount(&self, conv_rate: u8) -> String {
         self.0
             .clone()
@@ -523,8 +524,8 @@ impl Deploy {
             .to_string()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "args")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "args"))]
     pub fn args_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.args()) {
             Ok(json) => json,
@@ -535,8 +536,8 @@ impl Deploy {
         }
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "addArg")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "addArg"))]
     pub fn add_arg_js_alias(
         &mut self,
         js_value_arg: JsValue,

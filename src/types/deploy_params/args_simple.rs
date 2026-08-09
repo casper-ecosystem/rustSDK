@@ -1,13 +1,16 @@
+#[cfg(feature = "js")]
 use js_sys::Array;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Default, Debug, Clone)]
 pub struct ArgsSimple {
     args: Vec<String>,
 }
 
 impl ArgsSimple {
+    #[cfg(feature = "js")]
     pub fn new(args: JsValue) -> Self {
         let args: Array = args.into();
         let args: Vec<String> = args
@@ -39,6 +42,7 @@ impl From<Vec<String>> for ArgsSimple {
     }
 }
 
+#[cfg(feature = "js")]
 impl FromIterator<JsValue> for ArgsSimple {
     fn from_iter<I: IntoIterator<Item = JsValue>>(iter: I) -> Self {
         let args: Vec<String> = iter

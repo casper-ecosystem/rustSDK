@@ -1,6 +1,6 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::hash::block_hash::BlockHash;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
@@ -14,57 +14,60 @@ use casper_client::{
     get_block_transfers as get_block_transfers_lib,
     rpcs::results::GetBlockTransfersResult as _GetBlockTransfersResult, JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetBlockTransfersResult
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetBlockTransfersResult(_GetBlockTransfersResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<GetBlockTransfersResult> for _GetBlockTransfersResult {
     fn from(result: GetBlockTransfersResult) -> Self {
         result.0
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_GetBlockTransfersResult> for GetBlockTransfersResult {
     fn from(result: _GetBlockTransfersResult) -> Self {
         GetBlockTransfersResult(result)
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetBlockTransfersResult {
     /// Gets the API version as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the block hash as an Option<BlockHash>.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn block_hash(&self) -> Option<BlockHash> {
         self.0.block_hash.map(Into::into)
     }
 
     /// Gets the transfers as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn transfers(&self) -> JsValue {
         JsValue::from_serde(&self.0.transfers).unwrap()
     }
 
     /// Converts the GetBlockTransfersResult to a JsValue.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -72,8 +75,11 @@ impl GetBlockTransfersResult {
 
 /// Options for the `get_block_transfers` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getBlockTransfersOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getBlockTransfersOptions", getter_with_clone)
+)]
 pub struct GetBlockTransfersOptions {
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
@@ -81,8 +87,8 @@ pub struct GetBlockTransfersOptions {
     pub rpc_address: Option<String>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Parses block transfers options from a JsValue.
     ///
@@ -93,6 +99,7 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed block transfers options as a `GetBlockTransfersOptions` struct.
+    #[cfg(feature = "js")]
     pub fn get_block_transfers_options(
         &self,
         options: JsValue,
@@ -115,7 +122,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[wasm_bindgen(js_name = "get_block_transfers")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_block_transfers"))]
+    #[cfg(feature = "js")]
     pub async fn get_block_transfers_js_alias(
         &self,
         options: Option<GetBlockTransfersOptions>,
@@ -148,9 +156,10 @@ impl SDK {
     }
 
     // JavaScript alias for `get_block_transfers`.
-    #[wasm_bindgen(js_name = "chain_get_block_transfers")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "chain_get_block_transfers"))]
     #[deprecated(note = "This function is an alias. Please use `get_block_transfers` instead.")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn chain_get_block_transfers(
         &self,
         options: Option<GetBlockTransfersOptions>,

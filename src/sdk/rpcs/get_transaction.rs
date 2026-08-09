@@ -1,60 +1,64 @@
 use crate::types::hash::transaction_hash::TransactionHash;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::transaction::Transaction;
 use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_transaction, rpcs::results::GetTransactionResult as _GetTransactionResult, Error,
     JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetTransactionResult
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetTransactionResult(_GetTransactionResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<GetTransactionResult> for _GetTransactionResult {
     fn from(result: GetTransactionResult) -> Self {
         result.0
     }
 }
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_GetTransactionResult> for GetTransactionResult {
     fn from(result: _GetTransactionResult) -> Self {
         GetTransactionResult(result)
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetTransactionResult {
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     /// Gets the API version as a JavaScript value.
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     /// Gets the transaction information.
     pub fn transaction(&self) -> Transaction {
         self.0.transaction.clone().into()
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     /// Gets the execution info as a JavaScript value.
+    #[cfg(feature = "js")]
     pub fn execution_info(&self) -> JsValue {
         JsValue::from_serde(&self.0.execution_info).unwrap()
     }
 
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     /// Converts the result to a JSON JavaScript value.
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -62,8 +66,11 @@ impl GetTransactionResult {
 
 /// Options for the `get_transaction` method.
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getTransactionOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getTransactionOptions", getter_with_clone)
+)]
 pub struct GetTransactionOptions {
     pub transaction_hash_as_string: Option<String>,
     pub transaction_hash: Option<TransactionHash>,
@@ -72,7 +79,7 @@ pub struct GetTransactionOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Parses transaction options from a JsValue.
     ///
@@ -83,7 +90,7 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed transaction options as a `GetTransactionOptions` struct.
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
     pub fn get_transaction_options(
         &self,
         options: JsValue,
@@ -112,8 +119,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing either a `GetTransactionResult` or an error.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "get_transaction")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_transaction"))]
     pub async fn get_transaction_js_alias(
         &self,
         options: Option<GetTransactionOptions>,
@@ -156,7 +163,7 @@ impl SDK {
     }
 
     /// Retrieves transaction information using the provided options, alias for `get_transaction`.
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
     #[deprecated(note = "This function is an alias. Please use `get_transaction` instead.")]
     #[allow(deprecated)]
     pub async fn info_get_transaction(

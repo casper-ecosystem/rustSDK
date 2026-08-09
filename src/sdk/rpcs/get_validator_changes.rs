@@ -3,59 +3,62 @@ use casper_client::{
     get_validator_changes, rpcs::results::GetValidatorChangesResult as _GetValidatorChangesResult,
     Error, JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// Wrapper struct for the `GetValidatorChangesResult` from casper_client.
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetValidatorChangesResult(_GetValidatorChangesResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<GetValidatorChangesResult> for _GetValidatorChangesResult {
     fn from(result: GetValidatorChangesResult) -> Self {
         result.0
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_GetValidatorChangesResult> for GetValidatorChangesResult {
     fn from(result: _GetValidatorChangesResult) -> Self {
         GetValidatorChangesResult(result)
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetValidatorChangesResult {
     /// Gets the API version as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the validator changes as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn changes(&self) -> JsValue {
         JsValue::from_serde(&self.0.changes).unwrap()
     }
 
     /// Converts the GetValidatorChangesResult to a JsValue.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
 /// SDK methods for working with validator changes.
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Retrieves validator changes using the provided options.
     ///
@@ -71,7 +74,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[wasm_bindgen(js_name = "get_validator_changes")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_validator_changes"))]
+    #[cfg(feature = "js")]
     pub async fn get_validator_changes_js_alias(
         &self,
         verbosity: Option<Verbosity>,
@@ -90,6 +94,7 @@ impl SDK {
     // JavaScript alias for `get_validator_changes`
     #[deprecated(note = "This function is an alias. Please use `get_validator_changes` instead.")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn info_get_validator_change(
         &self,
         verbosity: Option<Verbosity>,

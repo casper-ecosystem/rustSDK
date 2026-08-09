@@ -1,13 +1,14 @@
 use casper_types::{DictionaryAddr as _DictionaryAddr, KEY_DICTIONARY_LENGTH};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct DictionaryAddr(_DictionaryAddr);
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl DictionaryAddr {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(bytes: Vec<u8>) -> Result<DictionaryAddr, JsError> {
         if bytes.len() != KEY_DICTIONARY_LENGTH {
             return Err(JsError::new("Invalid DictionaryAddr length"));

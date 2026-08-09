@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
@@ -11,46 +11,48 @@ use casper_client::{
     cli::get_block as get_block_cli, get_block as get_block_lib,
     rpcs::results::GetBlockResult as _GetBlockResult, JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use casper_types::Block;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetBlockResult
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetBlockResult(_GetBlockResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<GetBlockResult> for _GetBlockResult {
     fn from(result: GetBlockResult) -> Self {
         result.0
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_GetBlockResult> for GetBlockResult {
     fn from(result: _GetBlockResult) -> Self {
         GetBlockResult(result)
     }
 }
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetBlockResult {
     /// Gets the API version as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the block information as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn block(&self) -> JsValue {
         let block = self.0.block_with_signatures.clone().unwrap().block;
 
@@ -61,7 +63,8 @@ impl GetBlockResult {
     }
 
     /// Converts the GetBlockResult to a JsValue.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -69,8 +72,11 @@ impl GetBlockResult {
 
 /// Options for the `get_block` method.
 #[derive(Debug, Deserialize, Default, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getBlockOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getBlockOptions", getter_with_clone)
+)]
 pub struct GetBlockOptions {
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
@@ -78,8 +84,8 @@ pub struct GetBlockOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Parses block options from a JsValue.
     ///
@@ -90,6 +96,7 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed block options as a `GetBlockOptions` struct.
+    #[cfg(feature = "js")]
     pub fn get_block_options(&self, options: JsValue) -> Result<GetBlockOptions, JsError> {
         options
             .into_serde::<GetBlockOptions>()
@@ -109,7 +116,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[wasm_bindgen(js_name = "get_block")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_block"))]
+    #[cfg(feature = "js")]
     pub async fn get_block_js_alias(
         &self,
         options: Option<GetBlockOptions>,
@@ -156,6 +164,7 @@ impl SDK {
     /// Returns a `JsError` if there is an error during the retrieval process.
     #[deprecated(note = "This function is an alias. Please use `get_block` instead.")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn chain_get_block(
         &self,
         options: Option<GetBlockOptions>,

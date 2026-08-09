@@ -1,13 +1,14 @@
 use crate::types::{cl::cl_value::CLValue, key::Key};
 use casper_types::addressable_entity::NamedKeyValue as _NamedKeyValue;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::NamedKeyValue`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct NamedKeyValue(_NamedKeyValue);
 
 impl NamedKeyValue {
@@ -32,30 +33,30 @@ impl NamedKeyValue {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl NamedKeyValue {
-    #[wasm_bindgen(js_name = "nameClValue")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "nameClValue"))]
     pub fn name_cl_value_js(&self) -> CLValue {
         self.name_cl_value()
     }
 
-    #[wasm_bindgen(js_name = "keyClValue")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "keyClValue"))]
     pub fn key_cl_value_js(&self) -> CLValue {
         self.key_cl_value()
     }
 
-    #[wasm_bindgen(js_name = "name")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "name"))]
     pub fn name_js(&self) -> Option<String> {
         self.name()
     }
 
-    #[wasm_bindgen(js_name = "key")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "key"))]
     pub fn key_js(&self) -> Option<Key> {
         self.key()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

@@ -1,5 +1,5 @@
 use crate::types::deploy::Deploy;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::hash::block_hash::BlockHash;
 use crate::{
     types::{sdk_error::SdkError, verbosity::Verbosity},
@@ -10,57 +10,60 @@ use casper_client::{
     rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
     speculative_exec as speculative_exec_deploy_lib, JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the result of a speculative execution.
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct SpeculativeExecResult(_SpeculativeExecResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<SpeculativeExecResult> for _SpeculativeExecResult {
     fn from(result: SpeculativeExecResult) -> Self {
         result.0
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_SpeculativeExecResult> for SpeculativeExecResult {
     fn from(result: _SpeculativeExecResult) -> Self {
         SpeculativeExecResult(result)
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SpeculativeExecResult {
     /// Get the API version of the result.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Get the block hash.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn block_hash(&self) -> BlockHash {
         self.0.execution_result.block_hash.into()
     }
 
     /// Get the execution result.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn execution_result(&self) -> JsValue {
         JsValue::from_serde(&self.0.execution_result).unwrap()
     }
 
     /// Convert the result to JSON format.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -68,8 +71,11 @@ impl SpeculativeExecResult {
 
 /// Options for speculative execution.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getSpeculativeExecDeployOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getSpeculativeExecDeployOptions", getter_with_clone)
+)]
 pub struct GetSpeculativeExecDeployOptions {
     /// The deploy as a JSON string.
     pub deploy_as_string: Option<String>,
@@ -84,12 +90,13 @@ pub struct GetSpeculativeExecDeployOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Get options for speculative execution from a JavaScript value.
     #[deprecated(note = "prefer speculative_exec_transaction_options")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub fn get_speculative_exec_deploy_options(
         &self,
         options: JsValue,
@@ -110,7 +117,8 @@ impl SDK {
     /// A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
     #[deprecated(note = "prefer speculative_exec_transaction")]
     #[allow(deprecated)]
-    #[wasm_bindgen(js_name = "speculative_exec_deploy")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "speculative_exec_deploy"))]
+    #[cfg(feature = "js")]
     pub async fn speculative_exec_deploy_js_alias(
         &self,
         options: Option<GetSpeculativeExecDeployOptions>,

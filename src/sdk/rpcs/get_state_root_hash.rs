@@ -1,6 +1,6 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::digest::Digest;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
@@ -14,51 +14,52 @@ use casper_client::{
     get_state_root_hash as get_state_root_hash_lib,
     rpcs::results::GetStateRootHashResult as _GetStateRootHashResult, JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// Wrapper struct for the `GetStateRootHashResult` from casper_client.
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetStateRootHashResult(_GetStateRootHashResult);
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<GetStateRootHashResult> for _GetStateRootHashResult {
     fn from(result: GetStateRootHashResult) -> Self {
         result.0
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_GetStateRootHashResult> for GetStateRootHashResult {
     fn from(result: _GetStateRootHashResult) -> Self {
         GetStateRootHashResult(result)
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetStateRootHashResult {
     /// Gets the API version as a JsValue.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the state root hash as an Option<Digest>.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn state_root_hash(&self) -> Option<Digest> {
         self.0.state_root_hash.map(Into::into)
     }
 
     /// Gets the state root hash as a String.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn state_root_hash_as_string(&self) -> String {
         self.0
             .state_root_hash
@@ -68,14 +69,15 @@ impl GetStateRootHashResult {
     }
 
     /// Alias for state_root_hash_as_string
-    #[wasm_bindgen(js_name = "toString")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toString"))]
     pub fn to_string_js_alias(&self) -> String {
         // You can still use to_string method for compatibility
         self.state_root_hash_as_string()
     }
 
     /// Converts the GetStateRootHashResult to a JsValue.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -83,8 +85,11 @@ impl GetStateRootHashResult {
 
 /// Options for the `get_state_root_hash` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getStateRootHashOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getStateRootHashOptions", getter_with_clone)
+)]
 pub struct GetStateRootHashOptions {
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
@@ -92,8 +97,8 @@ pub struct GetStateRootHashOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Parses state root hash options from a JsValue.
     ///
@@ -104,6 +109,7 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed state root hash options as a `GetStateRootHashOptions` struct.
+    #[cfg(feature = "js")]
     pub fn get_state_root_hash_options(
         &self,
         options: JsValue,
@@ -126,7 +132,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[wasm_bindgen(js_name = "get_state_root_hash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_state_root_hash"))]
+    #[cfg(feature = "js")]
     pub async fn get_state_root_hash_js_alias(
         &self,
         options: Option<GetStateRootHashOptions>,
@@ -173,6 +180,7 @@ impl SDK {
     /// Returns a `JsError` if there is an error during the retrieval process.
     #[deprecated(note = "This function is an alias. Please use `get_state_root_hash` instead.")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn chain_get_state_root_hash(
         &self,
         options: Option<GetStateRootHashOptions>,

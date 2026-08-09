@@ -7,11 +7,11 @@ CURRENT_DIR = .
 WEB_OUT_DIR = pkg
 NODEJS_OUT_DIR = pkg-nodejs
 
-# web-full / nodejs-full: default features plus SSE (SSEClient + CESParser).
-# Cargo `full` stays watcher-only for crate consumers; packs express the full SDK.
+# web-full / nodejs-full: default features (includes `js`) plus SSE.
+# Cargo `full` stays domain-only (no `js`) for Rust consumers; packs keep `js` on.
 WASM_FEATURES_FULL = --features SSE
-WASM_FEATURES_READ_ONLY = --no-default-features
-WASM_FEATURES_TRANSACTION = --no-default-features --features transaction,helpers,watcher
+WASM_FEATURES_READ_ONLY = --no-default-features --features js
+WASM_FEATURES_TRANSACTION = --no-default-features --features transaction,helpers,watcher,js
 
 # Pin Binaryen so wasm-pack does not fall back to its vendored 117 download.
 BINARYEN_VERSION := 130
@@ -115,8 +115,13 @@ lint: format clippy
 clippy:
 	cargo clippy --target wasm32-unknown-unknown --bins --fix --allow-dirty --allow-staged -- -D warnings
 	cargo clippy --lib -- -D warnings
+	cargo clippy --target wasm32-unknown-unknown --lib -- -D warnings
 	cargo clippy --no-default-features --lib -- -D warnings
+	cargo clippy --target wasm32-unknown-unknown --no-default-features --lib -- -D warnings
+	cargo clippy --target wasm32-unknown-unknown --no-default-features --features transaction,helpers,watcher,SSE --lib -- -D warnings
+	cargo clippy --target wasm32-unknown-unknown --no-default-features --features js --lib -- -D warnings
 	cargo clippy --no-default-features --features transaction,helpers --lib -- -D warnings
+	cargo clippy --target wasm32-unknown-unknown --no-default-features --features transaction,helpers,watcher,js --lib -- -D warnings
 
 check-lint: clippy
 	cargo fmt -- --check

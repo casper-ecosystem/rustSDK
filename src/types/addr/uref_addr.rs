@@ -1,13 +1,14 @@
 use casper_types::{URefAddr as _URefAddr, UREF_ADDR_LENGTH};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct URefAddr(_URefAddr);
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl URefAddr {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(bytes: Vec<u8>) -> Result<URefAddr, JsError> {
         if bytes.len() != UREF_ADDR_LENGTH {
             return Err(JsError::new("Invalid URefAddr length"));

@@ -2,18 +2,19 @@ use core::fmt;
 
 use crate::types::hash::block_hash::BlockHash;
 use casper_client::rpcs::common::BlockIdentifier as _BlockIdentifier;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Serialize, Copy)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct BlockIdentifier(_BlockIdentifier);
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl BlockIdentifier {
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(block_identifier: BlockIdentifier) -> Self {
         block_identifier
     }
@@ -22,13 +23,13 @@ impl BlockIdentifier {
         Self(_BlockIdentifier::Hash(hash.into()))
     }
 
-    #[wasm_bindgen(js_name = "fromHeight")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromHeight"))]
     pub fn from_height(height: u64) -> Self {
         Self(_BlockIdentifier::Height(height))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }

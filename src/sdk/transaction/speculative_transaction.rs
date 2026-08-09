@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::rpcs::speculative_exec::SpeculativeExecTxnResult;
 use crate::{
     types::{
@@ -19,11 +19,11 @@ use casper_client::{
     cli::make_transaction, rpcs::results::SpeculativeExecTxnResult as _SpeculativeExecTxnResult,
     SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// This function allows executing a transaction speculatively.
     ///
@@ -37,8 +37,9 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
-    #[wasm_bindgen(js_name = "speculative_transaction")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "speculative_transaction"))]
     #[allow(clippy::too_many_arguments)]
+    #[cfg(feature = "js")]
     pub async fn speculative_transaction_js_alias(
         &self,
         builder_params: TransactionBuilderParams,

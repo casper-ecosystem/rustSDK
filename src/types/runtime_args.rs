@@ -1,15 +1,16 @@
 use crate::types::{cl::cl_value::CLValue, sdk_error::SdkError};
 use casper_types::{bytesrepr::ToBytes, CLValue as _CLValue, RuntimeArgs as _RuntimeArgs};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde_json::json;
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::RuntimeArgs`].
 ///
 /// Pass to `set_session_args` on transaction (or legacy deploy) session params (#43).
 /// `set_session_args_simple` / `set_session_args_json` remain for string bags.
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct RuntimeArgs(_RuntimeArgs);
 
@@ -65,30 +66,30 @@ pub fn runtime_args_to_json_array(args: &_RuntimeArgs) -> Vec<serde_json::Value>
         .collect()
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl RuntimeArgs {
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new() -> Self {
         RuntimeArgs(_RuntimeArgs::new())
     }
 
     /// Insert a named [`CLValue`].
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
     pub fn insert(&mut self, name: &str, value: &CLValue) {
         self.insert_cl_value(name, value.clone());
     }
 
     /// Insert a CLI-style simple arg (`name:Type='value'`).
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "insertSimple")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "insertSimple"))]
     pub fn insert_simple_js(&mut self, arg: &str) -> Result<(), JsError> {
         self.insert_simple(arg)
             .map_err(|err| JsError::new(&err.to_string()))
     }
 
     /// Insert from a JS object `{name,type,value}` or a simple arg string.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "insertJsValue")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "insertJsValue"))]
     pub fn insert_js_value(&mut self, js_value_arg: JsValue) -> Result<(), JsError> {
         crate::helpers::insert_js_value_arg(&mut self.0, js_value_arg)
             .map(|_| ())
@@ -96,15 +97,15 @@ impl RuntimeArgs {
     }
 
     /// JSON array suitable for `set_session_args_json` / payment args JSON.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toSessionArgsJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toSessionArgsJson"))]
     pub fn to_session_args_json_js(&self) -> Result<String, JsError> {
         self.to_session_args_json_string()
             .map_err(|err| JsError::new(&err.to_string()))
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.to_session_args_json_array()).unwrap_or(JsValue::null())
     }

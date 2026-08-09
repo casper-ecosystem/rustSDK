@@ -37,8 +37,9 @@ exclude = [
 ]
 
 [features]
-default = ["full"]
+default = ["full", "js"]
 # Convenience bundle (not a product gate). Includes `watcher`, not full `SSE`.
+# Domain slice only: `js` is intentionally not part of `full`.
 full = [
   "transaction",
   "deploy",
@@ -46,6 +47,13 @@ full = [
   "binary-port",
   "watcher",
   "helpers",
+]
+# wasm-bindgen / js-sys surface for SDK packs. Omit for Rust-only consumers.
+js = [
+  "dep:wasm-bindgen",
+  "dep:wasm-bindgen-futures",
+  "dep:js-sys",
+  "dep:gloo-utils",
 ]
 transaction = []
 deploy = []
@@ -67,13 +75,13 @@ casper-binary-port-access = { version = "0.1.0", optional = true }
 rand = { version = "0.9.2", default-features = false, features = [
   "thread_rng",
 ] }
-getrandom = { version = "0.3.3", default-features = false, features = [
-  "wasm_js",
+getrandom = { version = "0.3.3", default-features = false }
+wasm-bindgen = { version = "0.2.104", optional = true }
+wasm-bindgen-futures = { version = "*", optional = true }
+js-sys = { version = "*", optional = true }
+gloo-utils = { version = "0.2", optional = true, default-features = false, features = [
+  "serde",
 ] }
-wasm-bindgen = "0.2.104"
-wasm-bindgen-futures = "*"
-js-sys = "*"
-gloo-utils = { version = "0.2", default-features = false, features = ["serde"] }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde_json = "1.0"
 once_cell = { version = "1", default-features = false }
@@ -91,6 +99,11 @@ reqwest = { version = "0.12.12", default-features = false, features = [
 ] }
 futures-util = "*"
 async-trait = "0.1"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.3.3", default-features = false, features = [
+  "wasm_js",
+] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio = { version = "1", default-features = false, features = ["time"] }

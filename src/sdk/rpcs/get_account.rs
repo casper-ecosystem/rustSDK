@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
@@ -16,15 +16,16 @@ use casper_client::{
     cli::get_account as get_account_cli, get_account as get_account_lib,
     rpcs::results::GetAccountResult as _GetAccountResult, JsonRpcId, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wrapper around Casper Client `GetAccountResult`.
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct GetAccountResult(_GetAccountResult);
 
 impl From<GetAccountResult> for _GetAccountResult {
@@ -46,31 +47,34 @@ impl GetAccountResult {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl GetAccountResult {
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn account(&self) -> JsValue {
         JsValue::from_serde(&self.0.account).unwrap()
     }
 
     /// Gets the typed account wrapper.
-    #[wasm_bindgen(js_name = "accountTyped")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "accountTyped"))]
     pub fn account_typed_js(&self) -> Account {
         self.account_typed()
     }
 
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn merkle_proof(&self) -> String {
         self.0.merkle_proof.clone()
     }
 
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
@@ -78,8 +82,11 @@ impl GetAccountResult {
 
 // Define options for the `get_account` function
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getAccountOptions", getter_with_clone)]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(
+    feature = "js",
+    wasm_bindgen(js_name = "getAccountOptions", getter_with_clone)
+)]
 pub struct GetAccountOptions {
     pub account_identifier: Option<AccountIdentifier>,
     pub account_identifier_as_string: Option<String>,
@@ -89,12 +96,13 @@ pub struct GetAccountOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     // Deserialize options for `get_account` from a JavaScript object
     #[deprecated(note = "prefer 'get_entity_options'")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub fn get_account_options(&self, options: JsValue) -> Result<GetAccountOptions, JsError> {
         options
             .into_serde::<GetAccountOptions>()
@@ -123,9 +131,10 @@ impl SDK {
     ///
     /// Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
     /// ```
-    #[wasm_bindgen(js_name = "get_account")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "get_account"))]
     #[deprecated(note = "prefer 'get_entity'")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn get_account_js_alias(
         &self,
         options: Option<GetAccountOptions>,
@@ -166,9 +175,10 @@ impl SDK {
     }
 
     // JavaScript alias for `get_account`
-    #[wasm_bindgen(js_name = "state_get_account_info")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "state_get_account_info"))]
     #[deprecated(note = "prefer 'get_entity'")]
     #[allow(deprecated)]
+    #[cfg(feature = "js")]
     pub async fn state_get_account_info(
         &self,
         options: Option<GetAccountOptions>,

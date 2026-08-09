@@ -3,14 +3,15 @@ use crate::types::{
     hash::contract_package_hash::ContractPackageHash, named_keys::NamedKeys,
 };
 use casper_types::contracts::Contract as _Contract;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::contracts::Contract`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct Contract(_Contract);
 
 impl Contract {
@@ -47,45 +48,45 @@ impl Contract {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl Contract {
-    #[wasm_bindgen(js_name = "contractPackageHash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "contractPackageHash"))]
     pub fn contract_package_hash_js(&self) -> ContractPackageHash {
         self.contract_package_hash()
     }
 
-    #[wasm_bindgen(js_name = "contractWasmHash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "contractWasmHash"))]
     pub fn contract_wasm_hash_js(&self) -> String {
         self.contract_wasm_hash()
     }
 
-    #[wasm_bindgen(js_name = "namedKeys")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "namedKeys"))]
     pub fn named_keys_js(&self) -> NamedKeys {
         self.named_keys()
     }
 
-    #[wasm_bindgen(js_name = "entryPoints")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "entryPoints"))]
     pub fn entry_points_js(&self) -> EntryPoints {
         self.entry_points()
     }
 
-    #[wasm_bindgen(js_name = "entryPoint")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "entryPoint"))]
     pub fn entry_point_js(&self, name: &str) -> Option<EntryPoint> {
         self.entry_point(name)
     }
 
-    #[wasm_bindgen(js_name = "hasEntryPoint")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "hasEntryPoint"))]
     pub fn has_entry_point_js(&self, name: &str) -> bool {
         self.has_entry_point(name)
     }
 
-    #[wasm_bindgen(js_name = "protocolVersion")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "protocolVersion"))]
     pub fn protocol_version_js(&self) -> String {
         self.protocol_version()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

@@ -1,13 +1,14 @@
 use crate::types::{hash::account_hash::AccountHash, named_keys::NamedKeys, uref::URef};
 use casper_types::account::Account as _Account;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 /// Wasm/native wrapper around [`casper_types::account::Account`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct Account(_Account);
 
 impl Account {
@@ -28,25 +29,25 @@ impl Account {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl Account {
-    #[wasm_bindgen(js_name = "accountHash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "accountHash"))]
     pub fn account_hash_js(&self) -> AccountHash {
         self.account_hash()
     }
 
-    #[wasm_bindgen(js_name = "namedKeys")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "namedKeys"))]
     pub fn named_keys_js(&self) -> NamedKeys {
         self.named_keys()
     }
 
-    #[wasm_bindgen(js_name = "mainPurse")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "mainPurse"))]
     pub fn main_purse_js(&self) -> URef {
         self.main_purse()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }

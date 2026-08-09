@@ -1,10 +1,11 @@
 use crate::{helpers::get_str_or_default, types::sdk_error::SdkError};
 use casper_client::cli::DictionaryItemStrParams as _DictionaryItemStrParams;
 use casper_types::URef;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use once_cell::sync::OnceCell;
 use serde::{de::Error as SerdeError, Deserialize, Serialize, Serializer};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -82,7 +83,7 @@ where
     serializer.serialize_str(value_str)
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DictionaryItemStrParams {
     account_named_key: Option<AccountNamedKey>,
@@ -92,9 +93,9 @@ pub struct DictionaryItemStrParams {
     dictionary: Option<DictionaryVariant>,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl DictionaryItemStrParams {
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new() -> Self {
         DictionaryItemStrParams {
             account_named_key: None,
@@ -105,7 +106,7 @@ impl DictionaryItemStrParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "setAccountNamedKey")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "setAccountNamedKey"))]
     pub fn set_account_named_key(
         &mut self,
         key: &str,
@@ -129,7 +130,7 @@ impl DictionaryItemStrParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "setContractNamedKey")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "setContractNamedKey"))]
     pub fn set_contract_named_key(
         &mut self,
         key: &str,
@@ -153,7 +154,7 @@ impl DictionaryItemStrParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "setEntityNamedKey")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "setEntityNamedKey"))]
     pub fn set_entity_named_key(
         &mut self,
         key: &str,
@@ -177,7 +178,7 @@ impl DictionaryItemStrParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "setUref")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "setUref"))]
     pub fn set_uref(&mut self, seed_uref: &str, dictionary_item_key: &str) {
         self.uref = Some(URefVariant {
             seed_uref: OnceCell::new(),
@@ -197,7 +198,7 @@ impl DictionaryItemStrParams {
         }
     }
 
-    #[wasm_bindgen(js_name = "setDictionary")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "setDictionary"))]
     pub fn set_dictionary(&mut self, value: &str) {
         self.dictionary = Some(DictionaryVariant {
             value: OnceCell::new(),
@@ -208,8 +209,8 @@ impl DictionaryItemStrParams {
         }
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }

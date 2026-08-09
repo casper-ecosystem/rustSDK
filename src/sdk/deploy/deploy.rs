@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::hash::deploy_hash::DeployHash;
 use crate::{
     types::{
@@ -15,27 +15,27 @@ use crate::{
 use casper_client::{
     cli::deploy::make_deploy, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the result of a deploy.
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 #[derive(Debug, Deserialize, Clone, Serialize)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct PutDeployResult(_PutDeployResult);
 
 /// Implement conversions between PutDeployResult and _PutDeployResult.
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<PutDeployResult> for _PutDeployResult {
     fn from(result: PutDeployResult) -> Self {
         result.0
     }
 }
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 impl From<_PutDeployResult> for PutDeployResult {
     fn from(result: _PutDeployResult) -> Self {
         PutDeployResult(result)
@@ -43,30 +43,32 @@ impl From<_PutDeployResult> for PutDeployResult {
 }
 
 /// Implement JavaScript bindings for PutDeployResult.
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl PutDeployResult {
     /// Gets the API version as a JavaScript value.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
+    #[cfg(feature = "js")]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     /// Gets the deploy hash associated with this result.
-    #[wasm_bindgen(getter)]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter))]
     pub fn deploy_hash(&self) -> DeployHash {
         self.0.deploy_hash.into()
     }
 
     /// Converts PutDeployResult to a JavaScript object.
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// JavaScript function for deploying with deserialized parameters.
     ///
@@ -81,7 +83,8 @@ impl SDK {
     /// # Returns
     ///
     /// A result containing PutDeployResult or a JsError.
-    #[wasm_bindgen(js_name = "deploy")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "deploy"))]
+    #[cfg(feature = "js")]
     pub async fn deploy_js_alias(
         &self,
         deploy_params: DeployStrParams,

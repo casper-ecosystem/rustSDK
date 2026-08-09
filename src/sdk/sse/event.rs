@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
 /// Node SSE event type names (JS `EventName` parity).
@@ -92,12 +92,21 @@ impl fmt::Display for EventName {
 
 /// Raw SSE envelope before typed parse (JS `RawEvent` parity).
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
+#[cfg_attr(
+    all(feature = "js", target_arch = "wasm32"),
+    wasm_bindgen(getter_with_clone)
+)]
 pub struct RawEvent {
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "eventType"))]
+    #[cfg_attr(
+        all(feature = "js", target_arch = "wasm32"),
+        wasm_bindgen(js_name = "eventType")
+    )]
     pub event_type: String,
     pub data: String,
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "lastEventId"))]
+    #[cfg_attr(
+        all(feature = "js", target_arch = "wasm32"),
+        wasm_bindgen(js_name = "lastEventId")
+    )]
     pub last_event_id: String,
 }
 
@@ -145,15 +154,18 @@ impl RawEvent {
     }
 }
 
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
+#[cfg_attr(all(feature = "js", target_arch = "wasm32"), wasm_bindgen)]
 impl RawEvent {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new_js(event_type: String, data: String, last_event_id: String) -> Self {
         Self::new(event_type, data, last_event_id)
     }
 
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "parseAsApiVersion"))]
+    #[cfg_attr(
+        all(feature = "js", target_arch = "wasm32"),
+        wasm_bindgen(js_name = "parseAsApiVersion")
+    )]
     pub fn parse_as_api_version(&self) -> Result<ApiVersionEvent, String> {
         let v = self.extract_named(EventName::ApiVersion)?;
         match v {
@@ -164,7 +176,10 @@ impl RawEvent {
         }
     }
 
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "parseAsBlockAdded"))]
+    #[cfg_attr(
+        all(feature = "js", target_arch = "wasm32"),
+        wasm_bindgen(js_name = "parseAsBlockAdded")
+    )]
     pub fn parse_as_block_added(&self) -> Result<SSEPayload, String> {
         SSEPayload::from_named(
             EventName::BlockAdded,
@@ -173,7 +188,7 @@ impl RawEvent {
     }
 
     #[cfg_attr(
-        target_arch = "wasm32",
+        all(feature = "js", target_arch = "wasm32"),
         wasm_bindgen(js_name = "parseAsDeployProcessed")
     )]
     pub fn parse_as_deploy_processed(&self) -> Result<SSEPayload, String> {
@@ -184,7 +199,7 @@ impl RawEvent {
     }
 
     #[cfg_attr(
-        target_arch = "wasm32",
+        all(feature = "js", target_arch = "wasm32"),
         wasm_bindgen(js_name = "parseAsDeployAccepted")
     )]
     pub fn parse_as_deploy_accepted(&self) -> Result<SSEPayload, String> {
@@ -194,7 +209,10 @@ impl RawEvent {
         )
     }
 
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "parseAsDeployExpired"))]
+    #[cfg_attr(
+        all(feature = "js", target_arch = "wasm32"),
+        wasm_bindgen(js_name = "parseAsDeployExpired")
+    )]
     pub fn parse_as_deploy_expired(&self) -> Result<SSEPayload, String> {
         SSEPayload::from_named(
             EventName::DeployExpired,
@@ -203,7 +221,7 @@ impl RawEvent {
     }
 
     #[cfg_attr(
-        target_arch = "wasm32",
+        all(feature = "js", target_arch = "wasm32"),
         wasm_bindgen(js_name = "parseAsTransactionProcessed")
     )]
     pub fn parse_as_transaction_processed(&self) -> Result<SSEPayload, String> {
@@ -214,7 +232,7 @@ impl RawEvent {
     }
 
     #[cfg_attr(
-        target_arch = "wasm32",
+        all(feature = "js", target_arch = "wasm32"),
         wasm_bindgen(js_name = "parseAsTransactionAccepted")
     )]
     pub fn parse_as_transaction_accepted(&self) -> Result<SSEPayload, String> {
@@ -225,7 +243,7 @@ impl RawEvent {
     }
 
     #[cfg_attr(
-        target_arch = "wasm32",
+        all(feature = "js", target_arch = "wasm32"),
         wasm_bindgen(js_name = "parseAsTransactionExpired")
     )]
     pub fn parse_as_transaction_expired(&self) -> Result<SSEPayload, String> {
@@ -236,7 +254,7 @@ impl RawEvent {
     }
 
     #[cfg_attr(
-        target_arch = "wasm32",
+        all(feature = "js", target_arch = "wasm32"),
         wasm_bindgen(js_name = "parseAsFinalitySignature")
     )]
     pub fn parse_as_finality_signature(&self) -> Result<SSEPayload, String> {
@@ -246,19 +264,25 @@ impl RawEvent {
         )
     }
 
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "parseAsStep"))]
+    #[cfg_attr(
+        all(feature = "js", target_arch = "wasm32"),
+        wasm_bindgen(js_name = "parseAsStep")
+    )]
     pub fn parse_as_step(&self) -> Result<SSEPayload, String> {
         SSEPayload::from_named(EventName::Step, self.extract_named(EventName::Step)?)
     }
 
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "parseAsFault"))]
+    #[cfg_attr(
+        all(feature = "js", target_arch = "wasm32"),
+        wasm_bindgen(js_name = "parseAsFault")
+    )]
     pub fn parse_as_fault(&self) -> Result<SSEPayload, String> {
         SSEPayload::from_named(EventName::Fault, self.extract_named(EventName::Fault)?)
     }
 
     /// JSON string of the named payload body (wasm-friendly).
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "payloadJson")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "payloadJson"))]
     pub fn payload_json_js(&self, event_name: &str) -> Result<String, String> {
         let name =
             EventName::parse(event_name).ok_or_else(|| format!("unknown event: {event_name}"))?;
@@ -269,11 +293,17 @@ impl RawEvent {
 
 /// Typed wrapper with event name and JSON payload body.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
+#[cfg_attr(
+    all(feature = "js", target_arch = "wasm32"),
+    wasm_bindgen(getter_with_clone)
+)]
 pub struct SSEPayload {
     pub name: String,
     /// JSON string of the named payload body.
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "bodyJson"))]
+    #[cfg_attr(
+        all(feature = "js", target_arch = "wasm32"),
+        wasm_bindgen(js_name = "bodyJson")
+    )]
     pub body_json: String,
 }
 
@@ -290,10 +320,10 @@ impl SSEPayload {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SSEPayload {
-    #[wasm_bindgen(js_name = "body")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "body"))]
     pub fn body_js(&self) -> Result<String, String> {
         Ok(self.body_json.clone())
     }
@@ -301,9 +331,15 @@ impl SSEPayload {
 
 /// `ApiVersion` handshake payload.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
+#[cfg_attr(
+    all(feature = "js", target_arch = "wasm32"),
+    wasm_bindgen(getter_with_clone)
+)]
 pub struct ApiVersionEvent {
-    #[cfg_attr(target_arch = "wasm32", wasm_bindgen(js_name = "apiVersion"))]
+    #[cfg_attr(
+        all(feature = "js", target_arch = "wasm32"),
+        wasm_bindgen(js_name = "apiVersion")
+    )]
     pub api_version: String,
 }
 

@@ -3,14 +3,15 @@ use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     Digest as _Digest, DigestError,
 };
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct Digest(_Digest);
 
 impl Digest {
@@ -28,30 +29,34 @@ impl Digest {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl Digest {
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
+    #[cfg(feature = "js")]
     pub fn new_js_alias(digest_hex_str: &str) -> Result<Digest, JsError> {
         Self::from_string(digest_hex_str)
     }
 
-    #[wasm_bindgen(js_name = "fromString")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromString"))]
+    #[cfg(feature = "js")]
     pub fn from_string(digest_hex_str: &str) -> Result<Digest, JsError> {
         Self::try_from(digest_hex_str).map_err(Into::into)
     }
 
-    #[wasm_bindgen(js_name = "fromRaw")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "fromRaw"))]
+    #[cfg(feature = "js")]
     pub fn from_raw_js_alias(bytes: Vec<u8>) -> Result<Digest, JsError> {
         Self::from_raw(bytes).map_err(|err| JsError::new(&format!("{err:?}")))
     }
 
-    #[wasm_bindgen(js_name = "toJson")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toJson"))]
+    #[cfg(feature = "js")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 
-    #[wasm_bindgen(js_name = "toString")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toString"))]
     pub fn to_string_js_alias(&self) -> String {
         self.to_string()
     }

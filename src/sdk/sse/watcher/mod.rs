@@ -7,9 +7,9 @@ use crate::sdk::sse::framing::{extract_frames, url_with_start_from};
 use crate::SDK;
 use chrono::{Duration, Utc};
 use futures_util::StreamExt;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use js_sys::Promise;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
@@ -17,8 +17,9 @@ use std::{
     fmt,
     sync::{Arc, Mutex},
 };
+#[cfg(feature = "js")]
 use wasm_bindgen::prelude::*;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen_futures::future_to_promise;
 
 const DEFAULT_TIMEOUT_MS: u64 = 60000;
@@ -153,7 +154,7 @@ impl SDK {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl SDK {
     /// Creates a new Watcher instance to watch deploys (JavaScript-friendly).
     /// Legacy alias
@@ -166,8 +167,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Watcher` instance.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "watchDeploy")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "watchDeploy"))]
     #[deprecated(note = "prefer 'watchTransaction'")]
     #[allow(deprecated)]
     pub fn watch_deploy_js_alias(
@@ -188,8 +189,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Watcher` instance.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "watchTransaction")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "watchTransaction"))]
     pub fn watch_transaction_js_alias(
         &self,
         events_url: &str,
@@ -210,8 +211,8 @@ impl SDK {
     /// # Returns
     ///
     /// A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "waitDeploy")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "waitDeploy"))]
     #[deprecated(note = "prefer 'waitTransaction' with transaction")]
     #[allow(deprecated)]
     pub async fn wait_deploy_js_alias(
@@ -235,8 +236,8 @@ impl SDK {
     /// # Returns
     ///
     /// A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "waitTransaction")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "waitTransaction"))]
     pub async fn wait_transaction_js_alias(
         &self,
         events_url: &str,
@@ -275,7 +276,7 @@ impl SDK {
 /// * `active` - Reference-counted cell indicating whether the deploy watcher is active.
 /// * `timeout_duration` - Duration representing the optional timeout for watching events.
 #[derive(Clone)]
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 pub struct Watcher {
     events_url: String,
     subscriptions: Vec<Subscription>,
@@ -283,7 +284,7 @@ pub struct Watcher {
     timeout_duration: Duration,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl Watcher {
     /// Creates a new `Watcher` instance.
     ///
@@ -296,7 +297,7 @@ impl Watcher {
     /// # Returns
     ///
     /// A new `Watcher` instance.
-    #[wasm_bindgen(constructor)]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(events_url: String, timeout_duration: Option<u64>) -> Self {
         let timeout_duration = Duration::try_milliseconds(
             timeout_duration
@@ -323,8 +324,8 @@ impl Watcher {
     /// # Returns
     ///
     /// Result indicating success or an error message.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "subscribe")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "subscribe"))]
     pub fn subscribe_js_alias(&mut self, subscriptions: Vec<Subscription>) -> Result<(), String> {
         self.subscribe(subscriptions)
     }
@@ -336,7 +337,7 @@ impl Watcher {
     /// * `transaction_hash` - The transaction hash to unsubscribe.
     ///
     /// This method removes the deploy subscription associated with the provided transaction hash.
-    #[wasm_bindgen]
+    #[cfg_attr(feature = "js", wasm_bindgen)]
     pub fn unsubscribe(&mut self, target_hash: String) {
         self.subscriptions.retain(|s| s.target_hash != target_hash);
     }
@@ -346,8 +347,8 @@ impl Watcher {
     /// # Returns
     ///
     /// Result containing the serialized transaction events data or an error message.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "start")]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "start"))]
     pub async fn start_js_alias(&self) -> Result<JsValue, JsError> {
         let result = match self.start_internal(None).await {
             Some(res) => res,
@@ -363,7 +364,7 @@ impl Watcher {
     /// Stops watching for transaction events.
     ///
     /// This method sets the deploy watcher as inactive and stops the event listener if it exists.
-    #[wasm_bindgen]
+    #[cfg_attr(feature = "js", wasm_bindgen)]
     pub fn stop(&self) {
         {
             let mut active = self.active.lock().unwrap();
@@ -618,11 +619,11 @@ impl Watcher {
                             if transaction_hash_processed == subscription.target_hash {
                                 let event_handler = &subscription.event_handler_fn;
 
-                                #[cfg(not(target_arch = "wasm32"))]
+                                #[cfg(not(all(feature = "js", target_arch = "wasm32")))]
                                 {
                                     event_handler.call(event_parse_result.clone());
                                 }
-                                #[cfg(target_arch = "wasm32")]
+                                #[cfg(all(feature = "js", target_arch = "wasm32"))]
                                 {
                                     let this = JsValue::null();
                                     let args = js_sys::Array::new();
@@ -708,9 +709,9 @@ impl Default for EventHandlerFn {
     }
 }
 
-// Define Subscription struct with different configurations based on the target architecture.
-#[cfg(not(target_arch = "wasm32"))]
-/// Represents a subscription to transaction events for non-wasm32 target architecture.
+// Define Subscription struct with different configurations based on JS/wasm surface.
+#[cfg(not(all(feature = "js", target_arch = "wasm32")))]
+/// Represents a subscription to transaction events (native / Rust-only wasm).
 #[derive(Debug, Clone, Default)]
 pub struct Subscription {
     /// Transaction target hash to identify the subscription.
@@ -719,16 +720,16 @@ pub struct Subscription {
     pub event_handler_fn: EventHandlerFn,
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "js", target_arch = "wasm32"))]
 /// Represents a subscription to transaction events for wasm32 target architecture.
 #[derive(Debug, Clone, Default)]
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "js", wasm_bindgen(getter_with_clone))]
 pub struct Subscription {
     /// Transaction target hash to identify the subscription.
-    #[wasm_bindgen(js_name = "targetHash")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "targetHash"))]
     pub target_hash: String,
     /// Handler function for transaction events.
-    #[wasm_bindgen(js_name = "eventHandlerFn")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "eventHandlerFn"))]
     pub event_handler_fn: js_sys::Function,
 }
 
@@ -739,7 +740,7 @@ impl Subscription {
     ///
     /// * `target_hash` - Transaction target hash to identify the subscription.
     /// * `event_handler_fn` - Handler function for transaction events.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(not(all(feature = "js", target_arch = "wasm32")))]
     pub fn new(target_hash: String, event_handler_fn: EventHandlerFn) -> Self {
         Self {
             target_hash,
@@ -748,7 +749,7 @@ impl Subscription {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl Subscription {
     /// Constructor for Subscription for wasm32 target architecture.
     ///
@@ -756,8 +757,8 @@ impl Subscription {
     ///
     /// * `transaction_hash` - Transaction hash to identify the subscription.
     /// * `event_handler_fn` - Handler function for transaction events.
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
+    #[cfg(all(feature = "js", target_arch = "wasm32"))]
+    #[cfg_attr(feature = "js", wasm_bindgen(constructor))]
     pub fn new(target_hash: String, event_handler_fn: js_sys::Function) -> Self {
         Self {
             target_hash,
@@ -768,7 +769,7 @@ impl Subscription {
 
 /// Represents a failure response containing an error message.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "js", wasm_bindgen(getter_with_clone))]
 pub struct Failure {
     pub cost: String,
     pub error_message: String,
@@ -776,7 +777,7 @@ pub struct Failure {
 
 /// Represents a success response containing a cost value.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "js", wasm_bindgen(getter_with_clone))]
 pub struct Version2 {
     pub initiator: PublicKeyString,
     pub error_message: Option<String>,
@@ -787,27 +788,27 @@ pub struct Version2 {
 }
 
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "js", wasm_bindgen(getter_with_clone))]
 pub struct Payment {
     pub source: String,
 }
 
 /// Represents the result of an execution, either Success or Failure.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "js", wasm_bindgen(getter_with_clone))]
 pub struct ExecutionResult {
     /// Optional Success information.
     #[serde(rename = "Version2")]
-    #[wasm_bindgen(js_name = "Success")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "Success"))]
     pub success: Option<Version2>,
     /// Optional Failure information.
     #[serde(rename = "Failure")]
-    #[wasm_bindgen(js_name = "Failure")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "Failure"))]
     pub failure: Option<Failure>,
 }
 
 #[derive(Debug, Clone, Serialize, Default)]
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "js", wasm_bindgen(getter_with_clone))]
 pub struct HashString {
     pub hash: String,
 }
@@ -834,19 +835,19 @@ impl<'de> Deserialize<'de> for HashString {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl HashString {
-    #[wasm_bindgen(getter, js_name = "Deploy")]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter, js_name = "Deploy"))]
     pub fn deploy(&self) -> String {
         self.hash.clone()
     }
 
-    #[wasm_bindgen(getter, js_name = "Version1")]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter, js_name = "Version1"))]
     pub fn version1(&self) -> String {
         self.hash.clone()
     }
 
-    #[wasm_bindgen(js_name = "toString")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "toString"))]
     pub fn to_string_js(&self) -> String {
         self.to_string()
     }
@@ -859,23 +860,23 @@ impl fmt::Display for HashString {
 }
 
 #[derive(Debug, Deserialize, Clone, Serialize, Default)]
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "js", wasm_bindgen(getter_with_clone))]
 pub struct PublicKeyString {
     #[serde(rename = "PublicKey")]
-    #[wasm_bindgen(js_name = "PublicKey")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "PublicKey"))]
     pub public_key: String,
 }
 
 #[derive(Debug, Deserialize, Clone, Serialize, Default)]
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "js", wasm_bindgen(getter_with_clone))]
 pub struct Message {
     #[serde(rename = "String")]
-    #[wasm_bindgen(js_name = "String")]
+    #[cfg_attr(feature = "js", wasm_bindgen(js_name = "String"))]
     pub string: String,
 }
 
 #[derive(Debug, Deserialize, Clone, Serialize, Default)]
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "js", wasm_bindgen(getter_with_clone))]
 pub struct Messages {
     pub entity_hash: String,
     pub message: Message,
@@ -887,7 +888,7 @@ pub struct Messages {
 
 /// Represents processed deploy information.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "js", wasm_bindgen(getter_with_clone))]
 pub struct TransactionProcessed {
     #[serde(alias = "transaction_hash")]
     pub hash: HashString,
@@ -902,23 +903,26 @@ pub struct TransactionProcessed {
 
 /// Represents the body of an event, containing processed deploy information.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "js", wasm_bindgen(getter_with_clone))]
 pub struct Body {
     #[serde(rename = "TransactionProcessed")]
     pub transaction_processed: Option<TransactionProcessed>,
 }
 
 // Implementing methods to get the field using different aliases
-#[wasm_bindgen]
+#[cfg_attr(feature = "js", wasm_bindgen)]
 impl Body {
-    #[wasm_bindgen(getter, js_name = "get_deploy_processed")]
+    #[cfg_attr(feature = "js", wasm_bindgen(getter, js_name = "get_deploy_processed"))]
     #[deprecated(note = "prefer 'get_transaction_processed'")]
     #[allow(deprecated)]
     pub fn get_deploy_processed(&self) -> Option<TransactionProcessed> {
         self.transaction_processed.clone()
     }
 
-    #[wasm_bindgen(getter, js_name = "get_transaction_processed")]
+    #[cfg_attr(
+        feature = "js",
+        wasm_bindgen(getter, js_name = "get_transaction_processed")
+    )]
     pub fn get_transaction_processed(&self) -> Option<TransactionProcessed> {
         self.transaction_processed.clone()
     }
@@ -926,7 +930,7 @@ impl Body {
 
 /// Represents the result of parsing an event, containing error information and the event body.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "js", wasm_bindgen(getter_with_clone))]
 pub struct EventParseResult {
     pub err: Option<String>,
     pub body: Option<Body>,
