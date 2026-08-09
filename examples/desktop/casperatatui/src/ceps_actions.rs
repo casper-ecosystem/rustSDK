@@ -7,8 +7,8 @@ use ceps_client::cep78::InstallArgs as Cep78InstallArgs;
 use ceps_client::cep85::InstallArgs as Cep85InstallArgs;
 use ceps_client::cep95::InstallArgs as Cep95InstallArgs;
 use ceps_client::{
-    CallResult, Cep18Client, Cep78Client, Cep85Client, Cep95Client, DeployParams, EventsMode,
-    EventsMode78,
+    CallResult, Cep18Client, Cep78Client, Cep85Client, Cep95Client, EventsMode, EventsMode78,
+    TransactionParams,
 };
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -260,9 +260,9 @@ async fn cep18_install(args: &HashMap<String, String>, ctx: &CepsCtx<'_>) -> Res
     let install_args = Cep18InstallArgs::new(&name, &symbol, decimals, &total_supply)
         .with_events_mode(EventsMode::Ces)
         .with_mint_and_burn(true);
-    let deploy = deploy_params(pem, &payment, ctx);
+    let tx = transaction_params(pem, &payment, ctx);
     let put = client
-        .install(&install_args, &wasm, &deploy)
+        .install(&install_args, &wasm, &tx)
         .await
         .map_err(ceps_err)?;
 
@@ -302,9 +302,9 @@ async fn cep78_install(args: &HashMap<String, String>, ctx: &CepsCtx<'_>) -> Res
     let client = cep78_client(ctx)?;
     let install_args =
         Cep78InstallArgs::new(&name, &symbol, supply).with_events_mode(EventsMode78::Ces);
-    let deploy = deploy_params(pem, &payment, ctx);
+    let tx = transaction_params(pem, &payment, ctx);
     let put = client
-        .install(&install_args, &wasm, &deploy)
+        .install(&install_args, &wasm, &tx)
         .await
         .map_err(ceps_err)?;
 
@@ -344,9 +344,9 @@ async fn cep85_install(args: &HashMap<String, String>, ctx: &CepsCtx<'_>) -> Res
     let install_args = Cep85InstallArgs::new(&name, &uri)
         .with_events_mode(EventsMode::Ces)
         .with_enable_burn(true);
-    let deploy = deploy_params(pem, &payment, ctx);
+    let tx = transaction_params(pem, &payment, ctx);
     let put = client
-        .install(&install_args, &wasm, &deploy)
+        .install(&install_args, &wasm, &tx)
         .await
         .map_err(ceps_err)?;
 
@@ -385,9 +385,9 @@ async fn cep95_install(args: &HashMap<String, String>, ctx: &CepsCtx<'_>) -> Res
 
     let mut client = cep95_client(ctx)?;
     let install_args = Cep95InstallArgs::new(&name, &symbol, &package_key);
-    let deploy = deploy_params(pem, &payment, ctx);
+    let tx = transaction_params(pem, &payment, ctx);
     let put = client
-        .install(&install_args, &wasm, &deploy)
+        .install(&install_args, &wasm, &tx)
         .await
         .map_err(ceps_err)?;
 
@@ -403,12 +403,12 @@ async fn cep95_install(args: &HashMap<String, String>, ctx: &CepsCtx<'_>) -> Res
     Ok(out)
 }
 
-fn deploy_params(pem: &str, payment: &str, ctx: &CepsCtx<'_>) -> DeployParams {
-    let mut d = DeployParams::new(pem, payment);
+fn transaction_params(pem: &str, payment: &str, ctx: &CepsCtx<'_>) -> TransactionParams {
+    let mut tx = TransactionParams::new(pem, payment);
     if !ctx.chain_name.trim().is_empty() {
-        d = d.with_chain_name(ctx.chain_name.trim());
+        tx = tx.with_chain_name(ctx.chain_name.trim());
     }
-    d
+    tx
 }
 
 fn require_pem<'a>(ctx: &CepsCtx<'a>) -> Result<&'a str, String> {
