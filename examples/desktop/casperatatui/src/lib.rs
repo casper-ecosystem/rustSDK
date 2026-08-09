@@ -6,6 +6,8 @@ pub mod account_view;
 pub mod actions_catalog;
 pub mod auction_view;
 pub mod block_view;
+#[cfg(feature = "ceps")]
+pub mod ceps_actions;
 pub mod command;
 pub mod config;
 pub mod contract_view;

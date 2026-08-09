@@ -1145,6 +1145,7 @@ fn action_write_ctx(model: &AppModel) -> ActionWriteCtx {
         pem: model.secret_key_pem.clone(),
         public_key: model.public_key.clone(),
         chain_name: model.chain_name.clone(),
+        events_url: model.events_url.clone(),
         policy: model.policy.clone(),
     }
 }

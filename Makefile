@@ -214,6 +214,11 @@ run-casperatatui:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
 		cargo run -p casperatatui -- --preset nctl $(CASPERATATUI_ARGS) $(TUI_ARGS)
 
+# Needs sibling checkout ../../ceps-rust-ts-client (from repo root).
+run-casperatatui-ceps:
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		cargo run -p casperatatui --features ceps -- --preset nctl $(CASPERATATUI_ARGS) $(TUI_ARGS)
+
 build-casperatatui-release:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
 		cargo build -p casperatatui --release
@@ -227,11 +232,12 @@ check-lint-casperatatui:
 
 # Short aliases (same recipes).
 run-tui: run-casperatatui
+run-tui-ceps: run-casperatatui-ceps
 build-tui-release: build-casperatatui-release
 check-lint-tui: check-lint-casperatatui
 
-.PHONY: run-casperatatui build-casperatatui-release check-lint-casperatatui \
-	run-tui build-tui-release check-lint-tui
+.PHONY: run-casperatatui run-casperatatui-ceps build-casperatatui-release check-lint-casperatatui \
+	run-tui run-tui-ceps build-tui-release check-lint-tui
 
 # --- Signing desk (examples/desktop/tauri) ---
 

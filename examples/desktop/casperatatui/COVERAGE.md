@@ -10,7 +10,7 @@ Screen to SDK / MCP symbols used by Casperatatui today.
 | Accounts     | `4`, `/`, `w`                  | `get_entity` (fallback `get_account` when AE off), `query_balance`, `query_balance_details`, `get_auction_info`, `get_reward` | -                                                                                                     |
 | Validators   | `5`, `r`, `/`, `w`, Tab, Enter | `get_auction_info`, `get_reward`; `auction_view::{list_validators,list_bidders,get_validator}`                                | `sdk_list_validators`, `sdk_get_validator`, `sdk_list_bidders`                                        |
 | Contracts    | `6`, `/`                       | `query_global_state`, `query_contract_key`, `query_contract_dict`                                                             | -                                                                                                     |
-| Actions      | `7`                            | Catalog of RPC + helpers; write subset when `--enable-writes` + PEM                                                           | -                                                                                                     |
+| Actions      | `7`                            | Catalog of RPC + helpers; write subset when `--enable-writes` + PEM; with `--features ceps`: CEP info/query/install via `ceps-client` (SDK `js` off) | -                                                                                                     |
 | Writes       | `8`, `o`/`x`, `b`/`s`/`p`/`t`  | `make_transfer_transaction`, `make_transaction` (stake), `sign_transaction`, `put_transaction`, `transfer_transaction`        | `sdk_make_delegate_transaction`, `sdk_make_undelegate_transaction`, `sdk_make_redelegate_transaction` |
 | Wait         | `9`, `/`, `w`, Space           | `wait_transaction`, `SSEClient::collect`                                                                                      | `sdk_wait_transaction`, `sdk_SSE_collect`                                                             |
 | Help         | `h`                            | -                                                                                                                             | -                                                                                                     |
@@ -20,6 +20,7 @@ Screen to SDK / MCP symbols used by Casperatatui today.
 - Gate: `--enable-writes` (no PEM UI / Sign / Put when off)
 - Session PEM: `--secret-key` and/or in-app `o`; unload with `x`
 - Put fail-closed via `policy.rs` + `--policy-path` (sample: `policy.sample.json`)
+- CEP installs (`cep18_install`, `cep78_install`, `cep85_install`, `cep95_install`) use the same Put gate and explicit `allowed_ops` names
 
 ## Smoke
 
@@ -27,4 +28,8 @@ Screen to SDK / MCP symbols used by Casperatatui today.
 cargo run -p casperatatui --example smoke_status
 # optional write+wait (needs PEM path in env, never commit keys):
 # CASPER_SECRET_KEY=/path/to/secret_key.pem cargo run -p casperatatui --example smoke_write_wait
+# CEP (sibling ceps-rust-ts-client + --features ceps):
+# cargo run -p casperatatui --features ceps --example smoke_ceps_query
+# CASPER_SECRET_KEY=… CEPS_CEP18_WASM=…/cep18.wasm \
+#   cargo run -p casperatatui --features ceps --example smoke_ceps_install
 ```

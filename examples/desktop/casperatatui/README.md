@@ -16,6 +16,17 @@ make run-tui
 env -u CARGO_TARGET_DIR cargo run -p casperatatui -- --preset nctl
 ```
 
+CEP Actions (optional sibling `ceps-rust-ts-client`):
+
+```bash
+make run-casperatatui-ceps
+# alias: make run-tui-ceps
+# or
+env -u CARGO_TARGET_DIR cargo run -p casperatatui --features ceps -- --preset nctl
+```
+
+Feature `ceps` path-deps `../../../../ceps-rust-ts-client/ceps-client` (from this crate). Default build stays green without that checkout. SDK feature `js` stays off for both default and `ceps`.
+
 Extra args: `CASPERATATUI_ARGS` or `TUI_ARGS` (e.g. `make run-tui TUI_ARGS='--preset testnet'`).
 
 Presets: `nctl` (default), `testnet`, `mainnet`.
@@ -37,6 +48,11 @@ Non-interactive smoke:
 cargo run -p casperatatui --example smoke_status
 # SSE collect always; put+wait when CASPER_SECRET_KEY is set:
 cargo run -p casperatatui --example smoke_write_wait
+# CEP (needs --features ceps + sibling checkout):
+cargo run -p casperatatui --features ceps --example smoke_ceps_query
+# install needs NCTL + PEM + WASM path (CEPS_CEP18_WASM or wasm_path):
+# CASPER_SECRET_KEY=… CEPS_CEP18_WASM=…/cep18.wasm \
+#   cargo run -p casperatatui --features ceps --example smoke_ceps_install
 ```
 
 ## Release binary
@@ -107,7 +123,7 @@ Requires `--enable-writes`. Load a PEM with `--secret-key` or `o`. Flow: Tab kin
 
 ## Actions (key `7`)
 
-RPC + helpers catalog; write methods appear when writes enabled and PEM loaded.
+RPC + helpers catalog; write methods appear when writes enabled and PEM loaded. With `--features ceps`, a `ceps` group adds CEP-18/78/85/95 info, queries, and installs (sibling `ceps-client`; WASM via action arg or `CEPS_CEP*_WASM` / `CEPS_WASM_PATH`).
 
 ## Command palette (`:`)
 

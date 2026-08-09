@@ -6,7 +6,7 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Paragraph, Wrap};
 use ratatui::Frame;
 
-use crate::actions_catalog::ACTIONS;
+use crate::actions_catalog::all_actions;
 use crate::command::COMMANDS;
 use crate::model::AppModel;
 
@@ -63,6 +63,15 @@ pub fn draw_help(frame: &mut Frame, area: Rect, model: &AppModel) {
         Line::from("  SSE collect: toggle names, max_events, timeout → SSEClient::collect"),
         Line::from(""),
         Line::from(Span::styled(
+            "CEP Actions (feature ceps)",
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        )),
+        Line::from("  Build with --features ceps (sibling ceps-rust-ts-client/ceps-client)."),
+        Line::from("  SDK feature js stays off. CEP install needs --enable-writes + PEM + policy."),
+        Line::from(""),
+        Line::from(Span::styled(
             "Command palette",
             Style::default()
                 .fg(Color::Cyan)
@@ -92,7 +101,7 @@ pub fn draw_help(frame: &mut Frame, area: Rect, model: &AppModel) {
             .fg(Color::Cyan)
             .add_modifier(Modifier::BOLD),
     )));
-    for action in ACTIONS {
+    for action in all_actions() {
         lines.push(Line::from(format!(
             "  [{:<7}] {}",
             action.group.label(),

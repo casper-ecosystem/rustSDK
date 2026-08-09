@@ -10,6 +10,10 @@
     "install",
     "call_entrypoint",
     "put_transaction",
-    "make_transaction"
+    "make_transaction",
+    "cep18_install",
+    "cep78_install",
+    "cep85_install",
+    "cep95_install"
   ]
 }

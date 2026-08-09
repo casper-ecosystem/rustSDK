@@ -4,6 +4,8 @@
 pub enum ActionGroup {
     Rpc,
     Helpers,
+    #[cfg(feature = "ceps")]
+    Ceps,
 }
 
 impl ActionGroup {
@@ -11,6 +13,8 @@ impl ActionGroup {
         match self {
             Self::Rpc => "rpc",
             Self::Helpers => "helpers",
+            #[cfg(feature = "ceps")]
+            Self::Ceps => "ceps",
         }
     }
 }
@@ -61,6 +65,22 @@ const fn write_action(
         args,
         requires_writes: true,
         requires_pem,
+    }
+}
+
+#[cfg(feature = "ceps")]
+const fn ceps_write_action(
+    id: &'static str,
+    blurb: &'static str,
+    args: &'static [ArgSpec],
+) -> ActionSpec {
+    ActionSpec {
+        id,
+        group: ActionGroup::Ceps,
+        blurb,
+        args,
+        requires_writes: true,
+        requires_pem: true,
     }
 }
 
@@ -368,14 +388,407 @@ pub const ACTIONS: &[ActionSpec] = &[
     ),
 ];
 
+#[cfg(feature = "ceps")]
+pub const CEPS_ACTIONS: &[ActionSpec] = &[
+    action(
+        "cep18_info",
+        ActionGroup::Ceps,
+        "CEP-18 client endpoints",
+        &[],
+    ),
+    action(
+        "cep18_name",
+        ActionGroup::Ceps,
+        "CEP-18 token name",
+        &[
+            ArgSpec {
+                name: "contract_hash",
+                hint: "hash-… / entity-…",
+                required: true,
+            },
+            ArgSpec {
+                name: "package_hash",
+                hint: "optional package",
+                required: false,
+            },
+        ],
+    ),
+    action(
+        "cep18_symbol",
+        ActionGroup::Ceps,
+        "CEP-18 token symbol",
+        &[
+            ArgSpec {
+                name: "contract_hash",
+                hint: "hash-… / entity-…",
+                required: true,
+            },
+            ArgSpec {
+                name: "package_hash",
+                hint: "optional package",
+                required: false,
+            },
+        ],
+    ),
+    action(
+        "cep18_decimals",
+        ActionGroup::Ceps,
+        "CEP-18 decimals",
+        &[
+            ArgSpec {
+                name: "contract_hash",
+                hint: "hash-… / entity-…",
+                required: true,
+            },
+            ArgSpec {
+                name: "package_hash",
+                hint: "optional package",
+                required: false,
+            },
+        ],
+    ),
+    action(
+        "cep18_balance_of",
+        ActionGroup::Ceps,
+        "CEP-18 balance_of",
+        &[
+            ArgSpec {
+                name: "contract_hash",
+                hint: "hash-… / entity-…",
+                required: true,
+            },
+            ArgSpec {
+                name: "package_hash",
+                hint: "optional package",
+                required: false,
+            },
+            ArgSpec {
+                name: "account",
+                hint: "account-hash-… / hash-… / entity-…",
+                required: true,
+            },
+        ],
+    ),
+    ceps_write_action(
+        "cep18_install",
+        "install CEP-18 from WASM path",
+        &[
+            ArgSpec {
+                name: "name",
+                hint: "token name",
+                required: true,
+            },
+            ArgSpec {
+                name: "symbol",
+                hint: "default TUI",
+                required: false,
+            },
+            ArgSpec {
+                name: "decimals",
+                hint: "default 9",
+                required: false,
+            },
+            ArgSpec {
+                name: "total_supply",
+                hint: "default 1000",
+                required: false,
+            },
+            ArgSpec {
+                name: "wasm_path",
+                hint: "or CEPS_CEP18_WASM / CEPS_WASM_PATH",
+                required: false,
+            },
+            ArgSpec {
+                name: "payment_amount",
+                hint: "motes (default 400000000000)",
+                required: false,
+            },
+        ],
+    ),
+    action(
+        "cep78_info",
+        ActionGroup::Ceps,
+        "CEP-78 client endpoints",
+        &[],
+    ),
+    action(
+        "cep78_name",
+        ActionGroup::Ceps,
+        "CEP-78 collection_name",
+        &[
+            ArgSpec {
+                name: "contract_hash",
+                hint: "hash-… / entity-…",
+                required: true,
+            },
+            ArgSpec {
+                name: "package_hash",
+                hint: "optional package",
+                required: false,
+            },
+        ],
+    ),
+    action(
+        "cep78_balance",
+        ActionGroup::Ceps,
+        "CEP-78 balance_of",
+        &[
+            ArgSpec {
+                name: "contract_hash",
+                hint: "hash-… / entity-…",
+                required: true,
+            },
+            ArgSpec {
+                name: "package_hash",
+                hint: "optional package",
+                required: false,
+            },
+            ArgSpec {
+                name: "account",
+                hint: "owner key",
+                required: true,
+            },
+        ],
+    ),
+    ceps_write_action(
+        "cep78_install",
+        "install CEP-78 from WASM path",
+        &[
+            ArgSpec {
+                name: "collection_name",
+                hint: "collection name",
+                required: true,
+            },
+            ArgSpec {
+                name: "collection_symbol",
+                hint: "default T78",
+                required: false,
+            },
+            ArgSpec {
+                name: "total_token_supply",
+                hint: "default 50",
+                required: false,
+            },
+            ArgSpec {
+                name: "wasm_path",
+                hint: "or CEPS_CEP78_WASM / CEPS_WASM_PATH",
+                required: false,
+            },
+            ArgSpec {
+                name: "payment_amount",
+                hint: "motes (default 600000000000)",
+                required: false,
+            },
+        ],
+    ),
+    action(
+        "cep85_info",
+        ActionGroup::Ceps,
+        "CEP-85 client endpoints",
+        &[],
+    ),
+    action(
+        "cep85_name",
+        ActionGroup::Ceps,
+        "CEP-85 collection_name",
+        &[
+            ArgSpec {
+                name: "contract_hash",
+                hint: "hash-… / entity-…",
+                required: true,
+            },
+            ArgSpec {
+                name: "package_hash",
+                hint: "optional package",
+                required: false,
+            },
+        ],
+    ),
+    action(
+        "cep85_balance",
+        ActionGroup::Ceps,
+        "CEP-85 balance_of(account, id)",
+        &[
+            ArgSpec {
+                name: "contract_hash",
+                hint: "hash-… / entity-…",
+                required: true,
+            },
+            ArgSpec {
+                name: "package_hash",
+                hint: "optional package",
+                required: false,
+            },
+            ArgSpec {
+                name: "account",
+                hint: "owner key",
+                required: true,
+            },
+            ArgSpec {
+                name: "id",
+                hint: "token id",
+                required: true,
+            },
+        ],
+    ),
+    ceps_write_action(
+        "cep85_install",
+        "install CEP-85 from WASM path",
+        &[
+            ArgSpec {
+                name: "name",
+                hint: "collection name",
+                required: true,
+            },
+            ArgSpec {
+                name: "uri",
+                hint: "metadata URI template",
+                required: false,
+            },
+            ArgSpec {
+                name: "wasm_path",
+                hint: "or CEPS_CEP85_WASM / CEPS_WASM_PATH",
+                required: false,
+            },
+            ArgSpec {
+                name: "payment_amount",
+                hint: "motes (default 550000000000)",
+                required: false,
+            },
+        ],
+    ),
+    action(
+        "cep95_info",
+        ActionGroup::Ceps,
+        "CEP-95 client endpoints",
+        &[],
+    ),
+    action(
+        "cep95_name",
+        ActionGroup::Ceps,
+        "CEP-95 name",
+        &[
+            ArgSpec {
+                name: "contract_hash",
+                hint: "hash-… / entity-…",
+                required: true,
+            },
+            ArgSpec {
+                name: "package_hash",
+                hint: "optional package",
+                required: false,
+            },
+        ],
+    ),
+    action(
+        "cep95_symbol",
+        ActionGroup::Ceps,
+        "CEP-95 symbol",
+        &[
+            ArgSpec {
+                name: "contract_hash",
+                hint: "hash-… / entity-…",
+                required: true,
+            },
+            ArgSpec {
+                name: "package_hash",
+                hint: "optional package",
+                required: false,
+            },
+        ],
+    ),
+    action(
+        "cep95_owner_of",
+        ActionGroup::Ceps,
+        "CEP-95 owner_of(token_id)",
+        &[
+            ArgSpec {
+                name: "contract_hash",
+                hint: "hash-… / entity-…",
+                required: true,
+            },
+            ArgSpec {
+                name: "package_hash",
+                hint: "optional package",
+                required: false,
+            },
+            ArgSpec {
+                name: "token_id",
+                hint: "token id string",
+                required: true,
+            },
+        ],
+    ),
+    action(
+        "cep95_balance",
+        ActionGroup::Ceps,
+        "CEP-95 balance_of",
+        &[
+            ArgSpec {
+                name: "contract_hash",
+                hint: "hash-… / entity-…",
+                required: true,
+            },
+            ArgSpec {
+                name: "package_hash",
+                hint: "optional package",
+                required: false,
+            },
+            ArgSpec {
+                name: "account",
+                hint: "owner key",
+                required: true,
+            },
+        ],
+    ),
+    ceps_write_action(
+        "cep95_install",
+        "install CEP-95 + bind_odra_install",
+        &[
+            ArgSpec {
+                name: "name",
+                hint: "collection name",
+                required: true,
+            },
+            ArgSpec {
+                name: "symbol",
+                hint: "default T95",
+                required: false,
+            },
+            ArgSpec {
+                name: "package_key_name",
+                hint: "account named key for package",
+                required: true,
+            },
+            ArgSpec {
+                name: "wasm_path",
+                hint: "or CEPS_CEP95_WASM / CEPS_WASM_PATH",
+                required: false,
+            },
+            ArgSpec {
+                name: "payment_amount",
+                hint: "motes (default 600000000000)",
+                required: false,
+            },
+        ],
+    ),
+];
+
+#[cfg(not(feature = "ceps"))]
+pub const CEPS_ACTIONS: &[ActionSpec] = &[];
+
+/// All catalog entries (base + optional CEP group).
+pub fn all_actions() -> impl Iterator<Item = &'static ActionSpec> {
+    ACTIONS.iter().chain(CEPS_ACTIONS.iter())
+}
+
 pub fn find_action(id: &str) -> Option<&'static ActionSpec> {
-    ACTIONS.iter().find(|a| a.id == id)
+    all_actions().find(|a| a.id == id)
 }
 
 /// Filter catalog by write gate and loaded PEM.
 pub fn visible_actions(enable_writes: bool, has_pem: bool) -> Vec<&'static ActionSpec> {
-    ACTIONS
-        .iter()
+    all_actions()
         .filter(|a| {
             if a.requires_writes && !enable_writes {
                 return false;

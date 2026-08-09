@@ -29,6 +29,7 @@ pub struct ActionWriteCtx {
     pub pem: Option<String>,
     pub public_key: String,
     pub chain_name: String,
+    pub events_url: String,
     pub policy: WritePolicy,
 }
 
@@ -778,6 +779,22 @@ async fn run_action(
         "install" | "call_entrypoint" => Err(format!(
             "`{method}` needs a loaded PEM; transfer/stake live on Writes (8), install/call forms still WIP"
         )),
+        #[cfg(feature = "ceps")]
+        method if method.starts_with("cep") => {
+            crate::ceps_actions::run_ceps_action(
+                method,
+                args,
+                &crate::ceps_actions::CepsCtx {
+                    rpc,
+                    events_url: &write.events_url,
+                    chain_name: &write.chain_name,
+                    verbosity,
+                    pem: write.pem.as_deref(),
+                    policy: &write.policy,
+                },
+            )
+            .await
+        }
         other => Err(format!(
             "unknown action `{other}` · the catalog is confused"
         )),
