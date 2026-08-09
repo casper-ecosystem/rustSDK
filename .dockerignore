@@ -3,13 +3,14 @@
 # **/*.wasm shrinks MCP context, but the webclient must ship pkg's Wasm asset.
 .git
 .github
+.github_credentials
+.cursor
 target
 **/target
 node_modules
 **/*.wasm
 !pkg/casper_rust_wasm_sdk_bg.wasm
 .env
-.cursor
 tests/e2e
 tests/integration/rust/target
 docs/api-rust
