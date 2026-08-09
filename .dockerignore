@@ -2,8 +2,7 @@
 # Do NOT exclude examples/, pkg/, or docker/ — CI/CD Image needs them.
 # **/*.wasm shrinks MCP context, but the webclient must ship pkg's Wasm asset.
 .git
-.github
-.github_credentials
+.github*
 .cursor
 target
 **/target
