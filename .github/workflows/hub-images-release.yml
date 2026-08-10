@@ -86,6 +86,46 @@ jobs:
             docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
           done
 
+      - name: Log in to GHCR (personal)
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Tag and push personal GHCR
+        run: |
+          APP_VERSION="${{ steps.ver.outputs.version }}"
+          for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
+            docker tag "${image}:latest" "ghcr.io/groussac/${image}:${APP_VERSION}"
+            docker tag "${image}:latest" "ghcr.io/groussac/${image}:latest"
+            docker tag "${image}:latest" "ghcr.io/groussac/${image}:dev"
+            docker push "ghcr.io/groussac/${image}:${APP_VERSION}"
+            docker push "ghcr.io/groussac/${image}:latest"
+            docker push "ghcr.io/groussac/${image}:dev"
+          done
+
+      - name: Log in to GHCR (Interchouette / ITC)
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME_ITC }}
+          password: ${{ secrets.GHCR_PAT_ITC }}
+
+      - name: Tag and push worker and org GHCR
+        run: |
+          APP_VERSION="${{ steps.ver.outputs.version }}"
+          for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
+            for ns in interchouette interchouette-itc; do
+              docker tag "${image}:latest" "ghcr.io/${ns}/${image}:${APP_VERSION}"
+              docker tag "${image}:latest" "ghcr.io/${ns}/${image}:latest"
+              docker tag "${image}:latest" "ghcr.io/${ns}/${image}:dev"
+              docker push "ghcr.io/${ns}/${image}:${APP_VERSION}"
+              docker push "ghcr.io/${ns}/${image}:latest"
+              docker push "ghcr.io/${ns}/${image}:dev"
+            done
+          done
+
       - name: Trigger Render redeploy
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
