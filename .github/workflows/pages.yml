@@ -1,4 +1,6 @@
 # GitHub Pages only (rustdoc + typedoc under docs/).
+# Workspace member casperatatui path-deps sibling ceps-client; Cargo needs the
+# path present even when feature `ceps` is off (same layout as ci-test).
 name: pages
 
 on:
@@ -11,6 +13,10 @@ on:
 permissions:
   contents: write
 
+defaults:
+  run:
+    working-directory: rustSDK
+
 jobs:
   build-and-deploy:
     strategy:
@@ -21,6 +27,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          path: rustSDK
+
+      - name: Checkout sibling ceps-rust-ts-client
+        uses: actions/checkout@v5
+        with:
+          repository: Interchouette-ITC/ceps-rust-ts-client
+          path: ceps-rust-ts-client
+
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -38,5 +53,5 @@ jobs:
       - name: Deploy GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: docs
+          folder: rustSDK/docs
           commit-message: "Deploy documentation for ${{ github.ref_name }}"

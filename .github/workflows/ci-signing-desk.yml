@@ -31,9 +31,19 @@ jobs:
             patchelf
 
       - uses: actions/checkout@v5
+        with:
+          path: rustSDK
+
+      - name: Checkout sibling ceps-rust-ts-client
+        uses: actions/checkout@v5
+        with:
+          repository: Interchouette-ITC/ceps-rust-ts-client
+          path: ceps-rust-ts-client
 
       - name: Swatinem cache
         uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rustSDK
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -43,14 +53,16 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: examples/desktop/tauri/package-lock.json
+          cache-dependency-path: rustSDK/examples/desktop/tauri/package-lock.json
 
       - name: npm install
-        working-directory: examples/desktop/tauri
+        working-directory: rustSDK/examples/desktop/tauri
         run: npm ci
 
       - name: Lint signing desk
+        working-directory: rustSDK
         run: make check-lint-tauri
 
       - name: Unit tests
+        working-directory: rustSDK
         run: cargo test -p casper-signing-desk --lib
