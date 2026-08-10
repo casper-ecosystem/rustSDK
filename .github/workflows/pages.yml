@@ -1,6 +1,8 @@
 # GitHub Pages only (rustdoc + typedoc under docs/).
 # Workspace member casperatatui path-deps sibling ceps-client; Cargo needs the
-# path present even when feature `ceps` is off (same layout as ci-test).
+# path present even when feature `ceps` is off.
+# Keep this repo at GITHUB_WORKSPACE so JamesIves/github-pages-deploy-action
+# finds a .git root (do not checkout into a subdirectory).
 name: pages
 
 on:
@@ -13,10 +15,6 @@ on:
 permissions:
   contents: write
 
-defaults:
-  run:
-    working-directory: rustSDK
-
 jobs:
   build-and-deploy:
     strategy:
@@ -27,14 +25,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-        with:
-          path: rustSDK
 
+      # Sibling of GITHUB_WORKSPACE: matches ../../../../ceps-rust-ts-client
+      # from examples/desktop/casperatatui (ci-test uses path: rustSDK instead).
       - name: Checkout sibling ceps-rust-ts-client
-        uses: actions/checkout@v5
-        with:
-          repository: Interchouette-ITC/ceps-rust-ts-client
-          path: ceps-rust-ts-client
+        working-directory: ${{ github.workspace }}/..
+        run: |
+          rm -rf ceps-rust-ts-client
+          git clone --depth 1 https://github.com/Interchouette-ITC/ceps-rust-ts-client.git ceps-rust-ts-client
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -53,5 +51,5 @@ jobs:
       - name: Deploy GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: rustSDK/docs
+          folder: docs
           commit-message: "Deploy documentation for ${{ github.ref_name }}"
