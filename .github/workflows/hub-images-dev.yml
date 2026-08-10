@@ -38,13 +38,13 @@ jobs:
           docker build -f mcp/Dockerfile -t casper-rust-wasm-sdk-mcp:latest .
 
           for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
-            docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
+            docker tag "${image}:latest" "interchouette/${image}:dev"
           done
 
       - name: Push Docker images to Docker Hub
         run: |
           for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
-            docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
+            docker push "interchouette/${image}:dev"
           done
 
       - name: Log in to GHCR (personal)

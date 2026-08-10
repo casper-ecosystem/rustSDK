@@ -75,18 +75,18 @@ jobs:
           docker build -f mcp/Dockerfile -t casper-rust-wasm-sdk-mcp:latest .
 
           for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
-            docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:${APP_VERSION}"
-            docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:latest"
-            docker tag "${image}:latest" "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
+            docker tag "${image}:latest" "interchouette/${image}:${APP_VERSION}"
+            docker tag "${image}:latest" "interchouette/${image}:latest"
+            docker tag "${image}:latest" "interchouette/${image}:dev"
           done
 
       - name: Push Docker images to Docker Hub
         run: |
           APP_VERSION="${{ steps.ver.outputs.version }}"
           for image in casper-webclient cors-anywhere ws-proxy casper-rust-wasm-sdk-mcp; do
-            docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:${APP_VERSION}"
-            docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:latest"
-            docker push "${{ secrets.DOCKER_USERNAME_ITC }}/${image}:dev"
+            docker push "interchouette/${image}:${APP_VERSION}"
+            docker push "interchouette/${image}:latest"
+            docker push "interchouette/${image}:dev"
           done
 
       - name: Log in to GHCR (personal)
