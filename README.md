@@ -103,11 +103,11 @@ This will create a `pkg` and `pkg-nodejs` containing the Typescript interfaces. 
 
 Default is `full` + `js` (today's JS/wasm API) for both the wasm package and the Rust `rlib`. Slim builds drop optional surfaces. Omit `js` for Rust-only consumers so wasm-bindgen exports are not linked into a foreign pack.
 
-| Profile                 | Make target                | Cargo flags                                                              |
-| ----------------------- | -------------------------- | ------------------------------------------------------------------------ |
-| full + SSE (wasm packs) | `make web` / `make nodejs` | default features + `--features SSE` (SSEClient + CESParser; `js` on)     |
-| read-only               | `make web-read-only`       | `--no-default-features --features js`                                    |
-| transaction (no deploy) | `make web-transaction`     | `--no-default-features --features transaction,helpers,watcher,js`        |
+| Profile                 | Make target                | Cargo flags                                                          |
+| ----------------------- | -------------------------- | -------------------------------------------------------------------- |
+| full + SSE (wasm packs) | `make web` / `make nodejs` | default features + `--features SSE` (SSEClient + CESParser; `js` on) |
+| read-only               | `make web-read-only`       | `--no-default-features --features js`                                |
+| transaction (no deploy) | `make web-transaction`     | `--no-default-features --features transaction,helpers,watcher,js`    |
 
 Optional features: `js` (wasm-bindgen / js-sys surface; default on), `transaction`, `deploy`, `contract`, `binary-port`, `watcher` (wait/watch), `SSE` (node SSE client + CES; enables `watcher`), `helpers`. Core JSON-RPC reads stay available without them. `binary-port` pulls optional `casper-binary-port*` crates. Domain feature `full` does not include `js`.
 
@@ -2733,8 +2733,6 @@ The workspace package [`python/`](../python/) (`casper-rust-wasm-sdk-py`) is a P
 - Install / develop: see [Python Project](#python-project) under Install above, or [`python/README.md`](../python/README.md)
 - CI: path-filtered `python-bindings` (offline unit + Hub NCTL `:dev`)
 - Make: `make python-test`, `make python-test-nctl`
-
-Initial face: [#117](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/117). Parity waves 1–4: [#121](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/121) (closes [#120](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/120)). Epic [#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9) is **closed**. Deploy APIs, binary-port, and PyPI publish remain out of that epic.
 
 ## Rust API
 
