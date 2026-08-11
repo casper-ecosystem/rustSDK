@@ -1,7 +1,7 @@
 //! Application state and view modes.
 
 use crate::account_view::EntityOverview;
-use crate::actions_catalog::{find_action, visible_actions, ActionSpec};
+use crate::actions_catalog::{find_action, visible_actions_filtered, ActionGroup, ActionSpec};
 use crate::auction_view::{
     DelegationRow, SelfStakeRow, UndelegationRow, ValidatorDetail, ValidatorRow,
 };
@@ -56,6 +56,9 @@ impl ViewMode {
             Self::Accounts => "Accounts",
             Self::Validators => "Validators",
             Self::Contracts => "Contracts",
+            #[cfg(feature = "ceps")]
+            Self::Actions => "CEPS",
+            #[cfg(not(feature = "ceps"))]
             Self::Actions => "Actions",
             Self::Writes => "Writes",
             Self::Wait => "Wait",
@@ -649,6 +652,102 @@ impl Default for ContractsState {
     }
 }
 
+/// Sticky contract / package hashes remembered per CEP section.
+#[cfg(feature = "ceps")]
+#[derive(Debug, Clone, Default)]
+pub struct StickyCepBinds {
+    pub cep18_contract: Option<String>,
+    pub cep18_package: Option<String>,
+    pub cep78_contract: Option<String>,
+    pub cep78_package: Option<String>,
+    pub cep85_contract: Option<String>,
+    pub cep85_package: Option<String>,
+    pub cep95_contract: Option<String>,
+    pub cep95_package: Option<String>,
+}
+
+#[cfg(feature = "ceps")]
+impl StickyCepBinds {
+    fn for_group(&self, group: ActionGroup) -> (Option<&str>, Option<&str>) {
+        match group {
+            ActionGroup::Cep18 => (
+                self.cep18_contract.as_deref(),
+                self.cep18_package.as_deref(),
+            ),
+            ActionGroup::Cep78 => (
+                self.cep78_contract.as_deref(),
+                self.cep78_package.as_deref(),
+            ),
+            ActionGroup::Cep85 => (
+                self.cep85_contract.as_deref(),
+                self.cep85_package.as_deref(),
+            ),
+            ActionGroup::Cep95 => (
+                self.cep95_contract.as_deref(),
+                self.cep95_package.as_deref(),
+            ),
+            _ => (None, None),
+        }
+    }
+
+    fn set_for_group(
+        &mut self,
+        group: ActionGroup,
+        contract: Option<String>,
+        package: Option<String>,
+    ) {
+        match group {
+            ActionGroup::Cep18 => {
+                if let Some(c) = contract {
+                    self.cep18_contract = Some(c);
+                }
+                if let Some(p) = package {
+                    self.cep18_package = Some(p);
+                }
+            }
+            ActionGroup::Cep78 => {
+                if let Some(c) = contract {
+                    self.cep78_contract = Some(c);
+                }
+                if let Some(p) = package {
+                    self.cep78_package = Some(p);
+                }
+            }
+            ActionGroup::Cep85 => {
+                if let Some(c) = contract {
+                    self.cep85_contract = Some(c);
+                }
+                if let Some(p) = package {
+                    self.cep85_package = Some(p);
+                }
+            }
+            ActionGroup::Cep95 => {
+                if let Some(c) = contract {
+                    self.cep95_contract = Some(c);
+                }
+                if let Some(p) = package {
+                    self.cep95_package = Some(p);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    fn group_for_method(method: &str) -> Option<ActionGroup> {
+        if method.starts_with("cep18_") {
+            Some(ActionGroup::Cep18)
+        } else if method.starts_with("cep78_") {
+            Some(ActionGroup::Cep78)
+        } else if method.starts_with("cep85_") {
+            Some(ActionGroup::Cep85)
+        } else if method.starts_with("cep95_") {
+            Some(ActionGroup::Cep95)
+        } else {
+            None
+        }
+    }
+}
+
 /// Actions screen state.
 pub struct ActionsState {
     pub selected: usize,
@@ -660,6 +759,10 @@ pub struct ActionsState {
     pub last_result_text: Option<String>,
     pub last_method: Option<String>,
     pub result_scroll: u16,
+    /// Active section filter (`None` = all groups).
+    pub group_filter: Option<ActionGroup>,
+    #[cfg(feature = "ceps")]
+    pub sticky: StickyCepBinds,
 }
 
 impl ActionsState {
@@ -674,11 +777,21 @@ impl ActionsState {
             last_result_text: None,
             last_method: None,
             result_scroll: 0,
+            #[cfg(feature = "ceps")]
+            group_filter: Some(ActionGroup::Cep18),
+            #[cfg(not(feature = "ceps"))]
+            group_filter: None,
+            #[cfg(feature = "ceps")]
+            sticky: StickyCepBinds::default(),
         }
     }
 
+    pub fn visible(&self, enable_writes: bool, has_pem: bool) -> Vec<&'static ActionSpec> {
+        visible_actions_filtered(enable_writes, has_pem, self.group_filter)
+    }
+
     pub fn clamp_selected(&mut self, enable_writes: bool, has_pem: bool) {
-        let n = visible_actions(enable_writes, has_pem).len();
+        let n = self.visible(enable_writes, has_pem).len();
         if n == 0 {
             self.selected = 0;
         } else if self.selected >= n {
@@ -687,12 +800,34 @@ impl ActionsState {
     }
 
     pub fn selected_spec(&self, enable_writes: bool, has_pem: bool) -> &'static ActionSpec {
-        let visible = visible_actions(enable_writes, has_pem);
+        let visible = self.visible(enable_writes, has_pem);
         if visible.is_empty() {
             &crate::actions_catalog::ACTIONS[0]
         } else {
             visible[self.selected.min(visible.len() - 1)]
         }
+    }
+
+    #[cfg(feature = "ceps")]
+    pub fn cycle_group_filter(&mut self, forward: bool) {
+        use crate::actions_catalog::CEPS_GROUP_CYCLE;
+        let states: Vec<Option<ActionGroup>> = CEPS_GROUP_CYCLE
+            .iter()
+            .copied()
+            .map(Some)
+            .chain(std::iter::once(None))
+            .collect();
+        let idx = states
+            .iter()
+            .position(|g| *g == self.group_filter)
+            .unwrap_or(0);
+        let next = if forward {
+            states[(idx + 1) % states.len()]
+        } else {
+            states[(idx + states.len() - 1) % states.len()]
+        };
+        self.group_filter = next;
+        self.selected = 0;
     }
 
     pub fn open_or_run_selected(&mut self, enable_writes: bool, has_pem: bool) -> ActionLaunch {
@@ -705,9 +840,53 @@ impl ActionsState {
         } else {
             self.form_method = Some(spec.id);
             self.form_fields = spec.args.iter().map(|_| TextInput::new()).collect();
+            #[cfg(feature = "ceps")]
+            self.prefill_sticky(spec);
             self.form_field_idx = 0;
             self.pane = ActionsPane::Form;
             ActionLaunch::NeedForm
+        }
+    }
+
+    #[cfg(feature = "ceps")]
+    fn prefill_sticky(&mut self, spec: &ActionSpec) {
+        let (contract, package) = self.sticky.for_group(spec.group);
+        for (i, arg) in spec.args.iter().enumerate() {
+            let Some(field) = self.form_fields.get_mut(i) else {
+                continue;
+            };
+            if !field.buffer.is_empty() {
+                continue;
+            }
+            if arg.name == "contract_hash" {
+                if let Some(c) = contract {
+                    field.buffer = c.to_string();
+                    field.cursor = field.buffer.len();
+                }
+            } else if arg.name == "package_hash" {
+                if let Some(p) = package {
+                    field.buffer = p.to_string();
+                    field.cursor = field.buffer.len();
+                }
+            }
+        }
+    }
+
+    #[cfg(feature = "ceps")]
+    pub fn remember_binds_from_result(&mut self, method: &str, value: &Value) {
+        let Some(group) = StickyCepBinds::group_for_method(method) else {
+            return;
+        };
+        let contract = value
+            .get("contract_hash")
+            .and_then(|v| v.as_str())
+            .map(str::to_string);
+        let package = value
+            .get("package_hash")
+            .and_then(|v| v.as_str())
+            .map(str::to_string);
+        if contract.is_some() || package.is_some() {
+            self.sticky.set_for_group(group, contract, package);
         }
     }
 
@@ -1196,6 +1375,8 @@ impl AppModel {
             }
             RpcEvent::Action { method, result } => match result {
                 Ok(value) => {
+                    #[cfg(feature = "ceps")]
+                    self.actions.remember_binds_from_result(&method, &value);
                     let text =
                         serde_json::to_string_pretty(&value).unwrap_or_else(|_| value.to_string());
                     self.actions.last_result = Some(value);
@@ -1668,7 +1849,7 @@ impl AppModel {
 pub const TIPS: &[&str] = &[
     "tip: r runs a five-RPC Network seance in parallel",
     "tip: e edits the RPC URL without restarting the seance",
-    "tip: 7 Actions | Enter a spell | Tab fields | boom JSON",
+    "tip: 7 CEPS (or Actions) | [ ] section | Enter a spell | Tab fields",
     "tip: mouse select+copy works (no mouse capture)",
     "tip: Up/Down in : recalls past spells",
     "tip: Tab completes commands, views, and ~/paths",

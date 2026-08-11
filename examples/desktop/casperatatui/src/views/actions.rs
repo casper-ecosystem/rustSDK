@@ -6,7 +6,7 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, List, ListItem, Paragraph, Wrap};
 use ratatui::Frame;
 
-use crate::actions_catalog::{find_action, visible_actions};
+use crate::actions_catalog::find_action;
 use crate::model::{ActionsPane, AppModel, InputMode};
 
 pub fn draw_actions(frame: &mut Frame, area: Rect, model: &AppModel) {
@@ -20,7 +20,7 @@ pub fn draw_actions(frame: &mut Frame, area: Rect, model: &AppModel) {
 }
 
 fn draw_list(frame: &mut Frame, area: Rect, model: &AppModel) {
-    let visible = visible_actions(model.enable_writes, model.has_pem());
+    let visible = model.actions.visible(model.enable_writes, model.has_pem());
     let selected = if visible.is_empty() {
         0
     } else {
@@ -48,13 +48,21 @@ fn draw_list(frame: &mut Frame, area: Rect, model: &AppModel) {
         })
         .collect();
 
+    let section = match model.actions.group_filter {
+        Some(g) => g.label(),
+        None => "all",
+    };
+    #[cfg(feature = "ceps")]
+    let base = "CEPS";
+    #[cfg(not(feature = "ceps"))]
+    let base = "Spells";
     let title = if model.actions.pane == ActionsPane::List
         && model.input_mode == InputMode::Normal
         && model.view == crate::model::ViewMode::Actions
     {
-        " Spells (↑↓ Enter) "
+        format!(" {base} [{section}] (↑↓ Enter | [ ] section) ")
     } else {
-        " Spells "
+        format!(" {base} [{section}] ")
     };
 
     let list = List::new(items).block(

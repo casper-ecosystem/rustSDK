@@ -275,6 +275,44 @@ fn handle_key(code: KeyCode, modifiers: KeyModifiers, ctx: &mut KeyCtx<'_>) -> R
                 }
             }
         }
+        KeyCode::Char(']')
+            if ctx.model.view == ViewMode::Actions
+                && ctx.model.actions.pane == ActionsPane::List =>
+        {
+            #[cfg(feature = "ceps")]
+            {
+                ctx.model.actions.cycle_group_filter(true);
+                ctx.model
+                    .actions
+                    .clamp_selected(ctx.model.enable_writes, ctx.model.has_pem());
+                let label = ctx
+                    .model
+                    .actions
+                    .group_filter
+                    .map(casperatatui::actions_catalog::ActionGroup::label)
+                    .unwrap_or("all");
+                ctx.model.set_status(format!("CEPS section: {label}"));
+            }
+        }
+        KeyCode::Char('[')
+            if ctx.model.view == ViewMode::Actions
+                && ctx.model.actions.pane == ActionsPane::List =>
+        {
+            #[cfg(feature = "ceps")]
+            {
+                ctx.model.actions.cycle_group_filter(false);
+                ctx.model
+                    .actions
+                    .clamp_selected(ctx.model.enable_writes, ctx.model.has_pem());
+                let label = ctx
+                    .model
+                    .actions
+                    .group_filter
+                    .map(casperatatui::actions_catalog::ActionGroup::label)
+                    .unwrap_or("all");
+                ctx.model.set_status(format!("CEPS section: {label}"));
+            }
+        }
         KeyCode::Down | KeyCode::Char('j') => scroll_or_list(ctx.model, 1),
         KeyCode::Up | KeyCode::Char('k') => scroll_or_list(ctx.model, -1),
         KeyCode::PageDown => scroll_page(ctx.model, 10),
@@ -971,11 +1009,10 @@ fn scroll_or_list(model: &mut AppModel, delta: i32) {
     use casperatatui::model::BlocksPane;
     match model.view {
         ViewMode::Actions if model.actions.pane == ActionsPane::List => {
-            let len = casperatatui::actions_catalog::visible_actions(
-                model.enable_writes,
-                model.has_pem(),
-            )
-            .len();
+            let len = model
+                .actions
+                .visible(model.enable_writes, model.has_pem())
+                .len();
             if len == 0 {
                 return;
             }
@@ -1763,7 +1800,7 @@ fn parse_view_name(name: &str) -> Option<ViewMode> {
         "accounts" | "4" => Some(ViewMode::Accounts),
         "validators" | "5" => Some(ViewMode::Validators),
         "contracts" | "6" => Some(ViewMode::Contracts),
-        "actions" | "7" => Some(ViewMode::Actions),
+        "actions" | "ceps" | "7" => Some(ViewMode::Actions),
         "writes" | "8" => Some(ViewMode::Writes),
         "wait" | "9" => Some(ViewMode::Wait),
         "help" | "h" => Some(ViewMode::Help),

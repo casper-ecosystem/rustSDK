@@ -30,7 +30,12 @@ pub const COMMANDS: &[CommandSpec] = &[
     },
     CommandSpec {
         name: "actions",
-        help: "jump to Actions spellbook",
+        help: "jump to CEPS / Actions (key 7)",
+        takes_path: false,
+    },
+    CommandSpec {
+        name: "ceps",
+        help: "jump to CEPS / Actions (key 7)",
         takes_path: false,
     },
     CommandSpec {

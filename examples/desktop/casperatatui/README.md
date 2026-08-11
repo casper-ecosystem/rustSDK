@@ -50,8 +50,8 @@ cargo run -p casperatatui --example smoke_status
 cargo run -p casperatatui --example smoke_write_wait
 # CEP (needs --features ceps; fetches ceps-client from git):
 cargo run -p casperatatui --features ceps --example smoke_ceps_query
-# install needs NCTL + PEM + WASM path (CEPS_CEP18_WASM or wasm_path):
-# CASPER_SECRET_KEY=… CEPS_CEP18_WASM=…/cep18.wasm \
+# install needs NCTL + PEM + WASM (CEPS_WASM_ROOT alias, or CEPS_CEP18_WASM path):
+# CASPER_SECRET_KEY=… CEPS_WASM_ROOT=…/tests/wasm \
 #   cargo run -p casperatatui --features ceps --example smoke_ceps_install
 ```
 
@@ -68,27 +68,28 @@ CI: path-filtered [ci-casperatatui](../../../.github/workflows/ci-casperatatui.y
 
 ## Keys
 
-| Key              | Action                                                                                       |
-| ---------------- | -------------------------------------------------------------------------------------------- |
-| `q`              | Quit and **restore the terminal**                                                            |
-| Esc              | Back (detail / form); never quits                                                            |
-| Ctrl+Esc         | Quit (same as `q`)                                                                           |
-| `r`              | Network seance; on Validators reloads auction                                                |
-| `e`              | Edit RPC URL (Enter applies + refreshes)                                                     |
-| `1`–`9` / `h`    | Network…Wait / Help                                                                          |
-| `l`              | (Blocks) load latest N blocks                                                                |
-| `/`              | Focus lookup / filter / Wait form                                                            |
-| `w`              | (Accounts/Validators) reward; (Wait) wait/collect                                            |
-| `o` / `x`        | Load / unload session PEM (`--enable-writes`)                                                |
-| `b` / `s` / `p`  | (Writes) build / sign / put                                                                  |
-| `t`              | (Writes) one-shot transfer                                                                   |
-| Space            | (Wait SSE) toggle event name                                                                 |
-| Tab / Left/Right | Cycle views (Left/Right always leave Actions; Tab cycles Actions panes / in-screen sections) |
-| `j` `k` / arrows | Scroll body / move lists                                                                     |
-| Enter            | Open / fetch / start form action                                                             |
-| `:`              | Command palette                                                                              |
-| mouse select     | Works: mouse capture is **off**                                                              |
-| Ctrl-C           | Same as quit (signal handler restores TTY)                                                   |
+| Key              | Action                                                                             |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| `q`              | Quit and **restore the terminal**                                                  |
+| Esc              | Back (detail / form); never quits                                                  |
+| Ctrl+Esc         | Quit (same as `q`)                                                                 |
+| `r`              | Network seance; on Validators reloads auction                                      |
+| `e`              | Edit RPC URL (Enter applies + refreshes)                                           |
+| `1`–`9` / `h`    | Network…Wait / Help (`7` = **CEPS** when built with `--features ceps`)             |
+| `[` / `]`        | (CEPS list) cycle section filter (cep18…shared, rpc, helpers, all)                 |
+| `l`              | (Blocks) load latest N blocks                                                      |
+| `/`              | Focus lookup / filter / Wait form                                                  |
+| `w`              | (Accounts/Validators) reward; (Wait) wait/collect                                  |
+| `o` / `x`        | Load / unload session PEM (`--enable-writes`)                                      |
+| `b` / `s` / `p`  | (Writes) build / sign / put                                                        |
+| `t`              | (Writes) one-shot transfer                                                         |
+| Space            | (Wait SSE) toggle event name                                                       |
+| Tab / Left/Right | Cycle views (Left/Right leave CEPS/Actions; Tab cycles panes / in-screen sections) |
+| `j` `k` / arrows | Scroll body / move lists                                                           |
+| Enter            | Open / fetch / start form action                                                   |
+| `:`              | Command palette                                                                    |
+| mouse select     | Works: mouse capture is **off**                                                    |
+| Ctrl-C           | Same as quit (signal handler restores TTY)                                         |
 
 ## Writes (key `8`)
 
@@ -121,9 +122,11 @@ Requires `--enable-writes`. Load a PEM with `--secret-key` or `o`. Flow: Tab kin
 - `/` hash / package / shortcuts `auction` / `mint`
 - Named keys + entry points; query key / dict subforms
 
-## Actions (key `7`)
+## CEPS / Actions (key `7`)
 
-RPC + helpers catalog; write methods appear when writes enabled and PEM loaded. With `--features ceps`, a `ceps` group adds CEP-18/78/85/95 info, queries, and installs (`ceps-client` via git; WASM via action arg or `CEPS_CEP*_WASM` / `CEPS_WASM_PATH`).
+Without `ceps`: RPC + helpers catalog (title **Actions**).
+
+With `--features ceps`: chrome title **CEPS**; sections `cep18` / `cep78` / `cep85` / `cep95` / `ces` / `shared` (+ `rpc` / `helpers`). Cycle with `[` `]`. Sticky `contract_hash` / `package_hash` per CEP after install/bind. CES parse/collect sit under `ces`; custom put/entrypoint and wasm resolve under `shared`. Tip WASM via `ceps_client::wasm` (`CEPS_WASM_ROOT` or alias such as `cep18`). Writes need `--enable-writes` + PEM + `policy.sample.json` allow list.
 
 ## Command palette (`:`)
 

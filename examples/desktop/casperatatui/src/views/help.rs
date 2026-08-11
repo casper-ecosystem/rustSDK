@@ -26,9 +26,12 @@ pub fn draw_help(frame: &mut Frame, area: Rect, model: &AppModel) {
                 .add_modifier(Modifier::BOLD),
         )),
         Line::from("  q / Ctrl+Esc  quit and restore the terminal"),
-        Line::from("  Esc           back (Actions/Blocks detail); never quits"),
-        Line::from("  Tab / Left/Right  cycle views (Left/Right always leave Actions; Tab cycles Actions panes)"),
-        Line::from("  1-9 / h     Network…Wait / Help"),
+        Line::from("  Esc           back (CEPS/Actions/Blocks detail); never quits"),
+        Line::from(
+            "  Tab / Left/Right  cycle views (Left/Right always leave CEPS; Tab cycles panes)",
+        ),
+        Line::from("  1-9 / h     Network…Wait / Help (7 = CEPS when built with --features ceps)"),
+        Line::from("  [ / ]       (CEPS list) cycle section filter (cep18…shared / rpc / all)"),
         Line::from("  r           Network seance (5 RPCs); Validators reloads auction"),
         Line::from("  e           edit RPC URL (rebuild SDK haunt)"),
         Line::from("  l           (Blocks) load latest N blocks"),
@@ -63,13 +66,20 @@ pub fn draw_help(frame: &mut Frame, area: Rect, model: &AppModel) {
         Line::from("  SSE collect: toggle names, max_events, timeout → SSEClient::collect"),
         Line::from(""),
         Line::from(Span::styled(
-            "CEP Actions (feature ceps)",
+            "CEPS (key 7, feature ceps)",
             Style::default()
                 .fg(Color::Cyan)
                 .add_modifier(Modifier::BOLD),
         )),
-        Line::from("  Build with --features ceps (ceps-client from git, branch dev)."),
-        Line::from("  SDK feature js stays off. CEP install needs --enable-writes + PEM + policy."),
+        Line::from("  Sections: cep18 / cep78 / cep85 / cep95 / ces / shared (+ rpc / helpers)."),
+        Line::from(
+            "  CES parse/collect + SSE wait (key 9) after writes; sticky contract/package per CEP.",
+        ),
+        Line::from("  Tip WASM via ceps_client::wasm (CEPS_WASM_ROOT or alias under tests/wasm)."),
+        Line::from(
+            "  Build with --features ceps (ceps-client git branch dev). SDK feature js stays off.",
+        ),
+        Line::from("  Install/writes need --enable-writes + PEM + policy allow list."),
         Line::from(""),
         Line::from(Span::styled(
             "Command palette",
@@ -96,7 +106,7 @@ pub fn draw_help(frame: &mut Frame, area: Rect, model: &AppModel) {
 
     lines.push(Line::from(""));
     lines.push(Line::from(Span::styled(
-        "Actions catalog",
+        "CEPS / Actions catalog",
         Style::default()
             .fg(Color::Cyan)
             .add_modifier(Modifier::BOLD),

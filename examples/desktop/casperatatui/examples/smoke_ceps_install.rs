@@ -30,16 +30,16 @@ async fn main() -> Result<()> {
     let pem = std::fs::read_to_string(&pem_path)?.trim().to_string();
     let public_key = public_key_from_secret_key(&pem).map_err(|e| anyhow::anyhow!(e))?;
 
-    let wasm_path = match std::env::var("CEPS_CEP18_WASM")
-        .or_else(|_| std::env::var("CEPS_WASM_PATH"))
-    {
-        Ok(p) if !p.trim().is_empty() => p.trim().to_string(),
-        _ => {
-            println!("skip install: set CEPS_CEP18_WASM or CEPS_WASM_PATH to cep18.wasm");
-            println!("tip: in ceps-rust-ts-client run `make wasm-from-ceps` then point at tests/wasm/cep18/cep18.wasm");
-            return Ok(());
-        }
-    };
+    let wasm_arg =
+        match std::env::var("CEPS_CEP18_WASM").or_else(|_| std::env::var("CEPS_WASM_PATH")) {
+            Ok(p) if !p.trim().is_empty() => p.trim().to_string(),
+            _ if std::env::var("CEPS_WASM_ROOT").is_ok() => "cep18".to_string(),
+            _ => {
+                println!("skip install: set CEPS_WASM_ROOT (alias cep18) or CEPS_CEP18_WASM path");
+                println!("tip: point CEPS_WASM_ROOT at tests/wasm (cep18/cep18.wasm layout)");
+                return Ok(());
+            }
+        };
 
     let policy = WritePolicy::load(Path::new(
         "examples/desktop/casperatatui/policy.sample.json",
@@ -61,7 +61,7 @@ async fn main() -> Result<()> {
     let mut args = HashMap::new();
     args.insert("name".into(), format!("TuiCep18{nonce}"));
     args.insert("symbol".into(), "TUI".into());
-    args.insert("wasm_path".into(), wasm_path);
+    args.insert("wasm".into(), wasm_arg);
 
     println!("cep18_install …");
     client.spawn_action_with_write("cep18_install", args, write, tx);
