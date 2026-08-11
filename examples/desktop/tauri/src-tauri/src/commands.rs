@@ -15,7 +15,7 @@ use casper_rust_wasm_sdk::helpers::{
 use serde::Deserialize;
 use serde_json::Value;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tauri::State;
 use tauri_plugin_dialog::{DialogExt, FilePath};
 use tokio::sync::oneshot;
@@ -25,15 +25,17 @@ async fn pick_file_path(
     title: &str,
     filter_name: &str,
     exts: &[&str],
+    start_dir: Option<&PathBuf>,
 ) -> Result<PathBuf, String> {
     let (tx, rx) = oneshot::channel::<Option<FilePath>>();
-    app.dialog()
-        .file()
-        .add_filter(filter_name, exts)
-        .set_title(title)
-        .pick_file(move |path| {
-            let _ = tx.send(path);
-        });
+    let mut dlg = app.dialog().file();
+    dlg = dlg.add_filter(filter_name, exts).set_title(title);
+    if let Some(dir) = start_dir {
+        dlg = dlg.set_directory(dir);
+    }
+    dlg.pick_file(move |path| {
+        let _ = tx.send(path);
+    });
     let file = rx
         .await
         .map_err(|_| "dialog channel closed".to_string())?
@@ -47,16 +49,20 @@ async fn save_file_path(
     filter_name: &str,
     exts: &[&str],
     default_name: &str,
+    start_dir: Option<&PathBuf>,
 ) -> Result<PathBuf, String> {
     let (tx, rx) = oneshot::channel::<Option<FilePath>>();
-    app.dialog()
-        .file()
+    let mut dlg = app.dialog().file();
+    dlg = dlg
         .add_filter(filter_name, exts)
         .set_file_name(default_name)
-        .set_title(title)
-        .save_file(move |path| {
-            let _ = tx.send(path);
-        });
+        .set_title(title);
+    if let Some(dir) = start_dir {
+        dlg = dlg.set_directory(dir);
+    }
+    dlg.save_file(move |path| {
+        let _ = tx.send(path);
+    });
     let file = rx
         .await
         .map_err(|_| "dialog channel closed".to_string())?
@@ -86,6 +92,38 @@ fn resolve_chain(preset: &str, chain: Option<&str>) -> String {
 
 fn default_policy_path() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../policy.sample.json")
+}
+
+fn default_keys_dir() -> Option<PathBuf> {
+    let home = std::env::var("HOME").ok()?;
+    let dir = PathBuf::from(home).join(".casper-signing-desk/keys");
+    if let Err(e) = fs::create_dir_all(&dir) {
+        eprintln!(
+            "[signing-desk] keys dir create failed {}: {}",
+            dir.display(),
+            e
+        );
+        return None;
+    }
+    Some(dir)
+}
+
+fn workspace_root_guess() -> Option<PathBuf> {
+    let p = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../../");
+    fs::canonicalize(p).ok()
+}
+
+fn path_is_inside(base: &Path, path: &Path) -> bool {
+    let base = match fs::canonicalize(base) {
+        Ok(v) => v,
+        Err(_) => return false,
+    };
+    let parent = path.parent().unwrap_or(path);
+    let resolved_parent = match fs::canonicalize(parent) {
+        Ok(v) => v,
+        Err(_) => return false,
+    };
+    resolved_parent.starts_with(base)
 }
 
 #[derive(Debug, Deserialize)]
@@ -186,7 +224,15 @@ pub async fn session_unlock(
     session: State<'_, Session>,
 ) -> Result<String, String> {
     eprintln!("[signing-desk] unlock: opening PEM dialog");
-    let path = pick_file_path(&app, "Unlock secret key PEM", "PEM", &["pem"]).await?;
+    let start_dir = default_keys_dir();
+    let path = pick_file_path(
+        &app,
+        "Unlock secret key PEM",
+        "PEM",
+        &["pem"],
+        start_dir.as_ref(),
+    )
+    .await?;
     eprintln!("[signing-desk] unlock: loading {}", path.display());
     let (pem, public_key) = load_pem_file(&path.display().to_string())?;
     session.unlock(pem, public_key.clone());
@@ -207,14 +253,24 @@ pub async fn keygen_and_save(
     };
     let pem = sk.to_pem().map_err(|e| format!("to_pem: {e:?}"))?;
     let public_key = public_key_from_secret_key(&pem).map_err(|e| e.to_string())?;
+    let start_dir = default_keys_dir();
     let path = save_file_path(
         &app,
         "Save new secret key PEM",
         "PEM",
         &["pem"],
         "secret_key.pem",
+        start_dir.as_ref(),
     )
     .await?;
+    if let Some(root) = workspace_root_guess() {
+        if path_is_inside(&root, &path) {
+            return Err(format!(
+                "refusing to save PEM inside workspace ({}); choose a path outside the repo to avoid dev auto-restart",
+                root.display()
+            ));
+        }
+    }
     fs::write(&path, &pem).map_err(|e| format!("write PEM: {e}"))?;
     Ok(serde_json::json!({
         "algorithm": if algo == "secp256k1" { "secp256k1" } else { "ed25519" },
@@ -376,7 +432,7 @@ pub fn presets() -> serde_json::Value {
 
 #[tauri::command]
 pub async fn tx_open_json(app: tauri::AppHandle) -> Result<String, String> {
-    let path = pick_file_path(&app, "Open transaction JSON", "JSON", &["json"]).await?;
+    let path = pick_file_path(&app, "Open transaction JSON", "JSON", &["json"], None).await?;
     fs::read_to_string(&path).map_err(|e| format!("read {}: {e}", path.display()))
 }
 
@@ -385,14 +441,22 @@ pub async fn tx_save_json(app: tauri::AppHandle, args: SaveJsonArgs) -> Result<S
     let name = args
         .default_name
         .unwrap_or_else(|| "transaction.json".into());
-    let path = save_file_path(&app, "Save transaction JSON", "JSON", &["json"], &name).await?;
+    let path = save_file_path(
+        &app,
+        "Save transaction JSON",
+        "JSON",
+        &["json"],
+        &name,
+        None,
+    )
+    .await?;
     fs::write(&path, args.contents.as_bytes()).map_err(|e| format!("write: {e}"))?;
     Ok(path.display().to_string())
 }
 
 #[tauri::command]
 pub async fn pick_policy_path(app: tauri::AppHandle) -> Result<String, String> {
-    let path = pick_file_path(&app, "Choose write policy JSON", "JSON", &["json"]).await?;
+    let path = pick_file_path(&app, "Choose write policy JSON", "JSON", &["json"], None).await?;
     let _ = WritePolicy::load(&path)?;
     Ok(path.display().to_string())
 }

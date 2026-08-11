@@ -246,11 +246,13 @@ check-lint-tui: check-lint-casperatatui
 
 run-tauri:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		$(MAKE) -C examples/desktop/tauri run
+		-u GTK_PATH -u GTK_EXE_PREFIX -u GTK_MODULES -u GTK_IM_MODULE -u GIO_MODULE_DIR -u GDK_PIXBUF_MODULE_FILE \
+		bash -lc 'cd examples/desktop/tauri && if command -v npm >/dev/null 2>&1; then npm run tauri -- dev; else node ./node_modules/@tauri-apps/cli/tauri.js dev; fi'
 
 build-tauri:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		$(MAKE) -C examples/desktop/tauri build
+		-u GTK_PATH -u GTK_EXE_PREFIX -u GTK_MODULES -u GTK_IM_MODULE -u GIO_MODULE_DIR -u GDK_PIXBUF_MODULE_FILE \
+		bash -lc 'cd examples/desktop/tauri && if command -v npm >/dev/null 2>&1; then npm run tauri -- build; else node ./node_modules/@tauri-apps/cli/tauri.js build; fi'
 
 check-lint-tauri:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
