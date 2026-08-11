@@ -6,13 +6,23 @@ on:
   workflow_call:
     inputs:
       tag:
-        description: GitHub Release tag to upload into
+        description: GitHub Release tag to upload into (ignored when attach_to_release is false)
         required: true
         type: string
       ref:
         description: Git ref to build (tag or commit SHA)
         required: true
         type: string
+      attach_to_release:
+        description: If true, upload built files to the GitHub Release for inputs.tag
+        required: false
+        type: boolean
+        default: true
+      artifact_name:
+        description: actions/upload-artifact name for staged release files
+        required: false
+        type: string
+        default: desktop-mcp-casperatatui
 
 permissions:
   contents: write
@@ -83,9 +93,8 @@ jobs:
       - name: Build Casperatatui release binary
         run: make build-casperatatui-release
 
-      - name: Upload assets to release
+      - name: Stage release asset filenames
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
@@ -93,6 +102,8 @@ jobs:
           # electron-builder output names come from examples/desktop/electron/package.json version.
           PKG_VERSION=$(jq -r .version examples/desktop/electron/package.json)
           ASSET_LABEL=${TAG#v}
+          STAGE=release-assets
+          mkdir -p "$STAGE"
 
           # Stable semver Releases must match package.json (GitHub Release files, not Render).
           if [[ "$ASSET_LABEL" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && [ "$ASSET_LABEL" != "$PKG_VERSION" ]; then
@@ -104,9 +115,7 @@ jobs:
           APPIMAGE="$RELEASE_DIR/Casper Webclient-${PKG_VERSION}.AppImage"
           SNAP="$RELEASE_DIR/casper-webclient_${PKG_VERSION}_amd64.snap"
           MCP_SRC="target/release/casper-rust-wasm-sdk-mcp"
-          MCP_DST="casper-rust-wasm-sdk-mcp-${ASSET_LABEL}-linux-x86_64"
           CASPERATATUI_SRC="target/release/casperatatui"
-          CASPERATATUI_DST="casperatatui-${ASSET_LABEL}-linux-x86_64"
 
           for f in "$EXE" "$APPIMAGE" "$SNAP" "$MCP_SRC" "$CASPERATATUI_SRC"; do
             if [[ ! -f "$f" ]]; then
@@ -117,15 +126,29 @@ jobs:
             fi
           done
 
-          cp "$MCP_SRC" "$MCP_DST"
-          chmod +x "$MCP_DST"
-          cp "$CASPERATATUI_SRC" "$CASPERATATUI_DST"
-          chmod +x "$CASPERATATUI_DST"
+          cp "$EXE" "$STAGE/Casper.Webclient.${ASSET_LABEL}.exe"
+          cp "$APPIMAGE" "$STAGE/Casper.Webclient-${ASSET_LABEL}.AppImage"
+          cp "$SNAP" "$STAGE/casper-webclient_${ASSET_LABEL}_amd64.snap"
+          cp "$MCP_SRC" "$STAGE/casper-rust-wasm-sdk-mcp-${ASSET_LABEL}-linux-x86_64"
+          cp "$CASPERATATUI_SRC" "$STAGE/casperatatui-${ASSET_LABEL}-linux-x86_64"
+          chmod +x "$STAGE/casper-rust-wasm-sdk-mcp-${ASSET_LABEL}-linux-x86_64"
+          chmod +x "$STAGE/casperatatui-${ASSET_LABEL}-linux-x86_64"
 
-          gh release upload "$TAG" \
-            "$EXE#Casper.Webclient.${ASSET_LABEL}.exe" \
-            "$APPIMAGE#Casper.Webclient-${ASSET_LABEL}.AppImage" \
-            "$SNAP#casper-webclient_${ASSET_LABEL}_amd64.snap" \
-            "$MCP_DST" \
-            "$CASPERATATUI_DST" \
-            --clobber
+          ls -la "$STAGE"
+
+      - name: Upload staged assets as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: rustSDK/release-assets/*
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Upload assets to release
+        if: ${{ inputs.attach_to_release }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" release-assets/* --clobber

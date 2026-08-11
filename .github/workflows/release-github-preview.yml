@@ -1,4 +1,5 @@
-# Overnight tip Pre-release. Assets uploaded in this run (GITHUB_TOKEN cannot chain on: release).
+# Overnight tip Pre-release. Build assets first; only then overwrite the tag so a
+# failed pack/build cannot leave an empty Pre-release (source archives only).
 name: release-github-preview
 
 on:
@@ -11,15 +12,14 @@ permissions:
   contents: write
 
 jobs:
-  overwrite-prerelease:
-    name: Overwrite GitHub Pre-release dev-preview
+  prepare:
+    name: Resolve SHA for preview
     if: >
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     outputs:
       sha: ${{ steps.sha.outputs.sha }}
-
     steps:
       - name: Resolve SHA
         id: sha
@@ -30,17 +30,38 @@ jobs:
             echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           fi
 
+  # Build before any release delete so a failed make pack keeps the previous assets.
+  build-assets:
+    name: Build Electron + MCP + Casperatatui assets
+    needs: prepare
+    if: needs.prepare.result == 'success'
+    uses: ./.github/workflows/release-github-assets.yml
+    with:
+      tag: dev-preview
+      ref: ${{ needs.prepare.outputs.sha }}
+      attach_to_release: false
+      artifact_name: desktop-mcp-casperatatui-dev-preview
+    secrets: inherit
+
+  overwrite-prerelease:
+    name: Overwrite GitHub Pre-release dev-preview
+    needs: [prepare, build-assets]
+    if: >
+      needs.prepare.result == 'success' &&
+      needs.build-assets.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout tested commit
         uses: actions/checkout@v5
         with:
-          ref: ${{ steps.sha.outputs.sha }}
+          ref: ${{ needs.prepare.outputs.sha }}
           fetch-depth: 0
 
       - name: Move tag and overwrite Pre-release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: dev-preview
-          SHA: ${{ steps.sha.outputs.sha }}
+          SHA: ${{ needs.prepare.outputs.sha }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -49,7 +70,7 @@ jobs:
           SHORT=$(git rev-parse --short "$SHA")
           NOTES="Nightly-green tip of \`dev\` @ \`${SHORT}\` (\`${SHA}\`).
 
-          Overwritten on each successful [nightly-test](https://github.com/${{ github.repository }}/actions/workflows/nightly-test.yml). Not Latest — that remains the node-aligned semver release (e.g. v2.2.2).
+          Overwritten on each successful [nightly-test](https://github.com/${{ github.repository }}/actions/workflows/nightly-test.yml). Not Latest - that remains the node-aligned semver release (e.g. v2.2.2).
 
           ## Desktop / MCP / Casperatatui assets
           - \`Casper.Webclient.dev-preview.exe\`
@@ -71,21 +92,52 @@ jobs:
             --notes "$NOTES" \
             --target "$SHA"
 
-  upload-assets:
-    name: Upload Electron + MCP + Casperatatui assets
-    needs: overwrite-prerelease
+  attach-assets:
+    name: Attach built assets to Pre-release
+    needs: [overwrite-prerelease]
     if: needs.overwrite-prerelease.result == 'success'
-    uses: ./.github/workflows/release-github-assets.yml
-    with:
-      tag: dev-preview
-      ref: ${{ needs.overwrite-prerelease.outputs.sha }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download staged assets
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-mcp-casperatatui-dev-preview
+          path: release-assets
+
+      - name: Upload assets to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: dev-preview
+        run: |
+          set -euo pipefail
+          ls -la release-assets
+          expected=(
+            Casper.Webclient.dev-preview.exe
+            Casper.Webclient-dev-preview.AppImage
+            casper-webclient_dev-preview_amd64.snap
+            casper-rust-wasm-sdk-mcp-dev-preview-linux-x86_64
+            casperatatui-dev-preview-linux-x86_64
+          )
+          for f in "${expected[@]}"; do
+            test -f "release-assets/$f" || { echo "Missing staged asset: $f" >&2; exit 1; }
+          done
+          gh release upload "$TAG" release-assets/* --clobber
+          # Fail the job if GitHub still shows fewer than the five desktop/MCP/TUI files.
+          mapfile -t uploaded < <(gh release view "$TAG" --json assets --jq '.assets[].name' | sort)
+          echo "Uploaded asset names:"
+          printf '%s\n' "${uploaded[@]}"
+          for f in "${expected[@]}"; do
+            printf '%s\n' "${uploaded[@]}" | grep -Fxq "$f" || {
+              echo "Release $TAG missing asset after upload: $f" >&2
+              exit 1
+            }
+          done
 
   # Pull latest Hub :dev on Render after overnight-green tip (or manual preview run).
   render-redeploy:
     name: Trigger Render redeploy
-    needs: overwrite-prerelease
-    if: needs.overwrite-prerelease.result == 'success'
+    needs: attach-assets
+    if: needs.attach-assets.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render redeploy
