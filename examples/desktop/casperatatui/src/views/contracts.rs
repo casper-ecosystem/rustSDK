@@ -344,7 +344,7 @@ fn draw_writes(frame: &mut Frame, area: Rect, model: &AppModel) {
                     .add_modifier(Modifier::BOLD),
             )),
             Line::from(""),
-            Line::from("install / call_entrypoint need a session PEM (Phase 6)."),
+            Line::from("install / call_entrypoint need a session PEM (press o, or --secret-key)."),
             Line::from("Until then, use Actions for read queries, or expect SDK errors here."),
             Line::from(""),
             Line::from(format!(
@@ -362,7 +362,7 @@ fn draw_writes(frame: &mut Frame, area: Rect, model: &AppModel) {
             )),
             Line::from(""),
             Line::from("Restart with --enable-writes to show install / call_entrypoint."),
-            Line::from("PEM load + put policy arrive in Phase 6."),
+            Line::from("Then load a PEM with o or --secret-key."),
         ]
     };
     frame.render_widget(

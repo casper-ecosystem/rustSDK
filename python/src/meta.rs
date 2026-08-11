@@ -48,7 +48,7 @@ impl PySdk {
         self.inner.get_node_address(node_address)
     }
 
-    /// Set stored node address (binary-port not exposed in this epic).
+    /// Set stored node address (binary-port is not exposed on this binding).
     #[pyo3(signature = (node_address=None))]
     fn set_node_address(&mut self, node_address: Option<String>) -> PyResult<()> {
         self.inner.set_node_address(node_address).map_err(py_err)

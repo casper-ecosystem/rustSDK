@@ -1,4 +1,4 @@
-//! One-shot smoke: Network + Blocks/Txs + Accounts (Phase 1-3 paths).
+//! One-shot smoke: Network + Blocks/Txs + Accounts paths.
 
 use anyhow::Result;
 use casper_rust_wasm_sdk::types::verbosity::Verbosity;
