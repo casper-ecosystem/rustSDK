@@ -18,20 +18,18 @@ path = "src/lib.rs"
 
 [features]
 default = []
-# Sibling path-dep: ../../../../ceps-rust-ts-client/ceps-client (from this crate).
-# Does not enable SDK feature `js`.
 ceps = ["dep:ceps-client"]
 
 [dependencies]
 anyhow = "1"
-casper-rust-wasm-sdk = { path = "../../..", default-features = false, features = [
+casper-rust-wasm-sdk = { git = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk", branch = "dev", default-features = false, features = [
   "transaction",
   "contract",
   "helpers",
   "watcher",
   "SSE",
 ] }
-ceps-client = { path = "../../../../ceps-rust-ts-client/ceps-client", optional = true }
+ceps-client = { git = "https://github.com/Interchouette-ITC/ceps-rust-ts-client", branch = "dev", optional = true }
 clap = { version = "4", features = ["derive", "env"] }
 crossterm = "0.29"
 ctrlc = "3"
@@ -52,5 +50,3 @@ required-features = ["ceps"]
 [[example]]
 name = "smoke_ceps_install"
 required-features = ["ceps"]
-
-# TestBackend ships with ratatui 0.30 (no extra feature).

@@ -16,7 +16,7 @@ make run-tui
 env -u CARGO_TARGET_DIR cargo run -p casperatatui -- --preset nctl
 ```
 
-CEP Actions (optional sibling `ceps-rust-ts-client`):
+CEP / CEPS Actions (optional [`ceps-client`](https://github.com/Interchouette-ITC/ceps-rust-ts-client)):
 
 ```bash
 make run-casperatatui-ceps
@@ -25,7 +25,7 @@ make run-casperatatui-ceps
 env -u CARGO_TARGET_DIR cargo run -p casperatatui --features ceps -- --preset nctl
 ```
 
-Feature `ceps` path-deps `../../../../ceps-rust-ts-client/ceps-client` (from this crate). Default build stays green without that checkout. SDK feature `js` stays off for both default and `ceps`.
+Feature `ceps` pulls `ceps-client` from that repo (`branch = "dev"`). Default build stays green without it. SDK feature `js` stays off for both default and `ceps`.
 
 Extra args: `CASPERATATUI_ARGS` or `TUI_ARGS` (e.g. `make run-tui TUI_ARGS='--preset testnet'`).
 
@@ -48,7 +48,7 @@ Non-interactive smoke:
 cargo run -p casperatatui --example smoke_status
 # SSE collect always; put+wait when CASPER_SECRET_KEY is set:
 cargo run -p casperatatui --example smoke_write_wait
-# CEP (needs --features ceps + sibling checkout):
+# CEP (needs --features ceps; fetches ceps-client from git):
 cargo run -p casperatatui --features ceps --example smoke_ceps_query
 # install needs NCTL + PEM + WASM path (CEPS_CEP18_WASM or wasm_path):
 # CASPER_SECRET_KEY=… CEPS_CEP18_WASM=…/cep18.wasm \
@@ -68,27 +68,27 @@ CI: path-filtered [ci-casperatatui](../../../.github/workflows/ci-casperatatui.y
 
 ## Keys
 
-| Key              | Action                                            |
-| ---------------- | ------------------------------------------------- |
-| `q`              | Quit and **restore the terminal**                 |
-| Esc              | Back (detail / form); never quits                 |
-| Ctrl+Esc         | Quit (same as `q`)                                |
-| `r`              | Network seance; on Validators reloads auction     |
-| `e`              | Edit RPC URL (Enter applies + refreshes)          |
-| `1`–`9` / `h`    | Network…Wait / Help                               |
-| `l`              | (Blocks) load latest N blocks                     |
-| `/`              | Focus lookup / filter / Wait form                 |
-| `w`              | (Accounts/Validators) reward; (Wait) wait/collect |
-| `o` / `x`        | Load / unload session PEM (`--enable-writes`)     |
-| `b` / `s` / `p`  | (Writes) build / sign / put                       |
-| `t`              | (Writes) one-shot transfer                        |
-| Space            | (Wait SSE) toggle event name                      |
+| Key              | Action                                                                                       |
+| ---------------- | -------------------------------------------------------------------------------------------- |
+| `q`              | Quit and **restore the terminal**                                                            |
+| Esc              | Back (detail / form); never quits                                                            |
+| Ctrl+Esc         | Quit (same as `q`)                                                                           |
+| `r`              | Network seance; on Validators reloads auction                                                |
+| `e`              | Edit RPC URL (Enter applies + refreshes)                                                     |
+| `1`–`9` / `h`    | Network…Wait / Help                                                                          |
+| `l`              | (Blocks) load latest N blocks                                                                |
+| `/`              | Focus lookup / filter / Wait form                                                            |
+| `w`              | (Accounts/Validators) reward; (Wait) wait/collect                                            |
+| `o` / `x`        | Load / unload session PEM (`--enable-writes`)                                                |
+| `b` / `s` / `p`  | (Writes) build / sign / put                                                                  |
+| `t`              | (Writes) one-shot transfer                                                                   |
+| Space            | (Wait SSE) toggle event name                                                                 |
 | Tab / Left/Right | Cycle views (Left/Right always leave Actions; Tab cycles Actions panes / in-screen sections) |
-| `j` `k` / arrows | Scroll body / move lists                          |
-| Enter            | Open / fetch / start form action                  |
-| `:`              | Command palette                                   |
-| mouse select     | Works: mouse capture is **off**                   |
-| Ctrl-C           | Same as quit (signal handler restores TTY)        |
+| `j` `k` / arrows | Scroll body / move lists                                                                     |
+| Enter            | Open / fetch / start form action                                                             |
+| `:`              | Command palette                                                                              |
+| mouse select     | Works: mouse capture is **off**                                                              |
+| Ctrl-C           | Same as quit (signal handler restores TTY)                                                   |
 
 ## Writes (key `8`)
 
@@ -123,7 +123,7 @@ Requires `--enable-writes`. Load a PEM with `--secret-key` or `o`. Flow: Tab kin
 
 ## Actions (key `7`)
 
-RPC + helpers catalog; write methods appear when writes enabled and PEM loaded. With `--features ceps`, a `ceps` group adds CEP-18/78/85/95 info, queries, and installs (sibling `ceps-client`; WASM via action arg or `CEPS_CEP*_WASM` / `CEPS_WASM_PATH`).
+RPC + helpers catalog; write methods appear when writes enabled and PEM loaded. With `--features ceps`, a `ceps` group adds CEP-18/78/85/95 info, queries, and installs (`ceps-client` via git; WASM via action arg or `CEPS_CEP*_WASM` / `CEPS_WASM_PATH`).
 
 ## Command palette (`:`)
 

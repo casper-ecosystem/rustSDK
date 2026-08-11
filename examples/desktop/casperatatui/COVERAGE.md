@@ -28,7 +28,7 @@ Screen to SDK / MCP symbols used by Casperatatui today.
 cargo run -p casperatatui --example smoke_status
 # optional write+wait (needs PEM path in env, never commit keys):
 # CASPER_SECRET_KEY=/path/to/secret_key.pem cargo run -p casperatatui --example smoke_write_wait
-# CEP (sibling ceps-rust-ts-client + --features ceps):
+# CEP (--features ceps; ceps-client from git):
 # cargo run -p casperatatui --features ceps --example smoke_ceps_query
 # CASPER_SECRET_KEY=… CEPS_CEP18_WASM=…/cep18.wasm \
 #   cargo run -p casperatatui --features ceps --example smoke_ceps_install

@@ -2,7 +2,6 @@
 name = "casper-signing-desk"
 version = "0.1.0"
 description = "Casper signing desk: native PEM sign/verify, transfer/stake, multisig approvals"
-authors = ["casper-ecosystem"]
 edition = "2021"
 rust-version = "1.88"
 license = "Apache-2.0"
@@ -21,7 +20,7 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 anyhow = "1"
-casper-rust-wasm-sdk = { path = "../../../..", default-features = false, features = [
+casper-rust-wasm-sdk = { git = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk", branch = "dev", default-features = false, features = [
   "transaction",
   "helpers",
   "watcher",

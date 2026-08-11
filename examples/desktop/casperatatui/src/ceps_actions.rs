@@ -1,4 +1,4 @@
-//! CEP Actions behind feature `ceps` (ceps-client path-dep).
+//! CEP Actions behind feature `ceps` (ceps-client git dep).
 
 use casper_rust_wasm_sdk::helpers::public_key_from_secret_key;
 use casper_rust_wasm_sdk::types::verbosity::Verbosity;
@@ -7,8 +7,8 @@ use ceps_client::cep78::InstallArgs as Cep78InstallArgs;
 use ceps_client::cep85::InstallArgs as Cep85InstallArgs;
 use ceps_client::cep95::InstallArgs as Cep95InstallArgs;
 use ceps_client::{
-    CallResult, Cep18Client, Cep78Client, Cep85Client, Cep95Client, EventsMode, EventsMode78,
-    TransactionParams,
+    CEP18Client, CEP78Client, CEP85Client, CEP95Client, CallResult, EventsMode, EventsMode78,
+    TransactionParams, Verbosity as CepsVerbosity,
 };
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -187,20 +187,52 @@ fn chain_opt(ctx: &CepsCtx<'_>) -> Option<String> {
     }
 }
 
-fn cep18_client(ctx: &CepsCtx<'_>) -> Result<Cep18Client, String> {
-    Cep18Client::new(ctx.rpc, sse_opt(ctx), chain_opt(ctx), Some(ctx.verbosity)).map_err(ceps_err)
+fn cep18_client(ctx: &CepsCtx<'_>) -> Result<CEP18Client, String> {
+    CEP18Client::new(
+        ctx.rpc,
+        sse_opt(ctx),
+        chain_opt(ctx),
+        Some(ceps_verbosity(ctx.verbosity)),
+    )
+    .map_err(ceps_err)
 }
 
-fn cep78_client(ctx: &CepsCtx<'_>) -> Result<Cep78Client, String> {
-    Cep78Client::new(ctx.rpc, sse_opt(ctx), chain_opt(ctx), Some(ctx.verbosity)).map_err(ceps_err)
+fn cep78_client(ctx: &CepsCtx<'_>) -> Result<CEP78Client, String> {
+    CEP78Client::new(
+        ctx.rpc,
+        sse_opt(ctx),
+        chain_opt(ctx),
+        Some(ceps_verbosity(ctx.verbosity)),
+    )
+    .map_err(ceps_err)
 }
 
-fn cep85_client(ctx: &CepsCtx<'_>) -> Result<Cep85Client, String> {
-    Cep85Client::new(ctx.rpc, sse_opt(ctx), chain_opt(ctx), Some(ctx.verbosity)).map_err(ceps_err)
+fn cep85_client(ctx: &CepsCtx<'_>) -> Result<CEP85Client, String> {
+    CEP85Client::new(
+        ctx.rpc,
+        sse_opt(ctx),
+        chain_opt(ctx),
+        Some(ceps_verbosity(ctx.verbosity)),
+    )
+    .map_err(ceps_err)
 }
 
-fn cep95_client(ctx: &CepsCtx<'_>) -> Result<Cep95Client, String> {
-    Cep95Client::new(ctx.rpc, sse_opt(ctx), chain_opt(ctx), Some(ctx.verbosity)).map_err(ceps_err)
+fn cep95_client(ctx: &CepsCtx<'_>) -> Result<CEP95Client, String> {
+    CEP95Client::new(
+        ctx.rpc,
+        sse_opt(ctx),
+        chain_opt(ctx),
+        Some(ceps_verbosity(ctx.verbosity)),
+    )
+    .map_err(ceps_err)
+}
+
+fn ceps_verbosity(v: Verbosity) -> CepsVerbosity {
+    match v {
+        Verbosity::Low => CepsVerbosity::Low,
+        Verbosity::Medium => CepsVerbosity::Medium,
+        Verbosity::High => CepsVerbosity::High,
+    }
 }
 
 fn endpoints_json(cep: &str, rpc: &str, sse: Option<&str>, chain: &str) -> Value {
@@ -218,28 +250,28 @@ fn package_opt(args: &HashMap<String, String>) -> Option<String> {
         .filter(|s| !s.is_empty())
 }
 
-fn bind_contract(client: &mut Cep18Client, args: &HashMap<String, String>) -> Result<(), String> {
+fn bind_contract(client: &mut CEP18Client, args: &HashMap<String, String>) -> Result<(), String> {
     let hash = required(args, "contract_hash")?;
     client
         .set_contract_hash(&hash, package_opt(args).as_deref())
         .map_err(ceps_err)
 }
 
-fn bind_contract78(client: &mut Cep78Client, args: &HashMap<String, String>) -> Result<(), String> {
+fn bind_contract78(client: &mut CEP78Client, args: &HashMap<String, String>) -> Result<(), String> {
     let hash = required(args, "contract_hash")?;
     client
         .set_contract_hash(&hash, package_opt(args).as_deref())
         .map_err(ceps_err)
 }
 
-fn bind_contract85(client: &mut Cep85Client, args: &HashMap<String, String>) -> Result<(), String> {
+fn bind_contract85(client: &mut CEP85Client, args: &HashMap<String, String>) -> Result<(), String> {
     let hash = required(args, "contract_hash")?;
     client
         .set_contract_hash(&hash, package_opt(args).as_deref())
         .map_err(ceps_err)
 }
 
-fn bind_contract95(client: &mut Cep95Client, args: &HashMap<String, String>) -> Result<(), String> {
+fn bind_contract95(client: &mut CEP95Client, args: &HashMap<String, String>) -> Result<(), String> {
     let hash = required(args, "contract_hash")?;
     client
         .set_contract_hash(&hash, package_opt(args).as_deref())
@@ -258,7 +290,7 @@ async fn cep18_install(args: &HashMap<String, String>, ctx: &CepsCtx<'_>) -> Res
 
     let client = cep18_client(ctx)?;
     let install_args = Cep18InstallArgs::new(&name, &symbol, decimals, &total_supply)
-        .with_events_mode(EventsMode::Ces)
+        .with_events_mode(EventsMode::CES)
         .with_mint_and_burn(true);
     let tx = transaction_params(pem, &payment, ctx);
     let put = client
@@ -270,12 +302,10 @@ async fn cep18_install(args: &HashMap<String, String>, ctx: &CepsCtx<'_>) -> Res
     if let Ok(pk) = public_key_from_secret_key(pem) {
         let mut client = client;
         if let Ok(contract) = client
-            .core()
             .get_account_named_key(&pk, &format!("cep18_contract_hash_{name}"))
             .await
         {
             let package = client
-                .core()
                 .get_account_named_key(&pk, &format!("cep18_contract_package_{name}"))
                 .await
                 .ok();
@@ -301,7 +331,7 @@ async fn cep78_install(args: &HashMap<String, String>, ctx: &CepsCtx<'_>) -> Res
 
     let client = cep78_client(ctx)?;
     let install_args =
-        Cep78InstallArgs::new(&name, &symbol, supply).with_events_mode(EventsMode78::Ces);
+        Cep78InstallArgs::new(&name, &symbol, supply).with_events_mode(EventsMode78::CES);
     let tx = transaction_params(pem, &payment, ctx);
     let put = client
         .install(&install_args, &wasm, &tx)
@@ -312,12 +342,10 @@ async fn cep78_install(args: &HashMap<String, String>, ctx: &CepsCtx<'_>) -> Res
     if let Ok(pk) = public_key_from_secret_key(pem) {
         let mut client = client;
         if let Ok(contract) = client
-            .core()
             .get_account_named_key(&pk, &format!("cep78_contract_hash_{name}"))
             .await
         {
             let package = client
-                .core()
                 .get_account_named_key(&pk, &format!("cep78_contract_package_{name}"))
                 .await
                 .ok();
@@ -342,7 +370,7 @@ async fn cep85_install(args: &HashMap<String, String>, ctx: &CepsCtx<'_>) -> Res
 
     let client = cep85_client(ctx)?;
     let install_args = Cep85InstallArgs::new(&name, &uri)
-        .with_events_mode(EventsMode::Ces)
+        .with_events_mode(EventsMode::CES)
         .with_enable_burn(true);
     let tx = transaction_params(pem, &payment, ctx);
     let put = client
@@ -354,12 +382,10 @@ async fn cep85_install(args: &HashMap<String, String>, ctx: &CepsCtx<'_>) -> Res
     if let Ok(pk) = public_key_from_secret_key(pem) {
         let mut client = client;
         if let Ok(contract) = client
-            .core()
             .get_account_named_key(&pk, &format!("cep85_contract_hash_{name}"))
             .await
         {
             let package = client
-                .core()
                 .get_account_named_key(&pk, &format!("cep85_contract_package_{name}"))
                 .await
                 .ok();

@@ -68,7 +68,7 @@ pub fn draw_help(frame: &mut Frame, area: Rect, model: &AppModel) {
                 .fg(Color::Cyan)
                 .add_modifier(Modifier::BOLD),
         )),
-        Line::from("  Build with --features ceps (sibling ceps-rust-ts-client/ceps-client)."),
+        Line::from("  Build with --features ceps (ceps-client from git, branch dev)."),
         Line::from("  SDK feature js stays off. CEP install needs --enable-writes + PEM + policy."),
         Line::from(""),
         Line::from(Span::styled(

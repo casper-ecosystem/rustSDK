@@ -217,7 +217,7 @@ run-casperatatui:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
 		cargo run -p casperatatui -- --preset nctl $(CASPERATATUI_ARGS) $(TUI_ARGS)
 
-# Needs sibling checkout ../../ceps-rust-ts-client (from repo root).
+# Needs network once to fetch Interchouette-ITC/ceps-rust-ts-client (git dep, branch dev).
 run-casperatatui-ceps:
 	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
 		cargo run -p casperatatui --features ceps -- --preset nctl $(CASPERATATUI_ARGS) $(TUI_ARGS)
