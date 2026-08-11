@@ -32,7 +32,7 @@ jobs:
 
   # Build before any release delete so a failed make pack keeps the previous assets.
   build-assets:
-    name: Build Electron + MCP + Casperatatui assets
+    name: Build Electron + MCP + Casperatatui + Signing Desk assets
     needs: prepare
     if: needs.prepare.result == 'success'
     uses: ./.github/workflows/release-github-assets.yml
@@ -40,6 +40,7 @@ jobs:
       tag: dev-preview
       ref: ${{ needs.prepare.outputs.sha }}
       attach_to_release: false
+      include_signing_desk: true
       artifact_name: desktop-mcp-casperatatui-dev-preview
     secrets: inherit
 
@@ -72,12 +73,14 @@ jobs:
 
           Overwritten on each successful [nightly-test](https://github.com/${{ github.repository }}/actions/workflows/nightly-test.yml). Not Latest - that remains the node-aligned semver release (e.g. v2.2.2).
 
-          ## Desktop / MCP / Casperatatui assets
+          ## Desktop / MCP / Casperatatui / Signing Desk assets
           - \`Casper.Webclient.dev-preview.exe\`
           - \`Casper.Webclient-dev-preview.AppImage\`
           - \`casper-webclient_dev-preview_amd64.snap\`
           - \`casper-rust-wasm-sdk-mcp-dev-preview-linux-x86_64\`
           - \`casperatatui-dev-preview-linux-x86_64\`
+          - \`Casper.SigningDesk-dev-preview.AppImage\`
+          - \`casper-signing-desk-dev-preview-linux-x86_64\`
           "
 
           if gh release view "$TAG" >/dev/null 2>&1; then
@@ -117,12 +120,14 @@ jobs:
             casper-webclient_dev-preview_amd64.snap
             casper-rust-wasm-sdk-mcp-dev-preview-linux-x86_64
             casperatatui-dev-preview-linux-x86_64
+            Casper.SigningDesk-dev-preview.AppImage
+            casper-signing-desk-dev-preview-linux-x86_64
           )
           for f in "${expected[@]}"; do
             test -f "release-assets/$f" || { echo "Missing staged asset: $f" >&2; exit 1; }
           done
           gh release upload "$TAG" release-assets/* --clobber
-          # Fail the job if GitHub still shows fewer than the five desktop/MCP/TUI files.
+          # Fail the job if any expected tip desktop/MCP/TUI/Signing Desk file is missing.
           mapfile -t uploaded < <(gh release view "$TAG" --json assets --jq '.assets[].name' | sort)
           echo "Uploaded asset names:"
           printf '%s\n' "${uploaded[@]}"
