@@ -1,3 +1,6 @@
+# Recipes use bash (pipefail, etc.). Ubuntu CI /bin/sh is dash and rejects -o pipefail.
+SHELL := /bin/bash
+
 prepare:
 	rustup target add wasm32-unknown-unknown
 
