@@ -1,6 +1,6 @@
 # MCP server for casper-rust-wasm-sdk
 
-Rust **mcpkit** crate (`casper-rust-wasm-sdk-mcp`) exposing the native SDK API as MCP tools (in-process path dependency, not an HTTP proxy of the SDK).
+Rust **rmcp** crate (`casper-rust-wasm-sdk-mcp`) exposing the native SDK API as MCP tools (in-process path dependency, not an HTTP proxy of the SDK).
 
 Points at **your** Casper JSON-RPC / binary-port endpoints (`CASPER_RPC_URL`, `CASPER_NODE_URL`). No cloud indexer, no API key for chain data.
 

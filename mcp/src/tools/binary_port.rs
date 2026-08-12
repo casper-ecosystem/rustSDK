@@ -9,7 +9,7 @@ use casper_rust_wasm_sdk::types::public_key::PublicKey;
 use casper_rust_wasm_sdk::types::record_id::RecordId;
 use casper_rust_wasm_sdk::types::transaction::Transaction;
 use casper_types::EraId;
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::CallToolResult;
 use serde::Serialize;
 
 use crate::format;
@@ -54,7 +54,7 @@ pub fn tool_names() -> &'static [&'static str] {
     ]
 }
 
-fn bin_ok<T: Serialize, E: std::fmt::Display>(result: Result<T, E>) -> ToolOutput {
+fn bin_ok<T: Serialize, E: std::fmt::Display>(result: Result<T, E>) -> CallToolResult {
     match result {
         Ok(value) => format::serialize_ok(&value),
         Err(err) => format::err(err),
@@ -111,12 +111,12 @@ macro_rules! bin_call {
     };
 }
 
-pub async fn get_binary_latest_switch_block_header(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_latest_switch_block_header(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_latest_switch_block_header(node_address))
 }
 
-pub async fn get_binary_latest_block_header(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_latest_block_header(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_latest_block_header(node_address))
 }
@@ -124,7 +124,7 @@ pub async fn get_binary_latest_block_header(node_address: Option<String>) -> Too
 pub async fn get_binary_block_header_by_height(
     height: u64,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_block_header_by_height(node_address, height))
 }
@@ -132,7 +132,7 @@ pub async fn get_binary_block_header_by_height(
 pub async fn get_binary_block_header_by_hash(
     block_hash: String,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let hash = match parse_block_hash(&block_hash) {
         Ok(h) => h,
         Err(err) => return format::err(err),
@@ -141,7 +141,9 @@ pub async fn get_binary_block_header_by_hash(
     bin_call!(sdk.get_binary_block_header_by_hash(node_address, hash))
 }
 
-pub async fn get_binary_latest_block_with_signatures(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_latest_block_with_signatures(
+    node_address: Option<String>,
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_latest_block_with_signatures(node_address))
 }
@@ -149,7 +151,7 @@ pub async fn get_binary_latest_block_with_signatures(node_address: Option<String
 pub async fn get_binary_block_with_signatures_by_height(
     height: u64,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_block_with_signatures_by_height(node_address, height))
 }
@@ -157,7 +159,7 @@ pub async fn get_binary_block_with_signatures_by_height(
 pub async fn get_binary_block_with_signatures_by_hash(
     block_hash: String,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let hash = match parse_block_hash(&block_hash) {
         Ok(h) => h,
         Err(err) => return format::err(err),
@@ -170,7 +172,7 @@ pub async fn get_binary_transaction_by_hash(
     hash: String,
     with_finalized_approvals: Option<bool>,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let tx_hash = match parse_tx_hash(&hash) {
         Ok(h) => h,
         Err(err) => return format::err(err),
@@ -183,62 +185,64 @@ pub async fn get_binary_transaction_by_hash(
     ))
 }
 
-pub async fn get_binary_peers(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_peers(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_peers(node_address))
 }
 
-pub async fn get_binary_uptime(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_uptime(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_uptime(node_address))
 }
 
-pub async fn get_binary_last_progress(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_last_progress(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_last_progress(node_address))
 }
 
-pub async fn get_binary_reactor_state(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_reactor_state(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_reactor_state(node_address))
 }
 
-pub async fn get_binary_network_name(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_network_name(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_network_name(node_address))
 }
 
-pub async fn get_binary_consensus_validator_changes(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_consensus_validator_changes(
+    node_address: Option<String>,
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_consensus_validator_changes(node_address))
 }
 
-pub async fn get_binary_block_synchronizer_status(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_block_synchronizer_status(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_block_synchronizer_status(node_address))
 }
 
-pub async fn get_binary_available_block_range(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_available_block_range(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_available_block_range(node_address))
 }
 
-pub async fn get_binary_next_upgrade(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_next_upgrade(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_next_upgrade(node_address))
 }
 
-pub async fn get_binary_consensus_status(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_consensus_status(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_consensus_status(node_address))
 }
 
-pub async fn get_binary_chainspec_raw_bytes(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_chainspec_raw_bytes(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_chainspec_raw_bytes(node_address))
 }
 
-pub async fn get_binary_node_status(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_node_status(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_node_status(node_address))
 }
@@ -247,7 +251,7 @@ pub async fn get_binary_validator_reward_by_era(
     validator_key: String,
     era: u64,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let pk = match parse_pubkey(&validator_key) {
         Ok(k) => k,
         Err(err) => return format::err(err),
@@ -260,7 +264,7 @@ pub async fn get_binary_validator_reward_by_block_height(
     validator_key: String,
     block_height: u64,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let pk = match parse_pubkey(&validator_key) {
         Ok(k) => k,
         Err(err) => return format::err(err),
@@ -273,7 +277,7 @@ pub async fn get_binary_validator_reward_by_block_hash(
     validator_key: String,
     block_hash: String,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let pk = match parse_pubkey(&validator_key) {
         Ok(k) => k,
         Err(err) => return format::err(err),
@@ -291,7 +295,7 @@ pub async fn get_binary_delegator_reward_by_era(
     delegator_key: String,
     era: u64,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let v = match parse_pubkey(&validator_key) {
         Ok(k) => k,
         Err(err) => return format::err(err),
@@ -309,7 +313,7 @@ pub async fn get_binary_delegator_reward_by_block_height(
     delegator_key: String,
     block_height: u64,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let v = match parse_pubkey(&validator_key) {
         Ok(k) => k,
         Err(err) => return format::err(err),
@@ -327,7 +331,7 @@ pub async fn get_binary_delegator_reward_by_block_hash(
     delegator_key: String,
     block_hash: String,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let v = match parse_pubkey(&validator_key) {
         Ok(k) => k,
         Err(err) => return format::err(err),
@@ -348,7 +352,7 @@ pub async fn get_binary_read_record(
     record_id: u16,
     key_hex: String,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let id = match RecordId::new(record_id) {
         Ok(id) => id,
         Err(err) => return format::err(err),
@@ -373,7 +377,7 @@ pub async fn get_binary_global_state_item(
     key: String,
     path: Option<String>,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let key = match parse_key(&key) {
         Ok(k) => k,
         Err(err) => return format::err(err),
@@ -391,7 +395,7 @@ pub async fn get_binary_global_state_item_by_state_root_hash(
     key: String,
     path: Option<String>,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let digest = match parse_digest(&state_root_hash) {
         Ok(d) => d,
         Err(err) => return format::err(err),
@@ -413,7 +417,7 @@ pub async fn get_binary_global_state_item_by_block_hash(
     key: String,
     path: Option<String>,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let hash = match parse_block_hash(&block_hash) {
         Ok(h) => h,
         Err(err) => return format::err(err),
@@ -435,7 +439,7 @@ pub async fn get_binary_global_state_item_by_block_height(
     key: String,
     path: Option<String>,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let key = match parse_key(&key) {
         Ok(k) => k,
         Err(err) => return format::err(err),
@@ -456,7 +460,7 @@ pub async fn get_binary_global_state_item_by_block_height(
 pub async fn get_binary_try_speculative_execution(
     transaction_json: String,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let transaction = match Transaction::from_json_string(&transaction_json) {
         Ok(t) => t,
         Err(err) => return format::err(err),
@@ -465,7 +469,7 @@ pub async fn get_binary_try_speculative_execution(
     bin_call!(sdk.get_binary_try_speculative_execution(node_address, transaction.into()))
 }
 
-pub async fn get_binary_protocol_version(node_address: Option<String>) -> ToolOutput {
+pub async fn get_binary_protocol_version(node_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     bin_call!(sdk.get_binary_protocol_version(node_address))
 }

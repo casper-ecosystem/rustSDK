@@ -13,7 +13,7 @@ use casper_client::cli::{
     make_transaction as client_make_transaction, parse::transfer_target, TransactionBuilderParams,
 };
 use casper_types::U512;
-use rand::Rng;
+use rand::RngExt;
 use std::str::FromStr;
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;

@@ -15,7 +15,7 @@ use casper_client::{
     cli::deploy::make_transfer, rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
     SuccessResponse,
 };
-use rand::Rng;
+use rand::RngExt;
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 

@@ -1,33 +1,41 @@
-//! MCP server (`mcpkit`) for `casper-rust-wasm-sdk-mcp` (stdio or Streamable HTTP).
+//! MCP server (`rmcp`) for `casper-rust-wasm-sdk-mcp` (stdio or Streamable HTTP).
 
 #![allow(clippy::unused_async)]
+#![allow(non_snake_case)] // sdk_SSE_* / sdk_CES_* tool names + rmcp-generated *_tool_attr
 
-use mcpkit::prelude::*;
-use mcpkit::transport::stdio::StdioTransport;
-use mcpkit_axum::McpRouter;
+use std::sync::Arc;
 
+use rmcp::{
+    handler::server::wrapper::Parameters,
+    model::{CallToolResult, ServerCapabilities, ServerInfo},
+    tool, tool_handler, tool_router,
+    transport::stdio,
+    ErrorData as McpError, ServerHandler, ServiceExt,
+};
+
+use crate::tool_args::*;
 use crate::{compose, format, sdk_handle, tools};
 
 /// MCP server handle exposing Casper SDK tools.
+#[derive(Clone, Default)]
 pub struct CasperSdkMcp;
 
 /// Default HTTP bind address for Streamable MCP.
 pub const DEFAULT_HTTP_LISTEN: &str = "0.0.0.0:5790";
 
-// Keep in sync with Cargo.toml `version` (enforced by unit test below).
-#[mcp_server(name = "casper-rust-wasm-sdk", version = "2.2.2")]
+#[tool_router]
 impl CasperSdkMcp {
     #[tool(description = "Help: feature matrix, env vars, endpoints, and available sdk_* tools")]
-    async fn sdk_help(&self) -> ToolOutput {
-        format::text_ok(help_text())
+    async fn sdk_help(&self) -> Result<CallToolResult, McpError> {
+        Ok(format::text_ok(help_text()))
     }
 
     #[tool(
         description = "Show current CASPER_RPC_URL / CASPER_NODE_URL / verbosity on the shared SDK"
     )]
-    async fn sdk_get_endpoints(&self) -> ToolOutput {
+    async fn sdk_get_endpoints(&self) -> Result<CallToolResult, McpError> {
         let snap = sdk_handle::endpoint_snapshot();
-        format::json_ok(&serde_json::json!({
+        Ok(format::json_ok(&serde_json::json!({
             "rpc_address": snap.rpc_address,
             "node_address": snap.node_address,
             "verbosity": snap.verbosity,
@@ -36,7 +44,7 @@ impl CasperSdkMcp {
                 "CASPER_NODE_URL": sdk_handle::ENV_NODE_URL,
                 "CASPER_VERBOSITY": sdk_handle::ENV_VERBOSITY,
             }
-        }))
+        })))
     }
 
     #[tool(
@@ -44,29 +52,31 @@ impl CasperSdkMcp {
     )]
     async fn sdk_set_endpoints(
         &self,
-        rpc_address: Option<String>,
-        node_address: Option<String>,
-        verbosity: Option<String>,
-    ) -> ToolOutput {
+        Parameters(SdkSetEndpointsArgs {
+            rpc_address,
+            node_address,
+            verbosity,
+        }): Parameters<SdkSetEndpointsArgs>,
+    ) -> Result<CallToolResult, McpError> {
         let sdk = sdk_handle::shared();
         let mut guard = match sdk.lock() {
             Ok(g) => g,
-            Err(err) => return format::err(format!("sdk mutex poisoned: {err}")),
+            Err(err) => return Ok(format::err(format!("sdk mutex poisoned: {err}"))),
         };
         if let Some(rpc) = rpc_address {
             if let Err(err) = guard.set_rpc_address(Some(rpc)) {
-                return format::err(err);
+                return Ok(format::err(err));
             }
         }
         if let Some(node) = node_address {
             if let Err(err) = guard.set_node_address(Some(node)) {
-                return format::err(err);
+                return Ok(format::err(err));
             }
         }
         if let Some(raw) = verbosity {
             let v = sdk_handle::parse_verbosity(&raw);
             if let Err(err) = guard.set_verbosity(Some(v)) {
-                return format::err(err);
+                return Ok(format::err(err));
             }
         }
         let snap = sdk_handle::EndpointSnapshot {
@@ -74,23 +84,29 @@ impl CasperSdkMcp {
             node_address: guard.get_node_address(None),
             verbosity: format!("{:?}", guard.get_verbosity(None)),
         };
-        format::json_ok(&serde_json::json!({
+        Ok(format::json_ok(&serde_json::json!({
             "rpc_address": snap.rpc_address,
             "node_address": snap.node_address,
             "verbosity": snap.verbosity,
-        }))
+        })))
     }
 
-    // --- helpers (feature = "helpers") ---
-
     #[tool(description = "Current RFC3339 timestamp (optional unix-ms timestamp override)")]
-    async fn sdk_get_current_timestamp(&self, timestamp: Option<String>) -> ToolOutput {
-        tools::helpers::get_current_timestamp(timestamp)
+    async fn sdk_get_current_timestamp(
+        &self,
+        Parameters(SdkGetCurrentTimestampArgs { timestamp }): Parameters<
+            SdkGetCurrentTimestampArgs,
+        >,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::get_current_timestamp(timestamp))
     }
 
     #[tool(description = "Blake2b-256 hex digest of a UTF-8 string")]
-    async fn sdk_get_blake2b_hash(&self, meta_data: String) -> ToolOutput {
-        tools::helpers::get_blake2b_hash(meta_data)
+    async fn sdk_get_blake2b_hash(
+        &self,
+        Parameters(SdkGetBlake2bHashArgs { meta_data }): Parameters<SdkGetBlake2bHashArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::get_blake2b_hash(meta_data))
     }
 
     #[tool(
@@ -98,153 +114,216 @@ impl CasperSdkMcp {
     )]
     async fn sdk_make_dictionary_item_key(
         &self,
-        key: String,
-        value_key: Option<String>,
-        value_u256: Option<String>,
-    ) -> ToolOutput {
-        tools::helpers::make_dictionary_item_key(key, value_key, value_u256)
+        Parameters(SdkMakeDictionaryItemKeyArgs {
+            key,
+            value_key,
+            value_u256,
+        }): Parameters<SdkMakeDictionaryItemKeyArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::make_dictionary_item_key(
+            key, value_key, value_u256,
+        ))
     }
 
     #[tool(description = "CEP-18 base64 key from account-hash-… string")]
-    async fn sdk_get_base64_key_from_account_hash(&self, account_hash: String) -> ToolOutput {
-        tools::helpers::get_base64_key_from_account_hash(account_hash)
+    async fn sdk_get_base64_key_from_account_hash(
+        &self,
+        Parameters(SdkGetBase64KeyFromAccountHashArgs { account_hash }): Parameters<
+            SdkGetBase64KeyFromAccountHashArgs,
+        >,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::get_base64_key_from_account_hash(
+            account_hash,
+        ))
     }
 
     #[tool(description = "CEP-18 base64 key from hash-… formatted key")]
-    async fn sdk_get_base64_key_from_key_hash(&self, formatted_hash: String) -> ToolOutput {
-        tools::helpers::get_base64_key_from_key_hash(formatted_hash)
+    async fn sdk_get_base64_key_from_key_hash(
+        &self,
+        Parameters(SdkGetBase64KeyFromKeyHashArgs { formatted_hash }): Parameters<
+            SdkGetBase64KeyFromKeyHashArgs,
+        >,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::get_base64_key_from_key_hash(formatted_hash))
     }
 
     #[tool(description = "TTL string or SDK default")]
-    async fn sdk_get_ttl_or_default(&self, ttl: Option<String>) -> ToolOutput {
-        tools::helpers::get_ttl_or_default(ttl)
+    async fn sdk_get_ttl_or_default(
+        &self,
+        Parameters(SdkGetTtlOrDefaultArgs { ttl }): Parameters<SdkGetTtlOrDefaultArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::get_ttl_or_default(ttl))
     }
 
     #[tool(description = "Parse a timestamp string")]
-    async fn sdk_parse_timestamp(&self, value: String) -> ToolOutput {
-        tools::helpers::parse_timestamp(value)
+    async fn sdk_parse_timestamp(
+        &self,
+        Parameters(SdkParseTimestampArgs { value }): Parameters<SdkParseTimestampArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::parse_timestamp(value))
     }
 
     #[tool(description = "Parse a TTL / TimeDiff string")]
-    async fn sdk_parse_ttl(&self, value: String) -> ToolOutput {
-        tools::helpers::parse_ttl(value)
+    async fn sdk_parse_ttl(
+        &self,
+        Parameters(SdkParseTimestampArgs { value }): Parameters<SdkParseTimestampArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::parse_ttl(value))
     }
 
     #[tool(description = "Gas price or SDK default")]
-    async fn sdk_get_gas_price_or_default(&self, gas_price: Option<u64>) -> ToolOutput {
-        tools::helpers::get_gas_price_or_default(gas_price)
+    async fn sdk_get_gas_price_or_default(
+        &self,
+        Parameters(SdkGetGasPriceOrDefaultArgs { gas_price }): Parameters<
+            SdkGetGasPriceOrDefaultArgs,
+        >,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::get_gas_price_or_default(gas_price))
     }
 
     #[tool(description = "Generate Ed25519 secret key PEM (local; treat as secret)")]
-    async fn sdk_secret_key_generate(&self) -> ToolOutput {
-        tools::helpers::secret_key_generate()
+    async fn sdk_secret_key_generate(&self) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::secret_key_generate())
     }
 
     #[tool(description = "Generate secp256k1 secret key PEM (local; treat as secret)")]
-    async fn sdk_secret_key_secp256k1_generate(&self) -> ToolOutput {
-        tools::helpers::secret_key_secp256k1_generate()
+    async fn sdk_secret_key_secp256k1_generate(&self) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::secret_key_secp256k1_generate())
     }
 
     #[tool(description = "Validate a secret key PEM (does not echo the secret)")]
-    async fn sdk_secret_key_from_pem(&self, secret_key: String) -> ToolOutput {
-        tools::helpers::secret_key_from_pem(secret_key)
+    async fn sdk_secret_key_from_pem(
+        &self,
+        Parameters(SdkSecretKeyFromPemArgs { secret_key }): Parameters<SdkSecretKeyFromPemArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::secret_key_from_pem(secret_key))
     }
 
     #[tool(description = "Derive public key hex from secret key PEM")]
-    async fn sdk_public_key_from_secret_key(&self, secret_key: String) -> ToolOutput {
-        tools::helpers::public_key_from_secret_key(secret_key)
+    async fn sdk_public_key_from_secret_key(
+        &self,
+        Parameters(SdkSecretKeyFromPemArgs { secret_key }): Parameters<SdkSecretKeyFromPemArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::public_key_from_secret_key(secret_key))
     }
 
     #[tool(description = "Decode hex string to byte array JSON")]
-    async fn sdk_hex_to_uint8_vec(&self, hex_string: String) -> ToolOutput {
-        tools::helpers::hex_to_uint8_vec(hex_string)
+    async fn sdk_hex_to_uint8_vec(
+        &self,
+        Parameters(SdkHexToUint8VecArgs { hex_string }): Parameters<SdkHexToUint8VecArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::hex_to_uint8_vec(hex_string))
     }
 
     #[tool(description = "Decode hex string to UTF-8 (lossy) text")]
-    async fn sdk_hex_to_string(&self, hex_string: String) -> ToolOutput {
-        tools::helpers::hex_to_string(hex_string)
+    async fn sdk_hex_to_string(
+        &self,
+        Parameters(SdkHexToUint8VecArgs { hex_string }): Parameters<SdkHexToUint8VecArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::hex_to_string(hex_string))
     }
 
     #[tool(description = "Convert motes string to CSPR")]
-    async fn sdk_motes_to_cspr(&self, motes: String) -> ToolOutput {
-        tools::helpers::motes_to_cspr(motes)
+    async fn sdk_motes_to_cspr(
+        &self,
+        Parameters(SdkMotesToCsprArgs { motes }): Parameters<SdkMotesToCsprArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::motes_to_cspr(motes))
     }
 
     #[tool(description = "Pretty-print a JSON string at optional verbosity (low|medium|high)")]
-    async fn sdk_json_pretty_print(&self, value: String, verbosity: Option<String>) -> ToolOutput {
-        tools::helpers::json_pretty_print(value, verbosity)
+    async fn sdk_json_pretty_print(
+        &self,
+        Parameters(SdkJsonPrettyPrintArgs { value, verbosity }): Parameters<SdkJsonPrettyPrintArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::json_pretty_print(value, verbosity))
     }
 
     #[tool(description = "Convert a CLValue JSON document to JSON Value")]
-    async fn sdk_cl_value_to_json(&self, cl_value_json: String) -> ToolOutput {
-        tools::helpers::cl_value_to_json(cl_value_json)
+    async fn sdk_cl_value_to_json(
+        &self,
+        Parameters(SdkClValueToJsonArgs { cl_value_json }): Parameters<SdkClValueToJsonArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::helpers::cl_value_to_json(cl_value_json))
     }
-
-    // --- rpc (feature = "rpc") ---
 
     #[tool(description = "JSON-RPC info_get_status / get_node_status")]
     async fn sdk_get_node_status(
         &self,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_node_status(verbosity, rpc_address).await
+        Parameters(RpcOpts {
+            verbosity,
+            rpc_address,
+        }): Parameters<RpcOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_node_status(verbosity, rpc_address).await)
     }
 
     #[tool(description = "JSON-RPC info_get_peers")]
     async fn sdk_get_peers(
         &self,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_peers(verbosity, rpc_address).await
+        Parameters(RpcOpts {
+            verbosity,
+            rpc_address,
+        }): Parameters<RpcOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_peers(verbosity, rpc_address).await)
     }
 
     #[tool(description = "JSON-RPC info_get_chainspec")]
     async fn sdk_get_chainspec(
         &self,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_chainspec(verbosity, rpc_address).await
+        Parameters(RpcOpts {
+            verbosity,
+            rpc_address,
+        }): Parameters<RpcOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_chainspec(verbosity, rpc_address).await)
     }
 
     #[tool(description = "JSON-RPC info_get_validator_changes")]
     async fn sdk_get_validator_changes(
         &self,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_validator_changes(verbosity, rpc_address).await
+        Parameters(RpcOpts {
+            verbosity,
+            rpc_address,
+        }): Parameters<RpcOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_validator_changes(verbosity, rpc_address).await)
     }
 
     #[tool(description = "JSON-RPC list_rpcs")]
     async fn sdk_list_rpcs(
         &self,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::list_rpcs(verbosity, rpc_address).await
+        Parameters(RpcOpts {
+            verbosity,
+            rpc_address,
+        }): Parameters<RpcOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::list_rpcs(verbosity, rpc_address).await)
     }
 
     #[tool(description = "JSON-RPC chain_get_block (optional block height or hash string)")]
     async fn sdk_get_block(
         &self,
-        maybe_block_identifier: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_block(maybe_block_identifier, verbosity, rpc_address).await
+        Parameters(BlockIdOpts {
+            maybe_block_identifier,
+            verbosity,
+            rpc_address,
+        }): Parameters<BlockIdOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_block(maybe_block_identifier, verbosity, rpc_address).await)
     }
 
     #[tool(description = "JSON-RPC chain_get_block_transfers")]
     async fn sdk_get_block_transfers(
         &self,
-        maybe_block_identifier: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_block_transfers(maybe_block_identifier, verbosity, rpc_address).await
+        Parameters(BlockIdOpts {
+            maybe_block_identifier,
+            verbosity,
+            rpc_address,
+        }): Parameters<BlockIdOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_block_transfers(maybe_block_identifier, verbosity, rpc_address).await)
     }
 
     #[tool(
@@ -252,19 +331,21 @@ impl CasperSdkMcp {
     )]
     async fn sdk_get_latest_blocks(
         &self,
-        count: Option<u32>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
+        Parameters(SdkGetLatestBlocksArgs {
+            count,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkGetLatestBlocksArgs>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "rpc")]
         {
-            compose::blocks::get_latest_blocks(count, verbosity, rpc_address).await
+            Ok(compose::blocks::get_latest_blocks(count, verbosity, rpc_address).await)
         }
         #[cfg(not(feature = "rpc"))]
-        {
+        Ok({
             let _ = (count, verbosity, rpc_address);
             tools::feature_disabled("rpc")
-        }
+        })
     }
 
     #[tool(
@@ -272,26 +353,28 @@ impl CasperSdkMcp {
     )]
     async fn sdk_get_block_transactions(
         &self,
-        block_identifier: String,
-        expand: Option<bool>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
+        Parameters(SdkGetBlockTransactionsArgs {
+            block_identifier,
+            expand,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkGetBlockTransactionsArgs>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "rpc")]
         {
-            compose::blocks::get_block_transactions(
+            Ok(compose::blocks::get_block_transactions(
                 block_identifier,
                 expand,
                 verbosity,
                 rpc_address,
             )
-            .await
+            .await)
         }
         #[cfg(not(feature = "rpc"))]
-        {
+        Ok({
             let _ = (block_identifier, expand, verbosity, rpc_address);
             tools::feature_disabled("rpc")
-        }
+        })
     }
 
     #[tool(
@@ -299,18 +382,20 @@ impl CasperSdkMcp {
     )]
     async fn sdk_list_validators(
         &self,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
+        Parameters(RpcOpts {
+            verbosity,
+            rpc_address,
+        }): Parameters<RpcOpts>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "rpc")]
         {
-            compose::auction::list_validators(verbosity, rpc_address).await
+            Ok(compose::auction::list_validators(verbosity, rpc_address).await)
         }
         #[cfg(not(feature = "rpc"))]
-        {
+        Ok({
             let _ = (verbosity, rpc_address);
             tools::feature_disabled("rpc")
-        }
+        })
     }
 
     #[tool(
@@ -318,19 +403,21 @@ impl CasperSdkMcp {
     )]
     async fn sdk_get_validator(
         &self,
-        public_key: String,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
+        Parameters(SdkGetValidatorArgs {
+            public_key,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkGetValidatorArgs>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "rpc")]
         {
-            compose::auction::get_validator(public_key, verbosity, rpc_address).await
+            Ok(compose::auction::get_validator(public_key, verbosity, rpc_address).await)
         }
         #[cfg(not(feature = "rpc"))]
-        {
+        Ok({
             let _ = (public_key, verbosity, rpc_address);
             tools::feature_disabled("rpc")
-        }
+        })
     }
 
     #[tool(
@@ -338,89 +425,97 @@ impl CasperSdkMcp {
     )]
     async fn sdk_list_bidders(
         &self,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
+        Parameters(RpcOpts {
+            verbosity,
+            rpc_address,
+        }): Parameters<RpcOpts>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "rpc")]
         {
-            compose::auction::list_bidders(verbosity, rpc_address).await
+            Ok(compose::auction::list_bidders(verbosity, rpc_address).await)
         }
         #[cfg(not(feature = "rpc"))]
-        {
+        Ok({
             let _ = (verbosity, rpc_address);
             tools::feature_disabled("rpc")
-        }
+        })
     }
 
     #[tool(description = "Compose: build unsigned delegate transaction")]
     async fn sdk_make_delegate_transaction(
         &self,
-        delegator: String,
-        validator: String,
-        amount: String,
-        transaction_params_json: String,
-    ) -> ToolOutput {
+        Parameters(SdkMakeDelegateTransactionArgs {
+            delegator,
+            validator,
+            amount,
+            transaction_params_json,
+        }): Parameters<SdkMakeDelegateTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "transaction")]
         {
-            compose::stake::make_delegate_transaction(
+            Ok(compose::stake::make_delegate_transaction(
                 delegator,
                 validator,
                 amount,
                 transaction_params_json,
-            )
+            ))
         }
         #[cfg(not(feature = "transaction"))]
-        {
+        Ok({
             let _ = (delegator, validator, amount, transaction_params_json);
             tools::feature_disabled("transaction")
-        }
+        })
     }
 
     #[tool(description = "Compose: build unsigned undelegate transaction")]
     async fn sdk_make_undelegate_transaction(
         &self,
-        delegator: String,
-        validator: String,
-        amount: String,
-        transaction_params_json: String,
-    ) -> ToolOutput {
+        Parameters(SdkMakeDelegateTransactionArgs {
+            delegator,
+            validator,
+            amount,
+            transaction_params_json,
+        }): Parameters<SdkMakeDelegateTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "transaction")]
         {
-            compose::stake::make_undelegate_transaction(
+            Ok(compose::stake::make_undelegate_transaction(
                 delegator,
                 validator,
                 amount,
                 transaction_params_json,
-            )
+            ))
         }
         #[cfg(not(feature = "transaction"))]
-        {
+        Ok({
             let _ = (delegator, validator, amount, transaction_params_json);
             tools::feature_disabled("transaction")
-        }
+        })
     }
 
     #[tool(description = "Compose: build unsigned redelegate transaction")]
     async fn sdk_make_redelegate_transaction(
         &self,
-        delegator: String,
-        validator: String,
-        new_validator: String,
-        amount: String,
-        transaction_params_json: String,
-    ) -> ToolOutput {
+        Parameters(SdkMakeRedelegateTransactionArgs {
+            delegator,
+            validator,
+            new_validator,
+            amount,
+            transaction_params_json,
+        }): Parameters<SdkMakeRedelegateTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "transaction")]
         {
-            compose::stake::make_redelegate_transaction(
+            Ok(compose::stake::make_redelegate_transaction(
                 delegator,
                 validator,
                 new_validator,
                 amount,
                 transaction_params_json,
-            )
+            ))
         }
         #[cfg(not(feature = "transaction"))]
-        {
+        Ok({
             let _ = (
                 delegator,
                 validator,
@@ -429,27 +524,31 @@ impl CasperSdkMcp {
                 transaction_params_json,
             );
             tools::feature_disabled("transaction")
-        }
+        })
     }
 
     #[tool(description = "JSON-RPC state_get_auction_info")]
     async fn sdk_get_auction_info(
         &self,
-        maybe_block_identifier: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_auction_info(maybe_block_identifier, verbosity, rpc_address).await
+        Parameters(BlockIdOpts {
+            maybe_block_identifier,
+            verbosity,
+            rpc_address,
+        }): Parameters<BlockIdOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_auction_info(maybe_block_identifier, verbosity, rpc_address).await)
     }
 
     #[tool(description = "JSON-RPC chain_get_era_summary")]
     async fn sdk_get_era_summary(
         &self,
-        maybe_block_identifier: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_era_summary(maybe_block_identifier, verbosity, rpc_address).await
+        Parameters(BlockIdOpts {
+            maybe_block_identifier,
+            verbosity,
+            rpc_address,
+        }): Parameters<BlockIdOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_era_summary(maybe_block_identifier, verbosity, rpc_address).await)
     }
 
     #[tool(
@@ -457,13 +556,18 @@ impl CasperSdkMcp {
     )]
     async fn sdk_get_reward(
         &self,
-        validator: String,
-        delegator: Option<String>,
-        maybe_era_id: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_reward(validator, delegator, maybe_era_id, verbosity, rpc_address).await
+        Parameters(SdkGetRewardArgs {
+            validator,
+            delegator,
+            maybe_era_id,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkGetRewardArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(
+            tools::rpc::get_reward(validator, delegator, maybe_era_id, verbosity, rpc_address)
+                .await,
+        )
     }
 
     #[tool(
@@ -471,94 +575,108 @@ impl CasperSdkMcp {
     )]
     async fn sdk_get_era_info(
         &self,
-        maybe_block_identifier: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_era_info(maybe_block_identifier, verbosity, rpc_address).await
+        Parameters(BlockIdOpts {
+            maybe_block_identifier,
+            verbosity,
+            rpc_address,
+        }): Parameters<BlockIdOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_era_info(maybe_block_identifier, verbosity, rpc_address).await)
     }
 
     #[tool(description = "JSON-RPC chain_get_state_root_hash")]
     async fn sdk_get_state_root_hash(
         &self,
-        maybe_block_identifier: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_state_root_hash(maybe_block_identifier, verbosity, rpc_address).await
+        Parameters(BlockIdOpts {
+            maybe_block_identifier,
+            verbosity,
+            rpc_address,
+        }): Parameters<BlockIdOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_state_root_hash(maybe_block_identifier, verbosity, rpc_address).await)
     }
 
     #[tool(description = "JSON-RPC state_get_account_info (deprecated; prefer get_entity)")]
     async fn sdk_get_account(
         &self,
-        account_identifier: Option<String>,
-        maybe_block_identifier: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_account(
+        Parameters(SdkGetAccountArgs {
+            account_identifier,
+            maybe_block_identifier,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkGetAccountArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_account(
             account_identifier,
             maybe_block_identifier,
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "JSON-RPC state_get_entity / get_entity")]
     async fn sdk_get_entity(
         &self,
-        entity_identifier: Option<String>,
-        maybe_block_identifier: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_entity(
+        Parameters(SdkGetEntityArgs {
+            entity_identifier,
+            maybe_block_identifier,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkGetEntityArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_entity(
             entity_identifier,
             maybe_block_identifier,
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "JSON-RPC info_get_deploy")]
     async fn sdk_get_deploy(
         &self,
-        deploy_hash: String,
-        finalized_approvals: Option<bool>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_deploy(deploy_hash, finalized_approvals, verbosity, rpc_address).await
+        Parameters(SdkGetDeployArgs {
+            deploy_hash,
+            finalized_approvals,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkGetDeployArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_deploy(deploy_hash, finalized_approvals, verbosity, rpc_address).await)
     }
 
     #[tool(description = "JSON-RPC info_get_transaction")]
     async fn sdk_get_transaction(
         &self,
-        transaction_hash: String,
-        finalized_approvals: Option<bool>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_transaction(
+        Parameters(SdkGetTransactionArgs {
+            transaction_hash,
+            finalized_approvals,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkGetTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_transaction(
             transaction_hash,
             finalized_approvals,
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "JSON-RPC state_get_balance (purse uref string)")]
     async fn sdk_get_balance(
         &self,
-        purse_uref: String,
-        state_root_hash: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_balance(purse_uref, state_root_hash, verbosity, rpc_address).await
+        Parameters(SdkGetBalanceArgs {
+            purse_uref,
+            state_root_hash,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkGetBalanceArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_balance(purse_uref, state_root_hash, verbosity, rpc_address).await)
     }
 
     #[tool(
@@ -566,39 +684,43 @@ impl CasperSdkMcp {
     )]
     async fn sdk_query_balance(
         &self,
-        purse_identifier: String,
-        state_root_hash: Option<String>,
-        maybe_block_id: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::query_balance(
+        Parameters(SdkQueryBalanceArgs {
+            purse_identifier,
+            state_root_hash,
+            maybe_block_id,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkQueryBalanceArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::query_balance(
             purse_identifier,
             state_root_hash,
             maybe_block_id,
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "JSON-RPC query_balance_details")]
     async fn sdk_query_balance_details(
         &self,
-        purse_identifier: String,
-        state_root_hash: Option<String>,
-        maybe_block_id: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::query_balance_details(
+        Parameters(SdkQueryBalanceArgs {
+            purse_identifier,
+            state_root_hash,
+            maybe_block_id,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkQueryBalanceArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::query_balance_details(
             purse_identifier,
             state_root_hash,
             maybe_block_id,
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(
@@ -606,17 +728,19 @@ impl CasperSdkMcp {
     )]
     async fn sdk_get_dictionary_item(
         &self,
-        kind: String,
-        key: Option<String>,
-        dictionary_name: Option<String>,
-        dictionary_item_key: Option<String>,
-        seed_uref: Option<String>,
-        dictionary_value: Option<String>,
-        state_root_hash: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::get_dictionary_item(
+        Parameters(SdkGetDictionaryItemArgs {
+            kind,
+            key,
+            dictionary_name,
+            dictionary_item_key,
+            seed_uref,
+            dictionary_value,
+            state_root_hash,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkGetDictionaryItemArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::get_dictionary_item(
             kind,
             key,
             dictionary_name,
@@ -627,7 +751,7 @@ impl CasperSdkMcp {
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(
@@ -635,14 +759,16 @@ impl CasperSdkMcp {
     )]
     async fn sdk_query_global_state(
         &self,
-        key: String,
-        path: Option<String>,
-        state_root_hash: Option<String>,
-        maybe_block_id: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::query_global_state(
+        Parameters(SdkQueryGlobalStateArgs {
+            key,
+            path,
+            state_root_hash,
+            maybe_block_id,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkQueryGlobalStateArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::query_global_state(
             key,
             path,
             state_root_hash,
@@ -650,272 +776,348 @@ impl CasperSdkMcp {
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "JSON-RPC speculative_exec with full transaction JSON")]
     async fn sdk_speculative_exec(
         &self,
-        transaction_json: String,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::speculative_exec(transaction_json, verbosity, rpc_address).await
+        Parameters(SdkSpeculativeExecArgs {
+            transaction_json,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkSpeculativeExecArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::speculative_exec(transaction_json, verbosity, rpc_address).await)
     }
 
     #[tool(description = "JSON-RPC speculative_exec_deploy with full deploy JSON")]
     async fn sdk_speculative_exec_deploy(
         &self,
-        deploy_json: String,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::rpc::speculative_exec_deploy(deploy_json, verbosity, rpc_address).await
+        Parameters(SdkSpeculativeExecDeployArgs {
+            deploy_json,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkSpeculativeExecDeployArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::rpc::speculative_exec_deploy(deploy_json, verbosity, rpc_address).await)
     }
-
-    // --- binary-port (feature = "binary-port") ---
 
     #[tool(description = "Binary port: latest switch block header (needs CASPER_NODE_URL)")]
     async fn sdk_get_binary_latest_switch_block_header(
         &self,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_latest_switch_block_header(node_address).await
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_latest_switch_block_header(node_address).await)
     }
 
     #[tool(description = "Binary port: latest block header")]
-    async fn sdk_get_binary_latest_block_header(&self, node_address: Option<String>) -> ToolOutput {
-        tools::binary_port::get_binary_latest_block_header(node_address).await
+    async fn sdk_get_binary_latest_block_header(
+        &self,
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_latest_block_header(node_address).await)
     }
 
     #[tool(description = "Binary port: block header by height")]
     async fn sdk_get_binary_block_header_by_height(
         &self,
-        height: u64,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_block_header_by_height(height, node_address).await
+        Parameters(SdkGetBinaryBlockHeaderByHeightArgs {
+            height,
+            node_address,
+        }): Parameters<SdkGetBinaryBlockHeaderByHeightArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_block_header_by_height(height, node_address).await)
     }
 
     #[tool(description = "Binary port: block header by hash hex")]
     async fn sdk_get_binary_block_header_by_hash(
         &self,
-        block_hash: String,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_block_header_by_hash(block_hash, node_address).await
+        Parameters(SdkGetBinaryBlockHeaderByHashArgs {
+            block_hash,
+            node_address,
+        }): Parameters<SdkGetBinaryBlockHeaderByHashArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_block_header_by_hash(block_hash, node_address).await)
     }
 
     #[tool(description = "Binary port: latest block with signatures")]
     async fn sdk_get_binary_latest_block_with_signatures(
         &self,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_latest_block_with_signatures(node_address).await
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_latest_block_with_signatures(node_address).await)
     }
 
     #[tool(description = "Binary port: block with signatures by height")]
     async fn sdk_get_binary_block_with_signatures_by_height(
         &self,
-        height: u64,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_block_with_signatures_by_height(height, node_address).await
+        Parameters(SdkGetBinaryBlockHeaderByHeightArgs {
+            height,
+            node_address,
+        }): Parameters<SdkGetBinaryBlockHeaderByHeightArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(
+            tools::binary_port::get_binary_block_with_signatures_by_height(height, node_address)
+                .await,
+        )
     }
 
     #[tool(description = "Binary port: block with signatures by hash hex")]
     async fn sdk_get_binary_block_with_signatures_by_hash(
         &self,
-        block_hash: String,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_block_with_signatures_by_hash(block_hash, node_address).await
+        Parameters(SdkGetBinaryBlockHeaderByHashArgs {
+            block_hash,
+            node_address,
+        }): Parameters<SdkGetBinaryBlockHeaderByHashArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(
+            tools::binary_port::get_binary_block_with_signatures_by_hash(block_hash, node_address)
+                .await,
+        )
     }
 
     #[tool(description = "Binary port: transaction by hash hex")]
     async fn sdk_get_binary_transaction_by_hash(
         &self,
-        hash: String,
-        with_finalized_approvals: Option<bool>,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_transaction_by_hash(
+        Parameters(SdkGetBinaryTransactionByHashArgs {
+            hash,
+            with_finalized_approvals,
+            node_address,
+        }): Parameters<SdkGetBinaryTransactionByHashArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_transaction_by_hash(
             hash,
             with_finalized_approvals,
             node_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "Binary port: peers")]
-    async fn sdk_get_binary_peers(&self, node_address: Option<String>) -> ToolOutput {
-        tools::binary_port::get_binary_peers(node_address).await
+    async fn sdk_get_binary_peers(
+        &self,
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_peers(node_address).await)
     }
 
     #[tool(description = "Binary port: node uptime")]
-    async fn sdk_get_binary_uptime(&self, node_address: Option<String>) -> ToolOutput {
-        tools::binary_port::get_binary_uptime(node_address).await
+    async fn sdk_get_binary_uptime(
+        &self,
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_uptime(node_address).await)
     }
 
     #[tool(description = "Binary port: last progress")]
-    async fn sdk_get_binary_last_progress(&self, node_address: Option<String>) -> ToolOutput {
-        tools::binary_port::get_binary_last_progress(node_address).await
+    async fn sdk_get_binary_last_progress(
+        &self,
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_last_progress(node_address).await)
     }
 
     #[tool(description = "Binary port: reactor state")]
-    async fn sdk_get_binary_reactor_state(&self, node_address: Option<String>) -> ToolOutput {
-        tools::binary_port::get_binary_reactor_state(node_address).await
+    async fn sdk_get_binary_reactor_state(
+        &self,
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_reactor_state(node_address).await)
     }
 
     #[tool(description = "Binary port: network name")]
-    async fn sdk_get_binary_network_name(&self, node_address: Option<String>) -> ToolOutput {
-        tools::binary_port::get_binary_network_name(node_address).await
+    async fn sdk_get_binary_network_name(
+        &self,
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_network_name(node_address).await)
     }
 
     #[tool(description = "Binary port: consensus validator changes")]
     async fn sdk_get_binary_consensus_validator_changes(
         &self,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_consensus_validator_changes(node_address).await
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_consensus_validator_changes(node_address).await)
     }
 
     #[tool(description = "Binary port: block synchronizer status")]
     async fn sdk_get_binary_block_synchronizer_status(
         &self,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_block_synchronizer_status(node_address).await
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_block_synchronizer_status(node_address).await)
     }
 
     #[tool(description = "Binary port: available block range")]
     async fn sdk_get_binary_available_block_range(
         &self,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_available_block_range(node_address).await
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_available_block_range(node_address).await)
     }
 
     #[tool(description = "Binary port: next upgrade")]
-    async fn sdk_get_binary_next_upgrade(&self, node_address: Option<String>) -> ToolOutput {
-        tools::binary_port::get_binary_next_upgrade(node_address).await
+    async fn sdk_get_binary_next_upgrade(
+        &self,
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_next_upgrade(node_address).await)
     }
 
     #[tool(description = "Binary port: consensus status")]
-    async fn sdk_get_binary_consensus_status(&self, node_address: Option<String>) -> ToolOutput {
-        tools::binary_port::get_binary_consensus_status(node_address).await
+    async fn sdk_get_binary_consensus_status(
+        &self,
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_consensus_status(node_address).await)
     }
 
     #[tool(description = "Binary port: chainspec raw bytes")]
-    async fn sdk_get_binary_chainspec_raw_bytes(&self, node_address: Option<String>) -> ToolOutput {
-        tools::binary_port::get_binary_chainspec_raw_bytes(node_address).await
+    async fn sdk_get_binary_chainspec_raw_bytes(
+        &self,
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_chainspec_raw_bytes(node_address).await)
     }
 
     #[tool(description = "Binary port: node status")]
-    async fn sdk_get_binary_node_status(&self, node_address: Option<String>) -> ToolOutput {
-        tools::binary_port::get_binary_node_status(node_address).await
+    async fn sdk_get_binary_node_status(
+        &self,
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_node_status(node_address).await)
     }
 
     #[tool(description = "Binary port: validator reward by era")]
     async fn sdk_get_binary_validator_reward_by_era(
         &self,
-        validator_key: String,
-        era: u64,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_validator_reward_by_era(validator_key, era, node_address)
-            .await
+        Parameters(SdkGetBinaryValidatorRewardByEraArgs {
+            validator_key,
+            era,
+            node_address,
+        }): Parameters<SdkGetBinaryValidatorRewardByEraArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(
+            tools::binary_port::get_binary_validator_reward_by_era(
+                validator_key,
+                era,
+                node_address,
+            )
+            .await,
+        )
     }
 
     #[tool(description = "Binary port: validator reward by block height")]
     async fn sdk_get_binary_validator_reward_by_block_height(
         &self,
-        validator_key: String,
-        block_height: u64,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_validator_reward_by_block_height(
+        Parameters(SdkGetBinaryValidatorRewardByBlockHeightArgs {
             validator_key,
             block_height,
             node_address,
+        }): Parameters<SdkGetBinaryValidatorRewardByBlockHeightArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(
+            tools::binary_port::get_binary_validator_reward_by_block_height(
+                validator_key,
+                block_height,
+                node_address,
+            )
+            .await,
         )
-        .await
     }
 
     #[tool(description = "Binary port: validator reward by block hash hex")]
     async fn sdk_get_binary_validator_reward_by_block_hash(
         &self,
-        validator_key: String,
-        block_hash: String,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_validator_reward_by_block_hash(
+        Parameters(SdkGetBinaryValidatorRewardByBlockHashArgs {
             validator_key,
             block_hash,
             node_address,
+        }): Parameters<SdkGetBinaryValidatorRewardByBlockHashArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(
+            tools::binary_port::get_binary_validator_reward_by_block_hash(
+                validator_key,
+                block_hash,
+                node_address,
+            )
+            .await,
         )
-        .await
     }
 
     #[tool(description = "Binary port: delegator reward by era")]
     async fn sdk_get_binary_delegator_reward_by_era(
         &self,
-        validator_key: String,
-        delegator_key: String,
-        era: u64,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_delegator_reward_by_era(
+        Parameters(SdkGetBinaryDelegatorRewardByEraArgs {
+            validator_key,
+            delegator_key,
+            era,
+            node_address,
+        }): Parameters<SdkGetBinaryDelegatorRewardByEraArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_delegator_reward_by_era(
             validator_key,
             delegator_key,
             era,
             node_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "Binary port: delegator reward by block height")]
     async fn sdk_get_binary_delegator_reward_by_block_height(
         &self,
-        validator_key: String,
-        delegator_key: String,
-        block_height: u64,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_delegator_reward_by_block_height(
+        Parameters(SdkGetBinaryDelegatorRewardByBlockHeightArgs {
             validator_key,
             delegator_key,
             block_height,
             node_address,
+        }): Parameters<SdkGetBinaryDelegatorRewardByBlockHeightArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(
+            tools::binary_port::get_binary_delegator_reward_by_block_height(
+                validator_key,
+                delegator_key,
+                block_height,
+                node_address,
+            )
+            .await,
         )
-        .await
     }
 
     #[tool(description = "Binary port: delegator reward by block hash hex")]
     async fn sdk_get_binary_delegator_reward_by_block_hash(
         &self,
-        validator_key: String,
-        delegator_key: String,
-        block_hash: String,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_delegator_reward_by_block_hash(
+        Parameters(SdkGetBinaryDelegatorRewardByBlockHashArgs {
             validator_key,
             delegator_key,
             block_hash,
             node_address,
+        }): Parameters<SdkGetBinaryDelegatorRewardByBlockHashArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(
+            tools::binary_port::get_binary_delegator_reward_by_block_hash(
+                validator_key,
+                delegator_key,
+                block_hash,
+                node_address,
+            )
+            .await,
         )
-        .await
     }
 
     #[tool(description = "Binary port: read record (record_id 0-7, key_hex)")]
     async fn sdk_get_binary_read_record(
         &self,
-        record_id: u16,
-        key_hex: String,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_read_record(record_id, key_hex, node_address).await
+        Parameters(SdkGetBinaryReadRecordArgs {
+            record_id,
+            key_hex,
+            node_address,
+        }): Parameters<SdkGetBinaryReadRecordArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_read_record(record_id, key_hex, node_address).await)
     }
 
     #[tool(
@@ -923,139 +1125,172 @@ impl CasperSdkMcp {
     )]
     async fn sdk_get_binary_global_state_item(
         &self,
-        key: String,
-        path: Option<String>,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_global_state_item(key, path, node_address).await
+        Parameters(SdkGetBinaryGlobalStateItemArgs {
+            key,
+            path,
+            node_address,
+        }): Parameters<SdkGetBinaryGlobalStateItemArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_global_state_item(key, path, node_address).await)
     }
 
     #[tool(description = "Binary port: global state item by state root hash")]
     async fn sdk_get_binary_global_state_item_by_state_root_hash(
         &self,
-        state_root_hash: String,
-        key: String,
-        path: Option<String>,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_global_state_item_by_state_root_hash(
+        Parameters(SdkGetBinaryGlobalStateItemByStateRootHashArgs {
             state_root_hash,
             key,
             path,
             node_address,
+        }): Parameters<SdkGetBinaryGlobalStateItemByStateRootHashArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(
+            tools::binary_port::get_binary_global_state_item_by_state_root_hash(
+                state_root_hash,
+                key,
+                path,
+                node_address,
+            )
+            .await,
         )
-        .await
     }
 
     #[tool(description = "Binary port: global state item by block hash")]
     async fn sdk_get_binary_global_state_item_by_block_hash(
         &self,
-        block_hash: String,
-        key: String,
-        path: Option<String>,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_global_state_item_by_block_hash(
+        Parameters(SdkGetBinaryGlobalStateItemByBlockHashArgs {
             block_hash,
             key,
             path,
             node_address,
+        }): Parameters<SdkGetBinaryGlobalStateItemByBlockHashArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(
+            tools::binary_port::get_binary_global_state_item_by_block_hash(
+                block_hash,
+                key,
+                path,
+                node_address,
+            )
+            .await,
         )
-        .await
     }
 
     #[tool(description = "Binary port: global state item by block height")]
     async fn sdk_get_binary_global_state_item_by_block_height(
         &self,
-        block_height: u64,
-        key: String,
-        path: Option<String>,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_global_state_item_by_block_height(
+        Parameters(SdkGetBinaryGlobalStateItemByBlockHeightArgs {
             block_height,
             key,
             path,
             node_address,
+        }): Parameters<SdkGetBinaryGlobalStateItemByBlockHeightArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(
+            tools::binary_port::get_binary_global_state_item_by_block_height(
+                block_height,
+                key,
+                path,
+                node_address,
+            )
+            .await,
         )
-        .await
     }
 
     #[tool(description = "Binary port: speculative execution of transaction JSON")]
     async fn sdk_get_binary_try_speculative_execution(
         &self,
-        transaction_json: String,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::binary_port::get_binary_try_speculative_execution(transaction_json, node_address)
-            .await
+        Parameters(SdkGetBinaryTrySpeculativeExecutionArgs {
+            transaction_json,
+            node_address,
+        }): Parameters<SdkGetBinaryTrySpeculativeExecutionArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(
+            tools::binary_port::get_binary_try_speculative_execution(
+                transaction_json,
+                node_address,
+            )
+            .await,
+        )
     }
 
     #[tool(description = "Binary port: protocol version")]
-    async fn sdk_get_binary_protocol_version(&self, node_address: Option<String>) -> ToolOutput {
-        tools::binary_port::get_binary_protocol_version(node_address).await
+    async fn sdk_get_binary_protocol_version(
+        &self,
+        Parameters(NodeOpts { node_address }): Parameters<NodeOpts>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::binary_port::get_binary_protocol_version(node_address).await)
     }
-
-    // --- transaction (feature = "transaction") ---
 
     #[tool(
         description = "Build unsigned transaction from builder_params_json + transaction_params_json"
     )]
     async fn sdk_make_transaction(
         &self,
-        builder_params_json: String,
-        transaction_params_json: String,
-    ) -> ToolOutput {
-        tools::transaction::make_transaction(builder_params_json, transaction_params_json)
+        Parameters(SdkMakeTransactionArgs {
+            builder_params_json,
+            transaction_params_json,
+        }): Parameters<SdkMakeTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::transaction::make_transaction(
+            builder_params_json,
+            transaction_params_json,
+        ))
     }
 
     #[tool(description = "Build unsigned transfer transaction")]
     async fn sdk_make_transfer_transaction(
         &self,
-        target: String,
-        amount: String,
-        transaction_params_json: String,
-        maybe_source: Option<String>,
-        maybe_id: Option<String>,
-    ) -> ToolOutput {
-        tools::transaction::make_transfer_transaction(
+        Parameters(SdkMakeTransferTransactionArgs {
             target,
             amount,
             transaction_params_json,
             maybe_source,
             maybe_id,
-        )
+        }): Parameters<SdkMakeTransferTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::transaction::make_transfer_transaction(
+            target,
+            amount,
+            transaction_params_json,
+            maybe_source,
+            maybe_id,
+        ))
     }
 
     #[tool(description = "Speculative exec of a built transaction (no submit)")]
     async fn sdk_speculative_transaction(
         &self,
-        builder_params_json: String,
-        transaction_params_json: String,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::transaction::speculative_transaction(
+        Parameters(SdkSpeculativeTransactionArgs {
+            builder_params_json,
+            transaction_params_json,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkSpeculativeTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::transaction::speculative_transaction(
             builder_params_json,
             transaction_params_json,
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "Speculative transfer transaction (no submit)")]
     async fn sdk_speculative_transfer_transaction(
         &self,
-        target_account: String,
-        amount: String,
-        transaction_params_json: String,
-        maybe_source: Option<String>,
-        maybe_id: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::transaction::speculative_transfer_transaction(
+        Parameters(SdkSpeculativeTransferTransactionArgs {
+            target_account,
+            amount,
+            transaction_params_json,
+            maybe_source,
+            maybe_id,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkSpeculativeTransferTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::transaction::speculative_transfer_transaction(
             target_account,
             amount,
             transaction_params_json,
@@ -1064,70 +1299,80 @@ impl CasperSdkMcp {
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
-
-    // --- deploy (feature = "deploy", legacy) ---
 
     #[tool(description = "Build unsigned legacy deploy")]
     async fn sdk_make_deploy(
         &self,
-        deploy_params_json: String,
-        session_params_json: String,
-        payment_params_json: String,
-    ) -> ToolOutput {
-        tools::deploy::make_deploy(deploy_params_json, session_params_json, payment_params_json)
+        Parameters(SdkMakeDeployArgs {
+            deploy_params_json,
+            session_params_json,
+            payment_params_json,
+        }): Parameters<SdkMakeDeployArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::deploy::make_deploy(
+            deploy_params_json,
+            session_params_json,
+            payment_params_json,
+        ))
     }
 
     #[tool(description = "Build unsigned legacy transfer deploy")]
     async fn sdk_make_transfer(
         &self,
-        amount: String,
-        target_account: String,
-        deploy_params_json: String,
-        payment_params_json: String,
-        transfer_id: Option<String>,
-    ) -> ToolOutput {
-        tools::deploy::make_transfer(
+        Parameters(SdkMakeTransferArgs {
             amount,
             target_account,
             deploy_params_json,
             payment_params_json,
             transfer_id,
-        )
+        }): Parameters<SdkMakeTransferArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::deploy::make_transfer(
+            amount,
+            target_account,
+            deploy_params_json,
+            payment_params_json,
+            transfer_id,
+        ))
     }
 
     #[tool(description = "Speculative legacy deploy (no submit)")]
     async fn sdk_speculative_deploy(
         &self,
-        deploy_params_json: String,
-        session_params_json: String,
-        payment_params_json: String,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::deploy::speculative_deploy(
+        Parameters(SdkSpeculativeDeployArgs {
+            deploy_params_json,
+            session_params_json,
+            payment_params_json,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkSpeculativeDeployArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::deploy::speculative_deploy(
             deploy_params_json,
             session_params_json,
             payment_params_json,
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "Speculative legacy transfer (no submit)")]
     async fn sdk_speculative_transfer(
         &self,
-        amount: String,
-        target_account: String,
-        deploy_params_json: String,
-        payment_params_json: String,
-        transfer_id: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::deploy::speculative_transfer(
+        Parameters(SdkSpeculativeTransferArgs {
+            amount,
+            target_account,
+            deploy_params_json,
+            payment_params_json,
+            transfer_id,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkSpeculativeTransferArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::deploy::speculative_transfer(
             amount,
             target_account,
             deploy_params_json,
@@ -1136,99 +1381,107 @@ impl CasperSdkMcp {
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
-
-    // --- contract queries (feature = "contract") ---
 
     #[tool(description = "Query contract dictionary; kind + dictionary_item_json fields")]
     async fn sdk_query_contract_dict(
         &self,
-        kind: String,
-        dictionary_item_json: String,
-        state_root_hash: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::contract::query_contract_dict(
+        Parameters(SdkQueryContractDictArgs {
+            kind,
+            dictionary_item_json,
+            state_root_hash,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkQueryContractDictArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::contract::query_contract_dict(
             kind,
             dictionary_item_json,
             state_root_hash,
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "Query contract named key path under an entity")]
     async fn sdk_query_contract_key(
         &self,
-        entity_identifier: String,
-        path: String,
-        maybe_block_identifier: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::contract::query_contract_key(
+        Parameters(SdkQueryContractKeyArgs {
+            entity_identifier,
+            path,
+            maybe_block_identifier,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkQueryContractKeyArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::contract::query_contract_key(
             entity_identifier,
             path,
             maybe_block_identifier,
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
-
-    // --- write (feature = "write") ---
 
     #[tool(description = "Sign transaction JSON with secret key PEM (mutates approvals)")]
     async fn sdk_sign_transaction(
         &self,
-        transaction_json: String,
-        secret_key: String,
-    ) -> ToolOutput {
-        tools::write::sign_transaction(transaction_json, secret_key)
+        Parameters(SdkSignTransactionArgs {
+            transaction_json,
+            secret_key,
+        }): Parameters<SdkSignTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::sign_transaction(transaction_json, secret_key))
     }
 
     #[tool(description = "Submit signed transaction JSON via put_transaction")]
     async fn sdk_put_transaction(
         &self,
-        transaction_json: String,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::write::put_transaction(transaction_json, verbosity, rpc_address).await
+        Parameters(SdkSpeculativeExecArgs {
+            transaction_json,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkSpeculativeExecArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::put_transaction(transaction_json, verbosity, rpc_address).await)
     }
 
     #[tool(description = "Build + submit transaction (make + put)")]
     async fn sdk_transaction(
         &self,
-        builder_params_json: String,
-        transaction_params_json: String,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::write::transaction(
+        Parameters(SdkSpeculativeTransactionArgs {
+            builder_params_json,
+            transaction_params_json,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkSpeculativeTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::transaction(
             builder_params_json,
             transaction_params_json,
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "Build + submit transfer transaction")]
     async fn sdk_transfer_transaction(
         &self,
-        target_account: String,
-        amount: String,
-        transaction_params_json: String,
-        maybe_source: Option<String>,
-        maybe_id: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::write::transfer_transaction(
+        Parameters(SdkSpeculativeTransferTransactionArgs {
+            target_account,
+            amount,
+            transaction_params_json,
+            maybe_source,
+            maybe_id,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkSpeculativeTransferTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::transfer_transaction(
             target_account,
             amount,
             transaction_params_json,
@@ -1237,55 +1490,67 @@ impl CasperSdkMcp {
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "Sign deploy JSON with secret key PEM")]
-    async fn sdk_sign_deploy(&self, deploy_json: String, secret_key: String) -> ToolOutput {
-        tools::write::sign_deploy(deploy_json, secret_key)
+    async fn sdk_sign_deploy(
+        &self,
+        Parameters(SdkSignDeployArgs {
+            deploy_json,
+            secret_key,
+        }): Parameters<SdkSignDeployArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::sign_deploy(deploy_json, secret_key))
     }
 
     #[tool(description = "Submit signed deploy JSON")]
     async fn sdk_put_deploy(
         &self,
-        deploy_json: String,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::write::put_deploy(deploy_json, verbosity, rpc_address).await
+        Parameters(SdkSpeculativeExecDeployArgs {
+            deploy_json,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkSpeculativeExecDeployArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::put_deploy(deploy_json, verbosity, rpc_address).await)
     }
 
     #[tool(description = "Build + submit legacy deploy")]
     async fn sdk_deploy(
         &self,
-        deploy_params_json: String,
-        session_params_json: String,
-        payment_params_json: String,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::write::deploy(
+        Parameters(SdkSpeculativeDeployArgs {
+            deploy_params_json,
+            session_params_json,
+            payment_params_json,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkSpeculativeDeployArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::deploy(
             deploy_params_json,
             session_params_json,
             payment_params_json,
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "Build + submit legacy transfer")]
     async fn sdk_transfer(
         &self,
-        amount: String,
-        target_account: String,
-        deploy_params_json: String,
-        payment_params_json: String,
-        transfer_id: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::write::transfer(
+        Parameters(SdkSpeculativeTransferArgs {
+            amount,
+            target_account,
+            deploy_params_json,
+            payment_params_json,
+            transfer_id,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkSpeculativeTransferArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::transfer(
             amount,
             target_account,
             deploy_params_json,
@@ -1294,7 +1559,7 @@ impl CasperSdkMcp {
             verbosity,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(
@@ -1302,29 +1567,33 @@ impl CasperSdkMcp {
     )]
     async fn sdk_install(
         &self,
-        transaction_params_json: String,
-        wasm_hex: String,
-        rpc_address: Option<String>,
-        runtime_v2: Option<bool>,
-    ) -> ToolOutput {
-        tools::write::install(transaction_params_json, wasm_hex, rpc_address, runtime_v2).await
+        Parameters(SdkInstallArgs {
+            transaction_params_json,
+            wasm_hex,
+            rpc_address,
+            runtime_v2,
+        }): Parameters<SdkInstallArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::install(transaction_params_json, wasm_hex, rpc_address, runtime_v2).await)
     }
 
     #[tool(description = "Install via legacy deploy (deprecated; prefer sdk_install)")]
     async fn sdk_install_deploy(
         &self,
-        deploy_params_json: String,
-        session_params_json: String,
-        payment_amount: String,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::write::install_deploy(
+        Parameters(SdkInstallDeployArgs {
+            deploy_params_json,
+            session_params_json,
+            payment_amount,
+            rpc_address,
+        }): Parameters<SdkInstallDeployArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::install_deploy(
             deploy_params_json,
             session_params_json,
             payment_amount,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(
@@ -1332,64 +1601,70 @@ impl CasperSdkMcp {
     )]
     async fn sdk_call_entrypoint(
         &self,
-        builder_params_json: String,
-        transaction_params_json: String,
-        rpc_address: Option<String>,
-        runtime_v2: Option<bool>,
-    ) -> ToolOutput {
-        tools::write::call_entrypoint(
+        Parameters(SdkCallEntrypointArgs {
+            builder_params_json,
+            transaction_params_json,
+            rpc_address,
+            runtime_v2,
+        }): Parameters<SdkCallEntrypointArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::call_entrypoint(
             builder_params_json,
             transaction_params_json,
             rpc_address,
             runtime_v2,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "Call entrypoint via legacy deploy (deprecated)")]
     async fn sdk_call_entrypoint_deploy(
         &self,
-        deploy_params_json: String,
-        session_params_json: String,
-        payment_params_json: String,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
-        tools::write::call_entrypoint_deploy(
+        Parameters(SdkCallEntrypointDeployArgs {
+            deploy_params_json,
+            session_params_json,
+            payment_params_json,
+            rpc_address,
+        }): Parameters<SdkCallEntrypointDeployArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::call_entrypoint_deploy(
             deploy_params_json,
             session_params_json,
             payment_params_json,
             rpc_address,
         )
-        .await
+        .await)
     }
 
     #[tool(description = "Binary port: try_accept_transaction (submit via binary port)")]
     async fn sdk_get_binary_try_accept_transaction(
         &self,
-        transaction_json: String,
-        node_address: Option<String>,
-    ) -> ToolOutput {
-        tools::write::get_binary_try_accept_transaction(transaction_json, node_address).await
+        Parameters(SdkGetBinaryTrySpeculativeExecutionArgs {
+            transaction_json,
+            node_address,
+        }): Parameters<SdkGetBinaryTrySpeculativeExecutionArgs>,
+    ) -> Result<CallToolResult, McpError> {
+        Ok(tools::write::get_binary_try_accept_transaction(transaction_json, node_address).await)
     }
-
-    // --- watcher (feature = "watcher") / SSE (feature = "SSE") ---
 
     #[tool(description = "Wait for TransactionProcessed on node SSE for a transaction hash")]
     async fn sdk_wait_transaction(
         &self,
-        events_url: String,
-        transaction_hash: String,
-        timeout_ms: Option<u64>,
-    ) -> ToolOutput {
+        Parameters(SdkWaitTransactionArgs {
+            events_url,
+            transaction_hash,
+            timeout_ms,
+        }): Parameters<SdkWaitTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "watcher")]
         {
-            tools::watcher::wait_transaction(events_url, transaction_hash, timeout_ms).await
+            Ok(tools::watcher::wait_transaction(events_url, transaction_hash, timeout_ms).await)
         }
         #[cfg(not(feature = "watcher"))]
-        {
+        Ok({
             let _ = (events_url, transaction_hash, timeout_ms);
             tools::feature_disabled("watcher")
-        }
+        })
     }
 
     #[tool(
@@ -1398,22 +1673,32 @@ impl CasperSdkMcp {
     #[allow(non_snake_case)]
     async fn sdk_SSE_collect(
         &self,
-        events_url: String,
-        event_names: String,
-        max_events: Option<u64>,
-        timeout_ms: Option<u64>,
-        start_from: Option<u64>,
-    ) -> ToolOutput {
+        Parameters(SdkSseCollectArgs {
+            events_url,
+            event_names,
+            max_events,
+            timeout_ms,
+            start_from,
+        }): Parameters<SdkSseCollectArgs>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "SSE")]
         {
-            tools::SSE::SSE_collect(events_url, event_names, max_events, timeout_ms, start_from)
-                .await
+            Ok(
+                tools::SSE::SSE_collect(
+                    events_url,
+                    event_names,
+                    max_events,
+                    timeout_ms,
+                    start_from,
+                )
+                .await,
+            )
         }
         #[cfg(not(feature = "SSE"))]
-        {
+        Ok({
             let _ = (events_url, event_names, max_events, timeout_ms, start_from);
             tools::feature_disabled("SSE")
-        }
+        })
     }
 
     #[tool(
@@ -1422,19 +1707,24 @@ impl CasperSdkMcp {
     #[allow(non_snake_case)]
     async fn sdk_CES_parser_create(
         &self,
-        contract_hashes_json: String,
-        state_root_hash: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
+        Parameters(SdkCesParserCreateArgs {
+            contract_hashes_json,
+            state_root_hash,
+            rpc_address,
+        }): Parameters<SdkCesParserCreateArgs>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "SSE")]
         {
-            tools::SSE::CES_parser_create(contract_hashes_json, state_root_hash, rpc_address).await
+            Ok(
+                tools::SSE::CES_parser_create(contract_hashes_json, state_root_hash, rpc_address)
+                    .await,
+            )
         }
         #[cfg(not(feature = "SSE"))]
-        {
+        Ok({
             let _ = (contract_hashes_json, state_root_hash, rpc_address);
             tools::feature_disabled("SSE")
-        }
+        })
     }
 
     #[tool(
@@ -1443,18 +1733,23 @@ impl CasperSdkMcp {
     #[allow(non_snake_case)]
     async fn sdk_CES_parse_execution_result(
         &self,
-        schemas_metadata_json: String,
-        execution_result_json: String,
-    ) -> ToolOutput {
+        Parameters(SdkCesParseExecutionResultArgs {
+            schemas_metadata_json,
+            execution_result_json,
+        }): Parameters<SdkCesParseExecutionResultArgs>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "SSE")]
         {
-            tools::SSE::CES_parse_execution_result(schemas_metadata_json, execution_result_json)
+            Ok(tools::SSE::CES_parse_execution_result(
+                schemas_metadata_json,
+                execution_result_json,
+            ))
         }
         #[cfg(not(feature = "SSE"))]
-        {
+        Ok({
             let _ = (schemas_metadata_json, execution_result_json);
             tools::feature_disabled("SSE")
-        }
+        })
     }
 
     #[tool(
@@ -1463,16 +1758,18 @@ impl CasperSdkMcp {
     #[allow(non_snake_case)]
     async fn sdk_CES_parse_transaction(
         &self,
-        contract_hashes_json: String,
-        transaction_hash: String,
-        finalized_approvals: Option<bool>,
-        state_root_hash: Option<String>,
-        verbosity: Option<String>,
-        rpc_address: Option<String>,
-    ) -> ToolOutput {
+        Parameters(SdkCesParseTransactionArgs {
+            contract_hashes_json,
+            transaction_hash,
+            finalized_approvals,
+            state_root_hash,
+            verbosity,
+            rpc_address,
+        }): Parameters<SdkCesParseTransactionArgs>,
+    ) -> Result<CallToolResult, McpError> {
         #[cfg(feature = "SSE")]
         {
-            tools::SSE::CES_parse_transaction(
+            Ok(tools::SSE::CES_parse_transaction(
                 contract_hashes_json,
                 transaction_hash,
                 finalized_approvals,
@@ -1480,10 +1777,10 @@ impl CasperSdkMcp {
                 verbosity,
                 rpc_address,
             )
-            .await
+            .await)
         }
         #[cfg(not(feature = "SSE"))]
-        {
+        Ok({
             let _ = (
                 contract_hashes_json,
                 transaction_hash,
@@ -1493,7 +1790,7 @@ impl CasperSdkMcp {
                 rpc_address,
             );
             tools::feature_disabled("SSE")
-        }
+        })
     }
 }
 
@@ -1553,67 +1850,54 @@ Pending tool groups
 }
 
 /// Serves MCP over stdio until the client disconnects.
-pub async fn run() -> Result<(), McpError> {
-    let transport = StdioTransport::new();
-    let server = ServerBuilder::new(CasperSdkMcp)
-        .with_tools(CasperSdkMcp)
-        .build();
-    server.serve(transport).await
+pub async fn run() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let server = CasperSdkMcp;
+    let service = server.serve(stdio()).await?;
+    service.waiting().await?;
+    Ok(())
 }
 
 /// Serves MCP over Streamable HTTP until the process is stopped.
 pub async fn run_http(addr: &str) -> std::io::Result<()> {
-    McpRouter::new(CasperSdkMcp).serve(addr).await
+    let config =
+        rmcp::transport::streamable_http_server::tower::StreamableHttpServerConfig::default();
+    let service = rmcp::transport::streamable_http_server::tower::StreamableHttpService::new(
+        || Ok(CasperSdkMcp),
+        Arc::new(
+            rmcp::transport::streamable_http_server::session::local::LocalSessionManager::default(),
+        ),
+        config,
+    );
+    let method_router = axum::routing::any_service(service);
+    let app = axum::Router::new()
+        .route("/mcp", method_router.clone())
+        .route("/mcp/", method_router);
+    let listener = tokio::net::TcpListener::bind(addr).await?;
+    tracing::info!(%addr, "casper-rust-wasm-sdk-mcp HTTP listening");
+    axum::serve(listener, app).await?;
+    Ok(())
 }
 
-impl ResourceHandler for CasperSdkMcp {
-    async fn list_resources(&self, _ctx: &Context<'_>) -> Result<Vec<Resource>, McpError> {
-        Ok(Vec::new())
-    }
-
-    async fn read_resource(
-        &self,
-        uri: &str,
-        _ctx: &Context<'_>,
-    ) -> Result<Vec<ResourceContents>, McpError> {
-        Err(McpError::invalid_params(
-            "resources/read",
-            format!("unknown resource: {uri}"),
-        ))
-    }
-}
-
-impl PromptHandler for CasperSdkMcp {
-    async fn list_prompts(&self, _ctx: &Context<'_>) -> Result<Vec<Prompt>, McpError> {
-        Ok(Vec::new())
-    }
-
-    async fn get_prompt(
-        &self,
-        name: &str,
-        _args: Option<serde_json::Map<String, serde_json::Value>>,
-        _ctx: &Context<'_>,
-    ) -> Result<GetPromptResult, McpError> {
-        Err(McpError::invalid_params(
-            "prompts/get",
-            format!("unknown prompt: {name}"),
-        ))
+#[tool_handler]
+impl ServerHandler for CasperSdkMcp {
+    fn get_info(&self) -> ServerInfo {
+        ServerInfo::new(ServerCapabilities::builder().enable_tools().build())
+            .with_server_info(rmcp::model::Implementation::new(
+                "casper-rust-wasm-sdk",
+                env!("CARGO_PKG_VERSION"),
+            ))
+            .with_instructions(help_text())
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn mcp_server_version_matches_crate() {
-        let src = include_str!("server.rs");
-        let needle = format!(
-            r#"#[mcp_server(name = "casper-rust-wasm-sdk", version = "{}")]"#,
-            env!("CARGO_PKG_VERSION")
-        );
-        assert!(
-            src.contains(&needle),
-            "bump #[mcp_server(version = …)] to {} when changing Cargo.toml version",
-            env!("CARGO_PKG_VERSION")
-        );
+        let info = CasperSdkMcp.get_info();
+        assert_eq!(info.server_info.version, env!("CARGO_PKG_VERSION"));
+        assert_eq!(info.server_info.name.as_str(), "casper-rust-wasm-sdk");
     }
 }

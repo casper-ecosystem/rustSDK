@@ -1,7 +1,7 @@
 //! Transaction builder / speculative tools (feature `transaction`).
 
 use casper_rust_wasm_sdk::types::transaction::Transaction;
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::CallToolResult;
 
 use crate::format;
 use crate::sdk_handle;
@@ -18,7 +18,7 @@ pub fn tool_names() -> &'static [&'static str] {
     ]
 }
 
-pub fn serialize_transaction(tx: Transaction) -> ToolOutput {
+pub fn serialize_transaction(tx: Transaction) -> CallToolResult {
     match tx.to_json_string() {
         Ok(s) => match serde_json::from_str::<serde_json::Value>(&s) {
             Ok(v) => format::json_ok(&v),
@@ -35,7 +35,7 @@ fn verb(verbosity: Option<&str>) -> Option<casper_rust_wasm_sdk::types::verbosit
 pub fn make_transaction(
     builder_params_json: String,
     transaction_params_json: String,
-) -> ToolOutput {
+) -> CallToolResult {
     let builder = match parse_transaction_builder_params(&builder_params_json) {
         Ok(b) => b,
         Err(err) => return format::err(err),
@@ -57,7 +57,7 @@ pub fn make_transfer_transaction(
     transaction_params_json: String,
     maybe_source: Option<String>,
     maybe_id: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let params = match parse_transaction_str_params(&transaction_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),
@@ -78,7 +78,7 @@ pub async fn speculative_transaction(
     transaction_params_json: String,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let builder = match parse_transaction_builder_params(&builder_params_json) {
         Ok(b) => b,
         Err(err) => return format::err(err),
@@ -105,7 +105,7 @@ pub async fn speculative_transfer_transaction(
     maybe_id: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let params = match parse_transaction_str_params(&transaction_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),

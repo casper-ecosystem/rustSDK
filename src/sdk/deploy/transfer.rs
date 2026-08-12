@@ -14,7 +14,7 @@ use crate::{
 use casper_client::{
     cli::deploy::make_transfer, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
 };
-use rand::Rng;
+use rand::RngExt;
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 

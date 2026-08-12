@@ -6,7 +6,7 @@ use casper_rust_wasm_sdk::helpers;
 use casper_rust_wasm_sdk::types::cl::bytes::Bytes;
 use casper_rust_wasm_sdk::types::deploy::Deploy;
 use casper_rust_wasm_sdk::types::transaction::Transaction;
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::CallToolResult;
 
 use crate::format;
 use crate::sdk_handle;
@@ -39,7 +39,7 @@ fn verb(verbosity: Option<&str>) -> Option<casper_rust_wasm_sdk::types::verbosit
     sdk_handle::verbosity_override(verbosity)
 }
 
-pub fn sign_transaction(transaction_json: String, secret_key: String) -> ToolOutput {
+pub fn sign_transaction(transaction_json: String, secret_key: String) -> CallToolResult {
     let tx = match Transaction::from_json_string(&transaction_json) {
         Ok(t) => t,
         Err(err) => return format::err(err),
@@ -52,7 +52,7 @@ pub async fn put_transaction(
     transaction_json: String,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let tx = match Transaction::from_json_string(&transaction_json) {
         Ok(t) => t,
         Err(err) => return format::err(err),
@@ -72,7 +72,7 @@ pub async fn transaction(
     transaction_params_json: String,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let builder = match parse_transaction_builder_params(&builder_params_json) {
         Ok(b) => b,
         Err(err) => return format::err(err),
@@ -99,7 +99,7 @@ pub async fn transfer_transaction(
     maybe_id: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let params = match parse_transaction_str_params(&transaction_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),
@@ -126,7 +126,7 @@ pub async fn transfer_transaction(
     }
 }
 
-pub fn sign_deploy(deploy_json: String, secret_key: String) -> ToolOutput {
+pub fn sign_deploy(deploy_json: String, secret_key: String) -> CallToolResult {
     let deploy = match Deploy::from_json_string(&deploy_json) {
         Ok(d) => d,
         Err(err) => return format::err(err),
@@ -139,7 +139,7 @@ pub async fn put_deploy(
     deploy_json: String,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let deploy = match Deploy::from_json_string(&deploy_json) {
         Ok(d) => d,
         Err(err) => return format::err(err),
@@ -160,7 +160,7 @@ pub async fn deploy(
     payment_params_json: String,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let deploy_params = match parse_deploy_str_params(&deploy_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),
@@ -197,7 +197,7 @@ pub async fn transfer(
     transfer_id: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let deploy_params = match parse_deploy_str_params(&deploy_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),
@@ -229,7 +229,7 @@ pub async fn install(
     wasm_hex: String,
     rpc_address: Option<String>,
     runtime_v2: Option<bool>,
-) -> ToolOutput {
+) -> CallToolResult {
     let params = match parse_transaction_str_params(&transaction_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),
@@ -253,7 +253,7 @@ pub async fn install_deploy(
     session_params_json: String,
     payment_amount: String,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let deploy_params = match parse_deploy_str_params(&deploy_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),
@@ -277,7 +277,7 @@ pub async fn call_entrypoint(
     transaction_params_json: String,
     rpc_address: Option<String>,
     runtime_v2: Option<bool>,
-) -> ToolOutput {
+) -> CallToolResult {
     let builder = match parse_transaction_builder_params(&builder_params_json) {
         Ok(b) => b,
         Err(err) => return format::err(err),
@@ -301,7 +301,7 @@ pub async fn call_entrypoint_deploy(
     session_params_json: String,
     payment_params_json: String,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let deploy_params = match parse_deploy_str_params(&deploy_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),
@@ -327,7 +327,7 @@ pub async fn call_entrypoint_deploy(
 pub async fn get_binary_try_accept_transaction(
     transaction_json: String,
     node_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let transaction = match Transaction::from_json_string(&transaction_json) {
         Ok(t) => t,
         Err(err) => return format::err(err),

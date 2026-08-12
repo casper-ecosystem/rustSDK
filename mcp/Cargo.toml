@@ -2,7 +2,7 @@
 name = "casper-rust-wasm-sdk-mcp"
 version = "2.2.2"
 edition = "2021"
-rust-version = "1.85"
+rust-version = "1.88"
 license = "Apache-2.0"
 description = "MCP server for casper-rust-wasm-sdk (stdio + Streamable HTTP)"
 readme = "README.md"
@@ -41,14 +41,24 @@ SSE = ["watcher", "casper-rust-wasm-sdk/SSE"]
 
 [dependencies]
 anyhow = "1"
+axum = { version = "0.8", default-features = false, features = [
+  "http1",
+  "tokio",
+  "json",
+] }
 casper-rust-wasm-sdk = { path = "..", default-features = false }
-casper-types = { version = "7.0.0", default-features = false, features = [
+casper-types = { version = "7.1.1", default-features = false, features = [
   "datasize",
 ] }
 clap = { version = "4", features = ["derive", "env"] }
 hex = "0.4"
-mcpkit = "0.7"
-mcpkit-axum = "0.7"
+rmcp = { version = "3.1.2", default-features = false, features = [
+  "server",
+  "macros",
+  "transport-io",
+  "transport-streamable-http-server",
+] }
+schemars = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

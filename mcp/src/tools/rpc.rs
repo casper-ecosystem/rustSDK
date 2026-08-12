@@ -13,7 +13,7 @@ use casper_rust_wasm_sdk::types::hash::deploy_hash::DeployHash;
 use casper_rust_wasm_sdk::types::hash::transaction_hash::TransactionHash;
 use casper_rust_wasm_sdk::types::identifier::block_identifier::BlockIdentifierInput;
 use casper_rust_wasm_sdk::types::transaction::Transaction;
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::CallToolResult;
 
 use crate::format;
 use crate::sdk_handle;
@@ -64,7 +64,10 @@ macro_rules! rpc_ok {
     };
 }
 
-pub async fn get_node_status(verbosity: Option<String>, rpc_address: Option<String>) -> ToolOutput {
+pub async fn get_node_status(
+    verbosity: Option<String>,
+    rpc_address: Option<String>,
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_node_status(verb(verbosity.as_deref()), rpc_address)
@@ -72,12 +75,15 @@ pub async fn get_node_status(verbosity: Option<String>, rpc_address: Option<Stri
     )
 }
 
-pub async fn get_peers(verbosity: Option<String>, rpc_address: Option<String>) -> ToolOutput {
+pub async fn get_peers(verbosity: Option<String>, rpc_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(sdk.get_peers(verb(verbosity.as_deref()), rpc_address).await)
 }
 
-pub async fn get_chainspec(verbosity: Option<String>, rpc_address: Option<String>) -> ToolOutput {
+pub async fn get_chainspec(
+    verbosity: Option<String>,
+    rpc_address: Option<String>,
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_chainspec(verb(verbosity.as_deref()), rpc_address)
@@ -88,7 +94,7 @@ pub async fn get_chainspec(verbosity: Option<String>, rpc_address: Option<String
 pub async fn get_validator_changes(
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_validator_changes(verb(verbosity.as_deref()), rpc_address)
@@ -96,7 +102,7 @@ pub async fn get_validator_changes(
     )
 }
 
-pub async fn list_rpcs(verbosity: Option<String>, rpc_address: Option<String>) -> ToolOutput {
+pub async fn list_rpcs(verbosity: Option<String>, rpc_address: Option<String>) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(sdk.list_rpcs(verb(verbosity.as_deref()), rpc_address).await)
 }
@@ -105,7 +111,7 @@ pub async fn get_block(
     maybe_block_identifier: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_block(
@@ -121,7 +127,7 @@ pub async fn get_block_transfers(
     maybe_block_identifier: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_block_transfers(
@@ -137,7 +143,7 @@ pub async fn get_auction_info(
     maybe_block_identifier: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_auction_info(
@@ -153,7 +159,7 @@ pub async fn get_era_summary(
     maybe_block_identifier: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_era_summary(
@@ -171,7 +177,7 @@ pub async fn get_reward(
     maybe_era_id: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_reward_as_string(
@@ -189,7 +195,7 @@ pub async fn get_era_info(
     maybe_block_identifier: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_era_info(
@@ -205,7 +211,7 @@ pub async fn get_state_root_hash(
     maybe_block_identifier: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_state_root_hash(
@@ -222,7 +228,7 @@ pub async fn get_account(
     maybe_block_identifier: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_account(
@@ -241,7 +247,7 @@ pub async fn get_entity(
     maybe_block_identifier: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_entity(
@@ -260,7 +266,7 @@ pub async fn get_deploy(
     finalized_approvals: Option<bool>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let hash = match DeployHash::new(&deploy_hash) {
         Ok(h) => h,
         Err(err) => return format::err(err),
@@ -282,7 +288,7 @@ pub async fn get_transaction(
     finalized_approvals: Option<bool>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let hash = match TransactionHash::new(&transaction_hash) {
         Ok(h) => h,
         Err(err) => return format::err(err),
@@ -304,7 +310,7 @@ pub async fn get_balance(
     state_root_hash: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.get_balance(
@@ -323,7 +329,7 @@ pub async fn query_balance(
     maybe_block_id: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.query_balance(
@@ -345,7 +351,7 @@ pub async fn query_balance_details(
     maybe_block_id: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     rpc_ok!(
         sdk.query_balance_details(
@@ -371,7 +377,7 @@ pub async fn get_dictionary_item(
     state_root_hash: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let mut params = DictionaryItemStrParams::new();
     match kind.as_str() {
         "uref" => {
@@ -451,7 +457,7 @@ pub async fn query_global_state(
     maybe_block_id: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     let params = QueryGlobalStateParams {
         key: KeyIdentifierInput::String(key),
@@ -469,7 +475,7 @@ pub async fn speculative_exec(
     transaction_json: String,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let transaction = match Transaction::from_json_string(&transaction_json) {
         Ok(t) => t,
         Err(err) => return format::err(err),
@@ -485,7 +491,7 @@ pub async fn speculative_exec_deploy(
     deploy_json: String,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let deploy = match Deploy::from_json_string(&deploy_json) {
         Ok(d) => d,
         Err(err) => return format::err(err),

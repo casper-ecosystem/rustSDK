@@ -4,7 +4,7 @@ use casper_rust_wasm_sdk::rpcs::get_dictionary_item::DictionaryItemInput;
 use casper_rust_wasm_sdk::rpcs::query_global_state::PathIdentifierInput;
 use casper_rust_wasm_sdk::types::deploy_params::dictionary_item_str_params::DictionaryItemStrParams;
 use casper_rust_wasm_sdk::types::identifier::block_identifier::BlockIdentifierInput;
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::CallToolResult;
 
 use crate::format;
 use crate::sdk_handle;
@@ -102,7 +102,7 @@ pub async fn query_contract_dict(
     state_root_hash: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let fields: serde_json::Value = match serde_json::from_str(&dictionary_item_json) {
         Ok(v) => v,
         Err(err) => return format::err(format!("dictionary_item_json: {err}")),
@@ -132,7 +132,7 @@ pub async fn query_contract_key(
     maybe_block_identifier: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     let path = PathIdentifierInput::String(path);
     let block = maybe_block_identifier.map(BlockIdentifierInput::String);

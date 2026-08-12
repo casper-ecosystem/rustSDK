@@ -7,7 +7,7 @@ use casper_client::{
     put_deploy, rpcs::results::PutDeployResult as _PutDeployResult, Error, JsonRpcId,
     SuccessResponse,
 };
-use rand::Rng;
+use rand::RngExt;
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 

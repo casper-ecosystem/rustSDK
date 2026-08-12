@@ -254,5 +254,5 @@ Prefer dual-gate with domain feature where applicable (e.g. `transaction` + `wri
 1. Prefer transaction-path tools over deprecated deploy/contract aliases.
 2. Gate `write` and secret-key tools behind explicit approval UX.
 3. Complex structs (`TransactionStrParams`, `DeployStrParams`, `QueryGlobalStateParams`, …) accept JSON strings.
-4. Responses: pretty JSON via `format.rs`; map `SdkError` → `ToolOutput::error`.
+4. Responses: pretty JSON via `format.rs`; map `SdkError` → `CallToolResult::error`.
 5. Binary-port tools need `CASPER_NODE_URL`, not only RPC.

@@ -73,8 +73,8 @@ pub fn registered_tool_names() -> Vec<&'static str> {
     names
 }
 
-/// Error when a Cargo feature is disabled (mcpkit still lists the tool).
-pub fn feature_disabled(feature: &str) -> mcpkit::prelude::ToolOutput {
+/// Error when a Cargo feature is disabled (rmcp still lists the tool).
+pub fn feature_disabled(feature: &str) -> rmcp::model::CallToolResult {
     crate::format::err(format!(
         "Cargo feature `{feature}` is disabled; rebuild with --features {feature} (or full)"
     ))

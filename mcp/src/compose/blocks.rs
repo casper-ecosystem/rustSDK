@@ -2,7 +2,7 @@
 
 use casper_rust_wasm_sdk::types::hash::transaction_hash::TransactionHash;
 use casper_rust_wasm_sdk::types::identifier::block_identifier::BlockIdentifierInput;
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::CallToolResult;
 use serde_json::{json, Value};
 
 use crate::format;
@@ -34,7 +34,7 @@ pub async fn get_latest_blocks(
     count: Option<u32>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let count = count.unwrap_or(10).clamp(1, 50) as usize;
     let sdk = sdk_handle::sdk_snapshot();
 
@@ -90,7 +90,7 @@ pub async fn get_block_transactions(
     expand: Option<bool>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     let block = match sdk
         .get_block(

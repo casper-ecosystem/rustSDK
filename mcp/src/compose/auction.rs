@@ -1,6 +1,6 @@
 //! Auction composition: normalize get_auction_info for Validators / Bidders.
 
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::CallToolResult;
 use serde::Serialize;
 use serde_json::{json, Value};
 
@@ -45,7 +45,10 @@ struct ValidatorDetail {
 }
 
 /// Active validators (`inactive == false`), sorted by total stake descending.
-pub async fn list_validators(verbosity: Option<String>, rpc_address: Option<String>) -> ToolOutput {
+pub async fn list_validators(
+    verbosity: Option<String>,
+    rpc_address: Option<String>,
+) -> CallToolResult {
     match fetch_auction(verbosity, rpc_address).await {
         Ok(auction) => {
             let rows: Vec<ValidatorRow> = list_bidders_rows(&auction)
@@ -59,7 +62,10 @@ pub async fn list_validators(verbosity: Option<String>, rpc_address: Option<Stri
 }
 
 /// All auction bids, sorted by total stake descending.
-pub async fn list_bidders(verbosity: Option<String>, rpc_address: Option<String>) -> ToolOutput {
+pub async fn list_bidders(
+    verbosity: Option<String>,
+    rpc_address: Option<String>,
+) -> CallToolResult {
     match fetch_auction(verbosity, rpc_address).await {
         Ok(auction) => {
             let rows = list_bidders_rows(&auction);
@@ -74,7 +80,7 @@ pub async fn get_validator(
     public_key: String,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let want = public_key.trim().to_ascii_lowercase();
     if want.is_empty() {
         return format::err("public_key is required");

@@ -3,7 +3,7 @@
 use casper_rust_wasm_sdk::helpers;
 use casper_rust_wasm_sdk::types::key::Key;
 use casper_types::U256;
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::CallToolResult;
 use std::str::FromStr;
 
 use crate::format;
@@ -33,11 +33,11 @@ pub fn tool_names() -> &'static [&'static str] {
     ]
 }
 
-pub fn get_current_timestamp(timestamp: Option<String>) -> ToolOutput {
+pub fn get_current_timestamp(timestamp: Option<String>) -> CallToolResult {
     format::text_ok(helpers::get_current_timestamp(timestamp))
 }
 
-pub fn get_blake2b_hash(meta_data: String) -> ToolOutput {
+pub fn get_blake2b_hash(meta_data: String) -> CallToolResult {
     format::text_ok(helpers::get_blake2b_hash(&meta_data))
 }
 
@@ -45,7 +45,7 @@ pub fn make_dictionary_item_key(
     key: String,
     value_key: Option<String>,
     value_u256: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let key = match Key::from_formatted_str(&key) {
         Ok(k) => k,
         Err(err) => return format::err(format!("invalid key: {err}")),
@@ -63,45 +63,45 @@ pub fn make_dictionary_item_key(
     }
 }
 
-pub fn get_base64_key_from_account_hash(account_hash: String) -> ToolOutput {
+pub fn get_base64_key_from_account_hash(account_hash: String) -> CallToolResult {
     match helpers::get_base64_key_from_account_hash(&account_hash) {
         Ok(v) => format::text_ok(v),
         Err(err) => format::err(err),
     }
 }
 
-pub fn get_base64_key_from_key_hash(formatted_hash: String) -> ToolOutput {
+pub fn get_base64_key_from_key_hash(formatted_hash: String) -> CallToolResult {
     match helpers::get_base64_key_from_key_hash(&formatted_hash) {
         Ok(v) => format::text_ok(v),
         Err(err) => format::err(err),
     }
 }
 
-pub fn get_ttl_or_default(ttl: Option<String>) -> ToolOutput {
+pub fn get_ttl_or_default(ttl: Option<String>) -> CallToolResult {
     format::text_ok(helpers::get_ttl_or_default(ttl.as_deref()))
 }
 
-pub fn parse_timestamp(value: String) -> ToolOutput {
+pub fn parse_timestamp(value: String) -> CallToolResult {
     match helpers::parse_timestamp(&value) {
         Ok(ts) => format::text_ok(ts.to_string()),
         Err(err) => format::err(err),
     }
 }
 
-pub fn parse_ttl(value: String) -> ToolOutput {
+pub fn parse_ttl(value: String) -> CallToolResult {
     match helpers::parse_ttl(&value) {
         Ok(ttl) => format::text_ok(ttl.to_string()),
         Err(err) => format::err(err),
     }
 }
 
-pub fn get_gas_price_or_default(gas_price: Option<u64>) -> ToolOutput {
+pub fn get_gas_price_or_default(gas_price: Option<u64>) -> CallToolResult {
     format::json_ok(&serde_json::json!({
         "gas_price": helpers::get_gas_price_or_default(gas_price)
     }))
 }
 
-pub fn secret_key_generate() -> ToolOutput {
+pub fn secret_key_generate() -> CallToolResult {
     match helpers::secret_key_generate() {
         Ok(sk) => match sk.to_pem() {
             Ok(pem) => format::json_ok(&serde_json::json!({
@@ -114,7 +114,7 @@ pub fn secret_key_generate() -> ToolOutput {
     }
 }
 
-pub fn secret_key_secp256k1_generate() -> ToolOutput {
+pub fn secret_key_secp256k1_generate() -> CallToolResult {
     match helpers::secret_key_secp256k1_generate() {
         Ok(sk) => match sk.to_pem() {
             Ok(pem) => format::json_ok(&serde_json::json!({
@@ -127,7 +127,7 @@ pub fn secret_key_secp256k1_generate() -> ToolOutput {
     }
 }
 
-pub fn secret_key_from_pem(secret_key: String) -> ToolOutput {
+pub fn secret_key_from_pem(secret_key: String) -> CallToolResult {
     match helpers::secret_key_from_pem(&secret_key) {
         Ok(sk) => format::json_ok(&serde_json::json!({
             "ok": true,
@@ -137,30 +137,30 @@ pub fn secret_key_from_pem(secret_key: String) -> ToolOutput {
     }
 }
 
-pub fn public_key_from_secret_key(secret_key: String) -> ToolOutput {
+pub fn public_key_from_secret_key(secret_key: String) -> CallToolResult {
     match helpers::public_key_from_secret_key(&secret_key) {
         Ok(pk) => format::text_ok(pk),
         Err(err) => format::err(err),
     }
 }
 
-pub fn hex_to_uint8_vec(hex_string: String) -> ToolOutput {
+pub fn hex_to_uint8_vec(hex_string: String) -> CallToolResult {
     let bytes = helpers::hex_to_uint8_vec(&hex_string);
     format::json_ok(&serde_json::json!({ "bytes": bytes }))
 }
 
-pub fn hex_to_string(hex_string: String) -> ToolOutput {
+pub fn hex_to_string(hex_string: String) -> CallToolResult {
     format::text_ok(helpers::hex_to_string(&hex_string))
 }
 
-pub fn motes_to_cspr(motes: String) -> ToolOutput {
+pub fn motes_to_cspr(motes: String) -> CallToolResult {
     match helpers::motes_to_cspr(&motes) {
         Ok(cspr) => format::json_ok(&serde_json::json!({ "motes": motes, "cspr": cspr })),
         Err(err) => format::err(err),
     }
 }
 
-pub fn json_pretty_print(value: String, verbosity: Option<String>) -> ToolOutput {
+pub fn json_pretty_print(value: String, verbosity: Option<String>) -> CallToolResult {
     let parsed: serde_json::Value = match serde_json::from_str(&value) {
         Ok(v) => v,
         Err(err) => return format::err(format!("value must be JSON: {err}")),
@@ -172,7 +172,7 @@ pub fn json_pretty_print(value: String, verbosity: Option<String>) -> ToolOutput
     }
 }
 
-pub fn cl_value_to_json(cl_value_json: String) -> ToolOutput {
+pub fn cl_value_to_json(cl_value_json: String) -> CallToolResult {
     let cl_value: casper_types::CLValue = match serde_json::from_str(&cl_value_json) {
         Ok(v) => v,
         Err(err) => {

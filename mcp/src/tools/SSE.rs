@@ -4,7 +4,7 @@ use casper_rust_wasm_sdk::types::hash::transaction_hash::TransactionHash;
 use casper_rust_wasm_sdk::SSE::{
     parse_schemas_from_hex, CESParser, ContractMetadata, EventName, SSEClient,
 };
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::CallToolResult;
 use serde_json::Value;
 
 use crate::format;
@@ -30,7 +30,7 @@ pub async fn SSE_collect(
     max_events: Option<u64>,
     timeout_ms: Option<u64>,
     start_from: Option<u64>,
-) -> ToolOutput {
+) -> CallToolResult {
     let names = match parse_event_names(&event_names) {
         Ok(n) => n,
         Err(err) => return format::err(err),
@@ -52,7 +52,7 @@ pub async fn CES_parser_create(
     contract_hashes_json: String,
     state_root_hash: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let hashes: Vec<String> = match serde_json::from_str(&contract_hashes_json) {
         Ok(v) => v,
         Err(err) => {
@@ -86,7 +86,7 @@ pub async fn CES_parser_create(
 pub fn CES_parse_execution_result(
     schemas_metadata_json: String,
     execution_result_json: String,
-) -> ToolOutput {
+) -> CallToolResult {
     let parser = match parser_from_metadata_json(&schemas_metadata_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),
@@ -105,7 +105,7 @@ pub async fn CES_parse_transaction(
     state_root_hash: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let hashes: Vec<String> = match serde_json::from_str(&contract_hashes_json) {
         Ok(v) => v,
         Err(err) => {

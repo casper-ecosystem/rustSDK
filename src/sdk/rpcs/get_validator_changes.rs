@@ -5,7 +5,7 @@ use casper_client::{
 };
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
-use rand::Rng;
+use rand::RngExt;
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use serde::{Deserialize, Serialize};
 #[cfg(all(feature = "js", target_arch = "wasm32"))]

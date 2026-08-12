@@ -2,7 +2,7 @@
 
 use casper_rust_wasm_sdk::types::public_key::PublicKey;
 use casper_rust_wasm_sdk::types::transaction_params::transaction_builder_params::TransactionBuilderParams;
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::CallToolResult;
 
 use crate::format;
 use crate::sdk_handle;
@@ -23,7 +23,7 @@ pub fn make_delegate_transaction(
     validator: String,
     amount: String,
     transaction_params_json: String,
-) -> ToolOutput {
+) -> CallToolResult {
     make_stake(
         StakeKind::Delegate,
         &delegator,
@@ -40,7 +40,7 @@ pub fn make_undelegate_transaction(
     validator: String,
     amount: String,
     transaction_params_json: String,
-) -> ToolOutput {
+) -> CallToolResult {
     make_stake(
         StakeKind::Undelegate,
         &delegator,
@@ -58,7 +58,7 @@ pub fn make_redelegate_transaction(
     new_validator: String,
     amount: String,
     transaction_params_json: String,
-) -> ToolOutput {
+) -> CallToolResult {
     make_stake(
         StakeKind::Redelegate,
         &delegator,
@@ -82,7 +82,7 @@ fn make_stake(
     new_validator: Option<&str>,
     amount: &str,
     transaction_params_json: &str,
-) -> ToolOutput {
+) -> CallToolResult {
     let params = match parse_transaction_str_params(transaction_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),
@@ -137,9 +137,7 @@ mod tests {
             params.into(),
         );
         let text = format!("{out:?}");
-        assert!(
-            text.contains("Success") && text.contains("Delegate"),
-            "unexpected tool output: {text}"
-        );
+        assert_eq!(out.is_error, Some(false), "unexpected tool error: {text}");
+        assert!(text.contains("Delegate"), "unexpected tool output: {text}");
     }
 }

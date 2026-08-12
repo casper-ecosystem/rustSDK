@@ -3,7 +3,7 @@
 #![allow(deprecated)]
 
 use casper_rust_wasm_sdk::types::deploy::Deploy;
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::CallToolResult;
 
 use crate::format;
 use crate::sdk_handle;
@@ -20,7 +20,7 @@ pub fn tool_names() -> &'static [&'static str] {
     ]
 }
 
-pub fn serialize_deploy(deploy: Deploy) -> ToolOutput {
+pub fn serialize_deploy(deploy: Deploy) -> CallToolResult {
     match deploy.to_json_string() {
         Ok(s) => match serde_json::from_str::<serde_json::Value>(&s) {
             Ok(v) => format::json_ok(&v),
@@ -38,7 +38,7 @@ pub fn make_deploy(
     deploy_params_json: String,
     session_params_json: String,
     payment_params_json: String,
-) -> ToolOutput {
+) -> CallToolResult {
     let deploy_params = match parse_deploy_str_params(&deploy_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),
@@ -64,7 +64,7 @@ pub fn make_transfer(
     deploy_params_json: String,
     payment_params_json: String,
     transfer_id: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let deploy_params = match parse_deploy_str_params(&deploy_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),
@@ -92,7 +92,7 @@ pub async fn speculative_deploy(
     payment_params_json: String,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let deploy_params = match parse_deploy_str_params(&deploy_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),
@@ -129,7 +129,7 @@ pub async fn speculative_transfer(
     transfer_id: Option<String>,
     verbosity: Option<String>,
     rpc_address: Option<String>,
-) -> ToolOutput {
+) -> CallToolResult {
     let deploy_params = match parse_deploy_str_params(&deploy_params_json) {
         Ok(p) => p,
         Err(err) => return format::err(err),

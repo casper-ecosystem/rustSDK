@@ -4,6 +4,7 @@ pub mod compose;
 pub mod format;
 pub mod sdk_handle;
 pub mod server;
+pub mod tool_args;
 pub mod tools;
 
 pub use server::{run, run_http, DEFAULT_HTTP_LISTEN};

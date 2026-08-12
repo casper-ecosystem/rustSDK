@@ -1,36 +1,38 @@
-//! Map SDK / serde results to MCP `ToolOutput`.
+//! Map SDK / serde results to MCP `CallToolResult`.
 
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::{CallToolResult, ContentBlock};
 use serde::Serialize;
 
 /// Pretty-print JSON for tool responses.
-pub fn json_ok(value: &serde_json::Value) -> ToolOutput {
+pub fn json_ok(value: &serde_json::Value) -> CallToolResult {
     match serde_json::to_string_pretty(value) {
-        Ok(text) => ToolOutput::text(text),
-        Err(err) => ToolOutput::error(format!("json encode failed: {err}")),
+        Ok(text) => CallToolResult::success(vec![ContentBlock::text(text)]),
+        Err(err) => CallToolResult::error(vec![ContentBlock::text(format!(
+            "json encode failed: {err}"
+        ))]),
     }
 }
 
 /// Serialize any `Serialize` value as pretty JSON text.
-pub fn serialize_ok<T: Serialize>(value: &T) -> ToolOutput {
+pub fn serialize_ok<T: Serialize>(value: &T) -> CallToolResult {
     match serde_json::to_value(value) {
         Ok(v) => json_ok(&v),
         Err(e) => err(e),
     }
 }
 
-/// Wrap an arbitrary displayable error.
-pub fn err(err: impl std::fmt::Display) -> ToolOutput {
-    ToolOutput::error(err.to_string())
+/// Wrap an arbitrary displayable error (tool-level `isError`).
+pub fn err(err: impl std::fmt::Display) -> CallToolResult {
+    CallToolResult::error(vec![ContentBlock::text(err.to_string())])
 }
 
 /// Success path for plain text.
-pub fn text_ok(text: impl Into<String>) -> ToolOutput {
-    ToolOutput::text(text.into())
+pub fn text_ok(text: impl Into<String>) -> CallToolResult {
+    CallToolResult::success(vec![ContentBlock::text(text.into())])
 }
 
-/// Map `Result` → `ToolOutput` using `serialize_ok` / `err`.
-pub fn from_result<T: Serialize, E: std::fmt::Display>(result: Result<T, E>) -> ToolOutput {
+/// Map `Result` → `CallToolResult` using `serialize_ok` / `err`.
+pub fn from_result<T: Serialize, E: std::fmt::Display>(result: Result<T, E>) -> CallToolResult {
     match result {
         Ok(value) => serialize_ok(&value),
         Err(error) => err(error),
@@ -45,20 +47,20 @@ mod tests {
     fn json_ok_pretty_prints() {
         let value = serde_json::json!({ "ok": true });
         let out = json_ok(&value);
-        let _ = format!("{out:?}");
+        assert_eq!(out.is_error, Some(false));
     }
 
     #[test]
     fn err_builds_error_output() {
         let out = err("boom");
-        let _ = format!("{out:?}");
+        assert_eq!(out.is_error, Some(true));
     }
 
     #[test]
     fn from_result_ok_and_err() {
         let ok: Result<i32, &str> = Ok(7);
-        let _ = from_result(ok);
+        assert_eq!(from_result(ok).is_error, Some(false));
         let bad: Result<i32, &str> = Err("nope");
-        let _ = from_result(bad);
+        assert_eq!(from_result(bad).is_error, Some(true));
     }
 }

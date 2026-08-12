@@ -1,6 +1,6 @@
 //! Wait/watch tools (feature `watcher`).
 
-use mcpkit::prelude::ToolOutput;
+use rmcp::model::CallToolResult;
 
 use crate::format;
 use crate::sdk_handle;
@@ -13,7 +13,7 @@ pub async fn wait_transaction(
     events_url: String,
     transaction_hash: String,
     timeout_ms: Option<u64>,
-) -> ToolOutput {
+) -> CallToolResult {
     let sdk = sdk_handle::sdk_snapshot();
     match sdk
         .wait_transaction(&events_url, &transaction_hash, timeout_ms)

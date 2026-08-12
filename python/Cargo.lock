@@ -194,10 +194,8 @@ dependencies = [
  "chrono",
  "futures-util",
  "getrandom 0.3.4",
- "gloo-utils",
  "hex",
  "humantime",
- "js-sys",
  "num-traits",
  "once_cell",
  "rand 0.9.5",
@@ -206,8 +204,6 @@ dependencies = [
  "serde_json",
  "thiserror 2.0.19",
  "tokio",
- "wasm-bindgen",
- "wasm-bindgen-futures",
 ]
 
 [[package]]
@@ -772,19 +768,6 @@ dependencies = [
  "cfg-if",
  "libc",
  "r-efi 6.0.0",
-]
-
-[[package]]
-name = "gloo-utils"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b5555354113b18c547c1d3a98fbf7fb32a9ff4f6fa112ce823a21641a0ba3aa"
-dependencies = [
- "js-sys",
- "serde",
- "serde_json",
- "wasm-bindgen",
- "web-sys",
 ]
 
 [[package]]

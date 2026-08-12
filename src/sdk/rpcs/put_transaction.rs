@@ -8,7 +8,7 @@ use casper_client::{
     put_transaction, rpcs::results::PutTransactionResult as _PutTransactionResult, Error,
     JsonRpcId, SuccessResponse,
 };
-use rand::Rng;
+use rand::RngExt;
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 
