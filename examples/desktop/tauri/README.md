@@ -58,14 +58,14 @@ https://v2.tauri.app/start/prerequisites/
 
 ## Run
 
-From the repo root (clears Cursor sandbox `CARGO_TARGET_DIR` if set):
+From the repo root:
 
 ```bash
 make run-tauri
 # or
 cd examples/desktop/tauri
 npm install
-env -u CARGO_TARGET_DIR npm run tauri -- dev
+npm run tauri -- dev
 ```
 
 Presets: `nctl` (default), `testnet`, `mainnet`. Override RPC / events in the forms when needed.

@@ -6,14 +6,14 @@ Desktop example beside Electron / Node under `examples/desktop/`. JSON-RPC only 
 
 ## Run
 
-From the repo root (clears Cursor sandbox `CARGO_TARGET_DIR` if set):
+From the repo root:
 
 ```bash
 make run-casperatatui
 # alias:
 make run-tui
 # or
-env -u CARGO_TARGET_DIR cargo run -p casperatatui -- --preset nctl
+cargo run -p casperatatui -- --preset nctl
 ```
 
 CEP / CEPS Actions (optional [`ceps-client`](https://github.com/Interchouette-ITC/ceps-rust-ts-client)):
@@ -22,7 +22,7 @@ CEP / CEPS Actions (optional [`ceps-client`](https://github.com/Interchouette-IT
 make run-casperatatui-ceps
 # alias: make run-tui-ceps
 # or
-env -u CARGO_TARGET_DIR cargo run -p casperatatui --features ceps -- --preset nctl
+cargo run -p casperatatui --features ceps -- --preset nctl
 ```
 
 Feature `ceps` pulls `ceps-client` from that repo (`branch = "dev"`). Default build stays green without it. SDK feature `js` stays off for both default and `ceps`.

@@ -214,24 +214,19 @@ mcp-test-live:
 # --- Casperatatui (examples/desktop/casperatatui) ---
 
 run-casperatatui:
-	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo run -p casperatatui -- --preset nctl $(CASPERATATUI_ARGS) $(TUI_ARGS)
+	cargo run -p casperatatui -- --preset nctl $(CASPERATATUI_ARGS) $(TUI_ARGS)
 
 # Needs network once to fetch Interchouette-ITC/ceps-rust-ts-client (git dep, branch dev).
 run-casperatatui-ceps:
-	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo run -p casperatatui --features ceps -- --preset nctl $(CASPERATATUI_ARGS) $(TUI_ARGS)
+	cargo run -p casperatatui --features ceps -- --preset nctl $(CASPERATATUI_ARGS) $(TUI_ARGS)
 
 build-casperatatui-release:
-	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo build -p casperatatui --release
+	cargo build -p casperatatui --release
 
 # Not part of root wasm clippy matrix.
 check-lint-casperatatui:
-	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo clippy -p casperatatui --all-targets --no-deps -- -D warnings
-	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo fmt -p casperatatui -- --check
+	cargo clippy -p casperatatui --all-targets --no-deps -- -D warnings
+	cargo fmt -p casperatatui -- --check
 
 # Short aliases (same recipes).
 run-tui: run-casperatatui
@@ -245,18 +240,14 @@ check-lint-tui: check-lint-casperatatui
 # --- Signing desk (examples/desktop/tauri) ---
 
 run-tauri:
-	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		$(MAKE) -C examples/desktop/tauri run
+	$(MAKE) -C examples/desktop/tauri run
 
 build-tauri:
-	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		$(MAKE) -C examples/desktop/tauri build
+	$(MAKE) -C examples/desktop/tauri build
 
 check-lint-tauri:
-	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo clippy -p casper-signing-desk --all-targets --no-deps -- -D warnings
-	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
-		cargo fmt -p casper-signing-desk -- --check
+	cargo clippy -p casper-signing-desk --all-targets --no-deps -- -D warnings
+	cargo fmt -p casper-signing-desk -- --check
 
 .PHONY: run-tauri build-tauri check-lint-tauri
 
