@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "identifier": "net.casper.signing-desk",
   "build": {
-    "beforeDevCommand": "node ./node_modules/vite/bin/vite.js",
+    "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "node ./node_modules/typescript/bin/tsc && node ./node_modules/vite/bin/vite.js build",
+    "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
   "app": {
