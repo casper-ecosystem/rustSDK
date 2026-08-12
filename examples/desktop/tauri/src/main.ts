@@ -21,6 +21,15 @@ let busy = false;
 let presets: PresetInfo[] = [];
 let theme: Theme = "light";
 
+const FALLBACK_PRESETS: PresetInfo[] = [
+  {
+    id: "nctl",
+    rpc: "http://127.0.0.1:11101/rpc",
+    events: "http://127.0.0.1:18101/events",
+    chain_name: "casper-net-1",
+  },
+];
+
 function readStoredTheme(): Theme {
   try {
     const v = localStorage.getItem(THEME_KEY);
@@ -68,7 +77,6 @@ function setStatus(text: string, kind: "ok" | "err" | "" = ""): void {
 async function withBusy(fn: () => Promise<void>): Promise<void> {
   if (busy) return;
   busy = true;
-  render();
   try {
     await fn();
   } catch (e) {
@@ -632,9 +640,31 @@ async function onAction(action: string): Promise<void> {
 
 async function boot(): Promise<void> {
   applyTheme(readStoredTheme());
-  presets = await api<PresetInfo[]>("presets");
-  policyPath = await api<string>("default_policy");
-  publicKey = await api<string | null>("session_status");
+  // Render immediately so startup invoke latency never shows a blank window.
+  if (presets.length === 0) presets = [...FALLBACK_PRESETS];
+  render();
+
+  try {
+    const livePresets = await api<PresetInfo[]>("presets");
+    if (Array.isArray(livePresets) && livePresets.length > 0) {
+      presets = livePresets;
+    }
+  } catch {
+    setStatus("Using fallback presets", "");
+  }
+
+  try {
+    policyPath = await api<string>("default_policy");
+  } catch {
+    policyPath = "";
+  }
+
+  try {
+    publicKey = await api<string | null>("session_status");
+  } catch {
+    publicKey = null;
+  }
+
   await listen<{ action: string }>("menu-action", (ev) => {
     const action = ev.payload?.action;
     if (!action) return;
