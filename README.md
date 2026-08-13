@@ -90,12 +90,18 @@ If you want to compile the Wasm package from Rust you may need to install `wasm-
 curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 ```
 
+Release packs run `wasm-opt`. Check that Binaryen on `PATH` is current **before** `wasm-pack` / `make pack`. If `wasm-opt` is missing or too old, wasm-pack falls back to its vendored Binaryen **117**, which rejects modules from current `rustc` (bulk-memory and related ops). Debian/Ubuntu `apt install binaryen` is often **120** and is not enough.
+
+```shell
+wasm-opt --version
+```
+
+You need **version 130 or newer** (for example `wasm-opt version 131 (version_131)`). If the command is missing or the version is below 130, install a current Binaryen from the [upstream releases](https://github.com/WebAssembly/binaryen/releases) (`version_130` or later for your OS and arch), unpack it, and put that tree's `bin` directory on `PATH`. Then run `wasm-opt --version` again.
+
 ```shell
 $ make prepare
 $ make pack
 ```
-
-`make pack` ensures Binaryen **version_130** on `PATH` (host or `.tools/`) so `wasm-pack` does not fall back to its vendored Binaryen 117. Do not use `apt install binaryen` (often 120).
 
 This will create a `pkg` and `pkg-nodejs` containing the Typescript interfaces. You can find more details about building the SDK for Javascript with `wasm-pack` in the [wasm-pack documention](https://rustwasm.github.io/docs/wasm-pack/commands/build.html).
 
