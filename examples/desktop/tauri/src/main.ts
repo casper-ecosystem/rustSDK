@@ -642,8 +642,9 @@ async function onAction(action: string): Promise<void> {
   await runner(async () => {
     switch (action) {
       case "unlock": {
+        const prevKey = publicKey;
         publicKey = await api<string>("session_unlock");
-        if (!composeInit.trim()) composeInit = publicKey;
+        if (!composeInit.trim() || composeInit === prevKey) composeInit = publicKey;
         setStatus(`Unlocked ${truncate(publicKey)}`, "ok");
         render();
         break;
@@ -651,6 +652,7 @@ async function onAction(action: string): Promise<void> {
       case "unload": {
         await api("session_unload");
         publicKey = null;
+        composeInit = "";
         setStatus("Session unloaded", "ok");
         render();
         break;
