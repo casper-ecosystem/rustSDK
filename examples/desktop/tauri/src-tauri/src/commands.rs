@@ -94,9 +94,17 @@ fn default_policy_path() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../policy.sample.json")
 }
 
+fn user_home_dir() -> Option<PathBuf> {
+    // Unix: $HOME; Windows: USERPROFILE (and other platform fallbacks).
+    #[allow(deprecated)]
+    {
+        std::env::home_dir()
+    }
+}
+
 fn default_keys_dir() -> Option<PathBuf> {
-    let home = std::env::var("HOME").ok()?;
-    let dir = PathBuf::from(home).join(".casper-signing-desk/keys");
+    let home = user_home_dir()?;
+    let dir = home.join(".casper-signing-desk/keys");
     if let Err(e) = fs::create_dir_all(&dir) {
         eprintln!(
             "[signing-desk] keys dir create failed {}: {}",
@@ -113,17 +121,13 @@ fn workspace_root_guess() -> Option<PathBuf> {
     fs::canonicalize(p).ok()
 }
 
-fn path_is_inside(base: &Path, path: &Path) -> bool {
-    let base = match fs::canonicalize(base) {
-        Ok(v) => v,
-        Err(_) => return false,
-    };
+/// `Some(true)` if `path` is under `base`, `Some(false)` if definitely outside,
+/// `None` if the check could not be performed (caller should refuse).
+fn path_is_inside(base: &Path, path: &Path) -> Option<bool> {
+    let base = fs::canonicalize(base).ok()?;
     let parent = path.parent().unwrap_or(path);
-    let resolved_parent = match fs::canonicalize(parent) {
-        Ok(v) => v,
-        Err(_) => return false,
-    };
-    resolved_parent.starts_with(base)
+    let resolved_parent = fs::canonicalize(parent).ok()?;
+    Some(resolved_parent.starts_with(&base))
 }
 
 #[derive(Debug, Deserialize)]
@@ -264,11 +268,25 @@ pub async fn keygen_and_save(
     )
     .await?;
     if let Some(root) = workspace_root_guess() {
-        if path_is_inside(&root, &path) {
-            return Err(format!(
-                "refusing to save PEM inside workspace ({}); choose a path outside the repo to avoid dev auto-restart",
-                root.display()
-            ));
+        match path_is_inside(&root, &path) {
+            Some(true) => {
+                return Err(format!(
+                    "refusing to save PEM inside workspace ({}); choose a path outside the repo to avoid dev auto-restart",
+                    root.display()
+                ));
+            }
+            Some(false) => {}
+            None => {
+                eprintln!(
+                    "[signing-desk] warn: cannot verify PEM save path {} is outside workspace {}",
+                    path.display(),
+                    root.display()
+                );
+                return Err(format!(
+                    "cannot verify save path is outside the workspace ({}); choose a different location",
+                    path.display()
+                ));
+            }
         }
     }
     fs::write(&path, &pem).map_err(|e| format!("write PEM: {e}"))?;
