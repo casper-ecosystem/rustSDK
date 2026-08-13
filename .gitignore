@@ -16,8 +16,5 @@ target/
 
 .env
 
-# Local Binaryen pin (make ensure-binaryen)
-.tools/
-
 # Cursor Playwright MCP probe dumps (console/page snapshots)
 .playwright-mcp/

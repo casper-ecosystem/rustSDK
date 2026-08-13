@@ -95,8 +95,6 @@ $ make prepare
 $ make pack
 ```
 
-`make pack` ensures Binaryen **version_130** on `PATH` (host or `.tools/`) so `wasm-pack` does not fall back to its vendored Binaryen 117. Do not use `apt install binaryen` (often 120).
-
 This will create a `pkg` and `pkg-nodejs` containing the Typescript interfaces. You can find more details about building the SDK for Javascript with `wasm-pack` in the [wasm-pack documention](https://rustwasm.github.io/docs/wasm-pack/commands/build.html).
 
 ### Cargo features
