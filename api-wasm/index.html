@@ -19,11 +19,11 @@
 <p>This page covers different examples of using the SDK.</p>
 <p>⚠ WARNING: This application is for testing and development purposes. Do NOT use private keys or perform real transactions on mainnet unless you fully understand the security risks.</p>
 <h2 id="try-the-wasm-webclient" class="tsd-anchor-link">Try the Wasm webclient<a href="#try-the-wasm-webclient" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<p>A hosted build of the Angular example — <strong><a href="https://casper-webclient.interchouette.net/">Casper WebClient</a></strong> — lets you exercise the Wasm SDK in the browser against public networks (testnet / mainnet).</p>
+<p>A hosted build of the Angular <strong>frontend</strong> example — <strong><a href="https://casper-webclient.interchouette.net/">Casper WebClient</a></strong> — lets you exercise the Wasm SDK in the browser against public networks (testnet / mainnet).</p>
 <ul>
 <li>Live demo: <a href="https://casper-webclient.interchouette.net/">https://casper-webclient.interchouette.net/</a></li>
-<li>Source: <a href="media/angular"><code>examples/frontend/angular</code></a></li>
-<li>Same UI is also packaged as the <a href="#desktop-electron-demo-app">Desktop Electron demo</a></li>
+<li>Source: <a href="media/angular"><code>examples/frontend/angular</code></a> (see also React under <a href="#usage">Usage</a>)</li>
+<li>Optional desktop shell for that same UI: <a href="#electron-desktop-shell">Electron</a> under <a href="#desktop-examples">Desktop examples</a></li>
 </ul>
 <p>Demo / development only — same warning as above.</p>
 <h2 id="mcp" class="tsd-anchor-link">MCP<a href="#mcp" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
@@ -69,13 +69,17 @@
 <pre><code class="shell"><span class="hl-0">curl</span><span class="hl-1"> </span><span class="hl-2">https://rustwasm.github.io/wasm-pack/installer/init.sh</span><span class="hl-1"> </span><span class="hl-5">-sSf</span><span class="hl-1"> | </span><span class="hl-0">sh</span>
 </code><button type="button">Copy</button></pre>
 
+<p>Release packs run <code>wasm-opt</code>. Check that Binaryen on <code>PATH</code> is current <strong>before</strong> <code>wasm-pack</code> / <code>make pack</code>. If <code>wasm-opt</code> is missing or too old, wasm-pack falls back to its vendored Binaryen <strong>117</strong>, which rejects modules from current <code>rustc</code> (bulk-memory and related ops). Debian/Ubuntu <code>apt install binaryen</code> is often <strong>120</strong> and is not enough.</p>
+<pre><code class="shell"><span class="hl-0">wasm-opt</span><span class="hl-1"> </span><span class="hl-5">--version</span>
+</code><button type="button">Copy</button></pre>
+
+<p>You need <strong>version 130 or newer</strong> (for example <code>wasm-opt version 131 (version_131)</code>). If the command is missing or the version is below 130, install a current Binaryen from the <a href="https://github.com/WebAssembly/binaryen/releases">upstream releases</a> (<code>version_130</code> or later for your OS and arch), unpack it, and put that tree's <code>bin</code> directory on <code>PATH</code>. Then run <code>wasm-opt --version</code> again.</p>
 <pre><code class="shell"><span class="hl-0">$</span><span class="hl-1"> </span><span class="hl-2">make</span><span class="hl-1"> </span><span class="hl-2">prepare</span><br/><span class="hl-0">$</span><span class="hl-1"> </span><span class="hl-2">make</span><span class="hl-1"> </span><span class="hl-2">pack</span>
 </code><button type="button">Copy</button></pre>
 
-<p><code>make pack</code> ensures Binaryen <strong>version_130</strong> on <code>PATH</code> (host or <code>.tools/</code>) so <code>wasm-pack</code> does not fall back to its vendored Binaryen 117. Do not use <code>apt install binaryen</code> (often 120).</p>
 <p>This will create a <code>pkg</code> and <code>pkg-nodejs</code> containing the Typescript interfaces. You can find more details about building the SDK for Javascript with <code>wasm-pack</code> in the <a href="https://rustwasm.github.io/docs/wasm-pack/commands/build.html">wasm-pack documention</a>.</p>
 <h3 id="cargo-features" class="tsd-anchor-link">Cargo features<a href="#cargo-features" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<p>Default is <code>full</code> (today's API) for both the wasm package and the Rust <code>rlib</code>. Slim builds drop optional surfaces:</p>
+<p>Default is <code>full</code> + <code>js</code> (today's JS/wasm API) for both the wasm package and the Rust <code>rlib</code>. Slim builds drop optional surfaces. Omit <code>js</code> for Rust-only consumers so wasm-bindgen exports are not linked into a foreign pack.</p>
 <table>
 <thead>
 <tr>
@@ -88,22 +92,22 @@
 <tr>
 <td>full + SSE (wasm packs)</td>
 <td><code>make web</code> / <code>make nodejs</code></td>
-<td>default features + <code>--features SSE</code> (SSEClient + CESParser)</td>
+<td>default features + <code>--features SSE</code> (SSEClient + CESParser; <code>js</code> on)</td>
 </tr>
 <tr>
 <td>read-only</td>
 <td><code>make web-read-only</code></td>
-<td><code>--no-default-features</code></td>
+<td><code>--no-default-features --features js</code></td>
 </tr>
 <tr>
 <td>transaction (no deploy)</td>
 <td><code>make web-transaction</code></td>
-<td><code>--no-default-features --features transaction,helpers,watcher</code></td>
+<td><code>--no-default-features --features transaction,helpers,watcher,js</code></td>
 </tr>
 </tbody>
 </table>
-<p>Optional features: <code>transaction</code>, <code>deploy</code>, <code>contract</code>, <code>binary-port</code>, <code>watcher</code> (wait/watch), <code>SSE</code> (node SSE client + CES; enables <code>watcher</code>), <code>helpers</code>. Core JSON-RPC reads stay available without them. <code>binary-port</code> pulls optional <code>casper-binary-port*</code> crates.</p>
-<p>Cargo crate <code>default</code>/<code>full</code> includes <code>watcher</code> only. Browser <code>pkg</code> and Node <code>pkg-nodejs</code> packs from <code>make web</code> / <code>make nodejs</code> also enable <code>SSE</code> so demos and e2e harnesses get the full SDK surface.</p>
+<p>Optional features: <code>js</code> (wasm-bindgen / js-sys surface; default on), <code>transaction</code>, <code>deploy</code>, <code>contract</code>, <code>binary-port</code>, <code>watcher</code> (wait/watch), <code>SSE</code> (node SSE client + CES; enables <code>watcher</code>), <code>helpers</code>. Core JSON-RPC reads stay available without them. <code>binary-port</code> pulls optional <code>casper-binary-port*</code> crates. Domain feature <code>full</code> does not include <code>js</code>.</p>
+<p>Cargo crate <code>default</code> includes <code>full</code> and <code>js</code>. Browser <code>pkg</code> and Node <code>pkg-nodejs</code> packs from <code>make web</code> / <code>make nodejs</code> also enable <code>SSE</code> so demos and e2e harnesses get the full SDK surface. A dependent crate's own wasm-pack must not enable this SDK's <code>js</code> feature if it wants a private export surface (no SDK <code>SDK</code> / <code>Key</code> / <code>Transaction</code> classes in its <code>.d.ts</code>).</p>
 <p>This folder contains a Wasm binary, a JS wrapper file, Typescript types definitions, and a package.json file that you can load in your project.</p>
 <pre><code class="shell"><span class="hl-0">$</span><span class="hl-1"> </span><span class="hl-2">tree</span><span class="hl-1"> </span><span class="hl-2">pkg</span><br/><span class="hl-0">pkg</span><br/><span class="hl-0">├──</span><span class="hl-1"> </span><span class="hl-2">casper_rust_wasm_sdk_bg.wasm</span><br/><span class="hl-0">├──</span><span class="hl-1"> </span><span class="hl-2">casper_rust_wasm_sdk_bg.wasm.d.ts</span><br/><span class="hl-0">├──</span><span class="hl-1"> </span><span class="hl-2">casper_rust_wasm_sdk.d.ts</span><br/><span class="hl-0">├──</span><span class="hl-1"> </span><span class="hl-2">casper_rust_wasm_sdk.js</span><br/><span class="hl-0">├──</span><span class="hl-1"> </span><span class="hl-2">LICENSE</span><br/><span class="hl-0">├──</span><span class="hl-1"> </span><span class="hl-2">package.json</span><br/><span class="hl-0">└──</span><span class="hl-1"> </span><span class="hl-2">README.md</span>
 </code><button type="button">Copy</button></pre>
@@ -718,19 +722,38 @@ print(body.get("body"))
 </code><button type="button">Copy</button></pre>
 
 </details>
-<h3 id="desktop-electron-demo-app" class="tsd-anchor-link">Desktop Electron demo app<a href="#desktop-electron-demo-app" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<h3 id="desktop-examples" class="tsd-anchor-link">Desktop examples<a href="#desktop-examples" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Under <a href="media/desktop"><code>examples/desktop/</code></a>: native or packaged desktop apps. <strong>Casper WebClient</strong> itself lives under <a href="media/frontend"><code>examples/frontend/</code></a> (Angular / React); Electron below is only a desktop shell for that Angular UI.</p>
 <details open>
-  <summary><strong><code>Example of usage of the SDK in a Desktop application</code></strong></summary>
+  <summary><strong>Electron</strong> (desktop shell for Casper WebClient)</summary>
 <br>
-<p><img src="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/blob/dev/docs/images/get_status-electron.png" alt="Casper Electron App"></p>
-<p>The Electron based demo app loads the Angular webclient build (the same UI hosted at <a href="https://casper-webclient.interchouette.net/">casper-webclient.interchouette.net</a>). You can use this app on your computer to test every action the SDK can take.</p>
+<p><img src="images/get_status-electron.png" alt="Electron shell running Casper WebClient"></p>
+<p><strong>Electron</strong> loads the Angular <strong>Casper WebClient</strong> Wasm build in a desktop window (same UI as the <a href="https://casper-webclient.interchouette.net/">hosted WebClient</a>). It is not a separate product: frontend = WebClient; this package wraps it for local desktop installs.</p>
 <pre><code class="shell"><span class="hl-0">$</span><span class="hl-1"> </span><span class="hl-2">cd</span><span class="hl-1"> </span><span class="hl-2">./examples/desktop/electron</span><br/><span class="hl-0">$</span><span class="hl-1"> </span><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><br/><span class="hl-0">$</span><span class="hl-1"> </span><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-2">start</span><br/><span class="hl-0">$</span><span class="hl-1"> </span><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-2">build</span>
 </code><button type="button">Copy</button></pre>
 
-<p>Download pre-built desktop demos from the <strong><a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases">GitHub Releases</a></strong> page (CI artifacts — Windows portable, Linux AppImage, Snap). Mac build is TODO.</p>
-<p>For a terminal UI over the same SDK (not Electron), see <a href="#casperatatui">Casperatatui</a>.</p>
+<ul>
+<li>Source: <a href="media/electron"><code>examples/desktop/electron</code></a></li>
+<li>Frontend source: <a href="media/angular"><code>examples/frontend/angular</code></a></li>
+<li>Pre-built demos: <strong><a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases">GitHub Releases</a></strong> (Windows portable, Linux AppImage, Snap). Mac build is TODO.</li>
+</ul>
 </details>
-<h2 id="casperatatui" class="tsd-anchor-link">Casperatatui<a href="#casperatatui" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<details open>
+  <summary><strong>Casper Signing Desk</strong> (Tauri)</summary>
+<br>
+<p><img src="images/signing-desk.jpg" alt="Casper Signing Desk"></p>
+<p><strong>Casper Signing Desk</strong> is a Tauri desktop example over the native Rust SDK: message sign/verify, keygen, transfer / stake compose, multisig approvals, and <code>wait_transaction</code>. Transaction path only (no deploy). Specialized signing desk; not the WebClient catalog.</p>
+<p><strong>Native PEM unlock:</strong> pick a secret-key <code>.pem</code> with the OS file dialog; Rust holds it in a session for signing. The webview only sees the public key. Unload (or quit) clears the session. Compose can build unsigned JSON without unlocking; sign / add approval need an unlocked PEM. Details: <a href="media/README-2.md#native-pem-unlock">Native PEM unlock</a> in the example README.</p>
+<ul>
+<li>Source: <a href="media/tauri"><code>examples/desktop/tauri</code></a></li>
+<li>Make: <code>make run-tauri</code>, <code>make build-tauri</code>, <code>make check-lint-tauri</code></li>
+<li>Example README: <a href="media/README-2.md"><code>examples/desktop/tauri/README.md</code></a></li>
+</ul>
+</details>
+<details open>
+  <summary><strong>Casperatatui</strong> (TUI)</summary>
+<br>
+<p><img src="images/casperatatui-actions.jpg" alt="Casperatatui Actions"></p>
 <p><strong>Casperatatui</strong> is a Casper TUI (terminal UI) based on <a href="https://ratatui.rs/">ratatui</a>, over the native Rust SDK. JSON-RPC and SSE only (no binary port).</p>
 <ul>
 <li>Source: <a href="media/casperatatui"><code>examples/desktop/casperatatui</code></a></li>
@@ -740,7 +763,8 @@ print(body.get("body"))
 </code><button type="button">Copy</button></pre>
 
 <p>Writes stay off unless you pass <code>--enable-writes</code> and a secret key. Not part of the default SDK crate build or Hub images (unlike MCP).</p>
-<p>See <a href="media/README-2.md"><code>examples/desktop/casperatatui/README.md</code></a>.</p>
+<p>See <a href="media/README-3.md"><code>examples/desktop/casperatatui/README.md</code></a>.</p>
+</details>
 <h2 id="python-3" class="tsd-anchor-link">Python<a href="#python-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <p>The workspace package <a href="media/python"><code>python/</code></a> (<code>casper-rust-wasm-sdk-py</code>) is a PyO3 / maturin extension over the same native Rust <code>rlib</code> (not a Python port).</p>
 <ul>
@@ -748,7 +772,6 @@ print(body.get("body"))
 <li>CI: path-filtered <code>python-bindings</code> (offline unit + Hub NCTL <code>:dev</code>)</li>
 <li>Make: <code>make python-test</code>, <code>make python-test-nctl</code></li>
 </ul>
-<p>Initial face: <a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/117">#117</a>. Parity waves 1–4: <a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/121">#121</a> (closes <a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/120">#120</a>). Epic <a href="https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9">#9</a> is <strong>closed</strong>. Deploy APIs, binary-port, and PyPI publish remain out of that epic.</p>
 <h2 id="rust-api" class="tsd-anchor-link">Rust API<a href="#rust-api" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <p>Published rustdoc: <a href="https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/">crate root</a> · <a href="https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/all.html">all items</a></p>
 <p>Cargo features (see <code>Cargo.toml</code>): <code>transaction</code>, <code>deploy</code>, <code>contract</code>, <code>binary-port</code>, <code>watcher</code>, <code>SSE</code> (includes <code>watcher</code> + <code>SSEClient</code> / <code>CESParser</code>), <code>helpers</code>. Default bundle is <code>full</code> (not the same as enabling <code>SSE</code>).</p>
@@ -992,8 +1015,7 @@ Two ways to sign a transaction, either signTransaction</p>
 <li><a href="#typescript-15"><span>Typescript</span></a></li>
 <li><a href="#install-2"><span>Install</span></a></li>
 <li><a href="#mint-1"><span>Mint</span></a></li></ul></li>
-<li><a href="#desktop-electron-demo-app"><span>Desktop <wbr/>Electron demo app</span></a></li></ul></li>
-<li><a href="#casperatatui"><span>Casperatatui</span></a></li>
+<li><a href="#desktop-examples"><span>Desktop examples</span></a></li></ul></li>
 <li><a href="#python-3"><span>Python</span></a></li>
 <li><a href="#rust-api"><span>Rust <wbr/>API</span></a></li>
 <li>
