@@ -1,11 +1,4 @@
 # GitHub Pages only (rustdoc + typedoc under docs/).
-#
-# Cargo layout (same as ci-test): workspace member casperatatui path-deps
-# sibling ceps-client, and ceps-client path-deps this SDK as ../rustSDK.
-# Checkout into path: rustSDK + path: ceps-rust-ts-client.
-#
-# JamesIves needs a .git at GITHUB_WORKSPACE: symlink rustSDK/.git there
-# before deploy (no Rust / workspace member changes).
 name: pages
 
 on:
@@ -18,10 +11,6 @@ on:
 permissions:
   contents: write
 
-defaults:
-  run:
-    working-directory: rustSDK
-
 jobs:
   build-and-deploy:
     strategy:
@@ -32,14 +21,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-        with:
-          path: rustSDK
-
-      - name: Checkout sibling ceps-rust-ts-client
-        uses: actions/checkout@v5
-        with:
-          repository: Interchouette-ITC/ceps-rust-ts-client
-          path: ceps-rust-ts-client
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -55,12 +36,8 @@ jobs:
       - name: Doc
         run: make doc
 
-      - name: Expose .git at workspace root for JamesIves
-        working-directory: ${{ github.workspace }}
-        run: ln -sfn "${GITHUB_WORKSPACE}/rustSDK/.git" "${GITHUB_WORKSPACE}/.git"
-
       - name: Deploy GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: rustSDK/docs
+          folder: docs
           commit-message: "Deploy documentation for ${{ github.ref_name }}"

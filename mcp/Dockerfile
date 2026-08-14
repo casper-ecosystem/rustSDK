@@ -17,18 +17,14 @@ RUN apt-get update \
     binutils \
   && rm -rf /var/lib/apt/lists/*
 
-# Sibling layout: casperatatui optional-deps ceps-client (path must exist for Cargo).
 WORKDIR /work
-COPY Cargo.toml Cargo.lock ./rustSDK/
-COPY src ./rustSDK/src
-COPY mcp ./rustSDK/mcp
-COPY examples/desktop/casperatatui ./rustSDK/examples/desktop/casperatatui
-COPY examples/desktop/tauri/src-tauri ./rustSDK/examples/desktop/tauri/src-tauri
-COPY tests/integration/rust ./rustSDK/tests/integration/rust
-RUN git clone --depth 1 https://github.com/Interchouette-ITC/ceps-rust-ts-client.git \
-  /work/ceps-rust-ts-client
+COPY Cargo.toml Cargo.lock ./
+COPY src ./src
+COPY mcp ./mcp
+COPY examples/desktop/casperatatui ./examples/desktop/casperatatui
+COPY examples/desktop/tauri/src-tauri ./examples/desktop/tauri/src-tauri
+COPY tests/integration/rust ./tests/integration/rust
 
-WORKDIR /work/rustSDK
 RUN cargo build -p casper-rust-wasm-sdk-mcp --release \
   && strip -s target/release/casper-rust-wasm-sdk-mcp \
   && cp target/release/casper-rust-wasm-sdk-mcp /casper-rust-wasm-sdk-mcp
