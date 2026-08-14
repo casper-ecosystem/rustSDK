@@ -14,11 +14,11 @@ This page covers different examples of using the SDK.
 
 ## Try the Wasm webclient
 
-A hosted build of the Angular example — **[Casper WebClient](https://casper-webclient.interchouette.net/)** — lets you exercise the Wasm SDK in the browser against public networks (testnet / mainnet).
+A hosted build of the Angular **frontend** example — **[Casper WebClient](https://casper-webclient.interchouette.net/)** — lets you exercise the Wasm SDK in the browser against public networks (testnet / mainnet).
 
 - Live demo: https://casper-webclient.interchouette.net/
-- Source: [`examples/frontend/angular`](../examples/frontend/angular)
-- Same UI is also packaged as the [Desktop Electron demo](#desktop-electron-demo-app)
+- Source: [`examples/frontend/angular`](../examples/frontend/angular) (see also React under [Usage](#usage))
+- Optional desktop shell for that same UI: [Electron](#electron-desktop-shell) under [Desktop examples](#desktop-examples)
 
 Demo / development only — same warning as above.
 
@@ -90,28 +90,34 @@ If you want to compile the Wasm package from Rust you may need to install `wasm-
 curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 ```
 
+Release packs run `wasm-opt`. Check that Binaryen on `PATH` is current **before** `wasm-pack` / `make pack`. If `wasm-opt` is missing or too old, wasm-pack falls back to its vendored Binaryen **117**, which rejects modules from current `rustc` (bulk-memory and related ops). Debian/Ubuntu `apt install binaryen` is often **120** and is not enough.
+
+```shell
+wasm-opt --version
+```
+
+You need **version 130 or newer** (for example `wasm-opt version 131 (version_131)`). If the command is missing or the version is below 130, install a current Binaryen from the [upstream releases](https://github.com/WebAssembly/binaryen/releases) (`version_130` or later for your OS and arch), unpack it, and put that tree's `bin` directory on `PATH`. Then run `wasm-opt --version` again.
+
 ```shell
 $ make prepare
 $ make pack
 ```
 
-`make pack` ensures Binaryen **version_130** on `PATH` (host or `.tools/`) so `wasm-pack` does not fall back to its vendored Binaryen 117. Do not use `apt install binaryen` (often 120).
-
 This will create a `pkg` and `pkg-nodejs` containing the Typescript interfaces. You can find more details about building the SDK for Javascript with `wasm-pack` in the [wasm-pack documention](https://rustwasm.github.io/docs/wasm-pack/commands/build.html).
 
 ### Cargo features
 
-Default is `full` (today's API) for both the wasm package and the Rust `rlib`. Slim builds drop optional surfaces:
+Default is `full` + `js` (today's JS/wasm API) for both the wasm package and the Rust `rlib`. Slim builds drop optional surfaces. Omit `js` for Rust-only consumers so wasm-bindgen exports are not linked into a foreign pack.
 
-| Profile                 | Make target                | Cargo flags                                                    |
-| ----------------------- | -------------------------- | -------------------------------------------------------------- |
-| full + SSE (wasm packs) | `make web` / `make nodejs` | default features + `--features SSE` (SSEClient + CESParser)    |
-| read-only               | `make web-read-only`       | `--no-default-features`                                        |
-| transaction (no deploy) | `make web-transaction`     | `--no-default-features --features transaction,helpers,watcher` |
+| Profile                 | Make target                | Cargo flags                                                          |
+| ----------------------- | -------------------------- | -------------------------------------------------------------------- |
+| full + SSE (wasm packs) | `make web` / `make nodejs` | default features + `--features SSE` (SSEClient + CESParser; `js` on) |
+| read-only               | `make web-read-only`       | `--no-default-features --features js`                                |
+| transaction (no deploy) | `make web-transaction`     | `--no-default-features --features transaction,helpers,watcher,js`    |
 
-Optional features: `transaction`, `deploy`, `contract`, `binary-port`, `watcher` (wait/watch), `SSE` (node SSE client + CES; enables `watcher`), `helpers`. Core JSON-RPC reads stay available without them. `binary-port` pulls optional `casper-binary-port*` crates.
+Optional features: `js` (wasm-bindgen / js-sys surface; default on), `transaction`, `deploy`, `contract`, `binary-port`, `watcher` (wait/watch), `SSE` (node SSE client + CES; enables `watcher`), `helpers`. Core JSON-RPC reads stay available without them. `binary-port` pulls optional `casper-binary-port*` crates. Domain feature `full` does not include `js`.
 
-Cargo crate `default`/`full` includes `watcher` only. Browser `pkg` and Node `pkg-nodejs` packs from `make web` / `make nodejs` also enable `SSE` so demos and e2e harnesses get the full SDK surface.
+Cargo crate `default` includes `full` and `js`. Browser `pkg` and Node `pkg-nodejs` packs from `make web` / `make nodejs` also enable `SSE` so demos and e2e harnesses get the full SDK surface. A dependent crate's own wasm-pack must not enable this SDK's `js` feature if it wants a private export surface (no SDK `SDK` / `Key` / `Transaction` classes in its `.d.ts`).
 
 This folder contains a Wasm binary, a JS wrapper file, Typescript types definitions, and a package.json file that you can load in your project.
 
@@ -2656,16 +2662,18 @@ console.log(deploy_hash);
 
 </details>
 
-### Desktop Electron demo app
+### Desktop examples
+
+Under [`examples/desktop/`](../examples/desktop/): native or packaged desktop apps. **Casper WebClient** itself lives under [`examples/frontend/`](../examples/frontend/) (Angular / React); Electron below is only a desktop shell for that Angular UI.
 
 <details open>
-  <summary><strong><code>Example of usage of the SDK in a Desktop application</code></strong></summary>
+  <summary><strong>Electron</strong> (desktop shell for Casper WebClient)</summary>
 
 <br>
 
-![Casper Electron App](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/blob/dev/docs/images/get_status-electron.png)
+![Electron shell running Casper WebClient](images/get_status-electron.png)
 
-The Electron based demo app loads the Angular webclient build (the same UI hosted at [casper-webclient.interchouette.net](https://casper-webclient.interchouette.net/)). You can use this app on your computer to test every action the SDK can take.
+**Electron** loads the Angular **Casper WebClient** Wasm build in a desktop window (same UI as the [hosted WebClient](https://casper-webclient.interchouette.net/)). It is not a separate product: frontend = WebClient; this package wraps it for local desktop installs.
 
 ```shell
 $ cd ./examples/desktop/electron
@@ -2674,13 +2682,35 @@ $ npm start
 $ npm build
 ```
 
-Download pre-built desktop demos from the **[GitHub Releases](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases)** page (CI artifacts — Windows portable, Linux AppImage, Snap). Mac build is TODO.
-
-For a terminal UI over the same SDK (not Electron), see [Casperatatui](#casperatatui).
+- Source: [`examples/desktop/electron`](../examples/desktop/electron)
+- Frontend source: [`examples/frontend/angular`](../examples/frontend/angular)
+- Pre-built demos: **[GitHub Releases](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases)** (Windows portable, Linux AppImage, Snap). Mac build is TODO.
 
 </details>
 
-## Casperatatui
+<details open>
+  <summary><strong>Casper Signing Desk</strong> (Tauri)</summary>
+
+<br>
+
+![Casper Signing Desk](images/signing-desk.jpg)
+
+**Casper Signing Desk** is a Tauri desktop example over the native Rust SDK: message sign/verify, keygen, transfer / stake compose, multisig approvals, and `wait_transaction`. Transaction path only (no deploy). Specialized signing desk; not the WebClient catalog.
+
+**Native PEM unlock:** pick a secret-key `.pem` with the OS file dialog; Rust holds it in a session for signing. The webview only sees the public key. Unload (or quit) clears the session. Compose can build unsigned JSON without unlocking; sign / add approval need an unlocked PEM. Details: [Native PEM unlock](../examples/desktop/tauri/README.md#native-pem-unlock) in the example README.
+
+- Source: [`examples/desktop/tauri`](../examples/desktop/tauri)
+- Make: `make run-tauri`, `make build-tauri`, `make check-lint-tauri`
+- Example README: [`examples/desktop/tauri/README.md`](../examples/desktop/tauri/README.md)
+
+</details>
+
+<details open>
+  <summary><strong>Casperatatui</strong> (TUI)</summary>
+
+<br>
+
+![Casperatatui Actions](images/casperatatui-actions.jpg)
 
 **Casperatatui** is a Casper TUI (terminal UI) based on [ratatui](https://ratatui.rs/), over the native Rust SDK. JSON-RPC and SSE only (no binary port).
 
@@ -2700,6 +2730,8 @@ Writes stay off unless you pass `--enable-writes` and a secret key. Not part of 
 
 See [`examples/desktop/casperatatui/README.md`](../examples/desktop/casperatatui/README.md).
 
+</details>
+
 ## Python
 
 The workspace package [`python/`](../python/) (`casper-rust-wasm-sdk-py`) is a PyO3 / maturin extension over the same native Rust `rlib` (not a Python port).
@@ -2707,8 +2739,6 @@ The workspace package [`python/`](../python/) (`casper-rust-wasm-sdk-py`) is a P
 - Install / develop: see [Python Project](#python-project) under Install above, or [`python/README.md`](../python/README.md)
 - CI: path-filtered `python-bindings` (offline unit + Hub NCTL `:dev`)
 - Make: `make python-test`, `make python-test-nctl`
-
-Initial face: [#117](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/117). Parity waves 1–4: [#121](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/121) (closes [#120](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/120)). Epic [#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9) is **closed**. Deploy APIs, binary-port, and PyPI publish remain out of that epic.
 
 ## Rust API
 
