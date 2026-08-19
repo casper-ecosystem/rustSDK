@@ -223,7 +223,14 @@ export class FormService {
               targetControl.disable();
               disabledTargets.push(targetControlName);
             }
-            if (this.has_wasm && input?.disabled_when?.includes('has_wasm')) {
+            const actionHasWasm = fields.some((r) =>
+              r.some((f) => f.wasm_button),
+            );
+            if (
+              this.has_wasm &&
+              actionHasWasm &&
+              input?.disabled_when?.includes('has_wasm')
+            ) {
               control.reset();
               control.disable();
             } else if (!disabledTargets.includes(input.controlName)) {
