@@ -102,7 +102,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download staged assets
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: desktop-mcp-casperatatui-dev-preview
           path: release-assets
@@ -110,6 +110,7 @@ jobs:
       - name: Upload assets to release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           TAG: dev-preview
         run: |
           set -euo pipefail
@@ -126,8 +127,8 @@ jobs:
           for f in "${expected[@]}"; do
             test -f "release-assets/$f" || { echo "Missing staged asset: $f" >&2; exit 1; }
           done
+          # No checkout in this job: GH_REPO must be set so gh does not probe .git.
           gh release upload "$TAG" release-assets/* --clobber
-          # Fail the job if any expected tip desktop/MCP/TUI/Signing Desk file is missing.
           mapfile -t uploaded < <(gh release view "$TAG" --json assets --jq '.assets[].name' | sort)
           echo "Uploaded asset names:"
           printf '%s\n' "${uploaded[@]}"

@@ -37,25 +37,13 @@ jobs:
     name: Build and upload desktop + MCP + Casperatatui assets
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: rustSDK
-
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
           ref: ${{ inputs.ref }}
-          path: rustSDK
-
-      - name: Checkout sibling ceps-rust-ts-client
-        uses: actions/checkout@v5
-        with:
-          repository: Interchouette-ITC/ceps-rust-ts-client
-          path: ceps-rust-ts-client
 
       - name: Install system dependencies
-        working-directory: ${{ github.workspace }}
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -177,7 +165,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.artifact_name }}
-          path: rustSDK/release-assets/*
+          path: release-assets/*
           if-no-files-found: error
           retention-days: 3
 
@@ -185,6 +173,7 @@ jobs:
         if: ${{ inputs.attach_to_release }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail

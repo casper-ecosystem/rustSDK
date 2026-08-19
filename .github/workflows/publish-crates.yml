@@ -9,27 +9,14 @@ on:
         required: false
         type: string
 
-# Workspace member casperatatui path-deps sibling ceps-client; Cargo needs the
-# path present to load the workspace (same layout as ci-test).
 jobs:
   publish:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: rustSDK
 
     steps:
       - uses: actions/checkout@v5
         with:
           ref: ${{ inputs.ref || github.ref }}
-          path: rustSDK
-
-      - name: Checkout sibling ceps-rust-ts-client
-        uses: actions/checkout@v5
-        with:
-          repository: Interchouette-ITC/ceps-rust-ts-client
-          path: ceps-rust-ts-client
 
       - uses: dtolnay/rust-toolchain@stable
 

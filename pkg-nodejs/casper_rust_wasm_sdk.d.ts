@@ -25,6 +25,10 @@ export class AccessRights {
     is_readable(): boolean;
     is_writeable(): boolean;
     constructor(access_rights: number);
+    /**
+     * Construct from bit flags; `None` if the bits are invalid.
+     */
+    static try_from_u8(access_rights: number): AccessRights | undefined;
 }
 
 /**
@@ -1306,13 +1310,13 @@ export class Payment {
 export class PaymentStrParams {
     free(): void;
     [Symbol.dispose](): void;
-    constructor(payment_amount?: string | null, payment_hash?: string | null, payment_name?: string | null, payment_package_hash?: string | null, payment_package_name?: string | null, payment_path?: string | null, payment_args_simple?: Array<any> | null, payment_args_json?: string | null, payment_version?: string | null, payment_entry_point?: string | null);
+    constructor(payment_amount?: string | null, payment_hash?: string | null, payment_name?: string | null, payment_package_hash?: string | null, payment_package_name?: string | null, payment_path?: string | null, payment_args_simple?: string[] | null, payment_args_json?: string | null, payment_version?: string | null, payment_entry_point?: string | null);
     get payment_amount(): string | undefined;
     set payment_amount(value: string);
     get payment_args_json(): string | undefined;
     set payment_args_json(value: string);
-    get payment_args_simple(): Array<any> | undefined;
-    set payment_args_simple(value: Array<any>);
+    get payment_args_simple(): ArgsSimple | undefined;
+    set payment_args_simple(value: string[]);
     get payment_entry_point(): string | undefined;
     set payment_entry_point(value: string);
     get payment_hash(): string | undefined;

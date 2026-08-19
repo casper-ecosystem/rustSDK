@@ -1,6 +1,4 @@
 # Path-filtered Casperatatui gate. Opt-in package (not default-members / Hub).
-# Checkout layout: sibling ceps-rust-ts-client next to rustSDK so optional path-dep
-# in Cargo.toml resolves (Cargo requires the path even when feature `ceps` is off).
 name: ci-casperatatui
 
 on:
@@ -16,10 +14,6 @@ on:
       - ".github/workflows/ci-casperatatui.yml"
   workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: rustSDK
-
 jobs:
   casperatatui:
     name: Lint test smoke Casperatatui
@@ -27,25 +21,14 @@ jobs:
 
     steps:
       - name: Install dependencies
-        working-directory: ${{ github.workspace }}
         run: |
           sudo apt-get update
           sudo apt-get install -y pkg-config libssl-dev
 
       - uses: actions/checkout@v5
-        with:
-          path: rustSDK
-
-      - name: Checkout sibling ceps-rust-ts-client
-        uses: actions/checkout@v5
-        with:
-          repository: Interchouette-ITC/ceps-rust-ts-client
-          path: ceps-rust-ts-client
 
       - name: Swatinem cache
         uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rustSDK
 
       - uses: dtolnay/rust-toolchain@stable
         with:
