@@ -103,7 +103,6 @@ impl SDK {
         }
         self.put_deploy(deploy.unwrap().into(), None, rpc_address)
             .await
-            .map_err(SdkError::from)
     }
 }
 

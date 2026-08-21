@@ -1,12 +1,12 @@
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::transaction::transaction::PutTransactionResult;
 use crate::{
-    types::{transaction::Transaction, verbosity::Verbosity},
+    types::{sdk_error::SdkError, transaction::Transaction, verbosity::Verbosity},
     SDK,
 };
 use casper_client::{
-    put_transaction, rpcs::results::PutTransactionResult as _PutTransactionResult, Error,
-    JsonRpcId, SuccessResponse,
+    put_transaction, rpcs::results::PutTransactionResult as _PutTransactionResult, JsonRpcId,
+    SuccessResponse,
 };
 use rand::RngExt;
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
@@ -87,7 +87,7 @@ impl SDK {
         transaction: Transaction,
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
-    ) -> Result<SuccessResponse<_PutTransactionResult>, Error> {
+    ) -> Result<SuccessResponse<_PutTransactionResult>, SdkError> {
         let random_id = JsonRpcId::from(rand::rng().random::<u64>().to_string());
         //log("account_put_transaction!");
         put_transaction(
@@ -97,6 +97,7 @@ impl SDK {
             transaction.into(),
         )
         .await
+        .map_err(Into::into)
     }
 }
 

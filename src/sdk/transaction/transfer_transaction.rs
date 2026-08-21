@@ -105,7 +105,6 @@ impl SDK {
 
         self.put_transaction(transaction, verbosity, rpc_address)
             .await
-            .map_err(SdkError::from)
     }
 }
 

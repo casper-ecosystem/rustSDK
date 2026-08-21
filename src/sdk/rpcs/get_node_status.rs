@@ -1,8 +1,11 @@
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::{digest::Digest, public_key::PublicKey};
-use crate::{types::verbosity::Verbosity, SDK};
+use crate::{
+    types::{sdk_error::SdkError, verbosity::Verbosity},
+    SDK,
+};
 use casper_client::{
-    get_node_status, rpcs::results::GetNodeStatusResult as _GetNodeStatusResult, Error, JsonRpcId,
+    get_node_status, rpcs::results::GetNodeStatusResult as _GetNodeStatusResult, JsonRpcId,
     SuccessResponse,
 };
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
@@ -206,7 +209,7 @@ impl SDK {
         &self,
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
-    ) -> Result<SuccessResponse<_GetNodeStatusResult>, Error> {
+    ) -> Result<SuccessResponse<_GetNodeStatusResult>, SdkError> {
         //log("get_node_status!");
         let random_id = JsonRpcId::from(rand::rng().random::<u64>().to_string());
         get_node_status(
@@ -215,6 +218,7 @@ impl SDK {
             self.get_verbosity(verbosity).into(),
         )
         .await
+        .map_err(Into::into)
     }
 }
 

@@ -1,6 +1,9 @@
-use crate::{types::verbosity::Verbosity, SDK};
+use crate::{
+    types::{sdk_error::SdkError, verbosity::Verbosity},
+    SDK,
+};
 use casper_client::{
-    get_chainspec, rpcs::results::GetChainspecResult as _GetChainspecResult, Error, JsonRpcId,
+    get_chainspec, rpcs::results::GetChainspecResult as _GetChainspecResult, JsonRpcId,
     SuccessResponse,
 };
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
@@ -117,7 +120,7 @@ impl SDK {
         &self,
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
-    ) -> Result<SuccessResponse<_GetChainspecResult>, Error> {
+    ) -> Result<SuccessResponse<_GetChainspecResult>, SdkError> {
         //log("get_chainspec!");
         let random_id = JsonRpcId::from(rand::rng().random::<u64>().to_string());
         get_chainspec(
@@ -126,6 +129,7 @@ impl SDK {
             self.get_verbosity(verbosity).into(),
         )
         .await
+        .map_err(Into::into)
     }
 }
 

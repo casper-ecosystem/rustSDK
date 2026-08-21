@@ -1,10 +1,12 @@
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::deploy::Deploy;
 use crate::types::hash::deploy_hash::DeployHash;
-use crate::{types::verbosity::Verbosity, SDK};
+use crate::{
+    types::{sdk_error::SdkError, verbosity::Verbosity},
+    SDK,
+};
 use casper_client::{
-    get_deploy, rpcs::results::GetDeployResult as _GetDeployResult, Error, JsonRpcId,
-    SuccessResponse,
+    get_deploy, rpcs::results::GetDeployResult as _GetDeployResult, JsonRpcId, SuccessResponse,
 };
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
@@ -186,7 +188,7 @@ impl SDK {
         finalized_approvals: Option<bool>,
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
-    ) -> Result<SuccessResponse<_GetDeployResult>, Error> {
+    ) -> Result<SuccessResponse<_GetDeployResult>, SdkError> {
         //log("get_deploy!");
         let random_id = JsonRpcId::from(rand::rng().random::<u64>().to_string());
         get_deploy(
@@ -197,6 +199,7 @@ impl SDK {
             finalized_approvals.unwrap_or_default(),
         )
         .await
+        .map_err(Into::into)
     }
 }
 

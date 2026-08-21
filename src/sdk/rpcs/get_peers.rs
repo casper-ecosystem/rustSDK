@@ -1,6 +1,9 @@
-use crate::{types::verbosity::Verbosity, SDK};
+use crate::{
+    types::{sdk_error::SdkError, verbosity::Verbosity},
+    SDK,
+};
 use casper_client::{
-    get_peers, rpcs::results::GetPeersResult as _GetPeersResult, Error, JsonRpcId, SuccessResponse,
+    get_peers, rpcs::results::GetPeersResult as _GetPeersResult, JsonRpcId, SuccessResponse,
 };
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
@@ -113,7 +116,7 @@ impl SDK {
         &self,
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
-    ) -> Result<SuccessResponse<_GetPeersResult>, Error> {
+    ) -> Result<SuccessResponse<_GetPeersResult>, SdkError> {
         let random_id = JsonRpcId::from(rand::rng().random::<u64>().to_string());
         get_peers(
             random_id,
@@ -121,6 +124,7 @@ impl SDK {
             self.get_verbosity(verbosity).into(),
         )
         .await
+        .map_err(Into::into)
     }
 }
 

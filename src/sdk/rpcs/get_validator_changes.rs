@@ -1,7 +1,10 @@
-use crate::{types::verbosity::Verbosity, SDK};
+use crate::{
+    types::{sdk_error::SdkError, verbosity::Verbosity},
+    SDK,
+};
 use casper_client::{
     get_validator_changes, rpcs::results::GetValidatorChangesResult as _GetValidatorChangesResult,
-    Error, JsonRpcId, SuccessResponse,
+    JsonRpcId, SuccessResponse,
 };
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
@@ -124,7 +127,7 @@ impl SDK {
         &self,
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
-    ) -> Result<SuccessResponse<_GetValidatorChangesResult>, Error> {
+    ) -> Result<SuccessResponse<_GetValidatorChangesResult>, SdkError> {
         //log("get_validator_changes!");
         let random_id = JsonRpcId::from(rand::rng().random::<u64>().to_string());
         get_validator_changes(
@@ -133,6 +136,7 @@ impl SDK {
             self.get_verbosity(verbosity).into(),
         )
         .await
+        .map_err(Into::into)
     }
 }
 

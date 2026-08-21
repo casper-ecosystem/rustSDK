@@ -142,7 +142,6 @@ impl SDK {
         };
         self.put_transaction(transaction.into(), verbosity, rpc_address)
             .await
-            .map_err(SdkError::from)
     }
 }
 

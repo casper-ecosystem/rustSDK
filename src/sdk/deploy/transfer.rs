@@ -121,7 +121,6 @@ impl SDK {
 
         self.put_deploy(deploy.unwrap().into(), verbosity, rpc_address)
             .await
-            .map_err(SdkError::from)
     }
 }
 

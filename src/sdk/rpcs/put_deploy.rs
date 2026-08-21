@@ -1,11 +1,13 @@
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::deploy::deploy::PutDeployResult;
 use crate::types::deploy::Deploy;
-use crate::{types::verbosity::Verbosity, SDK};
+use crate::{
+    types::{sdk_error::SdkError, verbosity::Verbosity},
+    SDK,
+};
 #[allow(deprecated)]
 use casper_client::{
-    put_deploy, rpcs::results::PutDeployResult as _PutDeployResult, Error, JsonRpcId,
-    SuccessResponse,
+    put_deploy, rpcs::results::PutDeployResult as _PutDeployResult, JsonRpcId, SuccessResponse,
 };
 use rand::RngExt;
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
@@ -86,7 +88,7 @@ impl SDK {
         deploy: Deploy,
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
-    ) -> Result<SuccessResponse<_PutDeployResult>, Error> {
+    ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("account_put_deploy!");
         let random_id = JsonRpcId::from(rand::rng().random::<u64>().to_string());
         put_deploy(
@@ -96,6 +98,7 @@ impl SDK {
             deploy.into(),
         )
         .await
+        .map_err(Into::into)
     }
 }
 

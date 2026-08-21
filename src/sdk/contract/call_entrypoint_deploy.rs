@@ -98,9 +98,7 @@ impl SDK {
             false,
         )?;
 
-        self.put_deploy(deploy.into(), None, rpc_address)
-            .await
-            .map_err(SdkError::from)
+        self.put_deploy(deploy.into(), None, rpc_address).await
     }
 }
 

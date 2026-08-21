@@ -150,7 +150,6 @@ impl SDK {
         // Send the deploy to the network and handle any errors.
         self.put_deploy(deploy.unwrap().into(), verbosity, rpc_address)
             .await
-            .map_err(SdkError::from)
     }
 }
 

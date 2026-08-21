@@ -1,10 +1,13 @@
 use crate::types::hash::transaction_hash::TransactionHash;
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use crate::types::transaction::Transaction;
-use crate::{types::verbosity::Verbosity, SDK};
+use crate::{
+    types::{sdk_error::SdkError, verbosity::Verbosity},
+    SDK,
+};
 use casper_client::{
-    get_transaction, rpcs::results::GetTransactionResult as _GetTransactionResult, Error,
-    JsonRpcId, SuccessResponse,
+    get_transaction, rpcs::results::GetTransactionResult as _GetTransactionResult, JsonRpcId,
+    SuccessResponse,
 };
 #[cfg(all(feature = "js", target_arch = "wasm32"))]
 use gloo_utils::format::JsValueSerdeExt;
@@ -193,7 +196,7 @@ impl SDK {
         finalized_approvals: Option<bool>,
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
-    ) -> Result<SuccessResponse<_GetTransactionResult>, Error> {
+    ) -> Result<SuccessResponse<_GetTransactionResult>, SdkError> {
         //log("get_transaction!");
         let random_id = JsonRpcId::from(rand::rng().random::<u64>().to_string());
         get_transaction(
@@ -204,6 +207,7 @@ impl SDK {
             finalized_approvals.unwrap_or_default(),
         )
         .await
+        .map_err(Into::into)
     }
 }
 

@@ -187,10 +187,10 @@ pub enum SdkError {
     FailedToParseJsonArgs(#[from] serde_json::Error),
 
     #[error(transparent)]
-    JsonArgs(#[from] JsonArgsError),
+    JsonArgs(Box<JsonArgsError>),
 
     #[error(transparent)]
-    Core(#[from] CasperClientError),
+    Core(Box<CasperClientError>),
 
     #[error("Failed to handle response: {0}")]
     Response(String),
@@ -228,10 +228,24 @@ pub enum SdkError {
     UnexpectedStoredValue,
 }
 
+impl From<JsonArgsError> for SdkError {
+    fn from(error: JsonArgsError) -> Self {
+        SdkError::JsonArgs(Box::new(error))
+    }
+}
+
+impl From<CasperClientError> for SdkError {
+    fn from(error: CasperClientError) -> Self {
+        SdkError::Core(Box::new(error))
+    }
+}
+
 impl From<CLValueError> for SdkError {
     fn from(error: CLValueError) -> Self {
         match error {
-            CLValueError::Serialization(bytesrepr_error) => SdkError::Core(bytesrepr_error.into()),
+            CLValueError::Serialization(bytesrepr_error) => {
+                SdkError::Core(Box::new(bytesrepr_error.into()))
+            }
             CLValueError::Type(type_mismatch) => {
                 SdkError::InvalidCLValue(type_mismatch.to_string())
             }
@@ -281,8 +295,8 @@ impl From<CliError> for SdkError {
             CliError::FailedToParseJsonArgs(json_error) => {
                 SdkError::FailedToParseJsonArgs(json_error)
             }
-            CliError::JsonArgs(json_args_error) => SdkError::JsonArgs(json_args_error),
-            CliError::Core(core_error) => SdkError::Core(core_error),
+            CliError::JsonArgs(json_args_error) => SdkError::JsonArgs(Box::new(json_args_error)),
+            CliError::Core(core_error) => SdkError::Core(Box::new(core_error)),
             CliError::FailedToParseAddressableEntityHash { context, error } => {
                 SdkError::FailedToParseAddressableEntityHash { context, error }
             }
