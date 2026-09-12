@@ -1,0 +1,35 @@
+# Path-filtered npm gate for the Angular frontend example.
+name: ci-angular-example
+
+on:
+  push:
+    branches: [dev, "feat*", "fix*", "chore*", "release-*"]
+    paths:
+      - "examples/frontend/angular/**"
+      - ".github/workflows/ci-angular-example.yml"
+  pull_request:
+    branches: [dev, "feat*", "fix*", "chore*", "release-*"]
+    paths:
+      - "examples/frontend/angular/**"
+      - ".github/workflows/ci-angular-example.yml"
+
+jobs:
+  npm_audit:
+    name: angular example npm audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: examples/frontend/angular/package-lock.json
+
+      - name: Install
+        working-directory: examples/frontend/angular
+        run: npm ci
+
+      - name: npm audit (high+)
+        working-directory: examples/frontend/angular
+        run: npm audit --audit-level=high
